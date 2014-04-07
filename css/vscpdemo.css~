@@ -1,0 +1,8 @@
+body {
+   position:absolute;
+   left:0px;
+   top:0px;
+}
+
+canvas id="layer1" 
+style="z-index: 1;

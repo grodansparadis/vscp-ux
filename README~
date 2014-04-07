@@ -1,0 +1,51 @@
+This is the user interface project for VSCP
+
+testphp
+=======
+
+The testfiles for apache + PHP is in the testphp folder
+
+Remember that all folders must be accessable by the webserver. For apache this
+is usally www-data but check this in /etc/apache2/envvars Check for 
+APACHE_RUN_USER= and make sure that this user have privileges to access this
+folder and all subfolder. Start to make sure that the index.php file in this
+folder runs.
+
+Configure apache tso it see this folder. This is 
+
+Alias /merlin/ "/home/akhe/vscp_merlin/"
+<Directory "/home/akhe/vscp_merlin/">
+	Options Indexes FollowSymLinks MultiViews
+    	Order allow,deny
+    	Allow from all
+</Directory>
+
+on my machine. You find this file in /etc/apache2/sites-available/default
+
+
+testws
+======
+
+The testws interface is some tests for the VSCP daemon websocket interface.
+
+To test first set the the web root path of the VSCP daemon to this folder. 
+On my machine this is /home/akhe/vscp_merlin. 
+
+In the configuration file this is set as
+
+<!-- Path to server root file system -->
+<!-- Server should have read/write access to this location -->
+<webrootpath>/home/akhe/vscp_merlin</webrootpath>
+
+Remember to restart the daemon if you change the configuration file.
+
+To test that everything is working enter
+
+http://localhost:7681/testws/index.html
+
+and you should get the startpage.
+
+
+
+
+

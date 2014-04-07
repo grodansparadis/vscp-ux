@@ -1,0 +1,86 @@
+This is the vscp_merlin project a user interface for VSCP & Friends.
+====================================================================
+Copyright C 2013 Ake Hedman, Grodans Paradis AB. akhe@grodansparadis.com 
+
+This is the user interface project for VSCP & Friends. It consist of two parts. A HTML5 based websocket interface and HTML5 pages.
+
+On a standard system install this full source tree at /srv/vscp/web or other folder set in <webrootpath>...</webrootpath> directive in the vscpd.conf file of the VSCP daemon.
+
+If you just want the websocket javascript code you find it in the lib folder as vscpwslib.js  You should compress this javascript file for a production system. There are plenty of them around here http://javascriptcompressor.com/ is one of them.
+
+websockets
+==========
+
+Websocket test code is in the folder testws
+
+The testws interface is some tests for the VSCP daemon websocket interface.
+
+To test first set the the web root path of the VSCP daemon to this folder. 
+On my machine this is /srv/vscp/web. 
+
+In the configuration file this is set as
+
+<!-- Path to server root file system -->
+<!-- Server should have read/write access to this location -->
+<webrootpath>/srv/vscp/web</webrootpath>
+
+Remember to restart the daemon if you change the configuration file.
+
+To test that everything is working enter
+
+http://localhost:7681/testws/index.html
+
+and you should get the startpage.
+
+Some useful commands for the vanilla test window
+
+5 Turn ON  Zone=1, Subzone=35
+send 0,30,5,0,0,-,0,1,35
+
+6 Turn Off
+send 0,30,6,0,0,-,0,1,35
+
+7 Start
+send 0,30,7,0,0,-,0,1,35
+
+8 stop
+send 0,30,8,0,0,-,0,1,35
+
+send head,class,type,obid,time-stamp,GUID,data1,data2,data3....
+
+
+web-pages
+=========
+
+In a standard configuration point your browser to http://localhost:8080/index.html and you should see the default page. Add pages as you like. 
+
+
+testphp
+=======
+
+This is for a possible future setup. So disregard at the moment.
+
+The testfiles for apache + PHP is in the testphp folder
+
+Remember that all folders must be accessable by the webserver. For apache this
+is usally www-data but check this in /etc/apache2/envvars Check for 
+APACHE_RUN_USER= and make sure that this user have privileges to access this
+folder and all subfolder. Start to make sure that the index.php file in this
+folder runs.
+
+Configure apache tso it see this folder. This is 
+
+Alias /merlin/ "/home/akhe/vscp_merlin/"
+<Directory "/home/akhe/vscp_merlin/">
+	Options Indexes FollowSymLinks MultiViews
+    	Order allow,deny
+    	Allow from all
+</Directory>
+
+on my machine. You find this file in /etc/apache2/sites-available/default
+
+
+
+ 
+
+

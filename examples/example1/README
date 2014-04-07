@@ -1,0 +1,8 @@
+This is the VSCP Level II lm-sensor driver example from the wiki 
+described here
+
+http://www.vscp.org/wiki/doku.php/howto/driver_level2_lmsensors
+
+This sample shows the core temperature for two prococessor cores and five other mother board temperatures.
+
+
