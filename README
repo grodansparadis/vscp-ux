@@ -1,12 +1,16 @@
 This is the vscp_merlin project a user interface for VSCP & Friends.
 ====================================================================
-Copyright C 2013 Ake Hedman, Grodans Paradis AB. akhe@grodansparadis.com 
+Copyright C 2013-2014 Ake Hedman, Grodans Paradis AB. <akhe@grodansparadis.com> 
 
-This is the user interface project for VSCP & Friends. It consist of two parts. A HTML5 based websocket interface and HTML5 pages.
+This is the user interface project for VSCP & Friends. It consist of two parts. A HTML5 based websocket 
+interface and HTML5 pages.
 
-On a standard system install this full source tree at /srv/vscp/web or other folder set in <webrootpath>...</webrootpath> directive in the vscpd.conf file of the VSCP daemon.
+On a standard system install this full source tree at /srv/vscp/web or other folder set in 
+<webrootpath>...</webrootpath> directive in the vscpd.conf file of the VSCP daemon.
 
-If you just want the websocket javascript code you find it in the lib folder as vscpwslib.js  You should compress this javascript file for a production system. There are plenty of them around here http://javascriptcompressor.com/ is one of them.
+If you just want the websocket javascript code you find it in the lib folder as vscpwslib.js  You should 
+compress this javascript file for a production system. There are plenty of them around here 
+http://javascriptcompressor.com/ is one of them.
 
 websockets
 ==========
