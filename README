@@ -55,13 +55,11 @@ send head,class,type,obid,time-stamp,GUID,data1,data2,data3....
 
 web-pages
 =========
-
 In a standard configuration point your browser to http://localhost:8080/index.html and you should see the default page. Add pages as you like. 
 
 
 testphp
-=======
-
+======
 This is for a possible future setup. So disregard at the moment.
 
 The testfiles for apache + PHP is in the testphp folder
