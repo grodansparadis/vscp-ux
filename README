@@ -1,12 +1,16 @@
 This is the vscp_merlin project a user interface for VSCP & Friends.
 ====================================================================
-Copyright C 2013 Ake Hedman, Grodans Paradis AB. akhe@grodansparadis.com 
+Copyright C 2013-2014 Ake Hedman, Grodans Paradis AB. <akhe@grodansparadis.com> 
 
-This is the user interface project for VSCP & Friends. It consist of two parts. A HTML5 based websocket interface and HTML5 pages.
+This is the user interface project for VSCP & Friends. It consist of two parts. A HTML5 based websocket 
+interface and HTML5 pages.
 
-On a standard system install this full source tree at /srv/vscp/web or other folder set in <webrootpath>...</webrootpath> directive in the vscpd.conf file of the VSCP daemon.
+On a standard system install this full source tree at /srv/vscp/web or other folder set in 
+<webrootpath>...</webrootpath> directive in the vscpd.conf file of the VSCP daemon.
 
-If you just want the websocket javascript code you find it in the lib folder as vscpwslib.js  You should compress this javascript file for a production system. There are plenty of them around here http://javascriptcompressor.com/ is one of them.
+If you just want the websocket javascript code you find it in the lib folder as vscpwslib.js  You should 
+compress this javascript file for a production system. There are plenty of them around here 
+http://javascriptcompressor.com/ is one of them.
 
 websockets
 ==========
@@ -51,13 +55,11 @@ send head,class,type,obid,time-stamp,GUID,data1,data2,data3....
 
 web-pages
 =========
-
 In a standard configuration point your browser to http://localhost:8080/index.html and you should see the default page. Add pages as you like. 
 
 
 testphp
-=======
-
+======
 This is for a possible future setup. So disregard at the moment.
 
 The testfiles for apache + PHP is in the testphp folder
