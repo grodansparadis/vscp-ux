@@ -1,0 +1,219 @@
+<! DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<! Author = Dinesh Guleria>
+<! VSCP Developer>
+
+<html style="height: 100%;">
+
+<head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+<title>VSCP Single Floor house </title>
+
+<link rel="stylesheet" type="text/css" href="../css/singleFloorStyle.css">
+
+<script type="text/javascript" src="settings.js"></script>
+<script type="text/javascript" src="../lib/jquery.js"></script>
+<script type="text/javascript" src="../lib/wz_jsgraphics.js"></script>
+<script type="text/javascript" src="../lib/vscpwslib_mod.js"></script>
+
+<! script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"> </script>
+
+<script type="text/javascript" src="../lib/singleFloorsSocketCfg.js"> </script>
+<script type="text/javascript" src="../lib/singleFloorCfg.js"> </script>
+<script type="text/javascript" src="../lib/singleFloorScript.js"> </script>
+
+
+</head> 
+
+<body onload="doc_onload(0)">
+
+    <div id="images" class="scrollable">
+        <div id="Bedroom" class="input">
+            <input id="Bedroom_Image" type="image" src="../lib/widgets/room/room_selected.jpg" onclick="show_area_single(div_class_scrollable_Image, 'Bedroom_Image', div_class_scrollable_Hr, 'Bedroom_Hr', 'Area_Bedroom')" title="Room one" alt="Bulb pop up" width="80" height="48" />
+            <p id="Bedroom-Txt" class="imgtxt">Bedroom</p>
+            <hr id="Bedroom_Hr" style="border-color:#DDDFED; background-color:#DDDFED;align="left";width="80px"; size="4px";">
+        </div>
+        <div id="Kitchen" class="input">
+            <input id="Kitchen_Image" type="image" src="../lib/widgets/room/room_unselected.png" onclick="show_area_single( div_class_scrollable_Image, 'Kitchen_Image', div_class_scrollable_Hr, 'Kitchen_Hr', 'Area_Kitchen')" alt="Bulb pop up" width="80" height="48" />
+            <p id="Kitchen-Txt" class="imgtxt">Kitchen</p>
+            <hr id="Kitchen_Hr" style="border-color:#DDDFED; background-color:#DDDFED;align="left";width="80px"; size="4px";">
+        </div>
+        <div id="Drawing-Room" class="input">
+            <input id="Drawing_Room_Image" type="image" src="../lib/widgets/room/room_unselected.png"  onclick="show_area_single( div_class_scrollable_Image, 'Drawing_Room_Image',  div_class_scrollable_Hr,'Drawing_Room_Hr', 'Area_Drawing_Room')" alt="Bulb pop up" width="80" height="48" />
+            <p id="Drawing-Room-Txt" class="imgtxt">Drawing-Room</p>
+            <hr id="Drawing_Room_Hr" style="border-color:#DDDFED; background-color:#DDDFED;align="left";width="80px"; size="4px";">
+        </div>
+        <div id="Lobby" class="input">
+            <input id="Lobby_Image" type="image" src="../lib/widgets/room/room_unselected.png" onclick="show_area_single( div_class_scrollable_Image, 'Lobby_Image',  div_class_scrollable_Hr,'Lobby_Hr',  'Area_Lobby')" alt="Bulb pop up" width="80" height="48" />
+            <p id="Lobby-Txt" class="imgtxt">Lobby</p>
+            <hr id="Lobby_Hr" style="border-color:#DDDFED; background-color:#DDDFED;align="left";width="80px"; size="4px";">
+        </div>
+        <div id="Bedroom-1" class="input">
+            <input id="Bedroom_1_Image" type="image" src="../lib/widgets/room/room_unselected.png" onclick="show_area_single( div_class_scrollable_Image, 'Bedroom_1_Image',  div_class_scrollable_Hr,'Bedroom_1_Hr',  'Area_Bedroom_1')" alt="Bulb pop up" width="80" height="48" />
+            <p id="Bedroom-1-Txt" class="imgtxt">Bedroom-1</p>
+            <hr id="Bedroom_1_Hr" style="border-color:#DDDFED; background-color:#DDDFED;align="left";width="80px"; size="4px";">
+        </div>
+        <div id="Bedroom-2" class="input">
+            <input id="Bedroom_2_Image" type="image" src="../lib/widgets/room/room_unselected.png" onclick="show_area_single( div_class_scrollable_Image, 'Bedroom_2_Image',  div_class_scrollable_Hr,'Bedroom_2_Hr',  'Area_Bedroom_2')" alt="Bulb pop up" width="80" height="48" />
+            <p id="Bedroom-2-Txt" class="imgtxt">Bedroom-2</p>
+            <hr id="Bedroom_2_Hr" style="border-color:#DDDFED; background-color:#DDDFED;align="left";width="80px"; size="4px";">
+        </div>
+        <div id="Couridoor" class="input">
+            <input id="Couridoor_Image" type="image" src="../lib/widgets/room/room_unselected.png" onclick="show_area_single( div_class_scrollable_Image, 'Couridoor_Image',  div_class_scrollable_Hr,'Couridoor_Hr',  'Area_Couridoor')" alt="Bulb pop up" width="80" height="48" />
+            <p id="Couridoor-Txt" class="imgtxt">Couridoor</p>
+            <hr id="Couridoor_Hr" style="border-color:#DDDFED; background-color:#DDDFED;align="left";width="80px"; size="4px";">
+        </div>
+        <div id="Info" class="input">
+            <input id="Info-Image" type="image" src="../lib/widgets/info/info.jpg" onclick="alert('Info clicked')" alt="Bulb pop up" width="80" height="48" />
+            <p id="Info-Txt" class="imgtxt">Info</p>
+            <hr id="Info-Hr" style="border-color:#DDDFED; background-color:#DDDFED;align="left";width="80px"; size="4px";">
+        </div>
+    </div>
+
+
+
+    <div id="center" class="scrollableCenter">
+        <div class="Area_Bedroom">
+            <input id="Area_Bedroom_Bedroom_Light" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  title="Room one" alt="Bulb pop up" width="80" height="48" hspace="10"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Bedroom Light</p>
+        <hr/>
+        </div >
+        <div class="Area_Bedroom">
+            <input id="Area_Bedroom_Floor_Light" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Floor Light</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom">
+            <input id="Area_Bedroom_Temperature" type="image" src="../lib/widgets/thermometer/temprature_indicator.png"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Temperature</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom">
+            <input id="Area_Bedroom_Front_Door" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Front Door</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom">
+            <input id="Area_Bedroom_Music_Player" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Music Player</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom">
+            <input id="Area_Bedroom_Air_Conditioner" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Air Conditioner</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom">
+            <input id="Area_Bedroom_Television" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Television</p>
+        <hr/>
+        </div>
+
+
+
+        <div class="Area_Kitchen">
+            <input id="Area_Kitchen_Gas" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" />
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Gas</p>
+        <hr/>
+        </div>
+        <div class="Area_Kitchen">
+            <input id="Area_Kitchen_Refrigrator" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Refrigrator</p>
+        <hr/>
+        </div>
+        <div class="Area_Kitchen">
+            <input id="Area_Kitchen_Oven" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Oven</p>
+        <hr/>
+        </div>
+
+
+
+        <div class="Area_Drawing_Room">
+            <input id="Area_Drawing_Room_Top_Light" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  title="Room one" alt="Bulb pop up" width="80" height="48" hspace="10"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Top Light</p>
+        <hr/>
+        </div >
+        <div class="Area_Drawing_Room">
+            <input id="Area_Drawing_Room_Fan_1" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Fan-1</p>
+        <hr/>
+        </div>
+        <div class="Area_Drawing_Room">
+            <input id="Area_Drawing_Room_Heater" type="image" src="http://cdn.marketplaceimages.windowsphone.com/v8/images/278e1904-08b0-411f-a87f-1b4fff6523b3?imageType=ws_icon_large"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Heater</p>
+        <hr/>
+        </div>
+
+
+        <div class="Area_Lobby">
+            <input id="Area_Lobby_Shandelier" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" />
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Shandelier</p>
+        <hr/>
+        </div>
+        <div class="Area_Lobby">
+            <input id="Area_Lobby_Tube_Light" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Tube Light</p>
+        <hr/>
+        </div>
+
+
+        <div class="Area_Bedroom_1">
+            <input id="Area_Bedroom_1_Shandelier" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" />
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Shandelier</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom_1">
+            <input id="Area_Bedroom_1_Tube_Light" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Tube Light</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom_1">
+            <input id="Area_Bedroom_1_Fan_2" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Fan-2</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom_1">
+            <input id="Area_Bedroom_1_Heater_Blower" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Heater Blower</p>
+        <hr/>
+        </div>
+
+
+
+        <div class="Area_Bedroom_2">
+            <input id="Area_Bedroom_2_Air_Conditioner" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" />
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Air Conditioner</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom_2">
+            <input id="Area_Bedroom_2_Music_Player" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Music Player</p>
+        <hr/>
+        </div>
+        <div class="Area_Bedroom_2">
+            <input id="Area_Bedroom_2_Door_Lock" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Door Lock</p>
+        <hr/>
+        </div>
+
+
+
+        <div class="Area_Couridoor">
+            <input id="Area_Couridoor_Fan_3" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" />
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Fan-3</p>
+        <hr/>
+        </div>
+        <div class="Area_Couridoor">
+            <input id="Area_Couridoor_Top_Light" type="image" src="../lib/widgets/lightbulb/light-bulb-icon.jpg"  alt="Bulb pop up" width="80" height="48" hspace="10" vspace="6"/>
+            <p class="imgtxt" style="padding-top : 20px; padding-right : 100px; float:right;">Top Light</p>
+        <hr/>
+        </div>
+
+
+
+    </div>
+
+    <div id="fotter">Copyright © 2014 VSCP Singler Floor Layout</div>
+
+</body>
+</html>
