@@ -22,6 +22,27 @@ function doc_onload(page_type)
    Central_widget_visible_onload();
    // Create the Socket
    create_device_socket(Single_Floor_Device_Array);
+   // Create the Socket for Measurement  devices
+   create_measurement_device_socket(Single_Floor_Temperature_Device_Array);
+}
+
+function create_measurement_device_socket( Device_Array )
+{
+
+    for (var i = 0; i < Device_Array.length; i++)
+    {
+        var btn = new vscpws_simpleTextEvent( Device_Array[i].url,           // url to VSCP websocket i/f
+                                             Device_Array[i].id,              // Where it should be placed
+                                             Device_Array[i].vscpclass,       // Event class 10/60/65/15
+                                             Device_Array[i].vscptype,        // Evet type
+                                             Device_Array[i].codingIndex,     // Datacoding index
+                                             Device_Array[i].decimals,        // Number of decimals
+                                             Device_Array[i].formatstr,       // A value format string
+                                             Device_Array[i].guid,            // GUID we are interested in
+                                             Device_Array[i].fncallback );     // If set function to call
+                                                                               // when data arraives
+    }
+
 }
 
 function create_device_socket( Device_Array )
