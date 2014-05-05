@@ -17,6 +17,7 @@ function doc_onload()
    create_device_socket(Multi_Floor_Device_Array);
    // Create the Socket for Measurement  devices
    create_measurement_device_socket(Multi_Floor_Temperature_Device_Array);
+
 }
 
 function create_measurement_device_socket( Device_Array )
