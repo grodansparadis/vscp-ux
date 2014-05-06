@@ -87,6 +87,16 @@ How to create websocket connection for your every I/O digital device in your UI
    # change the Tx/Rx events for ON/OFF.
 
 
+How to create websocket connection for your every Measurement device in your UI
+===============================================================================
+
+1> Add websocket configuration of your Measurement device to following file multiFloorsSocketCfg.js :-
+   # In the following array Multi_Floor_Temperature_Device_Array[] --> add an entry of your device.
+2> compy already existing device entry & modify it.
+   # change the IP address of websocket.
+   # change the ID of your image.
+   # change the class, type, sensor index, decimals.
+
 
 NOTE :--
 # vscpwslib_mod.js file is same for single & multifloor house UI.
