@@ -69,7 +69,7 @@ How to create websocket connection for your every I/O digital device in your UI
 How to create websocket connection for your every Measurement device in your UI
 ===============================================================================
 
-1> Add websocket configuration of your Measurement device to following file multiFloorsSocketCfg.js :-
+1> Add websocket configuration of your Measurement device to following file singleFloorsSocketCfg.js :-
    # In the following array Single_Floor_Temperature_Device_Array[] --> add an entry of your device.
 2> compy already existing device entry & modify it.
    # change the IP address of websocket.
