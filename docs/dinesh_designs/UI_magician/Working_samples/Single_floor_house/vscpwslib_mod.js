@@ -3378,6 +3378,7 @@ vscpws_stateButton.prototype.onVSCPMessage = function(msg)
                 this.bState = true;
                 //alert("Rx_Pos_ON");
                 //this.draw();
+                this.canvas.src = this.image_up.src;
             }
             else if ( ("false" == msgitems[3].toLowerCase()) && 
                     (true == this.bState )) {
@@ -3385,6 +3386,7 @@ vscpws_stateButton.prototype.onVSCPMessage = function(msg)
                 this.bState = false;
                 //alert("Rx_Pos_OFF");
                 //this.draw();
+                this.canvas.src = this.image_down.src;
             }
         }
     }
