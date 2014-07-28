@@ -25,6 +25,58 @@ body, html {
     color:#DDDFED;
     font-size:15px;
 }
+.imgtxt_center {
+    margin: 0;
+    font-family:arial;
+    color:#DDDFED;
+    font-size:15px;
+    padding-top : 20px;
+    padding-right : 100px;
+    float:right;
+}
+
+
+.imgtxt_scrollmenu {
+    margin: 0;
+    font-family:arial;
+    color:#DDDFED;
+    font-size:15px;
+    padding-top : 20px;
+    padding-right : 10px;
+    float:right;
+}
+
+.hr_scrollable {
+    border-color:#DDDFED;
+    background-color:#DDDFED;
+    align : left;
+    width : 80px;
+    size : 40px;
+    height: 2px;
+}
+
+.image_scrollable {
+    width:80px;
+    height:48px;
+}
+
+input.image_menu_center_first {
+    width : 80px;
+    height : 48px;
+    hspace : 30px;
+    padding-left: 10px;
+}
+
+input.image_menu_center_second {
+    width : 80px;
+    height : 48px;
+    hspace : 10px;
+    vspace : 25px;
+    padding-left: 10px;
+    padding-top: 6px;
+    padding-bottom: 6px;
+}
+
 #images {
     background-color:#888686;
     white-space:nowrap;
