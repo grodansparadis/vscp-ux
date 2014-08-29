@@ -53,7 +53,7 @@ var div_class_Floor_3_Area_Txt = [
 "Floor_3_Area_Bedroom_1_Txt", "Floor_3_Area_Balcony_Txt", "Floor_3_Area_Couridoor_Txt"
 ];
 
-var central_area_widgets_id = [
+var central_Area_widgets_id = [
 "Ground_Floor_Area_Bedroom" , "Ground_Floor_Area_Drawing_Room", "Ground_Floor_Area_Kitchen", "Ground_Floor_Area_Lobby", "Ground_Floor_Area_Bedroom_1",
 "Ground_Floor_Area_Bedroom_3", "Ground_Floor_Area_Couridoor",
 "Floor_1_Area_Bedroom_1", "Floor_1_Area_Couridoor" ,
