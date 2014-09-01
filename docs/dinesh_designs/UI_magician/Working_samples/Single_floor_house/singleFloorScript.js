@@ -23,7 +23,7 @@ function doc_onload(page_type)
    // Create the Socket
    create_device_socket(Single_Floor_Device_Array);
    // Create the Socket for Measurement  devices
-   create_measurement_device_socket(Single_Floor_Temperature_Device_Array);
+   create_measurement_device_socket(Single_Floor_Sensor_Device_Array);
 }
 
 function create_measurement_device_socket( Device_Array )
@@ -130,8 +130,8 @@ function select_scroll_area_image()
 function Central_widget_visible_onload()
 {
 
-  $(central_area_widgets_id).each(function(index, element) {
-        if(element != central_area_widgets_id[0] )
+  $(central_Area_widgets_id).each(function(index, element) {
+        if(element != central_Area_widgets_id[0] )
         {
           $("." + element).hide();
 
@@ -244,7 +244,7 @@ function show_Central_widget_single(parameter)
 
 
   // Show elements in central area
-  $(central_area_widgets_id).each(function(index, element) {
+  $(central_Area_widgets_id).each(function(index, element) {
         if(element != parameter )
         {
           $("." + element).hide();
@@ -281,7 +281,7 @@ function show_Central_widget(parameter,parameter_image_array, parameter_image)
 
 
   // Show elements in central area
-  $(central_area_widgets_id).each(function(index, element) {
+  $(central_Area_widgets_id).each(function(index, element) {
         if(element != parameter )
         {
           $("." + element).hide();

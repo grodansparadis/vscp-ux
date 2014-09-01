@@ -321,7 +321,7 @@ var Multi_Floor_Device_Array = [
 
 
 /* Packet format for each device socket */
-var Multi_Floor_Temperature_Device_Array = [
+var Multi_Floor_Sensor_Device_Array = [
   /* Ground floor devices */
   { url: 'ws://192.168.65.147:7681', id: 'Ground_Floor_Area_Bedroom_Temperature_Txt', vscpclass: 10 , vscptype: 6 , codingIndex: 1,
     decimals : 1 , formatstr : "{0} Degrees {1}" , guid : undefined , fncallback : undefined

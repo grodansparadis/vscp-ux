@@ -15,7 +15,7 @@ var div_class_scrollable_Hr = [
 
 
 
-var central_area_widgets_id = [
+var central_Area_widgets_id = [
 "Area_Bedroom", "Area_Kitchen", "Area_Drawing_Room", "Area_Lobby", "Area_Bedroom_1", "Area_Bedroom_2", "Area_Couridoor"
 ];
 

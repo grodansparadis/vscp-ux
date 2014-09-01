@@ -35,6 +35,14 @@ body, html {
     float:right;
 }
 
+.hr_scrollable {
+    border-color:#DDDFED;
+    background-color:#DDDFED;
+    align : left;
+    width : 80px;
+    size : 40px;
+    height: 2px;
+}
 
 .imgtxt_scrollmenu {
     margin: 0;
