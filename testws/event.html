@@ -148,6 +148,22 @@
                                     );
     }
     
+    // Slider update
+    function sliderUpdate( val ) {
+        console.log( val );
+        var slidertxt = document.getElementById("sliderText"); 
+        slidertxt.value = val;
+        var  data = new Array(138,0,val);
+        vscpeventCtrl.sendEvent( 0,                                     // head
+                                    VSCP_CLASS1_MEASUREMENT,            // VSCP Class
+                                    VSCP_TYPE_MEASUREMENT_TEMPERATURE, // VSCP Type
+                                    0,              // obid
+                                    0,              // timestamp
+                                    "",             // Use interface GUID
+                                    data            // data (can be sent as a comma separated string also)
+                                    );
+    }
+    
 </script>
 </head>
 
@@ -159,7 +175,8 @@
 <p>
 This demo demonstrates the vscpws_event object. With this object it is possible to send and receive VSCP events.
 </p>
-<strong>Demo 1</strong>
+<br><br>
+<h3>Demo 1</h3>
 <hr>
 <p>
 The first button sends <strong>CLASS1.CONTROL, Type=5/TurnOn</strong> and the second button sends
@@ -168,8 +185,8 @@ open a telnet session to the VSCP daemon to see the events.
 </p>
 <button onclick="vscpTurnOnEvent()">Send ON Event (Zone=0, SubZone=0)</button>
 <button onclick="vscpTurnOffEvent()">Send OFF Event (Zone=0, SubZone=0)</button>
-<br><br>
-<strong>Demo 2</strong>
+<br><br><br><br>
+<h3>Demo 2</h3>
 <hr>
 <p>
 The testStateButton demo wait for a <strong>CLASS1.INFORMATION, Type=3/ON</strong> to validate a sent 
@@ -188,21 +205,44 @@ state of the button. </li>
 </p>
 <button onclick="vscpOnEvent()">Send ON Event (Zone=0, SubZone=0)</button>
 <button onclick="vscpOffEvent()">Send OFF Event (Zone=0, SubZone=0)</button>
-<br><br>
-<strong>Demo 3</strong>
+<br><br><br><br>
+<h3>Demo 3</h3>
 This demo can be used to send temperature events for the different temperature demos.<br>
 <hr>
 <br>
 <select id="tempEventSelect">
-  <option value="0,10,6,0,0,-,138,2,123">Send 1.23 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
-  <option value="0,10,6,0,0,-,138,0,123">Send 123 Sensoridx=2 Normalized Integer. Degrees centigrade<</option>
-  <option value="0,10,6,0,0,-,138,0x82,1">Send 100 Sensoridx=2 Normalized Integer. Degrees centigrade<</option>
-  <option value="0,10,6,0,0,-,138,0x00,0xE7">Send -25 Sensoridx=2 Normalized Integer. Degrees centigrade<</option>
+    <option value="0,10,6,0,0,-,138,0x00,0xE7">Send -25 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,0xE7">Send -20 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,0xE7">Send -15 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,0xE7">Send -10 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,0xE7">Send -5 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,0x00">Send 0 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,5">Send 5 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,10">Send 10 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,15">Send 15 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,20">Send 20 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,25">Send 25 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,30">Send 30 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,35">Send 35 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,40">Send 40 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,45">Send 45 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x00,0,0,0,0,0,50">Send 50 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,2,123">Send 1.23 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0,123">Send 123 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,10,6,0,0,-,138,0x82,1">Send 100 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="0,20,9,0,0,-,0,0,0">Send Heartbeat</option>
 </select>
 <button onclick="vscpSendTempSelectEvent()">Send selected value</button>
-<br>
-<br><br>
-<strong>Demo 4</strong>
+<br><br><br><br>
+<h3>Demo 4</h3>
+This demo show how to use a HTML5 slider to send temperature measurements.
+<hr>
+<div>
+<input id="slider1" type="range" min="-25" max="50" value="0" onchange="sliderUpdate(this.value)" /> 
+<input id="sliderText" type="text" value="0" size="2" />
+</div>
+<br><br><br><br>
+<h3>Demo 5</h3>
 This demo show how to listen for events. All events received on the system is displayed here. Normally
 one sets a filter to limit the received events to the one of interest.
 <hr>

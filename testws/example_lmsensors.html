@@ -8,6 +8,7 @@
 -->
 
 <script type="text/javascript" src="settings.js"></script>
+<script src="../lib/md5.js"></script>
 <script type="text/javascript" src="../lib/vscpwslib.js"></script>
 
 </head>
@@ -36,7 +37,9 @@
 
 
 <script type="text/javascript" >
-	var txt1 = new vscpws_simpleTextEvent( VSCP_WEBSOCKET_URL, 
+	var txt1 = new vscpws_simpleTextEvent( vscp_setting_user,
+                                            vscp_setting_passwordhash,
+                                            vscp_setting_url,
                                             "id1", 
                                             VSCP_CLASS1_MEASUREMENT,
                                             VSCP_TYPE_MEASUREMENT_TEMPERATURE,
@@ -52,7 +55,9 @@
         
         //var func_multiply = new Function(value,unit,event, "return 1;");
         
-	var txt2 = new vscpws_simpleTextEvent( VSCP_WEBSOCKET_URL, 
+	var txt2 = new vscpws_simpleTextEvent( vscp_setting_user,
+                                            vscp_setting_passwordhash,
+                                            vscp_setting_url, 
                                             "id2", 
                                             VSCP_CLASS1_MEASUREMENT,
                                             VSCP_TYPE_MEASUREMENT_TEMPERATURE,
@@ -90,15 +95,17 @@
     };
     
     
-    new vscpws_simpleTextEvent( VSCP_WEBSOCKET_URL, 
-                                            null, 
-                                            VSCP_CLASS1_INFORMATION,
-                                            VSCP_TYPE_INFORMATION_NODE_HEARTBEAT,
-                                            -1,
-                                            -1,
-                                            "",
-                                            "",
-                                            newnode );                                        
+    new vscpws_simpleTextEvent( vscp_setting_user,
+                                    vscp_setting_passwordhash,
+                                    vscp_setting_url, 
+                                    null, 
+                                    VSCP_CLASS1_INFORMATION,
+                                    VSCP_TYPE_INFORMATION_NODE_HEARTBEAT,
+                                    -1,
+                                    -1,
+                                    "",
+                                    "",
+                                    newnode );                                        
 </script>
 
 </body>
