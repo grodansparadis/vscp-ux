@@ -8,6 +8,7 @@
 -->
 
 <script type="text/javascript" src="settings.js"></script>
+<script src="../lib/md5.js"></script>
 <script type="text/javascript" src="../lib/vscpwslib.js"></script>
 
 </head>
@@ -79,20 +80,26 @@
                             "../images/Karnvillan_plan1_800.jpg", 
                             0, 0, 800, 670 );
     
-	var btn1 = new vscpws_stateButton( VSCP_WEBSOCKET_URL,  // url 
-                                         "buttonKitchen",   // canvas for button
-                                          true,             // Local state change
-                                          80 );             // Button type
-    btn1.setMonitorVariable("stateButton1", 1000);          // Update and monitor
-                                                            // this variable also
+	var btn1 = new vscpws_stateButton( vscp_setting_user,           // user   from settings.js
+                                        vscp_setting_passwordhash,  // password   from settings.js
+                                        vscp_setting_url,           // url 
+                                        "buttonKitchen",            // canvas for button
+                                        true,                       // Local state change
+                                        80 );                       // Button type
+    btn1.setMonitorVariable("stateButton1", 1000);                  // Update and monitor
+                                                                    // this variable also
     
-    var btn2 = new vscpws_stateButton( VSCP_WEBSOCKET_URL,  // url
-                                          "buttonStudy",    // canvas for button
-                                          false,            // No local state change
-                                          90);              // Button type
+    var btn2 = new vscpws_stateButton( vscp_setting_user,           // user   from settings.js
+                                        vscp_setting_passwordhash,  // password   from settings.js
+                                        vscp_setting_url,           // url
+                                        "buttonStudy",              // canvas for button
+                                        false,                      // No local state change
+                                        90);                        // Button type
                                           
-    var btn3 = new vscpws_stateButton( VSCP_WEBSOCKET_URL,      // url
-                                          "buttonLivingroom1" ); // canvas
+    var btn3 = new vscpws_stateButton( vscp_setting_user,           // user   from settings.js
+                                        vscp_setting_passwordhash,  // password   from settings.js
+                                        vscp_setting_url,           // url
+                                        "buttonLivingroom1" );      // canvas
 	
 </script>
 
