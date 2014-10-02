@@ -1,0 +1,55 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+<title>VSCP HTML5 websocket vscpws_slider</title>
+<!--
+<link rel="stylesheet" type="text/css" href="../css/vscpdemo.css" />
+-->
+
+<script type="text/javascript" src="settings.js"></script>
+<script src="../lib/md5.js"></script>
+<script type="text/javascript" src="../lib/vscpwslib.js"></script>
+
+</head>
+
+<body>
+
+<h1>VSCP HTML5 websocket vscpws_slider</h1>
+
+<a href="index.html">Go back to main page</a>
+
+
+<canvas id="mysslider1"
+   style="z-index: 1;
+      position:absolute;
+      left:100px;
+      top:200px;" >
+   Your browser does not support HTML5 Canvas.
+</canvas>
+
+<div>
+<input id="slider1" type="range" min="0" max="100" value="0" step="5" /*onchange="showValue(this.value)*/" />
+<span id="sliderrange1">0</span>
+<script type="text/javascript">
+/*function showValue(newValue)
+{
+	document.getElementById("sliderrange1").innerHTML=newValue;
+}*/
+</script>
+</div>
+
+
+<script type="text/javascript" >
+        
+	var temp1 = new vscpws_slider( vscp_setting_user,
+                                    vscp_setting_passwordhash,
+                                    vscp_setting_url, 
+                                    "slider1",
+                                    "slider1",
+                                    "sliderrange1" );
+                                                   	
+</script>
+
+</body>
+</html>
