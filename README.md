@@ -19,7 +19,7 @@ interface and HTML5 pages.
 
 On a standard system install this full source tree at /srv/vscp/web (programdata/vscp/www on windows) 
 or other folder set in <b>&lt;webrootpath&gt;...&lt;/webrootpath&gt;</b> directive under the 
-<b>&lt;websrver&gt;</b> in the vscpd.conf file of the VSCP daemon.
+<b>&lt;websrver&gt;</b> tag in the vscpd.conf file of the VSCP daemon.
 
 If you just want the VSCP websocket javascript code you find it in the lib folder as <b>vscpwslib.js</b>  You 
 should probably compress this javascript file for a production system. There are plenty of them around 
