@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-<title>VSCP HTML5 websocket vscpws_slider</title>
+<title>VSCP HTML5 slider demo</title>
 <!--
 <link rel="stylesheet" type="text/css" href="../css/vscpdemo.css" />
 -->
@@ -11,6 +11,7 @@
 <script src="../lib/md5.js"></script>
 <script type="text/javascript" src="../lib/vscpwslib.js"></script>
 
+<!--
 <style>
         input[type='range'] {
             -webkit-appearance: none;
@@ -45,60 +46,110 @@
             height: 20px;
             width: 20px;
         }
-    </style>
+</style>
+-->
 
+<script type="text/javascript" >
+    var zone = 1;
+    var subzone = 20;
+    
+    function sliderChange(newValue) 
+    {
+        document.getElementById("sliderText1").innerHTML = newValue;
+        
+        var  data = new Array(newValue,zone,subzone);  // optional=0, zone=0, subzone=0
+            vscpeventCtrl.sendEvent( 0,                             // head
+                                        VSCP_CLASS1_CONTROL,        // VSCP Class
+                                        VSCP_TYPE_CONTROL_DIM_LAMPS,// VSCP Type
+                                        0,                          // obid
+                                        0,                          // timestamp
+                                        "-",                        // Use interface GUID
+                                        data                        // data (can be sent as a comma separated string also)
+                                    );
+    
+    }
+    
+    
+    var eventReceive = function( vscphead,
+                                    vscpclass,
+                                    vscptype,
+                                    vscpobid,
+                                    vscptimestamp,
+                                    vscpguid,
+                                    vscpdata) {
+        //alert("Event received");                                    
+        if ( vscpclass == VSCP_CLASS1_INFORMATION &&
+                vscptype == VSCP_TYPE_INFORMATION_LEVEL_CHANGED &&
+                vscpdata[1] == zone && 
+                vscpdata[2] == subzone ) {
+            //alert("Wanted event received");
+            document.getElementById("sliderCtrl1").value = ( vscpdata[0] );
+        }
+    }
+
+    var vscpeventCtrl = new vscpws_Event( vscp_setting_user,
+                                            vscp_setting_passwordhash,
+                                            vscp_setting_url,
+                                            null,
+                                            eventReceive );    
+                                                            
+</script>    
 
 </head>
 
 <body>
 
-<h1>VSCP HTML5 websocket vscpws_slider</h1>
+<h1>VSCP HTML5 slider demo</h1>
 
 <a href="index.html">Go back to main page</a>
-
-
-<canvas id="mysslider1"
-   style="z-index: 1;
-      position:absolute;
-      left:100px;
-      top:200px;" >
-   Your browser does not support HTML5 Canvas.
-</canvas>
-
-<div>
-<input id="slider1" type="range" min="0" max="100" value="0" step="5" /*onchange="showValue(this.value)*/" />
-<span id="sliderrange1">0</span>
-<script type="text/javascript">
-/*function showValue(newValue)
-{
-	document.getElementById("sliderrange1").innerHTML=newValue;
-}*/
-</script>
-</div>
-<div style="width=600px;">
+<br><br>
+This demo demonstrates how to use the HTML slider control with VSCP. When you drag the slider it 
+sends <b>CLASS1.CONTROL, Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</b> with zone=1, subzone=20. This event 
+have a value between 0-100 in byte zero and zone/subzone in byte 1/2.
+<br><br>
+The usual response from a <b>CLASS1.CONTROL, Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</b> event is 
+<b>CLASS1.CONTROL, Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</b>. So a mask is set to only receive
+this event and if it is received it will set the value of the slider after checking that the zone/subzone
+is the expected ones. 
+<br><br>
+If one have several sliders one may be tempted to react on <b>CLASS1.CONTROL, Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</b>
+also but it is better to just use the CLASS1-INFORMATION event to avoid message loops.
+<br><br>
+You can update the slider by sending
+<br><br>
+<b>send 0,20,40,0,0,"-",90,1,20</b>
+<br><br>
+Over the TCP/IP connection. The <b>"90"</b> is the value of the slider.
 <br><br><br><br>
-<progress id="progress1" value="50" max="100"  onchange="showValue2(this.value)>33%</progress>
-function showValue2(newValue)
-{
-	document.getElementById("sliderrange1").innerHTML=newValue;
-}
-</div>
-
-
-<script type="text/javascript" >
-        
-	var temp1 = new vscpws_slider( vscp_setting_user,
-                                    vscp_setting_passwordhash,
-                                    vscp_setting_url, 
-                                    "slider1",
-                                    "slider1",
-                                    "sliderrange1" );
-                           
-    //document.getElementById("progress1").SetValue( 90 );                                
-</script>
-
 <div>
-<br>
+<datalist id="datalist">
+	<option>5</option>
+	<option>10</option>
+	<option>15</option>
+    <option>20</option>
+    <option>25</option>
+    <option>30</option>
+    <option>35</option>
+    <option>40</option>
+    <option>45</option>
+    <option>50</option>
+    <option>55</option>
+    <option>60</option>
+    <option>65</option>
+    <option>80</option>
+    <option>85</option>
+    <option>90</option>
+    <option>95</option>
+</datalist>
+<input id="sliderCtrl1" style="width: 600px;" type="range" min="0" max="100" 
+        value="0" step="5" list="datalist"  onchange="sliderChange(this.value)" />
+<span id="sliderText1">0</span>
+<div>
+<br><br>
+<input type="range" name="grade" orient="vertical" list="datalist"
+                style="width: 20px; height: 200px;
+                    -webkit-appearance: slider-vertical;
+                    writing-mode: bt-lr;">
 <hr>
 Copyright &copy; 2000-2014 <a href="mailto:akhe@grodansparadis.com">Åke Hedman</a>, 
 <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
