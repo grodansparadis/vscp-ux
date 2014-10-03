@@ -33,10 +33,12 @@ demonstrates the SCP daemon websocket interface.
 
 In the configuration file this is set as
 
+<pre><code>
 &lt;!-- Path to server root file system                       --&gt;
 &lt;!-- Server should have read/write access to this location --&gt;
 &lt;webserver enable="true" port="8080"&gt;
    <webrootpath>/srv/vscp/web</webrootpath&gt;
+</code></pre>
 
 Remember to restart the daemon if you change the configuration file.
 
@@ -48,16 +50,16 @@ and you should get the start page which takes you true the rest of the demo..
 
 Some useful commands for the vanilla test window
 
-5 Turn ON  Zone=1, Subzone=35
+<h5>5 Turn ON  Zone=1, Subzone=35</h5>
 <b>send 0,30,5,0,0,-,0,1,35</b>
 
-6 Turn Off
+<h5>6 Turn Off</h5>
 <b>send 0,30,6,0,0,-,0,1,35</b>
 
-7 Start
+<h5>7 Start</h5>
 </b>send 0,30,7,0,0,-,0,1,35</b>
 
-8 stop
+<h5>8 stop</h5>
 </b>send 0,30,8,0,0,-,0,1,35</b>
 
 send head,class,type,obid,time-stamp,GUID,data1,data2,data3....
