@@ -41,6 +41,18 @@
         vscpVariableCtrl.lengthVariable("demovariable");
     };
     
+    var lastchangeVariable = function() {
+        vscpVariableCtrl.lastchangeVariable("demovariable");
+    };
+    
+    var listVariable = function() {
+        vscpVariableCtrl.listVariable();
+    };
+    
+    var saveVariable = function() {
+        vscpVariableCtrl.saveVariable();
+    };
+    
     var monitorVariable = function( bMonitor ) {
         if ( bMonitor ) {
             vscpVariableCtrl.SetInterval( 1000 );
@@ -67,11 +79,17 @@
             }
         }
         else if ( ( "+" == msgarray[0] ) && ( "LENGTHVAR" == msgarray[1] ) ) {
-            alert("Variable length = " + msgarray[2] );
+            alert("Variable length = " + msgarray[3] );
+        }
+        else if ( ( "+" == msgarray[0] ) && ( "LASTCHANGEVAR" == msgarray[1] ) ) {
+            alert("Variable last change = " + msgarray[2] );
+        }
+        else if ( ( "+" == msgarray[0] ) && ( "LISTVAR" == msgarray[1] ) ) {
+            alert("Variable list = " + msgarray[2] + " - " + msgarray[3] );
         }
     }
 
-    var vscpVariableCtrl = new vscpws_variable( vscp_setting_user,
+    var vscpVariableCtrl = new vscpws_Variable( vscp_setting_user,
                                                     vscp_setting_passwordhash,
                                                     vscp_setting_url,
                                                     "demovariable",
@@ -121,11 +139,16 @@ In that case add the lines
 You can also create the variable by clicking this button
 </p>
 <input type="button" value="Create variable" onclick="createVariable()" />
- <input type="button" value="Set variable value to 'true'" onclick="setVariableTrue()" />
- <input type="button" value="Set variable value to 'false'" onclick="setVariableFalse()" />
+<br>
+ <input type="button" value="Set variable value to 'true' (writeVariable)" onclick="setVariableTrue()" />
+ <input type="button" value="Set variable value to 'false' (writeVariable)" onclick="setVariableFalse()" />
  <input type="button" value="Reset variable" onclick="resetVariable()" /> 
- <input type="button" value="Remove variable" onclick="removeVariable()" /> 
- <input type="button" value="Get variable length" onclick="lengthVariable()" />
+ <br>
+  <input type="button" value="Remove variable" onclick="removeVariable()" /> 
+  <input type="button" value="Get variable length" onclick="lengthVariable()" />
+  <input type="button" value="Get date/time for last change" onclick="lastchangeVariable()" />
+  <input type="button" value="List all variables" onclick="listVariable()" />
+  <input type="button" value="Save variables" onclick="saveVariable()" />
 <p>
 Variables are created if they are written to but not existing so all this button does is to write 
 the value <b>true</b> to the variable <i>demovariable</i>. 
