@@ -2,7 +2,7 @@
 <html>
 <head>
 <meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
-<title>VSCP Event demo</title>
+<title>VSCP vscpws_event demo</title>
 <!--
 <link rel="stylesheet" type="text/css" href="../css/vscpdemo.css" />
 -->
@@ -230,6 +230,11 @@ This demo can be used to send temperature events for the different temperature d
     <option value="0,10,6,0,0,-,138,2,123">Send 1.23 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
     <option value="0,10,6,0,0,-,138,0,123">Send 123 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
     <option value="0,10,6,0,0,-,138,0x82,1">Send 100 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
+    <option value="send 0,20,40,0,0,-,0,1,200">Send level changed value=0, Zone=1, subzone=20</option>
+    <option value="send 0,20,40,0,0,-,10,1,20">Send level changed value=10, Zone=1, subzone=20</option>
+    <option value="send 0,20,40,0,0,-,50,1,20">Send level changed value=50, Zone=1, subzone=20</option>
+    <option value="send 0,20,40,0,0,-,90,1,20">Send level changed value=90, Zone=1, subzone=90</option>
+    <option value="send 0,20,40,0,0,-,100,1,20">Send level changed value=100, Zone=1, subzone=20</option>
     <option value="0,20,9,0,0,-,0,0,0">Send Heartbeat</option>
 </select>
 <button onclick="vscpSendTempSelectEvent()">Send selected value</button>

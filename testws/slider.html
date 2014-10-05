@@ -86,13 +86,29 @@
             document.getElementById("sliderCtrl1").value = ( vscpdata[0] );
         }
     }
+    
+    var onrespone = function( bResponse, msgitems ) {
+        console.log( "---->" + msgitems );
+        if ( "OPEN" == msgitems[1] ) {
+            // We are only interested in receiving 
+            // VSCP_CLASS1_INFORMATION, VSCP_TYPE_INFORMATION_LEVEL_CHANGED
+            // so we set a filter for that.
+            vscpeventCtrl.setFilter( VSCP_CLASS1_INFORMATION, 
+                                VSCP_TYPE_INFORMATION_LEVEL_CHANGED, 
+                                "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00" ,
+                                0xffff,
+                                0xffff,
+                                "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00"  ); 
+        }
+    }
 
     var vscpeventCtrl = new vscpws_Event( vscp_setting_user,
                                             vscp_setting_passwordhash,
                                             vscp_setting_url,
-                                            null,
-                                            eventReceive );    
-                                                            
+                                            onrespone,
+                                            eventReceive );  
+                                       
+                                                           
 </script>    
 
 </head>
@@ -117,13 +133,22 @@ also but it is better to just use the CLASS1-INFORMATION event to avoid message 
 <br><br>
 You can update the slider by sending
 <br><br>
-<b>send 0,20,40,0,0,"-",90,1,20</b>
+<b>send 0,20,40,0,0,-,90,1,20</b>
 <br><br>
-Over the TCP/IP connection. The <b>"90"</b> is the value of the slider.
+Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can 
+also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b>there to
+set the slider value to either 0,10,50 or 100.
+<br><br>
+For those wanting to experiment there is a style in the beginning if this file that change the appearance 
+of the slider that is commented out. 
+<br><br>
+The VSCP_TYPE_CONTROL_BIG_CHANGE_LEVEL, VSCP_TYPE_INFORMATION_BIG_ LEVEL_CHANGED events can be used if you need ranges 
+other than 0-100
 <br><br><br><br>
 <div>
 <datalist id="datalist">
-	<option>5</option>
+	<option>0</option>
+    <option>5</option>
 	<option>10</option>
 	<option>15</option>
     <option>20</option>
@@ -136,10 +161,13 @@ Over the TCP/IP connection. The <b>"90"</b> is the value of the slider.
     <option>55</option>
     <option>60</option>
     <option>65</option>
+    <option>70</option>
+    <option>75</option>
     <option>80</option>
     <option>85</option>
     <option>90</option>
     <option>95</option>
+    <option>100</option>
 </datalist>
 <input id="sliderCtrl1" style="width: 600px;" type="range" min="0" max="100" 
         value="0" step="5" list="datalist"  onchange="sliderChange(this.value)" />
@@ -150,6 +178,9 @@ Over the TCP/IP connection. The <b>"90"</b> is the value of the slider.
                 style="width: 20px; height: 200px;
                     -webkit-appearance: slider-vertical;
                     writing-mode: bt-lr;">
+<br><br>
+The vertical slider is not connected to the automation.
+<br><br>
 <hr>
 Copyright &copy; 2000-2014 <a href="mailto:akhe@grodansparadis.com">Åke Hedman</a>, 
 <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
