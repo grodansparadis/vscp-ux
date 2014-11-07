@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+<meta content="text/html; charset=ISO-8859-1" http-equiv="content-type">
+<title>VSCP vscpws_table demo</title>
+
+    <!-- Don't cache the page -->
+    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
+    <META HTTP-EQUIV="Expires" CONTENT="-1">
+    
+    <script type="text/javascript" src="settings.js"></script>
+    <script type="text/javascript" src="../lib/md5.js"></script>
+    <script type="text/javascript" src="../lib/vscpwslib.js"></script>
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+	
+    var dataUpdate = function( tabledata ) {
+        tabledata.forEach( function(entry) {
+            console.log(entry);
+        });
+    }
+    
+    var vscptableCtrl = new vscpws_Table( vscp_setting_user,
+                                            vscp_setting_passwordhash,
+                                            vscp_setting_url,
+                                            "officetemp",
+                                            0,
+                                            dataUpdate );
+                                            
+    var ddd = [
+        { date: 20, value: 1 },
+        { date: 30, value: 2 },
+        { date: 40, value: 3 },
+        { date: 50, value: 4 },
+    ];                         
+
+    dataUpdate( ddd ); 
+    
+</script>
+</head>
+
+<body>
+
+<h1>VSCP HTML5 websocket vscpws_table demo of a dynamic table</h1>
+
+<a href="index.html">Go back to main page</a>
+<p>
+This demo demonstrates the vscpws_table object with a dynamic table (a table that grows indefinitely). With this 
+object it is possible to diagram  measurement data in an easy way without any external database or other tools than 
+the VSCP & Friends package.
+</p>
+<br><br>
+
+
+
+</body>
+</html>
