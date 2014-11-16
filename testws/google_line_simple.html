@@ -35,14 +35,13 @@
                                         vscpguid,
                                         vscpdata) 
             {
+			
                 if ((VSCP_CLASS1_MEASUREMENT == vscpclass) &&
                     (VSCP_TYPE_MEASUREMENT_TEMPERATURE == vscptype)) {
                 
                     var value;
                     
-                    // This event is for us
-                    value = 
-                        vscpws_toFixed(vscpws_measurementClass10Decode(vscpdata), 1);
+                    vscpws_toFixed(vscpws_measurementClass10Decode(vscpdata), 1);
                                 
                     // Should be a Celsius value
                     switch(vscpws_getDatacoding(vscpdata[0])) {
