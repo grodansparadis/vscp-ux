@@ -16,7 +16,7 @@
 <script type="text/javascript" >
 
 	var add2ResponseTable = function( bResponse, msgitems ) {
-        var table = document.getElementById("myReponseTable");
+        var table = document.getElementById("myResponseTable");
         var row = table.insertRow(table.rows.length);
         var cell1 = row.insertCell(0);
         var txt;
@@ -26,9 +26,9 @@
         else {
             txt = "Negative reply ";
         }
-        StripRows("myReponseTable", 5);
+        StripRows("myResponseTable", 5);
   
-        cell1.innerHTML = "Reply: </strong>=" + txt + " - " + msgitems;
+        cell1.innerHTML = "Reply: <strong>=" + txt + "</strong> - " + msgitems;
               
         return;
     };
@@ -285,7 +285,7 @@ one sets a filter to limit the received events to the one of interest.
 </div>
 <div>
     <h4>Received Response</h4>
-    <table id="myReponseTable"></table>
+    <table id="myResponseTable"></table>
 </div>
 
 </body>
