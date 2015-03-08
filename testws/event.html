@@ -11,7 +11,7 @@
 -->
 
 <script type="text/javascript" src="settings.js"></script>
-<script src="../lib/md5.js"></script>
+<script type="text/javascript" src="../lib/md5.js"></script>
 <script type="text/javascript" src="../lib/vscpwslib.js"></script>
 <script type="text/javascript" >
 
@@ -190,22 +190,24 @@
 <body>
 
 <h1>VSCP HTML5 websocket vscpws_event demo</h1>
-
+<p>
 <a href="index.html">Go back to main page</a>
+</p>
 <p>
 This demo demonstrates the vscpws_event object. With this object it is possible to send and receive VSCP events.
 </p>
-<br><br>
 <h3>Demo 1</h3>
+<p></p>
 <hr>
 <p>
 The first button sends <strong>CLASS1.CONTROL, Type=5/TurnOn</strong> and the second button sends
  <strong>CLASS1.CONTROL, Type=6/TurnOff</strong> 
 open a telnet session to the VSCP daemon to see the events.
 </p>
+<p>
 <button onclick="vscpTurnOnEvent()">Send ON Event (Zone=0, SubZone=0)</button>
 <button onclick="vscpTurnOffEvent()">Send OFF Event (Zone=0, SubZone=0)</button>
-<br><br><br><br>
+</p>
 <h3>Demo 2</h3>
 <hr>
 <p>
@@ -223,13 +225,16 @@ state of the button. </li>
 <strong>CLASS1.CONTROL, Type=6/TurnOff</strong> event and waits for <strong>CLASS1.INFORMATION, Type=3/OFF</strong>
 </ul>
 </p>
+<p>
 <button onclick="vscpOnEvent()">Send ON Event (Zone=0, SubZone=0)</button>
 <button onclick="vscpOffEvent()">Send OFF Event (Zone=0, SubZone=0)</button>
-<br><br><br><br>
+</p>
 <h3>Demo 3</h3>
-This demo can be used to send temperature events for the different temperature demos.<br>
+<p>
+This demo can be used to send temperature events for the different temperature demos.
+</p>
 <hr>
-<br>
+<p>
 <select id="tempEventSelect">
     <option value="0,10,6,0,0,-,138,0x00,0xE7">Send -25 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
     <option value="0,10,6,0,0,-,138,0x00,0xE7">Send -20 Sensoridx=2 Normalized Integer. Degrees centigrade</option>
@@ -258,18 +263,21 @@ This demo can be used to send temperature events for the different temperature d
     <option value="0,20,9,0,0,-,0,0,0">Send Heartbeat</option>
 </select>
 <button onclick="vscpSendTempSelectEvent()">Send selected value</button>
-<br><br><br><br>
+</p>
 <h3>Demo 4</h3>
+<p>
 This demo show how to use a HTML5 slider to send temperature measurements.
+</p>
 <hr>
-<div>
+<p>
 <input id="slider1" type="range" min="-25" max="50" value="0" onchange="sliderUpdate(this.value)" /> 
 <input id="sliderText" type="text" value="0" size="2" />
-</div>
-<br><br><br><br>
+</p>
 <h3>Demo 5</h3>
+<p>
 This demo show how to listen for events. All events received on the system is displayed here. Normally
 one sets a filter to limit the received events to the one of interest.
+</p>
 <hr>
 <div>
     <h4>Received events</h4>
