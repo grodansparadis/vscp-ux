@@ -173,10 +173,10 @@
         console.log( val );
         var slidertxt = document.getElementById("sliderText"); 
         slidertxt.value = val;
-        var  data = new Array(138,0,val);
-        vscpeventCtrl.sendEvent( 0,                                     // head
-                                    VSCP_CLASS1_MEASUREMENT,            // VSCP Class
-                                    VSCP_TYPE_MEASUREMENT_TEMPERATURE, // VSCP Type
+        var  data = new Array(val,0,0);
+        vscpeventCtrl.sendEvent( 0,                                 // head
+                                    VSCP_CLASS1_CONTROL,            // VSCP Class
+                                    VSCP_TYPE_CONTROL_DIM_LAMPS,    // VSCP Type
                                     0,              // obid
                                     0,              // timestamp
                                     "",             // Use interface GUID
@@ -266,11 +266,11 @@ This demo can be used to send temperature events for the different temperature d
 </p>
 <h3>Demo 4</h3>
 <p>
-This demo show how to use a HTML5 slider to send temperature measurements.
+This demo show how to use a HTML5 slider to dim a lamp.
 </p>
 <hr>
 <p>
-<input id="slider1" type="range" min="-25" max="50" value="0" onchange="sliderUpdate(this.value)" /> 
+<input id="slider1" type="range" min="0" max="100" value="0" onchange="sliderUpdate(this.value)" /> 
 <input id="sliderText" type="text" value="0" size="2" />
 </p>
 <h3>Demo 5</h3>
