@@ -117,7 +117,7 @@
     {
         if ( vscpeventCtrl.isOpen() ) {
             console.log("ON Event");
-            var  data = new Array(0,0,0); // optional=0, zone=0, subzone=0
+            var  data = new Array(0,1,12); // optional=0, zone=1, subzone=12
             vscpeventCtrl.sendEvent( 0,                             // head
                                         VSCP_CLASS1_INFORMATION,    // VSCP Class
                                         VSCP_TYPE_INFORMATION_ON,   // VSCP Type
@@ -136,7 +136,7 @@
     {
         if ( vscpeventCtrl.isOpen() ) {
             console.log("OFF Event");
-            var  data = new Array(0,0,0);
+            var data = new Array(0, 1, 12); // optional=0, zone=1, subzone=12
             vscpeventCtrl.sendEvent( 0,                             // head
                                         VSCP_CLASS1_INFORMATION,    // VSCP Class
                                         VSCP_TYPE_INFORMATION_OFF,  // VSCP Type
@@ -225,9 +225,10 @@ state of the button. </li>
 <strong>CLASS1.CONTROL, Type=6/TurnOff</strong> event and waits for <strong>CLASS1.INFORMATION, Type=3/OFF</strong>
 </ul>
 </p>
+<p>The righmost button in the statbutton demo will change state when the below buttons are pressed.</p>
 <p>
-<button onclick="vscpOnEvent()">Send ON Event (Zone=0, SubZone=0)</button>
-<button onclick="vscpOffEvent()">Send OFF Event (Zone=0, SubZone=0)</button>
+<button onclick="vscpOnEvent()">Send ON Event (Zone=1, SubZone=12)</button>
+<button onclick="vscpOffEvent()">Send OFF Event (Zone=1, SubZone=12)</button>
 </p>
 <h3>Demo 3</h3>
 <p>
@@ -287,6 +288,10 @@ one sets a filter to limit the received events to the one of interest.
     <h4>Received Response</h4>
     <table id="myResponseTable"></table>
 </div>
-
+    <br><br>
+    <hr>
+    Copyright &copy; 2000-2015 <a href="mailto:info@grodansparadis.com">email</a>,
+    <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
+    </div>
 </body>
 </html>
