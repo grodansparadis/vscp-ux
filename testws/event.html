@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -79,7 +79,7 @@
     {
         if ( vscpeventCtrl.isOpen() ) {
             console.log("ON Event");
-            var  data = new Array(0,0,0); // optional=0, zone=0, subzone=0
+            var  data = new Array(0,1,12); // optional=0, zone=0, subzone=0
             vscpeventCtrl.sendEvent( 0,                             // head
                                         VSCP_CLASS1_CONTROL,        // VSCP Class
                                         VSCP_TYPE_CONTROL_TURNON,   // VSCP Type
@@ -98,7 +98,7 @@
     {
         if ( vscpeventCtrl.isOpen() ) {
             console.log("OFF Event");
-            var  data = new Array(0,0,0);
+            var  data = new Array(0,1,12);
             vscpeventCtrl.sendEvent( 0,                             // head
                                         VSCP_CLASS1_CONTROL,        // VSCP Class
                                         VSCP_TYPE_CONTROL_TURNOFF,  // VSCP Type
@@ -205,13 +205,13 @@ The first button sends <strong>CLASS1.CONTROL, Type=5/TurnOn</strong> and the se
 open a telnet session to the VSCP daemon to see the events.
 </p>
 <p>
-<button onclick="vscpTurnOnEvent()">Send ON Event (Zone=0, SubZone=0)</button>
-<button onclick="vscpTurnOffEvent()">Send OFF Event (Zone=0, SubZone=0)</button>
+<button onclick="vscpTurnOnEvent()">Send TurnOn Event (Zone=1, SubZone=12)</button>
+<button onclick="vscpTurnOffEvent()">Send TurnOff Event (Zone=1, SubZone=12)</button>
 </p>
 <h3>Demo 2</h3>
 <hr>
 <p>
-The testStateButton demo wait for a <strong>CLASS1.INFORMATION, Type=3/ON</strong> to validate a sent 
+The StateButton demo wait for a <strong>CLASS1.INFORMATION, Type=3/ON</strong> to validate a sent 
 <strong>CLASS1.CONTROL, Type=5/TurnOn</strong> event 
 and will confirm an on state when it is received. The same is true for 
 <strong>CLASS1.INFORMATION, Type=3/OFF</strong> which is a
