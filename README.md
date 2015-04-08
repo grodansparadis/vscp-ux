@@ -10,7 +10,7 @@ The components available here is described
 
 If you want to know more about the <a href="http://www.vscp.org">VSCP project</a> visit the VSCP web site.
 
-Copyright C 2013-2015 <a href="http://www.grodansparadis.com">Paradise of the Frog/Grodans Paradis AB</a>. <akhe@grodansparadis.com> 
+Copyright C 2012-2015 <a href="http://www.grodansparadis.com">Paradise of the Frog/Grodans Paradis AB</a>. <akhe@grodansparadis.com> 
 
 This is the user interface project for VSCP & Friends. It consist of two parts. A HTML5 based websocket 
 interface and HTML5 pages.
@@ -72,6 +72,6 @@ send head,class,type,obid,time-stamp,GUID,data1,data2,data3....
 
    <br><br>
     <hr>
-    Copyright &copy; 2000-2015 <a href="mailto:info@grodansparadis.com">email</a>,
+    Copyright &copy; 2012-2015 <a href="mailto:info@grodansparadis.com">email</a>,
     <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
     </div>
