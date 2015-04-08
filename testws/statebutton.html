@@ -113,12 +113,18 @@ see the events sent.
                                         "buttonStudy",              // canvas for button
                                         false,                      // No local state change
                                         90);                        // Button type
+										
+	btn2.setOnTransmitZone( 2,0,10 );
+	btn2.setOffTransmitZone( 2,0,10 );
+	btn2.setOnReceiveZone( 2,0,10 );
+	btn2.setOffReceiveZone( 2,0,10 );									
                                           
     var btn3 = new vscpws_stateButton( vscp_setting_user,           // user   from settings.js
                                         vscp_setting_passwordhash,  // password   from settings.js
                                         vscp_setting_url,           // url
                                         "buttonLivingroom1" );      // canvas
 	
+	btn3.setOnTransmitZone( 2,0,11 );
 </script>
 
 </body>
