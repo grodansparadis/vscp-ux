@@ -10,8 +10,8 @@
 
     <script type="text/javascript" src="../js/md5.js"></script>
     <script type="text/javascript" src="../js/vscp.js"></script>
+    <script type="text/javascript" src="../js/vscpRegister.js"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script type="text/javascript" src="../js/dmNG.js"></script>
     <script type="text/javascript">
         /*jshint bitwise: false */
 
@@ -29,7 +29,6 @@
             this.typeFilter = 0;
             this.action = 0;
             this.actionParameter = 0;
-            this.dirty = 0;
                                     
             if ( "undefined" !== typeof options ) {
                 if ( "number" === typeof options.oAddr ) {
@@ -58,44 +57,19 @@
                 }
             }
             
-            this.setOAddr = function( oAddr ) {
-                this.oAddr = oAddr;
-                this.dirty |= 0x01;
-            };
-            
-            this.setFlags = function( flags ) {
-                this.flags = flags;
-                this.dirty |= 0x02;
-            };
-            
-            this.setClassMask = function( classMask ) {
-                this.classMask = classMask;
-                this.dirty |= 0x04;
-            };
-            
-            this.setClassFilter = function( classFilter ) {
-                this.classFilter = classFilter;
-                this.dirty |= 0x08;
-            };
-            
-            this.setTypeMask = function( typeMask ) {
-                this.typeMask = typeMask;
-                this.dirty |= 0x10;
-            };
-            
-            this.setTypeFilter = function( typeFilter ) {
-                this.typeFilter = typeFilter;
-                this.dirty |= 0x20;
-            };
-            
-            this.setAction = function( action ) {
-                this.action = action;
-                this.dirty |= 0x40;
-            };
-            
-            this.setActionParameter = function( actionParameter ) {
-                this.actionParameter = actionParameter;
-                this.dirty |= 0x80;
+            this.toArray = function() {
+                var data = [
+                    this.oAddr,
+                    this.flags,
+                    this.classMask,
+                    this.classFilter,
+                    this.typeMask,
+                    this.typeFilter,
+                    this.action,
+                    this.actionParameter
+                ];
+                
+                return data;
             };
         };
         
@@ -158,8 +132,6 @@
                     // Start receiving VSCP events
                     vscpConn.start({
                         onSuccess: function( conn ) {
-                            // Add a event listener
-                            vscpConn.addEventListener( vscpEventCallback );
                             
                             // Enable the user interface
                             ui.enable();
@@ -208,25 +180,25 @@
                 body += '        <tr>';
                 body += '            <td>' + (rowIndex + 1) + '</td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].oAddr + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].setOAddr( parseInt( this.value ) );" />';
+                body += '                <input type="number" value="' + dmStd[ rowIndex ].oAddr + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].oAddr = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].classMask + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].setClassMask( parseInt( this.value ) );" />';
+                body += '                <input type="number" value="' + dmStd[ rowIndex ].classMask + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].classMask = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].classFilter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].setClassFilter( parseInt( this.value ) );" />';
+                body += '                <input type="number" value="' + dmStd[ rowIndex ].classFilter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].classFilter = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].typeMask + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].setTypeMask( parseInt( this.value ) );" />';
+                body += '                <input type="number" value="' + dmStd[ rowIndex ].typeMask + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].typeMask = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].typeFilter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].setTypeFilter( parseInt( this.value ) );" />';
+                body += '                <input type="number" value="' + dmStd[ rowIndex ].typeFilter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].typeFilter = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].action + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].setAction( parseInt( this.value ) );" />';
+                body += '                <input type="number" value="' + dmStd[ rowIndex ].action + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].action = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].actionParameter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].setActionParameter( parseInt( this.value ) );" />';
+                body += '                <input type="number" value="' + dmStd[ rowIndex ].actionParameter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].actionParameter = this.value;" />';
                 body += '            </td>';
                 body += '        </tr>';
             }
@@ -239,275 +211,127 @@
             $( "#" + id ).html( '<p>' + head + body + footer + '</p>' );
         }
         
-        var operation = {
-            
-            states: {
-                NO_OPERATION: 0,
-                READ_CONFIGURATION: 1,
-                WRITE_CONFIGURATION: 2
-            },
-            
-            state: 0,
-            
-            read: {
-                
-                offset: 0,
-                row: 0,
-                rowOffset: 0,
-                timerHandle: null                
-            },
-            
-            write: {
-            
-                offset: 0,
-                timerHandle: null
-            },            
-        };
-
-        // This function is called for every received VSCP event
-        function vscpEventCallback( conn, evt ) {
-
-            var index   = 0;
-            var data    = [];
-
-            if ( "undefined" === typeof evt ) {
-                return;
-            }
-
-            if ( false === ( evt instanceof vscp.Event ) ) {
-                return;
-            }
-
-            // Only CLASS1.PROTOCOL events are interesting
-            if ( vscp.constants.classes.VSCP_CLASS1_PROTOCOL !== evt.vscpClass ) {
-                return;
-            }
-
-            // Especially the extended register read/write responses
-            if ( vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE !== evt.vscpType ) {
-                return;
-            }
-
-            // Reading the decision matrix configuration?
-            if ( operation.states.READ_CONFIGURATION === operation.state ) {
-
-                // Clear timer, because node answer was received
-                clearTimeout( operation.read.timerHandle );
-                
-                if ( 0 === operation.read.rowOffset ) {
-                    dmStd.push( new DMStdRow() );
-                }
-                
-                for( index = 0; index < ( evt.vscpData.length - 4 ); ++index ) {
-                    
-                    if ( 0 === operation.read.rowOffset ) {
-                        dmStd[ operation.read.row ].oAddr = evt.vscpData[ 4 + index ];
-                    }
-                    else if ( 1 === operation.read.rowOffset ) {
-                        dmStd[ operation.read.row ].flags = evt.vscpData[ 4 + index ];
-                    }
-                    else if ( 2 === operation.read.rowOffset ) {
-                        dmStd[ operation.read.row ].classMask = evt.vscpData[ 4 + index ];
-                    }
-                    else if ( 3 === operation.read.rowOffset ) {
-                        dmStd[ operation.read.row ].classFilter = evt.vscpData[ 4 + index ];
-                    }
-                    else if ( 4 === operation.read.rowOffset ) {
-                        dmStd[ operation.read.row ].typeMask = evt.vscpData[ 4 + index ];
-                    }
-                    else if ( 5 === operation.read.rowOffset ) {
-                        dmStd[ operation.read.row ].typeFilter = evt.vscpData[ 4 + index ];
-                    }
-                    else if ( 6 === operation.read.rowOffset ) {
-                        dmStd[ operation.read.row ].action = evt.vscpData[ 4 + index ];
-                    }
-                    else if ( 7 === operation.read.rowOffset ) {
-                        dmStd[ operation.read.row ].actionParameter = evt.vscpData[ 4 + index ];
-                    }
-                    
-                    ++operation.read.rowOffset;
-                }
-                
-                if ( 8 <= operation.read.rowOffset) {
-                
-                    dmStd[ operation.read.row ].dirty = 0;
-                    operation.read.rowOffset = 0;
-                    
-                    ++operation.read.row;
-                }
-                
-                if ( ui.getNumberOfRows() <= operation.read.row ) {
-                    operation.state = operation.states.NO_OPERATION;
-                    
-                    update( 'configuration' );
-                    
-                    // Enable user interface
-                    ui.enable();
-                }
-            }
-            // Writing decision matrix configuration?
-            else if ( operation.states.WRITE_CONFIGURATION === operation.state ) {
-            
-                clearTimeout( operation.write.timerHandle );
-            
-                // Finished?
-                if ( operation.write.config.length <= operation.write.index ) {
-                
-                    // Enable user interface
-                    ui.enable();
-                    
-                    return;
-                }
-            
-                data = [
-                    ui.getNodeId(),                 // Node address
-                    ( ui.getPage() >> 8 ) & 0xff,   // MSB of page where the register is located.
-                    ( ui.getPage() >> 0 ) & 0xff,   // LSB of page where the register is located.
-                    operation.write.offset          // Register to write (offset into page).
-                ];
-                
-                index = 0;
-                while( ( ( operation.write.index + index ) < operation.write.config.length ) && ( 4 > index ) ) {
-                    data.push( operation.write.config[ operation.write.index + index ] );
-                    ++index;
-                }
-                operation.write.index += index;
-                operation.write.offset += index;
-
-                vscpConn.sendEvent({
-                    event: new vscp.Event({
-                        vscpClass:      vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
-                        vscpType:       vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE,
-                        vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                        vscpData:       data
-                    })
-                });
-            }
-        }
-
         // Read configuration from node
         function readConfigFromNode() {
 
             var size = ui.getNumberOfRows() * 8;
         
-            if ( 0 === size ) {
+            if ( ( 0 === size ) || ( 256 < size ) ) {
                 return;
             }
-            else if ( 256 === size ) {
-                size = 0;
-            }
-        
-            operation.read.offset = ui.getOffset();
-            operation.read.rowOffset = 0;
-
-            var data = [
-                ui.getNodeId(),                 // Node address
-                ( ui.getPage() >> 8 ) & 0xff,   // MSB of page where the register is located.
-                ( ui.getPage() >> 0 ) & 0xff,   // LSB of page where the register is located.
-                operation.read.offset,          // Register to read (offset into page).
-                size                            // Number of registers to read.
-            ];
-
-            vscpConn.sendEvent({
-                event: new vscp.Event({
-                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
-                    vscpType:       vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ,
-                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                    vscpData:       data
-                }),
-
-                onSuccess: function( conn ) {
-
-                    operation.state = operation.states.READ_CONFIGURATION;
-
-                    // Disable the user interface
-                    ui.disable();
-
-                    operation.read.timerHandle = setTimeout(
-                        function() {
-                            console.log( "No response from node." );
-                            alert( "No response from node." );
-
-                            operation.state = operation.states.NO_OPERATION;
-
-                            // Enable the user interface
-                            ui.enable();
-                        },
-                        5000
-                    );
-
+            
+            // Disable the user interface
+            ui.disable();
+            
+            vscp.register.read({
+                
+                connection: vscpConn,
+                
+                nodeId: ui.getNodeId(),
+                
+                page: ui.getPage(),
+                
+                offset: ui.getOffset(),
+                
+                count: size,
+                
+                onSuccess: function( data ) {
+                
+                    var index       = 0;
+                    var rowIndex    = 0;
+                    var rowPart     = 0;
+                    
                     // Clear decision matrix
                     dmStd = [];
-                },
-
-                onError: function( conn ) {
+                    
+                    for( index = 0; index < data.length; ++index ) {
+                    
+                        rowIndex = Math.floor( index / 8 ); // Integer division!
+                        rowPart  = index % 8;
+                    
+                        if ( 0 === rowPart ) {
+                        
+                            dmStd.push( new DMStdRow() );
+                            dmStd[ rowIndex ].oAddr = data[ index ];
+                        }
+                        else if ( 1 === rowPart ) {
+                            dmStd[ rowIndex ].flags = data[ index ];
+                        }
+                        else if ( 2 === rowPart ) {
+                            dmStd[ rowIndex ].classMask = data[ index ];
+                        }
+                        else if ( 3 === rowPart ) {
+                            dmStd[ rowIndex ].classFilter = data[ index ];
+                        }
+                        else if ( 4 === rowPart ) {
+                            dmStd[ rowIndex ].typeMask = data[ index ];
+                        }
+                        else if ( 5 === rowPart ) {
+                            dmStd[ rowIndex ].typeFilter = data[ index ];
+                        }
+                        else if ( 6 === rowPart ) {
+                            dmStd[ rowIndex ].action = data[ index ];
+                        }
+                        else if ( 7 === rowPart ) {
+                            dmStd[ rowIndex ].actionParameter = data[ index ];
+                        }
+                    
+                    }
+                    
+                    update( 'configuration' );
+                
                     // Enable the user interface
                     ui.enable();
-
-                    alert( "Error ocurred." );
+                },
+                
+                onError: function() {
+                
+                    // Enable the user interface
+                    ui.enable();
                 }
             });
         }
 
         // Write configuration to node
         function writeConfigToNode() {
+
+            var index   = 0;
+            var data    = [];
         
-            var index = 0;
-
-            operation.write.config = dmNGInst.getConfig();
-            operation.write.index  = 0;
-            operation.write.offset = ui.getOffset();
-
-            var data = [
-                ui.getNodeId(),                 // Node address
-                ( ui.getPage() >> 8 ) & 0xff,   // MSB of page where the register is located.
-                ( ui.getPage() >> 0 ) & 0xff,   // LSB of page where the register is located.
-                operation.write.offset          // Register to write (offset into page).
-            ];
-            
-            index = 0;
-            while( ( index < operation.write.config.length ) && ( 4 > ( index - operation.write.index ) ) ) {
-                data.push( operation.write.config[ index ] );
-                ++index;
+            if ( 0 === dmStd.length ) {
+                return;
             }
-            operation.write.index += index;
-
-            vscpConn.sendEvent({
-                event: new vscp.Event({
-                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
-                    vscpType:       vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE,
-                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                    vscpData:       data
-                }),
-
-                onSuccess: function( conn ) {
-
-                    operation.state = operation.states.WRITE_CONFIGURATION;
-                    
-                    operation.write.offset += index;
-
-                    // Disable the user interface
-                    ui.disable();
-
-                    operation.write.timerHandle = setTimeout(
-                        function() {
-                            console.log( "No response from node." );
-                            alert( "No response from node." );
-
-                            operation.state = operation.states.NO_OPERATION;
-
-                            // Enable the user interface
-                            ui.enable();
-                        },
-                        5000
-                    );
-                },
-
-                onError: function( conn ) {
+            
+            // Disable the user interface
+            ui.disable();
+            
+            // Concatenate all decision matrix rows to a byte stream
+            for( index = 0; index < dmStd.length; ++index ) {
+                data = data.concat( dmStd[ index ].toArray() );
+            }
+            
+            vscp.register.write({
+                
+                connection: vscpConn,
+                
+                nodeId: ui.getNodeId(),
+                
+                page: ui.getPage(),
+                
+                offset: ui.getOffset(),
+                
+                data: data,
+                
+                onSuccess: function() {
+                
                     // Enable the user interface
                     ui.enable();
-
-                    alert( "Error ocurred." );
+                },
+                
+                onError: function() {
+                
+                    // Enable the user interface
+                    ui.enable();
                 }
             });
         }
