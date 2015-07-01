@@ -62,9 +62,6 @@
 
                 onSuccess: function( conn ) {
 
-                    // Enable the user interface
-                    ui.enable();
-
                     // Set filter for CLASS1.Protocol
                     vscpConn.setFilter({
                         filterClass: 0x0000,
@@ -75,15 +72,20 @@
 
                     // Start receiving VSCP events
                     vscpConn.start({
-                        onEvent: vscpEventCallback,
+                        onSuccess: function( conn ) {
+                            // Add a event listener
+                            vscpConn.addEventListener( vscpEventCallback );
+                            
+                            // Enable the user interface
+                            ui.enable();
+                        },
+                        onError: function( conn ) {
+                            alert("Couldn't start receiving events.");
+                        }
                     });
                 },
 
                 onError: function( conn ) {
-
-                    // Disable the user interface
-                    ui.disable();
-
                     alert("Connection lost. Please reload website.");
                 }
             });
@@ -214,7 +216,7 @@
                         }
 
                         body += '>';
-                        body += dmNGInst.event[index];
+                        body += dmNGInst.event[ index ];
                         body += '</option>';
                     }
 
@@ -238,7 +240,7 @@
                         }
 
                         body += '>';
-                        body += dmNGInst.basicOperators[index];
+                        body += dmNGInst.basicOperators[ index ];
                         body += '</option>';
                     }
 
@@ -260,7 +262,7 @@
                         }
 
                         body += '>';
-                        body += dmNGInst.logicOperators[index];
+                        body += dmNGInst.logicOperators[ index ];
                         body += '</option>';
                     }
 
@@ -286,7 +288,7 @@
             footer += '</table>';
 
             // Update now at once
-            $("#" + id).html('<p>' + head + body + footer + '</p>');
+            $( "#" + id ).html( '<p>' + head + body + footer + '</p>' );
         }
 
         // Get configuration data
