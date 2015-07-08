@@ -45,16 +45,13 @@ vscp._createNS( "vscp.service" );
 vscp.service.timeout = 5000;
 
 /**
- * Read one or more register values.
+ * Request a response from all nodes on the communication bus and returns
+ * their GUID and MDF URL.
  *
  * @param[in] options   Options
  *
  * Options:
  * - connection: VSCP connection
- * - nodeId: Node id
- * - page: Register page
- * - offset: Register page offset
- * - count: Number of registers to read
  * - onSuccess: Callback
  * - onError: Callback
  */
