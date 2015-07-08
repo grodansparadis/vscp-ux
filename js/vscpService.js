@@ -44,8 +44,6 @@ vscp._createNS( "vscp.service" );
 /** VSCP response timeout in ms */
 vscp.service.timeout = 5000;
 
-vscp._createNS( "vscp.service.whoIsThere" );
-
 /**
  * Read one or more register values.
  *
