@@ -163,6 +163,7 @@
             head += '        <tr>';
             head += '            <th>Number</th>';
             head += '            <th>Origination address</th>';
+            head += '            <th>Flags</th>';
             head += '            <th>Class mask</th>';
             head += '            <th>Class filter</th>';
             head += '            <th>Type mask</th>';
@@ -181,6 +182,9 @@
                 body += '            <td>' + (rowIndex + 1) + '</td>';
                 body += '            <td>';
                 body += '                <input type="number" value="' + dmStd[ rowIndex ].oAddr + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].oAddr = this.value;" />';
+                body += '            </td>';
+                body += '            <td>';
+                body += '                <input type="number" value="' + dmStd[ rowIndex ].flags + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].flags = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
                 body += '                <input type="number" value="' + dmStd[ rowIndex ].classMask + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].classMask = this.value;" />';
