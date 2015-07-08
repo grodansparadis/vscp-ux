@@ -282,7 +282,7 @@
                 nodeId: ui.getNodeId(),
 
                 onSuccess: function( data ) {
-                    $( "#output" ).append( "<tr><td>Manufacturer sub device ID:</td><td>0x" + convertToHex( data, 8 ) + "</td></tr>");
+                    $( "#output" ).append( "<tr><td>Manufacturer sub device ID:</td><td>" + convertToHex( data, 8 ) + "</td></tr>");
 
                     readNicknameId();
                 },
