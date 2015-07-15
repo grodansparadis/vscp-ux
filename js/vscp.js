@@ -2632,7 +2632,7 @@ vscp.Connection.prototype.createVar = function ( options ) {
         return;
     }
 
-    if ( "string" !== typeof options.type ) {
+    if ( "number" !== typeof options.type ) {
         console.error( vscp.utility.getTime() + " Variable type is missing. " );
         return;
     }
