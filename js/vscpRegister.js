@@ -270,7 +270,6 @@ vscp.register.write = function( options ) {
     var onError         = null;
     var eventData       = [];
     var eventListener   = null;
-    var registerData    = [];
     var timerHandle     = null;
     var index           = 0;
     var dataIndex       = 0;
@@ -341,7 +340,7 @@ vscp.register.write = function( options ) {
         // Is register write finished?
         if ( 0 === count ) {
             options.connection.removeEventListener( eventListener );
-            options.onSuccess( registerData );
+            options.onSuccess();
         }
         else {
             console.info( vscp.utility.getTime() + " Write register at page " + page + " and offset " + ( options.offset + dataIndex ) + " to node " + options.nodeId + "." );
