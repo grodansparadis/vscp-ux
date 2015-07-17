@@ -8,10 +8,16 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
     <script type="text/javascript" src="../js/md5.js"></script>
     <script type="text/javascript" src="../js/vscp.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script type="text/javascript" src="../js/dmNG.js"></script>
+
     <script type="text/javascript">
         /*jshint bitwise: false */
 
@@ -24,6 +30,30 @@
         // User interface data
         var ui = {
 
+            login: {
+
+                enable: function() {
+                    $( "#login :input" ).attr( "disabled", false );
+                },
+
+                disable: function() {
+                    $( "#login :input" ).attr( "disabled", true );
+                },
+
+                getDaemonUrl: function() {
+                    return $( "#daemonUrl" ).val();
+                },
+
+                getUserName: function() {
+                    return $( "#userName" ).val();
+                },
+
+                getPasswordHash: function() {
+                    return $( "#passwordHash" ).val();
+                }
+
+            },
+        
             getNodeId: function() {
                 return parseInt( $( "#nodeId" ).val() );
             },
@@ -51,14 +81,25 @@
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
 
+            // Enable user interface for login
+            ui.login.enable();
+
+            // Show empty configuration
+            update( "configuration" );
+        });
+
+        function connect() {
+
+            ui.login.disable();
+
             // Connect to VSCP server
             vscpConn.connect({
 
-                url: "ws://104.236.235.81:8080",
+                url: ui.login.getDaemonUrl(),
 
-                userName: "admin",
+                userName: ui.login.getUserName(),
 
-                password: "d50c3180375c27927c22e42a379c3f67",
+                password: ui.login.getPasswordHash(),
 
                 onSuccess: function( conn ) {
 
@@ -73,26 +114,32 @@
                     // Start receiving VSCP events
                     vscpConn.start({
                         onSuccess: function( conn ) {
+                        
                             // Add a event listener
                             vscpConn.addEventListener( vscpEventCallback );
-                            
-                            // Enable the user interface
+                        
+                            // Enable user interface
                             ui.enable();
                         },
                         onError: function( conn ) {
-                            alert("Couldn't start receiving events.");
+                            alert("Server error!");
+
+                            // Enable user interface for login
+                            ui.login.enable();
                         }
                     });
                 },
 
                 onError: function( conn ) {
+
+                    // Disable the user interface
+                    ui.disable();
+
                     alert("Connection lost. Please reload website.");
                 }
             });
-
-            update( "configuration" );
-        });
-
+        }
+        
         // Insert a rule
         function insertRule( index ) {
             console.log( "Insert rule at index " + index );
@@ -148,14 +195,14 @@
             head += 'Current rule set size: ' + dmNGInst.getSize() + ' byte<br />';
             
             // Head
-            head += '<table border="1" cellspacing="1" cellpadding="10">';
+            head += '<table class="table table-striped">';
             head += '    <thead>';
             head += '        <tr>';
             head += '            <th>Rule</th>';
             head += '            <th>Action</th>';
             head += '            <th>Action parameter</th>';
             head += '            <th>Conditions</th>';
-            head += '            <th><input type="submit" value="+" onclick="insertRule( 0 )" /></th>';
+            head += '            <th><input type="submit" class="btn btn-default" value="+" onclick="insertRule( 0 )" /></th>';
             head += '        </tr>';
             head += '    </thead>';
             head += '    <tbody>';
@@ -167,15 +214,15 @@
                 body += '        <tr>';
                 body += '            <td>' + (ruleIndex + 1) + '</td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmNGInst.rules[ ruleIndex ].actionId + '" min="0" max="255" onchange="dmNGInst.rules[ ' + ruleIndex + ' ].actionId = parseInt( this.value )" />';
+                body += '                <input type="number" class="form-control" value="' + dmNGInst.rules[ ruleIndex ].actionId + '" min="0" max="255" onchange="dmNGInst.rules[ ' + ruleIndex + ' ].actionId = parseInt( this.value )" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmNGInst.rules[ ruleIndex ].actionPar + '" min="0" max="255" onchange="dmNGInst.rules[ ' + ruleIndex + ' ].actionPar = parseInt( this.value )" />';
+                body += '                <input type="number" class="form-control" value="' + dmNGInst.rules[ ruleIndex ].actionPar + '" min="0" max="255" onchange="dmNGInst.rules[ ' + ruleIndex + ' ].actionPar = parseInt( this.value )" />';
                 body += '            </td>';
                 body += '            <td>';
 
                 // Head
-                body += '                <table border="1" cellspacing="1" cellpadding="10">';
+                body += '                <table class="table">';
                 body += '                    <thead>';
                 body += '                        <tr>';
                 body += '                            <th colspan="3">Condition</th>';
@@ -224,7 +271,7 @@
 
                     // Data X
                     if ( 16 === dmNGInst.rules[ ruleIndex ].conditions[ conditionIndex ].event ) {
-                        body += '                           <input type="number" value="' + dmNGInst.rules[ ruleIndex ].conditions[ conditionIndex ].dataXIndex + '" min="0" max="255" onchange="dmNGInst.rules[ ' + ruleIndex + ' ].conditions[ ' + conditionIndex + ' ].dataXIndex = parseInt( this.value )" />';
+                        body += '                           <input type="number" class="form-control" value="' + dmNGInst.rules[ ruleIndex ].conditions[ conditionIndex ].dataXIndex + '" min="0" max="255" onchange="dmNGInst.rules[ ' + ruleIndex + ' ].conditions[ ' + conditionIndex + ' ].dataXIndex = parseInt( this.value )" />';
                     }
 
                     body += '                        </td>';
@@ -248,7 +295,7 @@
                     body += '                        </td>';
                     body += '                        <td>';
 
-                    body += '                            <input type="number" value="' + dmNGInst.rules[ ruleIndex ].conditions[ conditionIndex ].value + '" min="0" max="' + conditionValueMax + '" onchange="dmNGInst.rules[ ' + ruleIndex + ' ].conditions[ ' + conditionIndex + ' ].value = parseInt( this.value )" />';
+                    body += '                            <input type="number" class="form-control" value="' + dmNGInst.rules[ ruleIndex ].conditions[ conditionIndex ].value + '" min="0" max="' + conditionValueMax + '" onchange="dmNGInst.rules[ ' + ruleIndex + ' ].conditions[ ' + conditionIndex + ' ].value = parseInt( this.value )" />';
                     body += '                        </td>';
                     body += '                        <td>';
                     body += '                           <select onchange="dmNGInst.rules[ ' + ruleIndex + ' ].conditions[ ' + conditionIndex + ' ].logicOperator = parseInt( this.value ); updateConditions( ' + ruleIndex + ', ' + conditionIndex + ' )">';
@@ -277,8 +324,8 @@
 
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="submit" value="+" onclick="insertRule( ' + ( ruleIndex + 1 ) + ' )" />';
-                body += '                <input type="submit" value="-" onclick="deleteRule( ' + ruleIndex + ' )" />';
+                body += '                <input type="submit" class="btn btn-default" value="+" onclick="insertRule( ' + ( ruleIndex + 1 ) + ' )" />';
+                body += '                <input type="submit" class="btn btn-default" value="-" onclick="deleteRule( ' + ruleIndex + ' )" />';
                 body += '            </td>';
                 body += '        </tr>';
             }
@@ -654,28 +701,49 @@
     </script>
 </head>
 <body>
-    <h1>Decision Matrix NG Configuration</h1>
-    <div id="ui">
-        <table style="border: 0px">
-            <tr>
-                <td>Node id:</td>
-                <td><input id="nodeId" type="number" value="1" min="0" max="255" disabled /></td>
-            </tr>
-            <tr>
-                <td>Page:</td>
-                <td><input id="page" type="number" value="0" min="0" max="65535" disabled /></td>
-            </tr>
-            <tr>
-                <td>Offset:</td>
-                <td><input id="offset" type="number" value="0" min="0" max="255" disabled /></td>
-            </tr>
-        </table>
-        <input type="submit" value="Read configuration from node" onclick="readConfigFromNode()" disabled /><br />
-        <input type="submit" value="Write configuration to node" onclick="writeConfigToNode()" disabled /><br />
-        <input type="submit" value="Get configuration as string" onclick="getConfig()" /><br />
-        <input type="submit" value="Set configuration via string" onclick="setConfig($('#configIn').val())" /><input id="configIn" type="text" value="">
-    </div>
-    <div id="configuration">
+    <div class="container">
+        <h1>Decision Matrix NG Configuration</h1>
+        <p>Enter the URL of your VSCP daemon with credentials and connect to it.</p>
+        <div id="login">
+            <table class="table table-hover">
+                <tr>
+                    <td>URL:</td>
+                    <td><input id="daemonUrl" class="form-control" type="text" value="ws://104.236.235.81:8080" size="40" disabled /></td>
+                </tr>
+                <tr>
+                    <td>User name:</td>
+                    <td><input id="userName" class="form-control" type="text" value="admin" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Password hash:</td>
+                    <td><input id="passwordHash" class="form-control" type="text" value="d50c3180375c27927c22e42a379c3f67" size="40" disabled /></td>
+                </tr>
+            </table>
+            <input type="submit" class="btn btn-default" value="Connect" onclick="connect()" disabled />
+        </div>
+        <hr />
+        <div id="ui">
+            <table class="table">
+                <tr>
+                    <td>Node id:</td>
+                    <td><input id="nodeId" type="number" class="form-control" value="1" min="0" max="255" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Page:</td>
+                    <td><input id="page" type="number" class="form-control" value="0" min="0" max="65535" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Offset:</td>
+                    <td><input id="offset" type="number" class="form-control" value="0" min="0" max="255" disabled /></td>
+                </tr>
+            </table>
+            <input type="submit" class="btn btn-default" value="Read configuration from node" onclick="readConfigFromNode()" disabled /><br />
+            <input type="submit" class="btn btn-default" value="Write configuration to node" onclick="writeConfigToNode()" disabled /><br />
+            <input type="submit" class="btn btn-default" value="Get configuration as string" onclick="getConfig()" /><br />
+            <input type="submit" class="btn btn-default" value="Set configuration via string" onclick="setConfig($('#configIn').val())" /><input id="configIn" type="text" class="form-control" value="">
+        </div>
+        <div id="configuration">
+        </div>
     </div>
 </body>
 </html>

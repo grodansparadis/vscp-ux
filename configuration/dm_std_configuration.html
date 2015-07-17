@@ -8,10 +8,16 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
     <script type="text/javascript" src="../js/md5.js"></script>
     <script type="text/javascript" src="../js/vscp.js"></script>
     <script type="text/javascript" src="../js/vscpRegister.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
     <script type="text/javascript">
         /*jshint bitwise: false */
 
@@ -79,6 +85,30 @@
         // User interface data
         var ui = {
 
+            login: {
+
+                enable: function() {
+                    $( "#login :input" ).attr( "disabled", false );
+                },
+
+                disable: function() {
+                    $( "#login :input" ).attr( "disabled", true );
+                },
+
+                getDaemonUrl: function() {
+                    return $( "#daemonUrl" ).val();
+                },
+
+                getUserName: function() {
+                    return $( "#userName" ).val();
+                },
+
+                getPasswordHash: function() {
+                    return $( "#passwordHash" ).val();
+                }
+
+            },
+        
             getNodeId: function() {
                 return parseInt( $( "#nodeId" ).val() );
             },
@@ -110,14 +140,25 @@
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
 
+            // Enable user interface for login
+            ui.login.enable();
+
+            // Show empty configuration
+            update( "configuration" );
+        });
+
+        function connect() {
+
+            ui.login.disable();
+
             // Connect to VSCP server
             vscpConn.connect({
 
-                url: "ws://104.236.235.81:8080",
+                url: ui.login.getDaemonUrl(),
 
-                userName: "admin",
+                userName: ui.login.getUserName(),
 
-                password: "d50c3180375c27927c22e42a379c3f67",
+                password: ui.login.getPasswordHash(),
 
                 onSuccess: function( conn ) {
 
@@ -132,24 +173,29 @@
                     // Start receiving VSCP events
                     vscpConn.start({
                         onSuccess: function( conn ) {
-                            
-                            // Enable the user interface
+
+                            // Enable user interface
                             ui.enable();
                         },
                         onError: function( conn ) {
-                            alert("Couldn't start receiving events.");
+                            alert("Server error!");
+
+                            // Enable user interface for login
+                            ui.login.enable();
                         }
                     });
                 },
 
                 onError: function( conn ) {
+
+                    // Disable the user interface
+                    ui.disable();
+
                     alert("Connection lost. Please reload website.");
                 }
             });
-
-            update( "configuration" );
-        });
-
+        }
+        
         // Update the configuration, which is shown the user
         function update( id ) {
             var head        = "";
@@ -158,7 +204,7 @@
             var rowIndex    = 0;
             
             // Head
-            head += '<table border="1" cellspacing="1" cellpadding="10">';
+            head += '<table class="table table-striped">';
             head += '    <thead>';
             head += '        <tr>';
             head += '            <th>Number</th>';
@@ -181,28 +227,28 @@
                 body += '        <tr>';
                 body += '            <td>' + (rowIndex + 1) + '</td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].oAddr + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].oAddr = this.value;" />';
+                body += '                <input type="number" class="form-control" value="' + dmStd[ rowIndex ].oAddr + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].oAddr = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].flags + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].flags = this.value;" />';
+                body += '                <input type="number" class="form-control" value="' + dmStd[ rowIndex ].flags + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].flags = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].classMask + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].classMask = this.value;" />';
+                body += '                <input type="number" class="form-control" value="' + dmStd[ rowIndex ].classMask + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].classMask = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].classFilter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].classFilter = this.value;" />';
+                body += '                <input type="number" class="form-control" value="' + dmStd[ rowIndex ].classFilter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].classFilter = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].typeMask + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].typeMask = this.value;" />';
+                body += '                <input type="number" class="form-control" value="' + dmStd[ rowIndex ].typeMask + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].typeMask = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].typeFilter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].typeFilter = this.value;" />';
+                body += '                <input type="number" class="form-control" value="' + dmStd[ rowIndex ].typeFilter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].typeFilter = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].action + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].action = this.value;" />';
+                body += '                <input type="number" class="form-control" value="' + dmStd[ rowIndex ].action + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].action = this.value;" />';
                 body += '            </td>';
                 body += '            <td>';
-                body += '                <input type="number" value="' + dmStd[ rowIndex ].actionParameter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].actionParameter = this.value;" />';
+                body += '                <input type="number" class="form-control" value="' + dmStd[ rowIndex ].actionParameter + '" min="0" max="255" onchange="dmStd[ ' + rowIndex + ' ].actionParameter = this.value;" />';
                 body += '            </td>';
                 body += '        </tr>';
             }
@@ -290,6 +336,8 @@
                 
                 onError: function() {
                 
+                    alert( "Node not found." );
+                
                     // Enable the user interface
                     ui.enable();
                 }
@@ -328,6 +376,8 @@
                 
                 onSuccess: function() {
                 
+                    alert( "Node not found." );
+                
                     // Enable the user interface
                     ui.enable();
                 },
@@ -343,30 +393,51 @@
     </script>
 </head>
 <body>
-    <h1>Decision Matrix (standard) Configuration</h1>
-    <div id="ui">
-        <table style="border: 0px">
-            <tr>
-                <td>Node id:</td>
-                <td><input id="nodeId" type="number" value="1" min="0" max="255" disabled /></td>
-            </tr>
-            <tr>
-                <td>Page:</td>
-                <td><input id="page" type="number" value="0" min="0" max="65535" disabled /></td>
-            </tr>
-            <tr>
-                <td>Offset:</td>
-                <td><input id="offset" type="number" value="0" min="0" max="255" disabled /></td>
-            </tr>
-            <tr>
-                <td>Number of rows:</td>
-                <td><input id="numberOfRows" type="number" value="10" min="1" max="32" disabled /></td>
-            </tr>
-        </table>
-        <input type="submit" value="Read configuration from node" onclick="readConfigFromNode()" disabled /><br />
-        <input type="submit" value="Write configuration to node" onclick="writeConfigToNode()" disabled /><br />
-    </div>
-    <div id="configuration">
+    <div class="container">
+        <h1>Decision Matrix (standard) Configuration</h1>
+        <p>Enter the URL of your VSCP daemon with credentials and connect to it.</p>
+        <div id="login">
+            <table class="table table-hover">
+                <tr>
+                    <td>URL:</td>
+                    <td><input id="daemonUrl" class="form-control" type="text" value="ws://104.236.235.81:8080" size="40" disabled /></td>
+                </tr>
+                <tr>
+                    <td>User name:</td>
+                    <td><input id="userName" class="form-control" type="text" value="admin" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Password hash:</td>
+                    <td><input id="passwordHash" class="form-control" type="text" value="d50c3180375c27927c22e42a379c3f67" size="40" disabled /></td>
+                </tr>
+            </table>
+            <input type="submit" class="btn btn-default" value="Connect" onclick="connect()" disabled />
+        </div>
+        <hr />
+        <div id="ui">
+            <table class="table">
+                <tr>
+                    <td>Node id:</td>
+                    <td><input id="nodeId" type="number" class="form-control" value="1" min="0" max="255" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Page:</td>
+                    <td><input id="page" type="number" class="form-control" value="0" min="0" max="65535" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Offset:</td>
+                    <td><input id="offset" type="number" class="form-control" value="0" min="0" max="255" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Number of rows:</td>
+                    <td><input id="numberOfRows" type="number" class="form-control" value="10" min="1" max="32" disabled /></td>
+                </tr>
+            </table>
+            <input type="submit" class="btn btn-default" value="Read configuration from node" onclick="readConfigFromNode()" disabled /><br />
+            <input type="submit" class="btn btn-default" value="Write configuration to node" onclick="writeConfigToNode()" disabled /><br />
+        </div>
+        <div id="configuration">
+        </div>
     </div>
 </body>
 </html>

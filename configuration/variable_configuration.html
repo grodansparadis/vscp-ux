@@ -8,9 +8,15 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
     <script type="text/javascript" src="../js/md5.js"></script>
     <script type="text/javascript" src="../js/vscp.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+
     <script type="text/javascript">
         /*jshint bitwise: false */
 
@@ -47,6 +53,30 @@
         // User interface data
         var ui = {
             
+            login: {
+
+                enable: function() {
+                    $( "#login :input" ).attr( "disabled", false );
+                },
+
+                disable: function() {
+                    $( "#login :input" ).attr( "disabled", true );
+                },
+
+                getDaemonUrl: function() {
+                    return $( "#daemonUrl" ).val();
+                },
+
+                getUserName: function() {
+                    return $( "#userName" ).val();
+                },
+
+                getPasswordHash: function() {
+                    return $( "#passwordHash" ).val();
+                }
+
+            },
+            
             enable: function() {
                 $( "#ui :input" ).attr( "disabled", false );
             },
@@ -62,14 +92,25 @@
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
 
+            // Enable user interface for login
+            ui.login.enable();
+            
+            // Show empty configuration
+            update( 'configuration' );
+        });
+
+        function connect() {
+
+            ui.login.disable();
+
             // Connect to VSCP server
             vscpConn.connect({
 
-                url: "ws://104.236.235.81:8080",
+                url: ui.login.getDaemonUrl(),
 
-                userName: "admin",
+                userName: ui.login.getUserName(),
 
-                password: "d50c3180375c27927c22e42a379c3f67",
+                password: ui.login.getPasswordHash(),
 
                 onSuccess: function( conn ) {
 
@@ -85,10 +126,8 @@
                     alert("Connection lost. Please reload website.");
                 }
             });
-            
-            update( 'configuration' );
-        });
-
+        }
+        
         // Update the configuration, which is shown the user
         function update( id ) {
         
@@ -99,7 +138,7 @@
             var size    = 0;
         
             // Head
-            head += '<table border="1" cellspacing="1" cellpadding="10">';
+            head += '<table class="table table-striped">';
             head += '    <thead>';
             head += '        <tr>';
             head += '            <th>Id</th>';
@@ -126,15 +165,15 @@
                     size = 20;
                 }
                 
-                body += '<td><input id="input' + index + '" type="text" value="' + variables[ index ].value + '"size="' + size + '" /></td>';
+                body += '<td><input id="input' + index + '" class="form-control" type="text" value="' + variables[ index ].value + '"size="' + size + '" /></td>';
                 body += '<td>' + variables[ index ].persistency + '</td>';
                 body += '<td>';
-                body += '<input type="button" value="Read" onclick="readVariable( \'' + variables[ index ].name + '\', \'input' + index + '\' )" />';
-                body += '<input type="button" value="Write" onclick="writeVariable( \'' + variables[ index ].name + '\', \'input' + index + '\' )" />';
-                body += '<input type="button" value="Reset" onclick="resetVariable( \'' + variables[ index ].name + '\', \'input' + index + '\' )" />';
-                body += '<input type="button" value="Remove" onclick="removeVariable( \'' + variables[ index ].name + '\' )" />';
-                body += '<input type="button" value="Get length" onclick="getVariableLength( \'' + variables[ index ].name + '\' )" />';
-                body += '<input type="button" value="Get last changed" onclick="getVariableLastChanged( \'' + variables[ index ].name + '\' )" />';
+                body += '<input type="button" class="btn btn-default" value="Read" onclick="readVariable( \'' + variables[ index ].name + '\', \'input' + index + '\' )" />';
+                body += '<input type="button" class="btn btn-default" value="Write" onclick="writeVariable( \'' + variables[ index ].name + '\', \'input' + index + '\' )" />';
+                body += '<input type="button" class="btn btn-default" value="Reset" onclick="resetVariable( \'' + variables[ index ].name + '\', \'input' + index + '\' )" />';
+                body += '<input type="button" class="btn btn-default" value="Remove" onclick="removeVariable( \'' + variables[ index ].name + '\' )" />';
+                body += '<input type="button" class="btn btn-default" value="Get length" onclick="getVariableLength( \'' + variables[ index ].name + '\' )" />';
+                body += '<input type="button" class="btn btn-default" value="Get last changed" onclick="getVariableLastChanged( \'' + variables[ index ].name + '\' )" />';
                 body += '</td>'
                 body += '</tr>';
             }
@@ -429,12 +468,33 @@
     </script>
 </head>
 <body>
-    <h1>Variable Configuration</h1>
-    <div id="ui">
-        <input type="submit" value="Read all variables" onclick="readAllVariables()" disabled /><br />
-        <input type="submit" value="Save persistent variables" onclick="savePersistentVariables()" disabled /><br />
-    </div>
-    <div id="configuration">
+    <div class="container">
+        <h1>Variable Configuration</h1>
+        <p>Enter the URL of your VSCP daemon with credentials and connect to it.</p>
+        <div id="login">
+            <table class="table table-hover">
+                <tr>
+                    <td>URL:</td>
+                    <td><input id="daemonUrl" class="form-control" type="text" value="ws://104.236.235.81:8080" size="40" disabled /></td>
+                </tr>
+                <tr>
+                    <td>User name:</td>
+                    <td><input id="userName" class="form-control" type="text" value="admin" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Password hash:</td>
+                    <td><input id="passwordHash" class="form-control" type="text" value="d50c3180375c27927c22e42a379c3f67" size="40" disabled /></td>
+                </tr>
+            </table>
+            <input type="submit" class="btn btn-default" value="Connect" onclick="connect()" disabled />
+        </div>
+        <hr />
+        <div id="ui">
+            <input type="submit" class="btn btn-default" value="Read all variables" onclick="readAllVariables()" disabled /><br />
+            <input type="submit" class="btn btn-default" value="Save persistent variables" onclick="savePersistentVariables()" disabled /><br />
+        </div>
+        <div id="configuration">
+        </div>
     </div>
 </body>
 </html>

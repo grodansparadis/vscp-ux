@@ -8,11 +8,16 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
     <script type="text/javascript" src="../js/md5.js"></script>
     <script type="text/javascript" src="../js/vscp.js"></script>
     <script type="text/javascript" src="../js/vscpRegister.js"></script>
     <script type="text/javascript" src="../js/vscpService.js"></script>
-    <script type="text/javascript" src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script type="text/javascript">
         /*jshint bitwise: false */
 
@@ -514,40 +519,39 @@
     </script>
 </head>
 <body>
-    <h1>VSCP registers</h1>
-    <div id="login">
-        <table style="border: 0px">
-            <tr>
-                <td>URL:</td>
-                <td><input id="daemonUrl" type="text" value="ws://104.236.235.81:8080" size="40" disabled /></td>
-            </tr>
-            <tr>
-                <td>User name:</td>
-                <td><input id="userName" type="text" value="admin" disabled /></td>
-            </tr>
-            <tr>
-                <td>Password hash:</td>
-                <td><input id="passwordHash" type="text" value="d50c3180375c27927c22e42a379c3f67" size="40" disabled /></td>
-            </tr>
+    <div class="container">
+        <h1>VSCP registers</h1>
+        <p>Enter the URL of your VSCP daemon with credentials and connect to it.</p>
+        <div id="login">
+            <table class="table table-hover">
+                <tr>
+                    <td>URL:</td>
+                    <td><input id="daemonUrl" class="form-control" type="text" value="ws://104.236.235.81:8080" size="40" disabled /></td>
+                </tr>
+                <tr>
+                    <td>User name:</td>
+                    <td><input id="userName" class="form-control" type="text" value="admin" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Password hash:</td>
+                    <td><input id="passwordHash" class="form-control" type="text" value="d50c3180375c27927c22e42a379c3f67" size="40" disabled /></td>
+                </tr>
+            </table>
+            <input type="submit" class="btn btn-default" value="Connect" onclick="connect()" disabled />
+        </div>
+        <hr />
+        <div id="ui">
+            <p>Scan for nodes (via CLASS1.Protocol.WhoIsThere event), select one and read its VSCP defined registers.</p>
+            <input type="submit" class="btn btn-default" value="Scan for nodes" onclick="whoIsThere()" disabled /><br />
+            <p>Node id:
+                <select id="nodeId">
+                    <option value="-" selected>-</option>
+                </select>
+                <input type="submit" class="btn btn-default" value="Read VSCP registers" onclick="readVscpRegisters()" disabled /></td>
+            </p>
+        </div>
+        <table id="output" class="table table-striped">
         </table>
-        <input type="submit" value="Connect" onclick="connect()" disabled />
     </div>
-    <hr />
-    <div id="ui">
-        <input type="submit" value="Scan for nodes" onclick="whoIsThere()" disabled /><br />
-        <table style="border: 0px">
-            <tr>
-                <td>Node id:</td>
-                <td>
-                    <select id="nodeId">
-                        <option value="-" selected>-</option>
-                    </select>
-                </td>
-                <td><input type="submit" value="Read VSCP registers" onclick="readVscpRegisters()" disabled /></td>
-            </tr>
-        </table>
-    </div>
-    <table id="output" border="0">
-    </table>
 </body>
 </html>
