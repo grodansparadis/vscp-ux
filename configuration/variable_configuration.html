@@ -14,7 +14,11 @@
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
 
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="settings.js"></script>
+    <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
 
     <script type="text/javascript">
@@ -86,7 +90,7 @@
             }
         };
 
-        // Wait until the whole website is loaded, until connection to the VSCP server
+        // Wait until the whole website is loaded
         $( document ).ready( function() {
 
             // Create a VSCP websocket
