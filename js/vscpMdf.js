@@ -46,6 +46,7 @@ vscp.mdf.timeout = 5000;
 
 vscp._createNS( "vscp.mdf.constants" );
 
+/** MDF specific constants */
 vscp.mdf.constants = {
 
     TYPE_SIZES: {
