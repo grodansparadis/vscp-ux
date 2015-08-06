@@ -109,7 +109,7 @@
         // VSCP websocket connection
         var vscpConn = null;
 
-       // Wait until the whole website is loaded
+        // Wait until the whole website is loaded
         $( document ).ready( function() {
             
             // Create a VSCP websocket
@@ -155,6 +155,10 @@
             if ( "undefined" === typeof evt ) {
                 return;
             }
+            
+            if ( false === ( evt instanceof vscp.Event ) ) {
+                return;
+            }
         
             if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
                  ( vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED === evt.vscpType ) &&
@@ -194,6 +198,13 @@
                             <li><a href="node_discovery.html">Passive node discovery</a></li>
                             <li><a href="slider.html">Slider demo</a></li>
                             <li><a href="slider.html">Progress bar demo</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="epoch_simple.html">Simple demo</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Service</a></li>

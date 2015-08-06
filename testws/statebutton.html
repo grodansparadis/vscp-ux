@@ -111,7 +111,7 @@
                     receiveZone: 1,             // Zone where state events will come from
                     receiveSubZone: 10,         // Sub-zone where state events will come from
                     bindToRemoteState: true,    // Button state depends on remote state
-                    enable: false               // Disable button per default
+                    enable: false               // Disable button by default
                 });
                 
                 // Create button in study room
@@ -127,7 +127,7 @@
                     receiveZone: 1,             // Zone where state events will come from
                     receiveSubZone: 11,         // Sub-zone where state events will come from
                     bindToRemoteState: false,   // Button state depends NOT on remote state
-                    enable: false               // Disable button per default
+                    enable: false               // Disable button by default
                 });
             
                 // Create button in living room
@@ -142,8 +142,8 @@
                     transmitSubZone: 12,        // Sub-zone where button event will be sent to
                     receiveZone: 1,             // Zone where state events will come from
                     receiveSubZone: 12,         // Sub-zone where state events will come from
-                    bindToRemoteState: true,    // Button state depends NOT on remote state
-                    enable: false               // Disable button per default
+                    bindToRemoteState: true,    // Button state depends on remote state
+                    enable: false               // Disable button by default
                 });
                 
             }
@@ -174,6 +174,13 @@
                             <li><a href="node_discovery.html">Passive node discovery</a></li>
                             <li><a href="slider.html">Slider demo</a></li>
                             <li><a href="slider.html">Progress bar demo</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="epoch_simple.html">Simple demo</a></li>
                         </ul>
                     </li>
                     <li><a href="#">Service</a></li>
