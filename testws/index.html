@@ -1,96 +1,142 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>VSCP Websocket widgets</title>
-<!-- Don't cache the page -->
-<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-<META HTTP-EQUIV="Expires" CONTENT="-1">
-<script type="text/javascript" src="../lib/vscpwslib.js"></script>
+    <meta charset="UTF-8">
+    <title>VSCP Websocket widgets</title>
+    
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+    
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
 </head>
-
 <body>
-<p>
-<img src="../images/logo/vscp_new.png" width="400" alt="vscp logo">
-</p>
-<h1>VSCP HTML5 websocket widget samples</h1>
-<p>
-For help on how to use the samples check the <a href="http://www.vscp.org/wiki">wiki</a> 
-and the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=start"> specification document</a> and
-the <a href="http://www.vscp.org/docs/vscpd/doku.php">VSCP daemon documentation</a>.
-</p>
-<ul>
-<li>Test of the authentication sequence - <a href="testauth.html">testauth.html</a></li>
-<li>Test event control <a href="event.html">event.html</a></li>
-<li>Test StateButton <a href="statebutton.html">statebutton.html</a></li>
-<li>Test SimpleText <a href="simpletext.html">simpletext.html</a></li>
-<li>Test Variables <a href="variable.html">variable.html</a></li>
-<li>Test ThermometerCelsius <a href="thermometercelsius.html">thermometercelsius.html</a></li>
-<li>Test Speedometer <a href="speedometer.html">speedometer.html</a></li>
-<li>Slider <a href="slider.html">slider.html</a></li>
-<li>Progress <a href="progress.html">progress.html</a></li>
-<li>VSCP Tables <a href="table_dynamic.html">table_dynamic.html</a></li>
-<li>Test Node Discovery <a href="node_discovery.html">node_discovery.html</a></li>
-</ul>
-<h2>Google Charts Demos</h2>
-<ul>
-<li>Google Charts Gauge <a href="google_gauge.html">google_gauge.html</a></li>
-<li>Google Charts Table <a href="google_table.html">google_table.html</a></li>
-<li>Google Charts Line Simple <a href="google_line_simple.html">google_line_simple.html</a></li>
-</ul>
-<p>
-More info about the Google charts library is <a href="https://developers.google.com/chart/">here</a>.
-</p>
+   <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Home</a></li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="testauth.html">Authentication test</a></li>
+                            <li><a href="event.html">Control events</a></li>
+                            <li><a href="statebutton.html">Widget demo</a></li>
+                            <li><a href="variable.html">Handle variables</a></li>
+                            <li><a href="node_discovery.html">Passive node discovery</a></li>
+                            <li><a href="slider.html">Slider demo</a></li>
+                            <li><a href="slider.html">Progress bar demo</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="epoch_simple.html">Simple demo</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="#">Service</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <h1>VSCP HTML5 websocket demos</h1>
+        <p>
+            For help on how to use the samples check the <a href="http://www.vscp.org/wiki">wiki</a> 
+            and the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=start"> specification document</a> and
+            the <a href="http://www.vscp.org/docs/vscpd/doku.php">VSCP daemon documentation</a>.
+        </p>
+        <ul>
+            <li>Test the authentication sequence - <a href="testauth.html">testauth.html</a></li>
+            <li>Control events - <a href="event.html">event.html</a></li>
+            <li>Widget demo - <a href="statebutton.html">statebutton.html</a></li>
+            <li>Handle variables from the daemon - <a href="variable.html">variable.html</a></li>
+            <li>Passive node discovery - <a href="node_discovery.html">node_discovery.html</a></li>
+            <li>Slider demo - <a href="slider.html">slider.html</a></li>
+            <li>Progress bar demo - <a href="progress.html">progress.html</a></li>
+            
+            <!--
+            <li>Test SimpleText <a href="simpletext.html">simpletext.html</a></li>
+            <li>Test ThermometerCelsius <a href="thermometercelsius.html">thermometercelsius.html</a></li>
+            <li>Test Speedometer <a href="speedometer.html">speedometer.html</a></li>
+            
+            <li>VSCP Tables <a href="table_dynamic.html">table_dynamic.html</a></li>
+            -->
+        </ul>
+        
+        <h1>Epoch chart demo</h1>
+        <ul>
+            <li>Simple demo - <a href="epoch_simple.html">epoch_simple.html</a></li>
+        </ul>
+        <p>
+            More info about the Epoch charting library is <a href="http://fastly.github.io/epoch/">here</a>.
+        </p>
+        
+        <!--
+        <h2>Google Charts Demos</h2>
+        <ul>
+            <li>Google Charts Gauge <a href="google_gauge.html">google_gauge.html</a></li>
+            <li>Google Charts Table <a href="google_table.html">google_table.html</a></li>
+            <li>Google Charts Line Simple <a href="google_line_simple.html">google_line_simple.html</a></li>
+        </ul>
+        <p>
+        More info about the Google charts library is <a href="https://developers.google.com/chart/">here</a>.
+        </p>
 
-<h2>Epoch Charts Demos</h2>
-<ul>
-<li>Simple <a href="epoch_simple.html">epoch_simple.html</a></li>
-</ul>
-<p>
-More info about the Epoch charting library is <a href="http://fastly.github.io/epoch/">here</a>.
-</p>
 
-<h2>Datatables Demos</h2>
-<p>
-More info about the Datatables library is <a href="http://datatables.net/">here</a>.
-</p>
+        <h2>Datatables Demos</h2>
+        <p>
+        More info about the Datatables library is <a href="http://datatables.net/">here</a>.
+        </p>
+        -->
+        <hr>
 
-<hr>
+        <h1>If you want to learn more or need help</h1>
 
-<h2>If you want to learn more or need help</h2>
+        <p>
+            You find links to the different parts of the documentation for the VSCP & Friends project 
+            <a href="http://www.vscp.org/docs.php">here</a>. It's a lot of words because it's a big and advanced system with
+            many features. You may also find our <a href="http://www.vscp.org/wiki/doku.php">wiki</a> to be a valuable resource. 
+            If you have questions or need pointers on where to start subscribe to our 
+            <a href="https://groups.google.com/forum/#!forum/vscp">mailinglist</a>. You will find that we have a very nice 
+            discussion climate and any question is taken care of.
+        </p>
 
-<p>
-You find links to the different parts of the documentation for the VSCP & Friends project 
-<a href="http://www.vscp.org/docs.php">here</a>. It's a lot of words because it's a big and advanced system with
-many features. You may also find our <a href="http://www.vscp.org/wiki/doku.php">wiki</a> to be a valuable resource. 
-If you have questions or need pointers on where to start subscribe to our 
- <a href="https://groups.google.com/forum/#!forum/vscp">mailinglist</a>. You will find that we have a very nice 
- discussion climate and any question is taken care of.
-</p>
+        <hr> 
+         
+        <h1>VSCP hardware</h1>
 
-<hr> 
- 
-<h2>VSCP hardware.</h2>
+        <p>
+            <a href="http://www.frogshop.se">
+                <img src="../images/frogshop-logo.png" class="img-responsive" alt="frogshop logo" />
+            </a>
+        </p>
+        <p>
+            If you need hardware you can build things yourself. The <a href="http://www.vscp.org/wiki/doku.php">wiki</a> contains many examples. 
+            You can also use any hardware you have have by building a simple driver for it. Check the documentation on how
+            to do it or use any of the available drivers as a starting point.
+        </p>
+        <p>
+            <a href="http://www.grodansparadis.com">Grodans Paradis AB/Paradise of the Frog</a> is the company behind VSCP &amp; Friends 
+            and we sell some VSCP plug and play hardware. Visit our <a href="http://www.grodansparadis.com">site</a> and 
+            <a href="http://www.frogshop.se">store</a> to get info about the latest greatest. Actually, the best way to support this project
+            is to buy products from our <a href="http://www.frogshop.se">store.</a>.
+        </p>
 
-<p>
-<a href="http://www.frogshop.se">
-<img src="../images/frogshop-logo.png" alt="frogshop logo"> 
-</a>
-<br>
-If you need hardware you can build things yourself. The <a href="http://www.vscp.org/wiki/doku.php">wiki</a> contains many examples. 
-You can also use any hardware you have have by building a simple driver for it. Check the documentation on how
-to do it or use any of the available drivers as a starting point.
-
-<a href="http://www.grodansparadis.com">Grodans Paradis AB/Paradise of the Frog</a> is the company behind VSCP & Friends 
-and we sell some VSCP plug and play hardware. Visit our <a href="http://www.grodansparadis.com">site</a> and 
-<a href="http://www.frogshop.se">store</a> to get info about the latest greatest. Actually, the best way to support this project
-is to buy products from our <a href="http://www.frogshop.se">store</a>.
-</p>
-
-<br>
-<hr>
-Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>, 
-<a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
-
+        <br /><br />
+        <hr>
+        Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>, 
+        <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
+    </div>
 </body>
 </html>

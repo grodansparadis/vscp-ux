@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>VSCP registers</title>
+
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="settings.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket bases library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP register access, depends on the websocket base library -->
+    <script type="text/javascript" src="../js/vscpRegister.js"></script>
+    <!-- VSCP service access, depends on the websocket base library -->
+    <script type="text/javascript" src="../js/vscpService.js"></script>
+    
+    <script type="text/javascript">
+        /*jshint bitwise: false */
+
+        // VSCP websocket connection
+        var vscpConn = null;
+
+        // User interface data
+        var ui = {
+
+            login: {
+
+                enable: function() {
+                    $( "#login :input" ).attr( "disabled", false );
+                },
+
+                disable: function() {
+                    $( "#login :input" ).attr( "disabled", true );
+                },
+
+                getDaemonUrl: function() {
+                    return $( "#daemonUrl" ).val();
+                },
+
+                getUserName: function() {
+                    return $( "#userName" ).val();
+                },
+
+                getPasswordHash: function() {
+                    return $( "#passwordHash" ).val();
+                }
+
+            },
+
+            getNodeId: function() {
+                return parseInt( $( "#nodeId option:selected" ).text() );
+            },
+
+            enable: function() {
+                $( "#ui :input" ).attr( "disabled", false );
+            },
+
+            disable: function() {
+                $( "#ui :input" ).attr( "disabled", true );
+            }
+        };
+
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
+
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
+
+            // Enable user interface for login
+            ui.login.enable();
+        });
+
+        function connect() {
+
+            ui.login.disable();
+
+            // Connect to VSCP server
+            vscpConn.connect({
+
+                url: ui.login.getDaemonUrl(),
+
+                userName: ui.login.getUserName(),
+
+                password: ui.login.getPasswordHash(),
+
+                onSuccess: function( conn ) {
+
+                    // Set filter for CLASS1.Protocol
+                    vscpConn.setFilter({
+                        filterClass: 0x0000,
+                        maskClass: 0xffff,
+                        filterType: 0x0000,
+                        maskType: 0x0000
+                    });
+
+                    // Start receiving VSCP events
+                    vscpConn.start({
+                        onSuccess: function( conn ) {
+
+                            // Enable user interface
+                            ui.enable();
+                        },
+                        onError: function( conn ) {
+                            alert("Server error!");
+
+                            // Enable user interface for login
+                            ui.login.enable();
+                        }
+                    });
+                },
+
+                onError: function( conn ) {
+
+                    // Disable the user interface
+                    ui.disable();
+
+                    alert("Connection lost. Please reload website.");
+                }
+            });
+        }
+
+        function convertToHex( value, length ) {
+            var str = value.toString( 16 );
+
+            while( length > str.length ) {
+                str = "0" + str;
+            }
+
+            str = "0x" + str;
+
+            return str;
+        }
+
+        function whoIsThere() {
+            var index = 0;
+            
+            // Disable user interface
+            ui.disable();
+            
+            // Clear nodes
+            $('#nodeId').empty();
+
+            vscp.service.whoIsThere({
+
+                connection: vscpConn,
+
+                onSuccess: function( nodes ) {
+
+                    for( index = 0; index < nodes.length; ++index ) {
+                        $('#nodeId').append("<option value=\"" + nodes[ index ].nodeId + "\">" + nodes[ index ].nodeId + "</option>");
+                    }
+                    
+                    alert( nodes.length + " nodes found." );
+
+                    // Enable the user interface
+                    ui.enable();
+                },
+
+                onError: function() {
+                    alert( "No nodes found." );
+                    
+                    // Enable the user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readAlarmStatus() {
+
+            vscp.register.readAlarmStatus({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Alarm status:</td><td>" + convertToHex( data, 2 ) + "</td></tr>");
+
+                    readVscpVersion();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readVscpVersion() {
+
+            vscp.register.readVscpVersion({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>VSCP version:</td><td>" + data.major + "." + data.minor + "</td></tr>");
+
+                    readNodeControlFlags();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readNodeControlFlags() {
+
+            vscp.register.readNodeControlFlags({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Node Control Flags:</td><td>" + convertToHex( data, 2 ) + "</td></tr>");
+
+                    readUserId();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readUserId() {
+
+            vscp.register.readUserId({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>User ID:</td><td>" + convertToHex( data, 10 ) + "</td></tr>");
+
+                    readManufacturerDevId();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readManufacturerDevId() {
+
+            vscp.register.readManufacturerDevId({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Manufacturer device ID:</td><td>" + convertToHex( data, 8 ) + "</td></tr>");
+
+                    readManufacturerSubDevId();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readManufacturerSubDevId() {
+
+            vscp.register.readManufacturerDevId({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Manufacturer sub device ID:</td><td>" + convertToHex( data, 8 ) + "</td></tr>");
+
+                    readNicknameId();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readNicknameId() {
+
+            vscp.register.readNicknameId({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Nickname ID:</td><td>" + data + "</td></tr>");
+
+                    readSelectedPage();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readSelectedPage() {
+
+            vscp.register.readSelectedPage({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Selected page:</td><td>" + data + "</td></tr>");
+
+                    readFirmwareVersion();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readFirmwareVersion() {
+
+            vscp.register.readFirmwareVersion({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Firmware version:</td><td>" + data.major + "." + data.minor + "." + data.subMinor + "</td></tr>");
+
+                    readBootloaderAlgorithm();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readBootloaderAlgorithm() {
+
+            vscp.register.readBootloaderAlgorithm({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Bootloader algorithm:</td><td>" + convertToHex( data, 2 ) + "</td></tr>");
+
+                    readUsedPages();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readUsedPages() {
+
+            vscp.register.readUsedPages({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Used pages:</td><td>" + data + "</td></tr>");
+
+                    readStdDevFamCode();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readStdDevFamCode() {
+
+            vscp.register.readStdDevFamCode({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Standard device family code:</td><td>" + convertToHex( data, 8 ) + "</td></tr>");
+
+                    readStdDevType();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readStdDevType() {
+
+            vscp.register.readStdDevType({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>Standard device type:</td><td>" + convertToHex( data, 8 ) + "</td></tr>");
+
+                    readGUID();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readGUID() {
+
+            vscp.register.readGUID({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+
+                    $( "#output" ).append( "<tr><td>GUID:</td><td>" + vscp.utility.guidToStr( data ) + "</td></tr>");
+
+                    readMdfUrl();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readMdfUrl() {
+
+            vscp.register.readMdfUrl({
+                connection: vscpConn,
+
+                nodeId: ui.getNodeId(),
+
+                onSuccess: function( data ) {
+                    $( "#output" ).append( "<tr><td>MDF URL:</td><td>" + data + "</td></tr>");
+
+                    // Enable user interface
+                    ui.enable();
+                },
+
+                onError: function() {
+                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        function readVscpRegisters() {
+
+            if ( isNaN( ui.getNodeId() ) ) {
+                return;
+            }
+
+            // Disable user interface
+            ui.disable();
+
+            // Remove all table rows
+            $( "#output" ).find("tr").remove();
+
+            readAlarmStatus();
+        }
+
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>VSCP registers</h1>
+        <p>Enter the URL of your VSCP daemon with credentials and connect to it.</p>
+        <div id="login">
+            <table class="table table-hover">
+                <tr>
+                    <td>URL:</td>
+                    <td><input id="daemonUrl" class="form-control" type="text" value="ws://104.236.235.81:8080" size="40" disabled /></td>
+                </tr>
+                <tr>
+                    <td>User name:</td>
+                    <td><input id="userName" class="form-control" type="text" value="admin" disabled /></td>
+                </tr>
+                <tr>
+                    <td>Password hash:</td>
+                    <td><input id="passwordHash" class="form-control" type="text" value="d50c3180375c27927c22e42a379c3f67" size="40" disabled /></td>
+                </tr>
+            </table>
+            <input type="submit" class="btn btn-default" value="Connect" onclick="connect()" disabled />
+        </div>
+        <hr />
+        <div id="ui">
+            <p>Scan for nodes (via CLASS1.Protocol.WhoIsThere event), select one and read its VSCP defined registers.</p>
+            <input type="submit" class="btn btn-default" value="Scan for nodes" onclick="whoIsThere()" disabled /><br />
+            <p>Node id:
+                <select id="nodeId">
+                    <option value="-" selected>-</option>
+                </select>
+                <input type="submit" class="btn btn-default" value="Read VSCP registers" onclick="readVscpRegisters()" disabled /></td>
+            </p>
+        </div>
+        <table id="output" class="table table-striped">
+        </table>
+    </div>
+</body>
+</html>
