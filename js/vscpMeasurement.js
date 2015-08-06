@@ -494,3 +494,157 @@ vscp.measurement.convertInchToMeter = function( value ) {
     var fTempVal = "string" == typeof value ? parseFloat(value) : value;
     return fTempVal * 0.3048 / 12;
 };
+
+/**
+ * Measurment decoder
+ *
+ * @param[in] options Options
+ *
+ * Options:
+ * - connection: VSCP connection
+ * - onValue: Function which will be called for every received measurement value.
+ * - filter: {
+ *   - vscpGuid: Node GUID string
+ *   - vscpClass: VSCP class
+ *   - vscpType: VSCP type
+ *   - sensorIndex: Sensor index
+ *   - zone: Zone
+ *   - subZone: Sub-zone
+ */
+vscp.measurement.Decoder = function( options ) {
+
+    this.connection = null;
+    this.onValue    = null;
+    this.filter     = null;
+
+    if ( "undefined" !== typeof options ) {
+
+        if ( true === ( options.connection instanceof vscp.Connection ) ) {
+            this.connection = options.connection;
+        }
+        
+        if ( "function" === typeof options.onValue ) {
+            this.onValue = options.onValue;
+        }
+        
+        if ( "object" === typeof options.filter ) {
+            this.filter = options.filter;
+        }
+    }
+    
+    if ( null !== this.connection ) {
+        this.connection.addEventListener( this.eventListener.bind( this ) );
+    }
+};
+
+/**
+ * VSCP event listener, which receives, filters and converts every received measurement event.
+ *
+ * @param[in] conn  VSCP connection
+ * @param[in] evt   VSCP event
+ */
+vscp.measurement.Decoder.prototype.eventListener = function( conn, evt ) {
+
+    var sensorIndex = -1;
+    var value       = 0;
+    var unitId      = -1;
+    var unit        = "";
+    var zone        = 255;
+    var subZone     = 255;
+    var mimicData   = [];
+    var index       = 0;
+
+    if ( "undefined" === typeof evt ) {
+        return;
+    }
+    
+    if ( false === ( evt instanceof vscp.Event ) ) {
+        return;
+    }
+    
+    // Apply pre filter
+    if ( null !== this.filter ) {
+        
+        if ( ( "undefined" !== typeof this.filter.vscpGuid ) &&
+             ( evt.vscpGuid.toLowerCase() !== this.filter.vscpGuid.toLowerCase() ) ) {
+            return;
+        }
+        
+        if ( ( "undefined" !== typeof this.filter.vscpClass ) &&
+             ( evt.vscpClass !== this.filter.vscpClass ) ) {
+            return;
+        }
+        
+        if ( ( "undefined" !== typeof this.filter.vscpType ) &&
+             ( evt.vscpType !== this.filter.vscpType ) ) {
+            return;
+        }
+    }
+    
+    // Classes with data coding byte
+    if ( ( vscp.constants.classes.VSCP_CLASS1_MEASUREMENT === evt.vscpClass ) ||
+         ( vscp.constants.classes.VSCP_CLASS1_DATA === evt.vscpClass ) ) {
+    
+        sensorIndex = vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
+        value = vscp.measurement.decodeClass10( evt.vscpData );
+        unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
+        unit = vscp.constants.units[ evt.vscpType ][ unitId ];
+    }
+    // Floating point
+    else if ( vscp.constants.classes.VSCP_CLASS1_MEASUREMENT64 === evt.vscpClass ) {
+        value = vscp.measurement.decodeClass60Number( evt.vscpData );
+        unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
+        unit = vscp.constants.units[ evt.vscpType ][ unitId ];
+    }
+    // Measurement with zone information
+    else if ( ( vscp.constants.classes.VSCP_CLASS1_MEASUREZONE === evt.vscpClass ) ||
+              ( vscp.constants.classes.VSCP_CLASS1_SETVALUEZONE === evt.vscpClass ) ) {
+
+        mimicData.push( evt.vscpData[ 0 ] );
+        for( index = 3; index < evt.vscpData.length; ++index ) {
+            mimicData.push( evt.vscpData[ index ] );
+        }
+              
+        sensorIndex = vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
+        value = vscp.measurement.decodeClass10Number( mimicData );
+        unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
+        unit = vscp.constants.units[ evt.vscpType ][ unitId ];
+        zone = evt.vscpData[ 1 ];
+        subZone = evt.vscpData[ 2 ];
+    }
+    else {
+        return;
+    }
+    
+    // Apply post filter
+    if ( null !== this.filter ) {
+        
+        if ( ( "undefined" !== typeof this.filter.sensorIndex ) &&
+             ( sensorIndex !== this.filter.sensorIndex ) ) {
+            return;
+        }
+        
+        if ( ( "undefined" !== typeof this.filter.zone ) &&
+             ( zone !== this.filter.zone ) ) {
+            return;
+        }
+        
+        if ( ( "undefined" !== typeof this.filter.subZone ) &&
+             ( subZone !== this.filter.subZone ) ) {
+            return;
+        }
+    }
+    
+    // Signal application
+    if ( null !== this.onValue ) {
+        this.onValue({
+            sensorIndex: sensorIndex,
+            value: value,
+            unitId: unitId,
+            unit: unit,
+            zone: zone,
+            subZone: subZone,
+            event: evt
+        });
+    }
+};
