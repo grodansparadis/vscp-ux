@@ -39,11 +39,9 @@
             var date_minute = date.getMinutes();
             var date_second = date.getSeconds();
             return date_year + '-' + date_month + '-' + date_day + ' ' + date_hour + ':' + date_minute + ':' + date_second;
-       }
+        }
         
-        
-        var lineChartData = [
-        {
+        var lineChartData = [{
             label: "Temperature",
             values: [ 
                 {time: 1370044800, y: 20}, {time: 1370044801, y: 20}, {time: 1370044802, y: 19}, {time: 1370044803, y: 18},
@@ -52,14 +50,7 @@
                 {time: 1370044812, y: 9}, {time: 1370044813, y: 8}, {time: 1370044814, y: 7}, {time: 1370044815, y: 6},
                 {time: 1370044822, y: 4}, {time: 1370044844, y: 1}, {time: 1370044848, y: 0}, {time: 1370044899, y: -3},
             ]
-        },
-
-        ];
-        
-        var areaChartData = [
-            { label: 'Layer 1', values: [ {x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 2} ] },
-            { label: 'Layer 2', values: [ {x: 0, y: 0}, {x: 1, y: 1}, {x: 2, y: 4} ] }
-        ];
+        }];
         
         // VSCP websocket connection
         var vscpConn = null;
@@ -243,16 +234,6 @@
             ticks: { left: 5, bottom: 5, right: 5 },
             tickFormats: { time: function(d) { return new Date(time*1000).toISOString() } },
             data: lineChartData,
-            axes: ['left', 'right', 'bottom']
-        });
-        </script>
-
-        <h2>Area x/y</h2>
-        <div id="lineAreaChart2" class="epoch category10" style="width: 800px; height: 200px"></div>
-        <script>
-        var areaChartInstance2 = $('#lineAreaChart2').epoch({
-            type: 'area',
-            data: areaChartData,
             axes: ['left', 'right', 'bottom']
         });
         </script>
