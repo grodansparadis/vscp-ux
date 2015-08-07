@@ -188,7 +188,7 @@ vscp.measurement.varInteger2Float = function( data ) {
     var bNegative   = false;
     var i           = 0;
 
-    if ( data[ 0 ] & 0x80 ) {
+    if ( 0 !== ( data[ 0 ] & 0x80 ) ) {
         bNegative = true;
 
         for ( i = 0; i < data.length; i++ ) {
@@ -201,7 +201,7 @@ vscp.measurement.varInteger2Float = function( data ) {
         rval += data[ i ];
     }
 
-    if ( bNegative ) {
+    if ( true === bNegative ) {
         rval = -1.0 * ( rval + 1 );
     }
 
@@ -284,7 +284,7 @@ vscp.measurement.decodeClass10 = function( data ) {
                 rval = vscp.measurement.varInteger2Float( newData );
 
                 // Handle mantissa
-                if ( exp & 0x80 ) {
+                if ( 0 !== ( exp & 0x80 ) ) {
                     exp &= 0x7f;
                     rval = rval / Math.pow(10,exp);
                 }
@@ -297,7 +297,7 @@ vscp.measurement.decodeClass10 = function( data ) {
             break;
         case 5: // Floating point
             {
-                if ( 5 == data.length ) {
+                if ( 5 === data.length ) {
                     sign = data[1] & 0x80;  // Negative if != 0
                     exp = (data[1] & 0x7f) << 1 + (data[2] & 0x80) ? 1 : 0;
                     mantissa = (data[2] & 0x7f) << 16 + data[3] << 8 + data[4];
@@ -343,7 +343,7 @@ vscp.measurement.decodeClass60Number = function( data ) {
         // sign * 2^exponent * mantissa
         rval = Math.pow( 2, exp ) * mantissa;
         
-        if (sign) {
+        if ( 0 !== sign ) {
             rval = -1 * rval;
         }
     }
@@ -368,7 +368,7 @@ vscp.measurement.decodeClass65Number = function( data ) {
     }
 
     // Handle exponent
-    if (exp & 128) {
+    if ( 0 !== ( exp & 128) ) {
         exp &= 0x7f;
         rval = rval * Math.pow(10, (-1 * exp));
     }
@@ -386,7 +386,7 @@ vscp.measurement.decodeClass65Number = function( data ) {
  * @return Converted value
  */
 vscp.measurement.convertFahrenheitToKelvin = function( value ) {
-    var fTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     var cTempVal = ( fTempVal - 32 ) * ( 5 / 9 ) + 273.15;
     return cTempVal;
 };
@@ -398,7 +398,7 @@ vscp.measurement.convertFahrenheitToKelvin = function( value ) {
  * @return Converted value
  */
 vscp.measurement.convertFahrenheitToCelsius = function( value ) {
-    var fTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     var cTempVal = ( fTempVal - 32 ) * ( 5 / 9 );
     return cTempVal;
 };
@@ -410,7 +410,7 @@ vscp.measurement.convertFahrenheitToCelsius = function( value ) {
  * @return Converted value
  */
 vscp.measurement.convertCelsiusToFahrenheit = function( value ) {
-    var cTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var cTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     var fTempVal = ( cTempVal * ( 9 / 5 ) ) + 32;
     return fTempVal;
 };
@@ -422,7 +422,7 @@ vscp.measurement.convertCelsiusToFahrenheit = function( value ) {
  * @return Converted value
  */
 vscp.measurement.convertKelvinToCelsius = function( value ) {
-    var kTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var kTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     var cTempVal = kTempVal - 273.15;
     return cTempVal;
 };
@@ -434,7 +434,7 @@ vscp.measurement.convertKelvinToCelsius = function( value ) {
  * @return Converted value
  */
 vscp.measurement.convertCelsiusToKelvin = function( value ) {
-    var kTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var kTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     var cTempVal = kTempVal + 273.15;
     return cTempVal;
 };
@@ -446,7 +446,7 @@ vscp.measurement.convertCelsiusToKelvin = function( value ) {
  * @return Converted value
  */
 vscp.measurement.convertKelvinToFahrenheit = function( value ) {
-    var kTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var kTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     var cTempVal = kTempVal + 273.15;
     return vscp.measurement.convertCelsiusToFahrenheit( cTempVal );
 };
@@ -458,7 +458,7 @@ vscp.measurement.convertKelvinToFahrenheit = function( value ) {
  * @return Converted value
  */
 vscp.measurement.convertMeterToFeet = function( value ) {
-    var fTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     return fTempVal * 3.2808399;
 };
 
@@ -469,7 +469,7 @@ vscp.measurement.convertMeterToFeet = function( value ) {
  * @return Converted value
  */
 vscp.measurement.convertFeetToMeter = function( value ) {
-    var fTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     return fTempVal * 0.3048;
 };
 
@@ -480,7 +480,7 @@ vscp.measurement.convertFeetToMeter = function( value ) {
  * @return Converted value
  */
 vscp.measurement.convertMeterToInch = function( value ) {
-    var fTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     return fTempVal * 3.2808399 * 12;
 };
 
@@ -491,7 +491,7 @@ vscp.measurement.convertMeterToInch = function( value ) {
  * @return Converted value
  */
 vscp.measurement.convertInchToMeter = function( value ) {
-    var fTempVal = "string" == typeof value ? parseFloat(value) : value;
+    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
     return fTempVal * 0.3048 / 12;
 };
 
