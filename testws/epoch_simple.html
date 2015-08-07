@@ -119,7 +119,7 @@
                 
                 // We are only interested in sensor 2
                 var sensorindex =  vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
-                if ( sensorindex !== 2 ) {
+                if ( 2 !== sensorindex ) {
                     return;
                 }
                 
@@ -128,13 +128,16 @@
                             
                 // Should be a Celsius value
                 switch( vscp.measurement.getDataCoding( evt.vscpData[ 0 ] ) ) {
-                    case 0:   // Kelvin
-                        value = vscp.measurement.convertKelvinToCelsius(this.value);
+                    // Kelvin
+                    case 0:
+                        value = vscp.measurement.convertKelvinToCelsius( this.value );
                         break;
-                    case 2:   // Fahrenheit
-                        value = vscp.measurement.convertFahrenheitToCelsius(this.value);
+                    // Fahrenheit
+                    case 2:
+                        value = vscp.measurement.convertFahrenheitToCelsius( this.value );
                         break;
-                    default:    // Do nothing (if already Celsius)
+                    // Do nothing (if already Celsius)
+                    default:
                         break;
                 }
                 
@@ -175,6 +178,7 @@
                             <li><a href="simpletext.html">Simple text demo</a></li>
                             <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
                             <li><a href="lmsensors.html">lm-sensors demo</a></li>
+                            <li><a href="table_dynamic.html">Dynamic table demo</a></li>
                         </ul>
                     </li>
                     <li class="dropdown">
