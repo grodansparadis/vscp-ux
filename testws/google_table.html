@@ -1,96 +1,189 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <meta charset="UTF-8">
     <title>VSCP Google Charts demo</title>
+    
     <!-- Don't cache the page -->
-    <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-    <META HTTP-EQUIV="Expires" CONTENT="-1">
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!-- Favorite icon -->
+    <link rel="icon" href="../favicon.ico">
+    
+    <!-- VSCP settings -->
     <script type="text/javascript" src="settings.js"></script>
-    <script src="../lib/md5.js"></script>
-    <script type="text/javascript" src="../lib/vscpwslib.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket base library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP measurement functions, which are dependend on the VSCP websocket base library -->
+    <script type="text/javascript" src="../js/vscpMeasurement.js"></script>
+    
+    <!-- Google Charts API -->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
     <script type="text/javascript">
-        google.load("visualization", "1", {packages:["table"]});
-        google.setOnLoadCallback(drawTable);
+    
+        // VSCP websocket connection
+        var vscpConn = null;
+
+        // Measurement event decoder
+        var decoder = null;
+
+        var data = null;
+        var table = null;
+        
+        google.load( "visualization", "1", { packages: ["table"] } );
+        google.setOnLoadCallback( drawTable );
+        
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
+            
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
+                                    
+            // Connect to VSCP server
+            vscpConn.connect({
+
+                url: settings.url,
+
+                userName: settings.user,
+
+                password: settings.passwordHash,
+
+                onSuccess: function( conn ) {
+                
+                    // Create a VSCP measurement event decoder
+                    decoder = new vscp.measurement.Decoder({
+                        connection: conn,
+                        onValue: onValue,
+                        filter: {
+                            vscpClass: vscp.constants.classes.VSCP_CLASS1_MEASUREMENT,
+                            vscpType: vscp.constants.types.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                            sensorIndex: 2
+                        }
+                    });
+                
+                    // Start receiving VSCP events
+                    vscpConn.start({
+                    
+                        onSuccess: function( conn ) {
+                            
+                        },
+                        
+                        onError: function( conn ) {
+                            alert("Couldn't start receiving events.");
+                        }
+                        
+                    });
+                    
+                },
+
+                onError: function( conn ) {
+                    alert("Couldn't establish a connection.");
+                }
+                
+            });
+        });
+        
+        var onValue = function( measurement ) {
+        
+            // Hopefully its in degree Celsius ;-)
+            var temperatureCelsius = measurement.value;
+            
+            var dateTime = new Date();
+    
+            data.addRows([
+                [ dateTime.toISOString(),
+                  measurement.sensorIndex, 
+                  parseFloat( vscp.measurement.toFixed( temperatureCelsius, 1 ) ) ]
+            ]);
+            table.draw( data, {showRowNumber: true});      
+        };
 
         function drawTable() {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Date');
-            data.addColumn('number', 'Sensor idx');
-            data.addColumn('number', 'Temperature');
+        
+            data = new google.visualization.DataTable();
+            data.addColumn( 'string', 'Date' );
+            data.addColumn( 'number', 'Sensor idx' );
+            data.addColumn( 'number', 'Temperature' );
+            
+            table = new google.visualization.Table( document.getElementById( 'table_div' ) );
 
-            var table = new google.visualization.Table(document.getElementById('table_div'));
-
-            var eventReceived = function( vscphead,
-                                        vscpclass,
-                                        vscptype,
-                                        vscpobid,
-                                        vscptimestamp,
-                                        vscpguid,
-                                        vscpdata) 
-            {
-                if ((VSCP_CLASS1_MEASUREMENT == vscpclass) &&
-                    (VSCP_TYPE_MEASUREMENT_TEMPERATURE == vscptype)) {
-                
-                    var value;
-                    
-                    // This event is for us
-                    value = 
-                        vscpws_toFixed(vscpws_measurementClass10Decode(vscpdata), 1);
-            
-                    // Should be a Celsius value
-                    switch(vscpws_getDatacoding(vscpdata[0])) {
-                        case 0:   // Kelvin
-                            value = vscpws_convertKelvinToCelsius(this.value);
-                            break;
-                        case 2:   // Fahrenheit
-                            value = vscpws_convertFahrenheitToCelsius(this.value);
-                            break;
-                        default:    // Do nothing (if already Celsius)
-                            break;
-                    }
-                    
-                    var d = new Date();
-      
-                    data.addRows([
-                        [ d.toISOString(), vscpws_getSensorIndexFromDataCoding(vscpdata[0]), parseFloat(value)]
-                    ]);
-                    table.draw( data, {showRowNumber: true});
-                }       
-            
-                return;
-            }
-            
-            var vscpeventCtrl = new vscpws_Event( vscp_setting_user,
-                                            vscp_setting_passwordhash,
-                                            vscp_setting_url,
-                                            null,
-                                            eventReceived );
-                                            
-                                            
+            table.draw( data, { showRowNumber: true } );
         }
+
     </script>
-  </head>
-  <body>
-    <h1>VSCP HTML5 websocket Google Charts Table demo</h1>
-    <a href="index.html">Go back to main page</a>
-    <br>
-    <p>
-    This demo uses the Table from Google charts to display dynamic temperature measurement values in degrees Celsius. It displays 
-    all CLASS1.MEASUREMENT, Type=6/Temperature values that comes from any sensor of that device. That is not just sensoridx=2 aside
-    the other demo do.
-    </p>
-    <p>
-    The <a href="event.html">event.html</a> sample can be used to set temperature values if you don't have live hardware.
-    </p>
-    <br><br>
-    <h4>Demo</h4>
-    <hr>
-    <div id="table_div" style="width: 600px; height: 420px;"></div>  <!-- dimensions is not needed -->
-      <br><br>
-    <hr>
-    Copyright &copy; 2000-2015 <a href="mailto:info@grodansparadis.com">email</a>,
-    <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
-  </body>
+</head>
+<body>
+   <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div>
+                <ul class="nav navbar-nav">
+                    <li class="active"><a href="index.html">Home</a></li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="testauth.html">Authentication test</a></li>
+                            <li><a href="event.html">Control events</a></li>
+                            <li><a href="statebutton.html">Widget demo</a></li>
+                            <li><a href="variable.html">Handle variables</a></li>
+                            <li><a href="node_discovery.html">Passive node discovery</a></li>
+                            <li><a href="slider.html">Slider demo</a></li>
+                            <li><a href="slider.html">Progress bar demo</a></li>
+                            <li><a href="simpletext.html">Simple text demo</a></li>
+                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="epoch_simple.html">Simple demo</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown">
+                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
+                        <span class="caret"></span></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="google_gauge.html">Gauge demo</a></li>
+                            <li><a href="google_line_simple.html">LineChart demo</a></li>
+                            <li><a href="google_table.html">Table demo</a></li>
+                        </ul>
+                    </li>
+                    <li><a href="../service/index.html">Service</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <h1>VSCP HTML5 websocket Google Charts Table demo</h1>
+        <p>
+            This demo uses the Table from Google charts to display dynamic temperature measurement values in degrees Celsius. It displays 
+            all CLASS1.MEASUREMENT, Type=6/Temperature values that comes from any sensor of that device. That is not just sensoridx=2 aside
+            the other demo do.
+        </p>
+        <p>
+            The <a href="event.html">event.html</a> sample can be used to set temperature values if you don't have live hardware.
+        </p>
+        <h2>Demo</h2>
+        <div id="table_div" style="width: 600px; height: 420px;"></div>  <!-- dimensions is not needed -->
+        
+        <br /><br />
+        <hr>
+        Copyright &copy; 2000-2015 <a href="mailto:info@grodansparadis.com">email</a>,
+        <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
+    </div>
+</body>
 </html>
