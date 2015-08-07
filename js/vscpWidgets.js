@@ -425,6 +425,19 @@ vscp.widget.images.button = [
     }
 ];
 
+vscp._createNS( "vscp.widget.images.thermometer" );
+
+/** Base path of the thermometer images */
+vscp.widget.images.thermometer.BASE_PATH = "../lib/widgets/thermometer";
+
+/** Thermometer images */
+vscp.widget.images.thermometer = [
+    vscp.widget.images.thermometer.BASE_PATH + "/thermometer1.png",
+    vscp.widget.images.thermometer.BASE_PATH + "/thermometer2.png",
+    vscp.widget.images.thermometer.BASE_PATH + "/thermometer3.jpg",
+    vscp.widget.images.thermometer.BASE_PATH + "/thermometer4.png"
+];
+
 /**
  * Create a UUID.
  *
@@ -733,7 +746,7 @@ vscp.widget.Button = function( options ) {
             .drawLine({
                 strokeStyle: '#f00',
                 strokeWidth: 2,
-                x1: ( this.x - imageWidth / 2 ), y1: ( this.y - imageWidth / 2 ),
+                x1: ( this.x - imageWidth / 2 ), y1: ( this.y - imageHeight / 2 ),
                 x2: ( this.x + imageWidth / 2 ), y2: ( this.y + imageHeight / 2 )
             })
             .drawLine({
@@ -787,3 +800,300 @@ vscp.widget.Button.prototype.setEnabled = function( value ) {
     this._isEnabled = value;
     this.draw();
 };
+
+/**
+ * Add a thermometer to the canvas.
+ *
+ * @param[in] options   Options
+ *
+ * Options:
+ * - canvasName: Name of the canvas, normally the canvas id
+ * - type: Thermometer type, see vscp.widget.images.thermometer
+ * - x: x position of the button in the canvas
+ * - y: y position of the button in the canvas
+ * - scale: Scale factor applied to the thermometer image
+ * - connection: VSCP connection, used for event communication
+ * - receiveZone: Zone where state events will come from
+ * - receiveSubZone: Sub-zone where state events will come from
+ * - sensorIndex: Sensor index
+ * - vscpClass: VSCP measurement class
+ * - vscpType: VSCP measurement type
+ * - enable: Enable or disable button
+ */
+vscp.widget.Thermometer = function( options ) {
+
+    this.canvasName     = "canvas";                 // Name of the canvas
+    this.type           = 0;                        // Widget type, see images
+    this.x              = 0;                        // x-coordinate in the canvas
+    this.y              = 0;                        // y-coordinate in the canvas
+    this.scale          = 1;                        // Scale factor
+    this._isEnabled     = true;                     // Widget is enabled or disabled
+    this._idThermometer = vscp.widget.getUUID();    // Id used to identify the layer
+    this._idDisabled    = vscp.widget.getUUID();    // Id used to identify the layer
+    this._idData        = vscp.widget.getUUID();    // Id used to identify the layer
+    this._temperature   = 0;                        // Temperature
+
+    this.connection         = null;     // VSCP connection
+    this.decoder            = null;     // VSCP measurement decoder
+    this.sensorIndex        = -1;       // Sensor index (instance number)
+    this.vscpClass          = vscp.constants.classes.VSCP_CLASS1_MEASUREMENT;           // Measurement class
+    this.vscpType           = vscp.constants.types.VSCP_TYPE_MEASUREMENT_TEMPERATURE;   // Measurement type
+    this.receiveZone        = 255;      // Zone where state events will come from
+    this.receiveSubZone     = 255;      // Sub-zone where state events will come from
+
+    if ( "undefined" !== typeof options ) {
+
+        if ( "string" === typeof options.canvasName ) {
+            this.canvasName = options.canvasName;
+        }
+
+        if ( "number" === typeof options.type ) {
+            if ( ( 0 > options.type ) || ( vscp.widget.images.thermometer.length <= options.type ) ) {
+                console.error( vscp.utility.getTime() + " Thermometer type " + options.type + " unknown." );
+            }
+            else {
+                this.type = options.type;
+            }
+        }
+
+        if ( "number" === typeof options.x ) {
+            this.x = options.x;
+        }
+
+        if ( "number" === typeof options.y ) {
+            this.y = options.y;
+        }
+
+        if ( "number" === typeof options.scale ) {
+            this.scale = options.scale;
+        }
+
+        if ( "object" === typeof options.connection ) {
+            this.connection = options.connection;
+        }
+
+        if ( "number" === typeof options.receiveZone ) {
+            this.receiveZone = options.receiveZone;
+        }
+
+        if ( "number" === typeof options.receiveSubZone ) {
+            this.receiveSubZone = options.receiveSubZone;
+        }
+
+        if ( "number" === typeof options.sensorIndex ) {
+            this.sensorIndex = options.sensorIndex;
+        }
+
+        if ( "number" === typeof options.vscpClass ) {
+            this.vscpClass = options.vscpClass;
+        }
+        
+        if ( "number" === typeof options.vscpType ) {
+            this.vscpType = options.vscpType;
+        }
+        
+        if ( "boolean" === typeof options.enable ) {
+            this._isEnabled = options.enable;
+        }
+    }
+    
+    var onValue = function( measurement ) {
+    
+        var value = 0;
+    
+        if ( "undefined" === measurement ) {
+            return;
+        }
+    
+        value = vscp.measurement.toFixed( measurement.value, 1 );
+    
+        // Temperature in degree Celsius expected
+        switch( measurement.unitId ) {
+        
+            // Kelvin
+            case 0:
+                value = vscp.measurement.convertKelvinToCelsius( value );
+                break;
+
+            // Fahrenheit
+            case 2:
+                value = vscp.measurement.convertFahrenheitToCelsius( value );
+                break;
+            
+            // Celsius
+            default:
+                break;
+        }
+        
+        this._temperature = value;
+        this.draw();
+        
+    }.bind( this );
+
+    // Create a VSCP measurement event decoder
+    this.decoder = new vscp.measurement.Decoder({
+        connection: this.connection,
+        onValue: onValue,
+        filter: {
+            vscpClass: this.vscpClass,
+            vscpType: this.vscpType,
+            sensorIndex: this.sensorIndex
+        }
+    });
+
+    /* Create
+     * - one layer with the thermometer
+     * - one layer with the disabled sign
+     */
+    $( this.canvasName )
+    .drawImage({
+        name: this._idThermometer,
+        source: vscp.widget.images.thermometer[ this.type ],
+        layer: true,
+        x: this.x,
+        y: this.y,
+        scale: this.scale,
+        visible: true
+    })
+    .addLayer({
+        type: 'function',
+        name: this._idDisabled,
+        fn: ( function( ctx ) {
+
+            var imageWidth  = $( this.canvasName ).getLayer( this._idThermometer ).width  * this.scale;
+            var imageHeight = $( this.canvasName ).getLayer( this._idThermometer ).height * this.scale;
+
+            $( this.canvasName )
+            .drawLine({
+                strokeStyle: '#f00',
+                strokeWidth: 2,
+                x1: ( this.x - imageWidth / 2 ), y1: ( this.y - imageHeight / 2 ),
+                x2: ( this.x + imageWidth / 2 ), y2: ( this.y + imageHeight / 2 )
+            })
+            .drawLine({
+                strokeStyle: '#f00',
+                strokeWidth: 2,
+                x1: ( this.x - imageWidth / 2 ), y1: ( this.y + imageHeight / 2 ),
+                x2: ( this.x + imageWidth / 2 ), y2: ( this.y - imageHeight / 2 )
+            });
+        } ).bind( this ),
+        visible: true
+    })
+    .addLayer({
+        type: 'function',
+        name: this._idData,
+        fn: ( function( ctx ) {
+
+            var imageWidth  = $( this.canvasName ).getLayer( this._idThermometer ).width  * this.scale;
+            var imageHeight = $( this.canvasName ).getLayer( this._idThermometer ).height * this.scale;
+            
+            var thermometerData = null;
+            
+            if ( ( 0 === this.type ) ||
+                 ( 2 === this.type ) ) {
+                thermometerData = {
+                    maxT: 35,
+                    minT: -25,
+                    x: 26,
+                    y: 189,
+                    height: 181,
+                    width: 7,
+                    yOffset: 5,
+                    color: '#8A0000'
+                };
+            }
+            else if ( 1 === this.type ) {
+                thermometerData = {
+                    maxT: 45,
+                    minT: -35,
+                    x: 36,
+                    y: 239,
+                    height: 220,
+                    width: 10,
+                    yOffset: 11,
+                    color: '#FF0000'
+                };
+            }
+            else if ( 3 === this.type ) {
+                thermometerData = {
+                    maxT: 55,
+                    minT: -20,
+                    x: 32,
+                    y: 158,
+                    height: 142,
+                    width: 8,
+                    yOffset: 2,
+                    color: '#FF0000'
+                };
+            }
+            
+            var maxDeltaT   = thermometerData.maxT - thermometerData.minT;
+            var realX       = thermometerData.x * this.scale;
+            var realY       = thermometerData.y * this.scale;
+            var realHeight  = thermometerData.height * this.scale;
+            var realWidth   = thermometerData.width * this.scale;
+            var realYOffset = thermometerData.yOffset * this.scale;
+            var temperature = this._temperature;
+            
+            if ( thermometerData.maxT < temperature ) {
+                temperature = thermometerData.maxT;
+            }
+            else if ( thermometerData.minT > this._temperature ) {
+                temperature = thermometerData.minT;
+            }
+            
+            var t = ( temperature - thermometerData.minT ) * realHeight / maxDeltaT;
+            
+            console.log( temperature );
+            
+            $( this.canvasName )
+            .drawRect({
+                fillStyle: thermometerData.color,
+                x: ( this.x - imageWidth / 2 ) + realX,
+                y: ( this.y - imageHeight / 2 ) + realY,
+                width: realWidth,
+                height: -realYOffset - t,
+                fromCenter: false
+            });
+        } ).bind( this ),
+        visible: true
+    });
+    
+    this.draw();
+};
+
+/**
+ * Draw the thermometer depended on its current state.
+ */
+vscp.widget.Thermometer.prototype.draw = function() {
+
+    if ( false === this._isEnabled ) {
+        $( this.canvasName ).getLayer( this._idThermometer ).visible = true;
+        $( this.canvasName ).getLayer( this._idData ).visible = false;
+        $( this.canvasName ).getLayer( this._idDisabled ).visible = true;
+    }
+    else {
+        $( this.canvasName ).getLayer( this._idThermometer ).visible = true;
+        $( this.canvasName ).getLayer( this._idData ).visible = true;
+        $( this.canvasName ).getLayer( this._idDisabled ).visible = false;
+    }
+
+    $( this.canvasName ).drawLayers();
+};
+
+/**
+ * Enable or disable the thermometer.
+ *
+ * @param[in] value Enable (true) or disable (false) it
+ */
+vscp.widget.Thermometer.prototype.setEnabled = function( value ) {
+
+    if ( "boolean" !== typeof value ) {
+        return;
+    }
+
+    this._isEnabled = value;
+    this.draw();
+};
+
+
