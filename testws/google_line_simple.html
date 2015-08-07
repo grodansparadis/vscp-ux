@@ -96,14 +96,42 @@
         
         var onValue = function( measurement ) {
         
-            // Hopefully its in degree Celsius ;-)
-            var temperatureCelsius = measurement.value;
+            var temperatureCelsius = 0;
+        
+            if ( "undefined" === measurement ) {
+                return;
+            }
+
+            // Temperature in degree Celsius expected
+            switch( measurement.unitId ) {
+            
+                // Kelvin
+                case 0:
+                    temperatureCelsius = vscp.measurement.convertKelvinToCelsius( measurement.value );
+                    break;
+
+                // Celsius
+                case 1:
+                    temperatureCelsius = measurement.value;
+                    break;
+                    
+                // Fahrenheit
+                case 2:
+                    temperatureCelsius = vscp.measurement.convertFahrenheitToCelsius( measurement.value );
+                    break;
+                
+                // Should never happen
+                default:
+                    break;
+            }
+            
+            temperatureCelsius = parseFloat( vscp.measurement.toFixed( temperatureCelsius, 1 ) );   
             
             var dateTime = new Date();
             var strTime = "" + dateTime.getHours() + ":" + dateTime.getMinutes() + ":" + dateTime.getSeconds();
             
             data.addRows([
-                [ strTime, parseFloat( vscp.measurement.toFixed( temperatureCelsius, 1 ) ) ]
+                [ strTime, temperatureCelsius ]
             ]);
             
             chart.draw( data, options );            

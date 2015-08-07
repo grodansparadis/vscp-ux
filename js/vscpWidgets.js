@@ -912,13 +912,18 @@ vscp.widget.Thermometer = function( options ) {
             case 0:
                 value = vscp.measurement.convertKelvinToCelsius( measurement.value );
                 break;
+                
+            // Celsius
+            case 1:
+                value = measurement.value;
+                break;
 
             // Fahrenheit
             case 2:
                 value = vscp.measurement.convertFahrenheitToCelsius( measurement.value );
                 break;
             
-            // Celsius
+            // Should never happen
             default:
                 break;
         }
