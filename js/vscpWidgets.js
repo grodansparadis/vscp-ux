@@ -1044,8 +1044,6 @@ vscp.widget.Thermometer = function( options ) {
             
             var t = ( temperature - thermometerData.minT ) * realHeight / maxDeltaT;
             
-            console.log( temperature );
-            
             $( this.canvasName )
             .drawRect({
                 fillStyle: thermometerData.color,
