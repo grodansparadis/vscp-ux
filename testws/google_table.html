@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP Google Charts demo</title>
-    
+
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
@@ -16,7 +16,7 @@
 
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- VSCP settings -->
     <script type="text/javascript" src="settings.js"></script>
     <!-- VSCP hash calculation -->
@@ -25,7 +25,7 @@
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP measurement functions, which are dependend on the VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscpMeasurement.js"></script>
-    
+
     <!-- Google Charts API -->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
@@ -33,9 +33,9 @@
     <script src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
     <script src="menu.js"></script>
-    
+
     <script type="text/javascript">
-    
+
         (function() {
             // VSCP websocket connection
             var vscpConn = null;
@@ -45,19 +45,19 @@
 
             var data = null;
             var table = null;
-            
+
             google.load( "visualization", "1", { packages: ["table"] } );
             google.setOnLoadCallback( drawTable );
-            
+
             // Wait until the whole website is loaded
             $( document ).ready( function() {
-                
+
                 // Show navigation bar menu
                 navBarMenu.show( "menu", navBarMenu.content );
-                
+
                 // Create a VSCP websocket
                 vscpConn = new vscp.Connection();
-                                        
+
                 // Connect to VSCP server
                 vscpConn.connect({
 
@@ -68,7 +68,7 @@
                     password: settings.passwordHash,
 
                     onSuccess: function( conn ) {
-                    
+
                         // Create a VSCP measurement event decoder
                         decoder = new vscp.measurement.Decoder({
                             connection: conn,
@@ -79,40 +79,40 @@
                                 sensorIndex: 2
                             }
                         });
-                    
+
                         // Start receiving VSCP events
                         vscpConn.start({
-                        
+
                             onSuccess: function( conn ) {
-                                
+
                             },
-                            
+
                             onError: function( conn ) {
                                 alert("Couldn't start receiving events.");
                             }
-                            
+
                         });
-                        
+
                     },
 
                     onError: function( conn ) {
                         alert("Couldn't establish a connection.");
                     }
-                    
+
                 });
             });
-            
+
             var onValue = function( measurement ) {
-            
+
                 var temperatureCelsius = 0;
-            
+
                 if ( "undefined" === measurement ) {
                     return;
                 }
 
                 // Temperature in degree Celsius expected
                 switch( measurement.unitId ) {
-                
+
                     // Kelvin
                     case 0:
                         temperatureCelsius = vscp.measurement.convertKelvinToCelsius( measurement.value );
@@ -122,43 +122,43 @@
                     case 1:
                         temperatureCelsius = measurement.value;
                         break;
-                        
+
                     // Fahrenheit
                     case 2:
                         temperatureCelsius = vscp.measurement.convertFahrenheitToCelsius( measurement.value );
                         break;
-                    
+
                     // Should never happen
                     default:
                         break;
                 }
-                
+
                 temperatureCelsius = parseFloat( vscp.measurement.toFixed( temperatureCelsius, 1 ) );
-                            
+
                 var dateTime = new Date();
-        
+
                 data.addRows([
                     [ dateTime.toISOString(),
-                      measurement.sensorIndex, 
+                      measurement.sensorIndex,
                       temperatureCelsius ]
                 ]);
-                table.draw( data, {showRowNumber: true});      
+                table.draw( data, {showRowNumber: true});
             };
 
             function drawTable() {
-            
+
                 data = new google.visualization.DataTable();
                 data.addColumn( 'string', 'Date' );
                 data.addColumn( 'number', 'Sensor idx' );
                 data.addColumn( 'number', 'Temperature' );
-                
+
                 table = new google.visualization.Table( document.getElementById( 'table_div' ) );
 
                 table.draw( data, { showRowNumber: true } );
             }
 
         })();
-        
+
     </script>
 </head>
 <body>
@@ -174,7 +174,7 @@
     <div class="container-fluid">
         <h1>VSCP HTML5 websocket Google Charts Table demo</h1>
         <p>
-            This demo uses the Table from Google charts to display dynamic temperature measurement values in degrees Celsius. It displays 
+            This demo uses the Table from Google charts to display dynamic temperature measurement values in degrees Celsius. It displays
             all CLASS1.MEASUREMENT, Type=6/Temperature values that comes from any sensor of that device. That is not just sensoridx=2 aside
             the other demo do.
         </p>
@@ -183,7 +183,7 @@
         </p>
         <h2>Demo</h2>
         <div id="table_div" style="width: 600px; height: 420px;"></div>  <!-- dimensions is not needed -->
-        
+
         <br /><br />
         <hr>
         Copyright &copy; 2000-2015 <a href="mailto:info@grodansparadis.com">email</a>,

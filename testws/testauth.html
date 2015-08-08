@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP websocket authentication test</title>
-    
+
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
@@ -13,10 +13,10 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    
+
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- VSCP settings -->
     <script type="text/javascript" src="settings.js"></script>
     <!-- VSCP hash calculation -->
@@ -28,23 +28,23 @@
     <script src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
     <script src="menu.js"></script>
-    
+
     <script type="text/javascript">
-    
+
         (function() {
             // VSCP websocket connection
             var vscpConn = null;
-        
+
             // Wait until the whole website is loaded
             $( document ).ready( function() {
-                
+
                 // Show navigation bar menu
                 navBarMenu.show( "menu", navBarMenu.content );
-                
+
                 // Redirect console output
                 (function(){
                     var original = window.console;
-                    
+
                     function handle( method, args ){
                         var message = Array.prototype.slice.apply(args).join(' ');
                         $( "#output" ).append( "<br />" + args[ 0 ] );
@@ -52,7 +52,7 @@
                             original[method](message);
                         }
                     }
-                    
+
                     window.console = {
                         log: function(){
                             handle( 'log', arguments );
@@ -70,12 +70,12 @@
                             handle( 'debug', arguments );
                         }
                     };
-                    
+
                 })();
-                
+
                 // Create a VSCP websocket
                 vscpConn = new vscp.Connection();
-                            
+
                 // Connect to VSCP server
                 vscpConn.connect({
 
@@ -92,12 +92,12 @@
                     onError: function( conn ) {
                         $( "#output" ).append( "<br /><br />Connection establishment failed." );
                     }
-                    
+
                 });
             });
-        
+
         })();
-        
+
     </script>
 </head>
 <body>
@@ -120,7 +120,7 @@
 
         <br /><br />
         <hr>
-        Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>, 
+        Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>,
         <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
     </div>
 </body>

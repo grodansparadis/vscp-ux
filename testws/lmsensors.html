@@ -3,11 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP HTML5 lm-sensors example</title>
-    
+
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -30,9 +30,9 @@
     <script src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
     <script src="menu.js"></script>
-    
+
     <script type="text/javascript" >
-    
+
         (function() {
             // VSCP websocket connection
             var vscpConn = null;
@@ -42,13 +42,13 @@
 
             // Wait until the whole website is loaded
             $( document ).ready( function() {
-                
+
                 // Show navigation bar menu
                 navBarMenu.show( "menu", navBarMenu.content );
-                
+
                 // Create a VSCP websocket
                 vscpConn = new vscp.Connection();
-                                        
+
                 // Connect to VSCP server
                 vscpConn.connect({
 
@@ -59,7 +59,7 @@
                     password: settings.passwordHash,
 
                     onSuccess: function( conn ) {
-                    
+
                         // Create a VSCP measurement event decoder
                         decoder = new vscp.measurement.Decoder({
                             connection: conn,
@@ -70,45 +70,45 @@
                                 sensorIndex: 0
                             }
                         });
-                    
+
                         // Start receiving VSCP events
                         vscpConn.start({
-                        
+
                             onSuccess: function( conn ) {
-                                
+
                             },
-                            
+
                             onError: function( conn ) {
                                 alert("Couldn't start receiving events.");
                             }
-                            
+
                         });
-                        
+
                     },
 
                     onError: function( conn ) {
                         alert("Couldn't establish a connection.");
                     }
-                    
+
                 });
             });
-            
+
             var onValue = function( measurement ) {
-            
+
                 var temperatureCelsius = 0;
-            
+
                 if ( "undefined" === measurement ) {
                     return;
                 }
-            
+
                 // Temperature in degree Celsius expected
                 switch( measurement.unitId ) {
-                
+
                     // Kelvin
                     case 0:
                         temperatureCelsius = vscp.measurement.convertKelvinToCelsius( measurement.value );
                         break;
-                        
+
                     // Celsius
                     case 1:
                         temperatureCelsius = measurement.value;
@@ -118,17 +118,17 @@
                     case 2:
                         temperatureCelsius = vscp.measurement.convertFahrenheitToCelsius( measurement.value );
                         break;
-                    
+
                     // Should never happen
                     default:
                         break;
                 }
-                
+
                 temperatureCelsius = vscp.measurement.toFixed( temperatureCelsius, 1 );
-            
+
                 // CPU0 ?
                 if ( "FF:FF:FF:FF:FF:FF:00:00:00:00:00:00:00:00:00:01" === measurement.event.vscpGuid.toUpperCase() ) {
-                
+
                     // Display in Celsius
                     $( "#cpu0" ).text(
                         "" + temperatureCelsius + " degrees Celsius"
@@ -136,7 +136,7 @@
                 }
                 // CPU1 ?
                 else if ( "FF:FF:FF:FF:FF:FF:00:00:00:00:00:00:00:00:00:02" === measurement.event.vscpGuid.toUpperCase() ) {
-                
+
                     // Display in Celsius
                     $( "#cpu1" ).text(
                         "" + temperatureCelsius + " degrees Celsius"
@@ -145,9 +145,9 @@
             };
 
         })();
-        
+
     </script>
-    
+
 </head>
 
 <body>
@@ -182,7 +182,7 @@
         <hr>
         Copyright &copy; 2000-2015 <a href="mailto:info@grodansparadis.com">email</a>,
         <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
-        
+
     </div>
 </body>
 </html>

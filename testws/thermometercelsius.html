@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP thermometerWidgetCelsius demo</title>
-    
+
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
@@ -16,7 +16,7 @@
 
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- VSCP settings -->
     <script type="text/javascript" src="settings.js"></script>
     <!-- VSCP hash calculation -->
@@ -28,33 +28,33 @@
     <!-- VSCP measurement functions, which are dependend on the VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscpMeasurement.js"></script>
     <!-- jCanvas is a jQuery plugin that makes the HTML5 canvas easy to work with. -->
-    <script type="text/javascript" src="https://raw.github.com/caleb531/jcanvas/master/jcanvas.min.js"></script>    
+    <script type="text/javascript" src="https://raw.github.com/caleb531/jcanvas/master/jcanvas.min.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
     <script src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
     <script src="menu.js"></script>
-    
+
     <script type="text/javascript" >
-        
+
         (function() {
             // VSCP websocket connection
             var vscpConn = null;
-            
+
             var thermometer1 = null;
             var thermometer2 = null;
             var thermometer3 = null;
             var thermometer4 = null;
-            
+
             // Wait until the whole website is loaded
             $( document ).ready( function() {
-                                
+
                 // Show navigation bar menu
                 navBarMenu.show( "menu", navBarMenu.content );
-                                
+
                 // Create a VSCP websocket
                 vscpConn = new vscp.Connection();
-                
+
                 // Connect to VSCP server
                 vscpConn.connect({
 
@@ -65,42 +65,42 @@
                     password: settings.passwordHash,
 
                     onSuccess: function( conn ) {
-                    
+
                         // Initialize canvas
                         // Don't do this without a established connection, because
                         // the thermometer widget needs the connection object!
                         initCanvas();
-                    
+
                         // Start receiving VSCP events
                         vscpConn.start({
-                        
+
                             onSuccess: function( conn ) {
-                                
+
                                 // The user interface make only sense in case that the event communication is ready
                                 thermometer1.setEnabled( true );
                                 thermometer2.setEnabled( true );
                                 thermometer3.setEnabled( true );
                                 thermometer4.setEnabled( true );
                             },
-                            
+
                             onError: function( conn ) {
                                 alert("Couldn't start receiving events.");
                             }
-                            
+
                         });
-                        
+
                     },
 
                     onError: function( conn ) {
                         alert("Couldn't establish a connection.");
                     }
-                    
+
                 });
 
             });
-            
+
             function initCanvas() {
-                        
+
                 thermometer1 = new vscp.widget.Thermometer({
                     connection: vscpConn,           // VSCP connection object
                     canvasName: "#thermometer1",    // Canvas id
@@ -122,7 +122,7 @@
                     sensorIndex: 2,                 // Sensor index
                     enable: false                   // Disable thermometer by default
                 });
-                
+
                 thermometer3 = new vscp.widget.Thermometer({
                     connection: vscpConn,           // VSCP connection object
                     canvasName: "#thermometer3",    // Canvas id
@@ -133,7 +133,7 @@
                     sensorIndex: 2,                 // Sensor index
                     enable: false                   // Disable thermometer by default
                 });
-                
+
                 thermometer4 = new vscp.widget.Thermometer({
                     connection: vscpConn,           // VSCP connection object
                     canvasName: "#thermometer4",    // Canvas id
@@ -145,11 +145,11 @@
                     enable: false                   // Disable thermometer by default
                 });
             }
-        
+
         })();
-        
+
     </script>
-    
+
 </head>
 
 <body>
