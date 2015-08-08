@@ -29,125 +29,136 @@
     <!-- Google Charts API -->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+    
     <script type="text/javascript">
     
-        // VSCP websocket connection
-        var vscpConn = null;
+        (function() {
+            // VSCP websocket connection
+            var vscpConn = null;
 
-        // Measurement event decoder
-        var decoder = null;
+            // Measurement event decoder
+            var decoder = null;
 
-        var data = null;
-        var table = null;
-        
-        google.load( "visualization", "1", { packages: ["table"] } );
-        google.setOnLoadCallback( drawTable );
-        
-        // Wait until the whole website is loaded
-        $( document ).ready( function() {
+            var data = null;
+            var table = null;
             
-            // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
-                                    
-            // Connect to VSCP server
-            vscpConn.connect({
-
-                url: settings.url,
-
-                userName: settings.user,
-
-                password: settings.passwordHash,
-
-                onSuccess: function( conn ) {
+            google.load( "visualization", "1", { packages: ["table"] } );
+            google.setOnLoadCallback( drawTable );
+            
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
                 
-                    // Create a VSCP measurement event decoder
-                    decoder = new vscp.measurement.Decoder({
-                        connection: conn,
-                        onValue: onValue,
-                        filter: {
-                            vscpClass: vscp.constants.classes.VSCP_CLASS1_MEASUREMENT,
-                            vscpType: vscp.constants.types.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                            sensorIndex: 2
-                        }
-                    });
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
                 
-                    // Start receiving VSCP events
-                    vscpConn.start({
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
+                                        
+                // Connect to VSCP server
+                vscpConn.connect({
+
+                    url: settings.url,
+
+                    userName: settings.user,
+
+                    password: settings.passwordHash,
+
+                    onSuccess: function( conn ) {
                     
-                        onSuccess: function( conn ) {
+                        // Create a VSCP measurement event decoder
+                        decoder = new vscp.measurement.Decoder({
+                            connection: conn,
+                            onValue: onValue,
+                            filter: {
+                                vscpClass: vscp.constants.classes.VSCP_CLASS1_MEASUREMENT,
+                                vscpType: vscp.constants.types.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                                sensorIndex: 2
+                            }
+                        });
+                    
+                        // Start receiving VSCP events
+                        vscpConn.start({
+                        
+                            onSuccess: function( conn ) {
+                                
+                            },
                             
-                        },
+                            onError: function( conn ) {
+                                alert("Couldn't start receiving events.");
+                            }
+                            
+                        });
                         
-                        onError: function( conn ) {
-                            alert("Couldn't start receiving events.");
-                        }
-                        
-                    });
-                    
-                },
+                    },
 
-                onError: function( conn ) {
-                    alert("Couldn't establish a connection.");
+                    onError: function( conn ) {
+                        alert("Couldn't establish a connection.");
+                    }
+                    
+                });
+            });
+            
+            var onValue = function( measurement ) {
+            
+                var temperatureCelsius = 0;
+            
+                if ( "undefined" === measurement ) {
+                    return;
+                }
+
+                // Temperature in degree Celsius expected
+                switch( measurement.unitId ) {
+                
+                    // Kelvin
+                    case 0:
+                        temperatureCelsius = vscp.measurement.convertKelvinToCelsius( measurement.value );
+                        break;
+
+                    // Celsius
+                    case 1:
+                        temperatureCelsius = measurement.value;
+                        break;
+                        
+                    // Fahrenheit
+                    case 2:
+                        temperatureCelsius = vscp.measurement.convertFahrenheitToCelsius( measurement.value );
+                        break;
+                    
+                    // Should never happen
+                    default:
+                        break;
                 }
                 
-            });
-        });
+                temperatureCelsius = parseFloat( vscp.measurement.toFixed( temperatureCelsius, 1 ) );
+                            
+                var dateTime = new Date();
         
-        var onValue = function( measurement ) {
-        
-            var temperatureCelsius = 0;
-        
-            if ( "undefined" === measurement ) {
-                return;
-            }
+                data.addRows([
+                    [ dateTime.toISOString(),
+                      measurement.sensorIndex, 
+                      temperatureCelsius ]
+                ]);
+                table.draw( data, {showRowNumber: true});      
+            };
 
-            // Temperature in degree Celsius expected
-            switch( measurement.unitId ) {
+            function drawTable() {
             
-                // Kelvin
-                case 0:
-                    temperatureCelsius = vscp.measurement.convertKelvinToCelsius( measurement.value );
-                    break;
-
-                // Celsius
-                case 1:
-                    temperatureCelsius = measurement.value;
-                    break;
-                    
-                // Fahrenheit
-                case 2:
-                    temperatureCelsius = vscp.measurement.convertFahrenheitToCelsius( measurement.value );
-                    break;
+                data = new google.visualization.DataTable();
+                data.addColumn( 'string', 'Date' );
+                data.addColumn( 'number', 'Sensor idx' );
+                data.addColumn( 'number', 'Temperature' );
                 
-                // Should never happen
-                default:
-                    break;
+                table = new google.visualization.Table( document.getElementById( 'table_div' ) );
+
+                table.draw( data, { showRowNumber: true } );
             }
-            
-            temperatureCelsius = parseFloat( vscp.measurement.toFixed( temperatureCelsius, 1 ) );
-                        
-            var dateTime = new Date();
-    
-            data.addRows([
-                [ dateTime.toISOString(),
-                  measurement.sensorIndex, 
-                  temperatureCelsius ]
-            ]);
-            table.draw( data, {showRowNumber: true});      
-        };
 
-        function drawTable() {
+        })();
         
-            data = new google.visualization.DataTable();
-            data.addColumn( 'string', 'Date' );
-            data.addColumn( 'number', 'Sensor idx' );
-            data.addColumn( 'number', 'Temperature' );
-            
-            table = new google.visualization.Table( document.getElementById( 'table_div' ) );
-
-            table.draw( data, { showRowNumber: true } );
-        }
-
     </script>
 </head>
 <body>
@@ -156,44 +167,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                            <li><a href="lmsensors.html">lm-sensors demo</a></li>
-                            <li><a href="table_dynamic.html">Dynamic table demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="../service/index.html">Service</a></li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>

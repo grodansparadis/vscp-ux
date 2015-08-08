@@ -28,106 +28,120 @@
     <script src="../js/d3/d3.min.js"></script>
     <script src="../js/epoch/epoch.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="../js/epoch/epoch.min.css">
-        
+    
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+    
     <script type="text/javascript">
     
-        var bData = false;
-        var lineChart;
-        // The data array
-        var lineChartData = [
-            {
-                label: "Temperature",
-                values: [ 
-                    {time: 1370044800, y: 20} 
-                ]
-            }
-        ];
+        (function() {
         
-        var upDateChart = function () {
-
-            var start = new Date();
-            var end = new Date();
-
-            start.setTime( Date.parse( document.getElementById("_datefrom").value ) ); 
-            end.setTime( Date.parse( document.getElementById("_dateto").value ) );
-            vscptableCtrl.getTableData( start, end );
-        };
-    
-        var dataUpdate = function( tabledata ) {
-    
-
-        var table = document.getElementById("mymeasurementTable");
-        var row = table.insertRow(table.rows.length);
-        
-        if ( ( "+" == tabledata[0] ) && 
-                ( "GT" == tabledata[1] ) &&
-                ( "START" == tabledata[2] ) ) {
-            bData = true;
-
-            try {
-                $( "lineChart" ).empty();
-                delete lineChart;
-            
-                // delete all rows in table if any
-                if( table.rows.length > 0 ) {
-                    while ( table.rows.length ) {
-                        table.deleteRow(0);
-                    }
-                }
-                
-                if( lineChartData[0].values.length > 0 ) {
-                    while ( lineChartData[0].values.length ) {
-                        lineChartData[0].values.deleteRow(0);
-                    }
-                }
-                
-            } catch(e) {
-                console.log(e);
-            }
-            
-            console.log( tabledata );
-            var statistics = document.getElementById("stat");
-            statistics.innerHTML = "<b>Fetched</b> " + 
-                                        tabledata[3] + " <b>records of total</b>  " +
-                                    tabledata[4] + " " +
-                                    "<br />Total data interval in table is <b>From:</b> " + tabledata[5] +
-                                    " <b>To:</b> " + tabledata[6];
-                                            
-        }
-        else if ( ( "+" == tabledata[0] ) && 
-                    ( "GT" == tabledata[1] ) &&
-                    ( "END" == tabledata[2] ) ) {
-            bData = false;			
-            lineChart = $('#lineChart').epoch({
-                type: 'time.line',
-                tickFormats: { time: function(d) { return new Date(time*1000).toISOString() } },
-                data: lineChartData,
-                windowSize: 120,
-                axes: ['left', 'right', 'bottom']
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
             });
-        }
-        else if ( bData && ( "+" == tabledata[0] ) && 
-                ( "GT" == tabledata[1] ) ) {	
-            var d = new Date();
-            d.setTime( Date.parse( tabledata[3] ) );
-            var data = { time: d.getTime(), y: tabledata[4] };
-            lineChartData[0].values.push( data )
-    
-            // Add row to table
-            var cell1 = row.insertCell(0);
-            cell1.innerHTML = "Date = " + d.toLocaleString() + " Value = " + tabledata[4]
-            
-        }
         
-    }
-    
-    var vscptableCtrl = new vscpws_Table(   settings.user,
-                                            settings.passwordHash,
-                                            settings.url,
-                                            "officetemp",
-                                            0,
-                                            dataUpdate );
-                                                   
+            var bData = false;
+            var lineChart;
+            // The data array
+            var lineChartData = [
+                {
+                    label: "Temperature",
+                    values: [ 
+                        {time: 1370044800, y: 20} 
+                    ]
+                }
+            ];
+            
+            var upDateChart = function () {
+
+                var start = new Date();
+                var end = new Date();
+
+                start.setTime( Date.parse( document.getElementById("_datefrom").value ) ); 
+                end.setTime( Date.parse( document.getElementById("_dateto").value ) );
+                vscptableCtrl.getTableData( start, end );
+            };
+        
+            var dataUpdate = function( tabledata ) {
+        
+                var table = document.getElementById("mymeasurementTable");
+                var row = table.insertRow(table.rows.length);
+                
+                if ( ( "+" == tabledata[0] ) && 
+                        ( "GT" == tabledata[1] ) &&
+                        ( "START" == tabledata[2] ) ) {
+                    bData = true;
+
+                    try {
+                        $( "lineChart" ).empty();
+                        delete lineChart;
+                    
+                        // delete all rows in table if any
+                        if( table.rows.length > 0 ) {
+                            while ( table.rows.length ) {
+                                table.deleteRow(0);
+                            }
+                        }
+                        
+                        if( lineChartData[0].values.length > 0 ) {
+                            while ( lineChartData[0].values.length ) {
+                                lineChartData[0].values.deleteRow(0);
+                            }
+                        }
+                        
+                    } catch(e) {
+                        console.log(e);
+                    }
+                    
+                    console.log( tabledata );
+                    var statistics = document.getElementById("stat");
+                    statistics.innerHTML = "<b>Fetched</b> " + 
+                                                tabledata[3] + " <b>records of total</b>  " +
+                                            tabledata[4] + " " +
+                                            "<br />Total data interval in table is <b>From:</b> " + tabledata[5] +
+                                            " <b>To:</b> " + tabledata[6];
+                                                    
+                }
+                else if ( ( "+" == tabledata[0] ) && 
+                            ( "GT" == tabledata[1] ) &&
+                            ( "END" == tabledata[2] ) ) {
+                    bData = false;			
+                    lineChart = $('#lineChart').epoch({
+                        type: 'time.line',
+                        tickFormats: { time: function(d) { return new Date(time*1000).toISOString() } },
+                        data: lineChartData,
+                        windowSize: 120,
+                        axes: ['left', 'right', 'bottom']
+                    });
+                }
+                else if ( bData && ( "+" == tabledata[0] ) && 
+                        ( "GT" == tabledata[1] ) ) {	
+                    var d = new Date();
+                    d.setTime( Date.parse( tabledata[3] ) );
+                    var data = { time: d.getTime(), y: tabledata[4] };
+                    lineChartData[0].values.push( data )
+            
+                    // Add row to table
+                    var cell1 = row.insertCell(0);
+                    cell1.innerHTML = "Date = " + d.toLocaleString() + " Value = " + tabledata[4]
+                    
+                }
+                
+            }
+            
+            var vscptableCtrl = new vscpws_Table(   settings.user,
+                                                    settings.passwordHash,
+                                                    settings.url,
+                                                    "officetemp",
+                                                    0,
+                                                    dataUpdate );
+        
+        })();
+        
     </script>
 </head>
 
@@ -137,44 +151,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                            <li><a href="lmsensors.html">lm-sensors demo</a></li>
-                            <li><a href="table_dynamic.html">Dynamic table demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="../service/index.html">Service</a></li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>

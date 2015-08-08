@@ -24,6 +24,11 @@
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
 
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+    
     <style>
         // Progress 1
         /* Firefox - value portion of progress progress1 */
@@ -106,76 +111,83 @@
 
     <script type="text/javascript" >
         
-        var zone = 1;
-        var subZone = 20;
-        
-        // VSCP websocket connection
-        var vscpConn = null;
-
-        // Wait until the whole website is loaded
-        $( document ).ready( function() {
+        (function() {
+                        
+            var zone = 1;
+            var subZone = 20;
             
-            // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
-                                    
-            // Connect to VSCP server
-            vscpConn.connect({
+            // VSCP websocket connection
+            var vscpConn = null;
 
-                url: settings.url,
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
 
-                userName: settings.user,
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
+        
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
+                                        
+                // Connect to VSCP server
+                vscpConn.connect({
 
-                password: settings.passwordHash,
+                    url: settings.url,
 
-                onSuccess: function( conn ) {
-                
-                    // Start receiving VSCP events
-                    vscpConn.start({
+                    userName: settings.user,
+
+                    password: settings.passwordHash,
+
+                    onSuccess: function( conn ) {
                     
-                        onSuccess: function( conn ) {
+                        // Start receiving VSCP events
+                        vscpConn.start({
                         
-                            vscpConn.addEventListener( eventListener );
+                            onSuccess: function( conn ) {
                             
-                        },
+                                vscpConn.addEventListener( eventListener );
+                                
+                            },
+                            
+                            onError: function( conn ) {
+                                alert("Couldn't start receiving events.");
+                            }
+                            
+                        });
                         
-                        onError: function( conn ) {
-                            alert("Couldn't start receiving events.");
-                        }
-                        
-                    });
-                    
-                },
+                    },
 
-                onError: function( conn ) {
-                    alert("Couldn't establish a connection.");
+                    onError: function( conn ) {
+                        alert("Couldn't establish a connection.");
+                    }
+                    
+                });
+            });
+            
+            function eventListener( conn, evt ) {
+            
+                if ( "undefined" === typeof evt ) {
+                    return;
                 }
                 
-            });
-        });
-        
-        function eventListener( conn, evt ) {
-        
-            if ( "undefined" === typeof evt ) {
-                return;
-            }
+                if ( false === ( evt instanceof vscp.Event ) ) {
+                    return;
+                }
             
-            if ( false === ( evt instanceof vscp.Event ) ) {
-                return;
-            }
-        
-            if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
-                 ( vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED === evt.vscpType ) &&
-                 ( zone === evt.vscpData[ 1 ] ) &&
-                 ( subZone === evt.vscpData[ 2 ] ) ) {
+                if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
+                     ( vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED === evt.vscpType ) &&
+                     ( zone === evt.vscpData[ 1 ] ) &&
+                     ( subZone === evt.vscpData[ 2 ] ) ) {
 
-                console.debug( evt.vscpData[ 0 ] );
-                $( "#bar" ).val( evt.vscpData[ 0 ] );
-                $( "#progress1" ).val( evt.vscpData[ 0 ] );
-                $( "#progress2" ).val( evt.vscpData[ 0 ] );
-                $( "#progress3" ).val( evt.vscpData[ 0 ] );
-                
-            }
-        };
+                    console.debug( evt.vscpData[ 0 ] );
+                    $( "#bar" ).val( evt.vscpData[ 0 ] );
+                    $( "#progress1" ).val( evt.vscpData[ 0 ] );
+                    $( "#progress2" ).val( evt.vscpData[ 0 ] );
+                    $( "#progress3" ).val( evt.vscpData[ 0 ] );
+                    
+                }
+            };
+        
+        })();
         
     </script>
 
@@ -187,44 +199,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                            <li><a href="lmsensors.html">lm-sensors demo</a></li>
-                            <li><a href="table_dynamic.html">Dynamic table demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="../service/index.html">Service</a></li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>

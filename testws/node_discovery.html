@@ -24,93 +24,105 @@
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
 
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+    
     <script type="text/javascript" >
 
-        // VSCP websocket connection
-        var vscpConn = null;
+        (function() {
         
-        var idArray = [];
-        
-        // Wait until the whole website is loaded
-        $( document ).ready( function() {
-        
-            // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
+            // VSCP websocket connection
+            var vscpConn = null;
             
-            // Connect to VSCP server
-            vscpConn.connect({
+            var idArray = [];
+            
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
 
-                url: settings.url,
-
-                userName: settings.user,
-
-                password: settings.passwordHash,
-
-                onSuccess: function( conn ) {
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
+            
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
                 
-                    // Start receiving VSCP events
-                    vscpConn.start({
-                    
-                        onSuccess: function( conn ) {
-                            
-                            vscpConn.addEventListener( checkForNode );
-                            
-                        },
-                        
-                        onError: function( conn ) {
-                            alert("Couldn't start receiving events.");
-                        }
-                        
-                    });
-                    
-                },
+                // Connect to VSCP server
+                vscpConn.connect({
 
-                onError: function( conn ) {
-                    alert("Couldn't establish a connection.");
+                    url: settings.url,
+
+                    userName: settings.user,
+
+                    password: settings.passwordHash,
+
+                    onSuccess: function( conn ) {
+                    
+                        // Start receiving VSCP events
+                        vscpConn.start({
+                        
+                            onSuccess: function( conn ) {
+                                
+                                vscpConn.addEventListener( checkForNode );
+                                
+                            },
+                            
+                            onError: function( conn ) {
+                                alert("Couldn't start receiving events.");
+                            }
+                            
+                        });
+                        
+                    },
+
+                    onError: function( conn ) {
+                        alert("Couldn't establish a connection.");
+                    }
+                    
+                });
+            });
+            
+            var checkForNode = function( conn, evt ) {
+                
+                var index   = 0;
+                var bFound  = false;
+                
+                if ( "undefined" === typeof evt ) {
+                    return;
                 }
                 
-            });
-        });
-        
-        var checkForNode = function( conn, evt ) {
-            
-            var index   = 0;
-            var bFound  = false;
-            
-            if ( "undefined" === typeof evt ) {
-                return;
-            }
-            
-            if ( false === ( evt instanceof vscp.Event ) ) {
-                return;
-            }
-            
-            if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
-                 ( vscp.constants.types.VSCP_TYPE_INFORMATION_NODE_HEARTBEAT === evt.vscpType ) ) {
+                if ( false === ( evt instanceof vscp.Event ) ) {
+                    return;
+                }
+                
+                if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
+                     ( vscp.constants.types.VSCP_TYPE_INFORMATION_NODE_HEARTBEAT === evt.vscpType ) ) {
 
-                for( index = 0; index < idArray.length; ++index ) {
-                    if ( evt.vscpGuid === idArray[ index ] ) {
-                        bFound = true;
-                        break;
+                    for( index = 0; index < idArray.length; ++index ) {
+                        if ( evt.vscpGuid === idArray[ index ] ) {
+                            bFound = true;
+                            break;
+                        }
+                    }
+                    
+                    if ( false === bFound ) {
+                    
+                        idArray.push( evt.vscpGuid );
+                        idArray.sort();
+                        
+                        // Clear old options if any
+                        $( "#nodeList" ).empty();
+                        $( "#nodeList" ).css( "backgroundColor", "#00FF00" );
+                        $( "#id3" ).text( "Found" );
+                        $( "#nodeCount" ).text( idArray.length );
+                        $.each( idArray, function( index, item ) {
+                            $( "#nodeList" ).append( $( "<option></option>" ).text( item ).val( item ) );
+                        });
                     }
                 }
-                
-                if ( false === bFound ) {
-                
-                    idArray.push( evt.vscpGuid );
-                    idArray.sort();
-                    
-                    // Clear old options if any
-                    $( "#nodeList" ).empty();
-                    $( "#nodeList" ).css( "backgroundColor", "#00FF00" );
-                    $( "#id3" ).text( "Found" );
-                    $( "#nodeCount" ).text( idArray.length );
-                    $.each( idArray, function( index, item ) {
-                        $( "#nodeList" ).append( $( "<option></option>" ).text( item ).val( item ) );
-                    });
-                }
-            }
-        };
+            };
+            
+        })();
         
     </script>
     
@@ -122,44 +134,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                            <li><a href="lmsensors.html">lm-sensors demo</a></li>
-                            <li><a href="table_dynamic.html">Dynamic table demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="../service/index.html">Service</a></li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>

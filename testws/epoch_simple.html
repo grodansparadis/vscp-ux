@@ -31,6 +31,11 @@
     <script src="../js/epoch/epoch.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="../js/epoch/epoch.min.css">
     
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+    
     <script type="text/javascript">
 	
         var setTime = function( d ) {
@@ -60,6 +65,9 @@
 
         // Wait until the whole website is loaded
         $( document ).ready( function() {
+            
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
             
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
@@ -151,7 +159,7 @@
                 areaChartInstance1.push( data );
             }
         };
-        	
+        
     </script>
 </head>
 
@@ -161,53 +169,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                            <li><a href="lmsensors.html">lm-sensors demo</a></li>
-                            <li><a href="table_dynamic.html">Dynamic table demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Service
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="../service/variable_configuration.html">Variable configuration</a></li>
-                            <li><a href="../service/dm_std_configuration.html">Edit standard decision matrix</a></li>
-                            <li><a href="../service/dm_ng_configuration.html">Edit decision matrix next generation</a></li>
-                            <li><a href="../service/vscp_registers.html">Read standard registers</a></li>
-                        </ul>
-                    </li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>
