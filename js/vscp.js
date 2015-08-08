@@ -1380,6 +1380,16 @@ vscp.utility.guidToStr = function( guid ) {
     return guidStr;
 };
 
+/**
+ * Get node id from a node GUID.
+ *
+ * @param[in] guid  Node GUID (string)
+ * @return Node id
+ */
+vscp.utility.getNodeId = function( guid ) {
+    return parseInt( guid.split( ":" )[ 15 ] );
+};
+
 /* ---------------------------------------------------------------------- */
 
 /**
