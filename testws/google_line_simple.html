@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP Google Charts demo</title>
-    
+
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
@@ -16,7 +16,7 @@
 
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- VSCP settings -->
     <script type="text/javascript" src="settings.js"></script>
     <!-- VSCP hash calculation -->
@@ -25,106 +25,145 @@
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP measurement functions, which are dependend on the VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscpMeasurement.js"></script>
-    
+
     <!-- Google Charts API -->
     <script type="text/javascript" src="https://www.google.com/jsapi"></script>
 
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+
     <script type="text/javascript">
-    
-        // VSCP websocket connection
-        var vscpConn = null;
 
-        // Measurement event decoder
-        var decoder = null;
+        (function() {
+            // VSCP websocket connection
+            var vscpConn = null;
 
-        var data = null;
-        var options = null;
-        var chart = null;
-        
-        google.load( "visualization", "1", { packages: ["corechart"] } );
-        google.setOnLoadCallback( drawChart );
-        
-        // Wait until the whole website is loaded
-        $( document ).ready( function() {
-            
-            // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
-                                    
-            // Connect to VSCP server
-            vscpConn.connect({
+            // Measurement event decoder
+            var decoder = null;
 
-                url: settings.url,
+            var data = null;
+            var options = null;
+            var chart = null;
 
-                userName: settings.user,
+            google.load( "visualization", "1", { packages: ["corechart"] } );
+            google.setOnLoadCallback( drawChart );
 
-                password: settings.passwordHash,
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
 
-                onSuccess: function( conn ) {
-                
-                    // Create a VSCP measurement event decoder
-                    decoder = new vscp.measurement.Decoder({
-                        connection: conn,
-                        onValue: onValue,
-                        filter: {
-                            vscpClass: vscp.constants.classes.VSCP_CLASS1_MEASUREMENT,
-                            vscpType: vscp.constants.types.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
-                            sensorIndex: 2
-                        }
-                    });
-                
-                    // Start receiving VSCP events
-                    vscpConn.start({
-                    
-                        onSuccess: function( conn ) {
-                            
-                        },
-                        
-                        onError: function( conn ) {
-                            alert("Couldn't start receiving events.");
-                        }
-                        
-                    });
-                    
-                },
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
 
-                onError: function( conn ) {
-                    alert("Couldn't establish a connection.");
-                }
-                
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
+
+                // Connect to VSCP server
+                vscpConn.connect({
+
+                    url: settings.url,
+
+                    userName: settings.user,
+
+                    password: settings.passwordHash,
+
+                    onSuccess: function( conn ) {
+
+                        // Create a VSCP measurement event decoder
+                        decoder = new vscp.measurement.Decoder({
+                            connection: conn,
+                            onValue: onValue,
+                            filter: {
+                                vscpClass: vscp.constants.classes.VSCP_CLASS1_MEASUREMENT,
+                                vscpType: vscp.constants.types.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                                sensorIndex: 2
+                            }
+                        });
+
+                        // Start receiving VSCP events
+                        vscpConn.start({
+
+                            onSuccess: function( conn ) {
+
+                            },
+
+                            onError: function( conn ) {
+                                alert("Couldn't start receiving events.");
+                            }
+
+                        });
+
+                    },
+
+                    onError: function( conn ) {
+                        alert("Couldn't establish a connection.");
+                    }
+
+                });
             });
-        });
-        
-        var onValue = function( measurement ) {
-        
-            // Hopefully its in degree Celsius ;-)
-            var temperatureCelsius = measurement.value;
-            
-            var dateTime = new Date();
-            var strTime = "" + dateTime.getHours() + ":" + dateTime.getMinutes() + ":" + dateTime.getSeconds();
-            
-            data.addRows([
-                [ strTime, parseFloat( vscp.measurement.toFixed( temperatureCelsius, 1 ) ) ]
-            ]);
-            
-            chart.draw( data, options );            
-        };
 
-        function drawChart() {
-        
-            data = google.visualization.arrayToDataTable([
-                ['Date', 'Temperature'],         
-                ['00:00:00', 0]
-            ]);
-            
-            options = {
-                title: 'Temperature Diagram',
-                Continuous: 'date'
+            var onValue = function( measurement ) {
+
+                var temperatureCelsius = 0;
+
+                if ( "undefined" === measurement ) {
+                    return;
+                }
+
+                // Temperature in degree Celsius expected
+                switch( measurement.unitId ) {
+
+                    // Kelvin
+                    case 0:
+                        temperatureCelsius = vscp.measurement.convertKelvinToCelsius( measurement.value );
+                        break;
+
+                    // Celsius
+                    case 1:
+                        temperatureCelsius = measurement.value;
+                        break;
+
+                    // Fahrenheit
+                    case 2:
+                        temperatureCelsius = vscp.measurement.convertFahrenheitToCelsius( measurement.value );
+                        break;
+
+                    // Should never happen
+                    default:
+                        break;
+                }
+
+                temperatureCelsius = parseFloat( vscp.measurement.toFixed( temperatureCelsius, 1 ) );
+
+                var dateTime = new Date();
+                var strTime = "" + dateTime.getHours() + ":" + dateTime.getMinutes() + ":" + dateTime.getSeconds();
+
+                data.addRows([
+                    [ strTime, temperatureCelsius ]
+                ]);
+
+                chart.draw( data, options );
             };
 
-            chart = new google.visualization.LineChart( document.getElementById( 'chart_div' ) );
+            function drawChart() {
 
-            chart.draw( data, options );
-        }
+                data = google.visualization.arrayToDataTable([
+                    ['Date', 'Temperature'],
+                    ['00:00:00', 0]
+                ]);
+
+                options = {
+                    title: 'Temperature Diagram',
+                    Continuous: 'date'
+                };
+
+                chart = new google.visualization.LineChart( document.getElementById( 'chart_div' ) );
+
+                chart.draw( data, options );
+            }
+
+        })();
 
     </script>
 </head>
@@ -134,49 +173,14 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="../service/index.html">Service</a></li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>
     <div class="container-fluid">
         <h1>VSCP HTML5 Google Charts LineChart demo</h1>
         <div id="chart_div" style="width: 900px; height: 500px;"></div>
-        
+
         <br /><br />
         <hr>
         Copyright &copy; 2000-2015 <a href="mailto:info@grodansparadis.com">email</a>,

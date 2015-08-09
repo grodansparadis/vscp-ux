@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP HTML5 progress bar</title>
-    
+
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
@@ -13,16 +13,21 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    
+
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- VSCP settings -->
     <script type="text/javascript" src="settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
 
     <style>
         // Progress 1
@@ -50,7 +55,7 @@
             width: 250px;
             height: 20px;
         }
-        
+
         // Progress 2
         /* Firefox - value portion of progress progress1 */
         progress#progress2::-moz-progress-bar {
@@ -76,7 +81,7 @@
             width: 250px;
             height: 20px;
         }
-        
+
         // Progress 3
         /* Firefox - value portion of progress progress1 */
         progress#progress3::-moz-progress-bar {
@@ -101,82 +106,89 @@
             padding: 3px;
             width: 250px;
             height: 20px;
-        }    
+        }
     </style>
 
     <script type="text/javascript" >
-        
-        var zone = 1;
-        var subZone = 20;
-        
-        // VSCP websocket connection
-        var vscpConn = null;
 
-        // Wait until the whole website is loaded
-        $( document ).ready( function() {
-            
-            // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
-                                    
-            // Connect to VSCP server
-            vscpConn.connect({
+        (function() {
 
-                url: settings.url,
+            var zone = 1;
+            var subZone = 20;
 
-                userName: settings.user,
+            // VSCP websocket connection
+            var vscpConn = null;
 
-                password: settings.passwordHash,
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
 
-                onSuccess: function( conn ) {
-                
-                    // Start receiving VSCP events
-                    vscpConn.start({
-                    
-                        onSuccess: function( conn ) {
-                        
-                            vscpConn.addEventListener( eventListener );
-                            
-                        },
-                        
-                        onError: function( conn ) {
-                            alert("Couldn't start receiving events.");
-                        }
-                        
-                    });
-                    
-                },
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
 
-                onError: function( conn ) {
-                    alert("Couldn't establish a connection.");
-                }
-                
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
+
+                // Connect to VSCP server
+                vscpConn.connect({
+
+                    url: settings.url,
+
+                    userName: settings.user,
+
+                    password: settings.passwordHash,
+
+                    onSuccess: function( conn ) {
+
+                        // Start receiving VSCP events
+                        vscpConn.start({
+
+                            onSuccess: function( conn ) {
+
+                                vscpConn.addEventListener( eventListener );
+
+                            },
+
+                            onError: function( conn ) {
+                                alert("Couldn't start receiving events.");
+                            }
+
+                        });
+
+                    },
+
+                    onError: function( conn ) {
+                        alert("Couldn't establish a connection.");
+                    }
+
+                });
             });
-        });
-        
-        function eventListener( conn, evt ) {
-        
-            if ( "undefined" === typeof evt ) {
-                return;
-            }
-            
-            if ( false === ( evt instanceof vscp.Event ) ) {
-                return;
-            }
-        
-            if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
-                 ( vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED === evt.vscpType ) &&
-                 ( zone === evt.vscpData[ 1 ] ) &&
-                 ( subZone === evt.vscpData[ 2 ] ) ) {
 
-                console.debug( evt.vscpData[ 0 ] );
-                $( "#bar" ).val( evt.vscpData[ 0 ] );
-                $( "#progress1" ).val( evt.vscpData[ 0 ] );
-                $( "#progress2" ).val( evt.vscpData[ 0 ] );
-                $( "#progress3" ).val( evt.vscpData[ 0 ] );
-                
-            }
-        };
-        
+            function eventListener( conn, evt ) {
+
+                if ( "undefined" === typeof evt ) {
+                    return;
+                }
+
+                if ( false === ( evt instanceof vscp.Event ) ) {
+                    return;
+                }
+
+                if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
+                     ( vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED === evt.vscpType ) &&
+                     ( zone === evt.vscpData[ 1 ] ) &&
+                     ( subZone === evt.vscpData[ 2 ] ) ) {
+
+                    console.debug( evt.vscpData[ 0 ] );
+                    $( "#bar" ).val( evt.vscpData[ 0 ] );
+                    $( "#progress1" ).val( evt.vscpData[ 0 ] );
+                    $( "#progress2" ).val( evt.vscpData[ 0 ] );
+                    $( "#progress3" ).val( evt.vscpData[ 0 ] );
+
+                }
+            };
+
+        })();
+
     </script>
 
 </head>
@@ -187,42 +199,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="../service/index.html">Service</a></li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>
@@ -240,7 +217,7 @@
             <br /><br />
         </p>
         <p>
-            Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can 
+            Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
             also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b>there to
             set the slider value to either 0,10,50 or 100.
         </p>
@@ -251,11 +228,11 @@
             <progress id="progress1" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
             <br /><br /><br />
         </div>
-        
+
         <div>
             <progress id="progress2" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
         </div>
-        
+
         <div>
             <progress id="progress3" style="width: 600px; height: 30px;" value="90" max="100"  >33%</progress>
         </div>

@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP websocket authentication test</title>
-    
+
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
@@ -13,10 +13,10 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    
+
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- VSCP settings -->
     <script type="text/javascript" src="settings.js"></script>
     <!-- VSCP hash calculation -->
@@ -24,69 +24,80 @@
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
 
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+
     <script type="text/javascript">
-    
-        // VSCP websocket connection
-        var vscpConn = null;
-    
-        // Wait until the whole website is loaded
-        $( document ).ready( function() {
-            
-            // Redirect console output
-            (function(){
-                var original = window.console;
-                
-                function handle( method, args ){
-                    var message = Array.prototype.slice.apply(args).join(' ');
-                    $( "#output" ).append( "<br />" + args[ 0 ] );
-                    if ( original ) {
-                        original[method](message);
+
+        (function() {
+            // VSCP websocket connection
+            var vscpConn = null;
+
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
+
+                // Redirect console output
+                (function(){
+                    var original = window.console;
+
+                    function handle( method, args ){
+                        var message = Array.prototype.slice.apply(args).join(' ');
+                        $( "#output" ).append( "<br />" + args[ 0 ] );
+                        if ( original ) {
+                            original[method](message);
+                        }
                     }
-                }
-                
-                window.console = {
-                    log: function(){
-                        handle( 'log', arguments );
+
+                    window.console = {
+                        log: function(){
+                            handle( 'log', arguments );
+                        },
+                        info: function(){
+                            handle( 'info', arguments );
+                        },
+                        warn: function(){
+                            handle( 'warn', arguments );
+                        },
+                        error: function(){
+                            handle( 'error', arguments );
+                        },
+                        debug: function(){
+                            handle( 'debug', arguments );
+                        }
+                    };
+
+                })();
+
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
+
+                // Connect to VSCP server
+                vscpConn.connect({
+
+                    url: settings.url,
+
+                    userName: settings.user,
+
+                    password: settings.passwordHash,
+
+                    onSuccess: function( conn ) {
+                        $( "#output" ).append( "<br /><br />Connection establishment successful." );
                     },
-                    info: function(){
-                        handle( 'info', arguments );
-                    },
-                    warn: function(){
-                        handle( 'warn', arguments );
-                    },
-                    error: function(){
-                        handle( 'error', arguments );
-                    },
-                    debug: function(){
-                        handle( 'debug', arguments );
+
+                    onError: function( conn ) {
+                        $( "#output" ).append( "<br /><br />Connection establishment failed." );
                     }
-                };
-                
-            })();
-            
-            // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
-                        
-            // Connect to VSCP server
-            vscpConn.connect({
 
-                url: settings.url,
-
-                userName: settings.user,
-
-                password: settings.passwordHash,
-
-                onSuccess: function( conn ) {
-                    $( "#output" ).append( "<br /><br />Connection establishment successful." );
-                },
-
-                onError: function( conn ) {
-                    $( "#output" ).append( "<br /><br />Connection establishment failed." );
-                }
-                
+                });
             });
-        });
-        
+
+        })();
+
     </script>
 </head>
 <body>
@@ -95,42 +106,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="../service/index.html">Service</a></li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>
@@ -144,7 +120,7 @@
 
         <br /><br />
         <hr>
-        Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>, 
+        Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>,
         <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
     </div>
 </body>

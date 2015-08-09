@@ -905,25 +905,30 @@ vscp.widget.Thermometer = function( options ) {
             return;
         }
     
-        value = vscp.measurement.toFixed( measurement.value, 1 );
-    
         // Temperature in degree Celsius expected
         switch( measurement.unitId ) {
         
             // Kelvin
             case 0:
-                value = vscp.measurement.convertKelvinToCelsius( value );
+                value = vscp.measurement.convertKelvinToCelsius( measurement.value );
+                break;
+                
+            // Celsius
+            case 1:
+                value = measurement.value;
                 break;
 
             // Fahrenheit
             case 2:
-                value = vscp.measurement.convertFahrenheitToCelsius( value );
+                value = vscp.measurement.convertFahrenheitToCelsius( measurement.value );
                 break;
             
-            // Celsius
+            // Should never happen
             default:
                 break;
         }
+        
+        value = vscp.measurement.toFixed( value, 1 );
         
         this._temperature = value;
         this.draw();

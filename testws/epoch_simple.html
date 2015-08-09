@@ -3,20 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP Epoch chart demo simple</title>
-	
+
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
-	
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    
+
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- VSCP settings -->
     <script type="text/javascript" src="settings.js"></script>
     <!-- VSCP hash calculation -->
@@ -25,14 +25,19 @@
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP measurement functions, which are dependend on the VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscpMeasurement.js"></script>
-    
+
     <!-- JavaScript library for manipulating documents based on data -->
     <script src="../js/d3/d3.min.js"></script>
     <script src="../js/epoch/epoch.min.js"></script>
 	<link rel="stylesheet" type="text/css" href="../js/epoch/epoch.min.css">
-    
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+
     <script type="text/javascript">
-	
+
         var setTime = function( d ) {
             var date = new Date(d*1000);
             var date_year = date.getFullYear();
@@ -43,10 +48,10 @@
             var date_second = date.getSeconds();
             return date_year + '-' + date_month + '-' + date_day + ' ' + date_hour + ':' + date_minute + ':' + date_second;
         }
-        
+
         var lineChartData = [{
             label: "Temperature",
-            values: [ 
+            values: [
                 {time: 1370044800, y: 20}, {time: 1370044801, y: 20}, {time: 1370044802, y: 19}, {time: 1370044803, y: 18},
                 {time: 1370044804, y: 17}, {time: 1370044805, y: 16}, {time: 1370044806, y: 15}, {time: 1370044807, y: 14},
                 {time: 1370044808, y: 13}, {time: 1370044809, y: 12}, {time: 1370044810, y: 11}, {time: 1370044811, y: 10},
@@ -54,16 +59,19 @@
                 {time: 1370044822, y: 4}, {time: 1370044844, y: 1}, {time: 1370044848, y: 0}, {time: 1370044899, y: -3},
             ]
         }];
-        
+
         // VSCP websocket connection
         var vscpConn = null;
 
         // Wait until the whole website is loaded
         $( document ).ready( function() {
-            
+
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
+
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
-                                    
+
             // Connect to VSCP server
             vscpConn.connect({
 
@@ -74,70 +82,73 @@
                 password: settings.passwordHash,
 
                 onSuccess: function( conn ) {
-                
+
                     // Start receiving VSCP events
                     vscpConn.start({
-                    
+
                         onSuccess: function( conn ) {
-                        
+
                             vscpConn.addEventListener( eventListener );
-                            
+
                         },
-                        
+
                         onError: function( conn ) {
                             alert("Couldn't start receiving events.");
                         }
-                        
+
                     });
-                    
+
                 },
 
                 onError: function( conn ) {
                     alert("Couldn't establish a connection.");
                 }
-                               
+
             });
         });
-        
+
         var eventListener = function( conn, evt ) {
-        
+
             var value = 0;
-        
+
             if ( "undefined" === typeof evt ) {
                 return;
             }
-            
+
             if ( false === ( evt instanceof vscp.Event ) ) {
                 return;
             }
-        
+
             if ( ( vscp.constants.classes.VSCP_CLASS1_MEASUREMENT === evt.vscpClass ) &&
                  ( vscp.constants.types.VSCP_TYPE_MEASUREMENT_TEMPERATURE === evt.vscpType ) ) {
-                 
+
                 // This event is for us
                 console.log( "Codingbyte = " + evt.vscpData );
-                
+
                 // We are only interested in sensor 2
                 var sensorindex =  vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
-                if ( sensorindex !== 2 ) {
+                if ( 2 !== sensorindex ) {
                     return;
                 }
-                
+
                 // This event is for us
                 value = vscp.measurement.toFixed( vscp.measurement.decodeClass10( evt.vscpData ), 1 );
-                            
+
                 // Should be a Celsius value
                 switch( vscp.measurement.getDataCoding( evt.vscpData[ 0 ] ) ) {
-                    case 0:   // Kelvin
-                        value = vscp.measurement.convertKelvinToCelsius(this.value);
+                    // Kelvin
+                    case 0:
+                        value = vscp.measurement.convertKelvinToCelsius( this.value );
                         break;
-                    case 2:   // Fahrenheit
-                        value = vscp.measurement.convertFahrenheitToCelsius(this.value);
+                    // Fahrenheit
+                    case 2:
+                        value = vscp.measurement.convertFahrenheitToCelsius( this.value );
                         break;
-                    default:    // Do nothing (if already Celsius)
+                    // Do nothing (if already Celsius)
+                    default:
                         break;
                 }
-                
+
                 var d = new Date();
                 var data = [{
                     time: d.getTime(),
@@ -148,7 +159,7 @@
                 areaChartInstance1.push( data );
             }
         };
-        	
+
     </script>
 </head>
 
@@ -158,51 +169,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Service
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="../service/variable_configuration.html">Variable configuration</a></li>
-                            <li><a href="../service/dm_std_configuration.html">Edit standard decision matrix</a></li>
-                            <li><a href="../service/dm_ng_configuration.html">Edit decision matrix next generation</a></li>
-                            <li><a href="../service/vscp_registers.html">Read standard registers</a></li>
-                        </ul>
-                    </li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>

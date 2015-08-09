@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP vscpws_variable demo</title>
-    
+
     <!-- Don't cache the page -->
     <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
     <META HTTP-EQUIV="Expires" CONTENT="-1">
@@ -24,281 +24,292 @@
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
 
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+
     <script type="text/javascript" >
-    
-        // VSCP websocket connection
-        var vscpConn = null;
 
-       // Wait until the whole website is loaded
-        $( document ).ready( function() {
-            
-            // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
-            
-            settings.url = "ws://104.236.235.81:8080";
-            
-            // Connect to VSCP server
-            vscpConn.connect({
+        (function() {
+            // VSCP websocket connection
+            var vscpConn = null;
 
-                url: settings.url,
+           // Wait until the whole website is loaded
+            $( document ).ready( function() {
 
-                userName: settings.user,
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
 
-                password: settings.passwordHash,
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
 
-                onSuccess: function( conn ) {
-                
-                    // Start receiving VSCP events
-                    vscpConn.start({
-                    
-                        onSuccess: function( conn ) {
-                            // Enable the user interface
-                            ui.enable();
-                        },
-                        
-                        onError: function( conn ) {
-                            alert("Couldn't start receiving events.");
-                        }
-                        
-                    });
-                    
-                },
+                settings.url = "ws://104.236.235.81:8080";
 
-                onError: function( conn ) {
-                    alert("Couldn't establish a connection.");
-                }
-                
-            });
-        });
+                // Connect to VSCP server
+                vscpConn.connect({
 
-        // User interface data
-        var ui = {
-            
-            enable: function() {
-                $( "#ui :input" ).attr( "disabled", false );
-            },
-            
-            disable: function() {
-                $( "#ui :input" ).attr( "disabled", true );
-            }
-        };
-    
-        var zone = 1;
-        var subzone = 20;
-        var bMonitorActive = false;
-        
-        var createVariable = function() {
-        
-            ui.disable();
-            
-            vscpConn.createVar({
-            
-                name:           "demovariable",
-                type:           vscp.constants.varTypes.BOOLEAN,
-                value:          "true",
-                persistency:    true,
-                
-                onSuccess: function( conn ) {
-                    ui.enable();
-                },
-                
-                onError: function( conn ) {
-                    ui.enable();
-                }
-            });
-            
-        };
-        
-        var setVariableTrue = function() {
-        
-            ui.disable();
-            
-            vscpConn.writeVar({
-            
-                name:   "demovariable",
-                value:  "true",
-                
-                onSuccess: function( conn ) {
-                    ui.enable();
-                },
-                
-                onError: function( conn ) {
-                    ui.enable();
-                }
-            });
-            
-        };
-        
-        var setVariableFalse = function() {
-        
-            ui.disable();
-            
-            vscpConn.writeVar({
-            
-                name:   "demovariable",
-                value:  "false",
-                
-                onSuccess: function( conn ) {
-                    ui.enable();
-                },
-                
-                onError: function( conn ) {
-                    ui.enable();
-                }
-            });
-            
-        };
-        
-        var resetVariable = function() {
-        
-            ui.disable();
-            
-            vscpConn.resetVar({
-            
-                name: "demovariable",
-                
-                onSuccess: function( conn ) {
-                    ui.enable();
-                },
-                
-                onError: function( conn ) {
-                    ui.enable();
-                }
-            });
-            
-        };
-        
-        var removeVariable = function() {
-        
-            ui.disable();
-            
-            vscpConn.removeVar({
-            
-                name: "demovariable",
-                
-                onSuccess: function( conn ) {
-                    ui.enable();
-                },
-                
-                onError: function( conn ) {
-                    ui.enable();
-                }
-            });
-            
-        };
-        
-        var lengthVariable = function() {
-        
-            ui.disable();
-            
-            vscpConn.lengthVar({
-            
-                name: "demovariable",
-                
-                onSuccess: function( conn, options ) {
-                    alert("Variable length = " + options.length );
-                    ui.enable();
-                },
-                
-                onError: function( conn ) {
-                    ui.enable();
-                }
-            });
-            
-        };
-        
-        var lastchangeVariable = function() {
-        
-            ui.disable();
-        
-            vscpConn.lastChangeVar({
-            
-                name: "demovariable",
-                
-                onSuccess: function( conn, options ) {
-                    alert( options.name + " was last changed " + options.lastChange + "." );
-                    ui.enable();
-                },
-                
-                onError: function( conn ) {
-                    ui.enable();
-                }
-            });
-            
-        };
-        
-        var listVariable = function() {
-        
-            ui.disable();
-        
-            vscpConn.listVar({
-            
-                onVariable: function( conn, variable ) {
-                    alert( variable.name + ", " +  variable.type + ", " + variable.value + ", " + variable.persistency );
-                },
-            
-                onSuccess: function( conn ) {
-                    ui.enable();
-                },
-                
-                onError: function( conn ) {
-                    ui.enable();
-                }
-            });
-            
-        };
-        
-        var saveVariable = function() {
-        
-            ui.disable();
-        
-            vscpConn.saveVar({
-            
-                onSuccess: function( conn ) {
-                    ui.enable();
-                },
-                
-                onError: function( conn ) {
-                    ui.enable();
-                }
-            });
+                    url: settings.url,
 
-        };
-        
-        var intervalId = 0;
-        
-        var monitorVariable = function( bMonitor ) {
-        
-            if ( true === bMonitor ) {
-                intervalId = setInterval(
-                    function () {
-                        vscpConn.readVar({
-                            name: "demovariable",
-                            onSuccess: function( conn, options ) {
-                                if ( "true" === options.value ) {
-                                    document.body.style.backgroundColor = "#00FF00";
-                                }
-                                else {
-                                    document.body.style.backgroundColor = "#FF0000";
-                                }
+                    userName: settings.user,
+
+                    password: settings.passwordHash,
+
+                    onSuccess: function( conn ) {
+
+                        // Start receiving VSCP events
+                        vscpConn.start({
+
+                            onSuccess: function( conn ) {
+                                // Enable the user interface
+                                ui.enable();
+                            },
+
+                            onError: function( conn ) {
+                                alert("Couldn't start receiving events.");
                             }
+
                         });
+
                     },
-                    1000
-                );
-                
-                document.getElementById("btnMonitor").value = "Stop to monitor variable";
-            }
-            else {
-                clearInterval( intervalId );
-                document.getElementById("btnMonitor").value = "Start to monitor variable"
-            }
-            
-            bMonitorActive = bMonitor;
-            
-            document.body.style.backgroundColor = "#FFFFFF";
-        };
-        
+
+                    onError: function( conn ) {
+                        alert("Couldn't establish a connection.");
+                    }
+
+                });
+            });
+
+            // User interface data
+            var ui = {
+
+                enable: function() {
+                    $( "#ui :input" ).attr( "disabled", false );
+                },
+
+                disable: function() {
+                    $( "#ui :input" ).attr( "disabled", true );
+                }
+            };
+
+            var zone = 1;
+            var subzone = 20;
+            var bMonitorActive = false;
+
+            var createVariable = function() {
+
+                ui.disable();
+
+                vscpConn.createVar({
+
+                    name:           "demovariable",
+                    type:           vscp.constants.varTypes.BOOLEAN,
+                    value:          "true",
+                    persistency:    true,
+
+                    onSuccess: function( conn ) {
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
+
+            var setVariableTrue = function() {
+
+                ui.disable();
+
+                vscpConn.writeVar({
+
+                    name:   "demovariable",
+                    value:  "true",
+
+                    onSuccess: function( conn ) {
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
+
+            var setVariableFalse = function() {
+
+                ui.disable();
+
+                vscpConn.writeVar({
+
+                    name:   "demovariable",
+                    value:  "false",
+
+                    onSuccess: function( conn ) {
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
+
+            var resetVariable = function() {
+
+                ui.disable();
+
+                vscpConn.resetVar({
+
+                    name: "demovariable",
+
+                    onSuccess: function( conn ) {
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
+
+            var removeVariable = function() {
+
+                ui.disable();
+
+                vscpConn.removeVar({
+
+                    name: "demovariable",
+
+                    onSuccess: function( conn ) {
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
+
+            var lengthVariable = function() {
+
+                ui.disable();
+
+                vscpConn.lengthVar({
+
+                    name: "demovariable",
+
+                    onSuccess: function( conn, options ) {
+                        alert("Variable length = " + options.length );
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
+
+            var lastchangeVariable = function() {
+
+                ui.disable();
+
+                vscpConn.lastChangeVar({
+
+                    name: "demovariable",
+
+                    onSuccess: function( conn, options ) {
+                        alert( options.name + " was last changed " + options.lastChange + "." );
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
+
+            var listVariable = function() {
+
+                ui.disable();
+
+                vscpConn.listVar({
+
+                    onVariable: function( conn, variable ) {
+                        alert( variable.name + ", " +  variable.type + ", " + variable.value + ", " + variable.persistency );
+                    },
+
+                    onSuccess: function( conn ) {
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
+
+            var saveVariable = function() {
+
+                ui.disable();
+
+                vscpConn.saveVar({
+
+                    onSuccess: function( conn ) {
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
+
+            var intervalId = 0;
+
+            var monitorVariable = function( bMonitor ) {
+
+                if ( true === bMonitor ) {
+                    intervalId = setInterval(
+                        function () {
+                            vscpConn.readVar({
+                                name: "demovariable",
+                                onSuccess: function( conn, options ) {
+                                    if ( "true" === options.value ) {
+                                        document.body.style.backgroundColor = "#00FF00";
+                                    }
+                                    else {
+                                        document.body.style.backgroundColor = "#FF0000";
+                                    }
+                                }
+                            });
+                        },
+                        1000
+                    );
+
+                    document.getElementById("btnMonitor").value = "Stop to monitor variable";
+                }
+                else {
+                    clearInterval( intervalId );
+                    document.getElementById("btnMonitor").value = "Start to monitor variable"
+                }
+
+                bMonitorActive = bMonitor;
+
+                document.body.style.backgroundColor = "#FFFFFF";
+            };
+
+        })();
+
     </script>
 
 </head>
@@ -309,49 +320,14 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div>
-                <ul class="nav navbar-nav">
-                    <li class="active"><a href="index.html">Home</a></li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="testauth.html">Authentication test</a></li>
-                            <li><a href="event.html">Control events</a></li>
-                            <li><a href="statebutton.html">Widget demo</a></li>
-                            <li><a href="variable.html">Handle variables</a></li>
-                            <li><a href="node_discovery.html">Passive node discovery</a></li>
-                            <li><a href="slider.html">Slider demo</a></li>
-                            <li><a href="slider.html">Progress bar demo</a></li>
-                            <li><a href="simpletext.html">Simple text demo</a></li>
-                            <li><a href="thermometercelsius.html">Thermometer widget demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Epoch chart demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="epoch_simple.html">Simple demo</a></li>
-                        </ul>
-                    </li>
-                    <li class="dropdown">
-                        <a class="dropdown-toggle" data-toggle="dropdown" href="#">Google Charts demos
-                        <span class="caret"></span></a>
-                        <ul class="dropdown-menu">
-                            <li><a href="google_gauge.html">Gauge demo</a></li>
-                            <li><a href="google_line_simple.html">LineChart demo</a></li>
-                            <li><a href="google_table.html">Table demo</a></li>
-                        </ul>
-                    </li>
-                    <li><a href="../service/index.html">Service</a></li>
-                </ul>
+            <div id="menu">
             </div>
         </div>
     </nav>
     <div class="container-fluid">
         <h1>VSCP variable handling</h1>
         <p>
-            The VSCP Dameon has variables that can be defined/written/read/manipulated by external nodes. 
+            The VSCP Dameon has variables that can be defined/written/read/manipulated by external nodes.
             For example can a temperature value be stores in a node and that way be persistent over time,
             another possibility is that a variable holds the mean of temperatures over time or a state of
             something. They are a very powerful tool.
@@ -361,15 +337,15 @@
             variable you are interested in and then you will get info when this variable has changed.
         </p>
         <p>
-            In this demo we just monitor the boolean variable <b>demoVariable</b> and show information when 
-            it's value is changed. Go to the administration interface of the vscp daemon 
+            In this demo we just monitor the boolean variable <b>demoVariable</b> and show information when
+            it's value is changed. Go to the administration interface of the vscp daemon
             (http://localhost:8080/vscp/dmedit?new=true default) and create the variable.
         </p>
         <p>
             <img src="../images/create_variable_boolean.jpg" class="img-responsive" width="700">
         </p>
         <p>
-            There is also another way. You can add it to the <b>variable.xml</b> file and restart the VSCP daemon. 
+            There is also another way. You can add it to the <b>variable.xml</b> file and restart the VSCP daemon.
             In that case add the lines
         </p>
         <p>
@@ -389,26 +365,26 @@
             <br />
             <input type="button" class="btn btn-default" value="Set variable value to 'true' (writeVariable)" onclick="setVariableTrue()" disabled />
             <input type="button" class="btn btn-default" value="Set variable value to 'false' (writeVariable)" onclick="setVariableFalse()" disabled />
-            <input type="button" class="btn btn-default" value="Reset variable" onclick="resetVariable()" disabled /> 
+            <input type="button" class="btn btn-default" value="Reset variable" onclick="resetVariable()" disabled />
             <br />
-            <input type="button" class="btn btn-default" value="Remove variable" onclick="removeVariable()" disabled /> 
+            <input type="button" class="btn btn-default" value="Remove variable" onclick="removeVariable()" disabled />
             <input type="button" class="btn btn-default" value="Get variable length" onclick="lengthVariable()" disabled />
             <input type="button" class="btn btn-default" value="Get date/time for last change" onclick="lastchangeVariable()" disabled />
             <input type="button" class="btn btn-default" value="List all variables" onclick="listVariable()" disabled />
             <input type="button" class="btn btn-default" value="Save variables" onclick="saveVariable()" disabled />
             <p>
-            Variables are created if they are written to but not existing so all this button does is to write 
-            the value <b>true</b> to the variable <i>demovariable</i>. 
+            Variables are created if they are written to but not existing so all this button does is to write
+            the value <b>true</b> to the variable <i>demovariable</i>.
             </p>
             <p>
             Now when you have the variable defined you can start to monitor the variables with this button
             </p>
             <input id="btnMonitor" type="button" class="btn btn-default" value="Start to monitor variable" onclick="monitorVariable(!bMonitorActive)" />
         </div>
-        
+
         <br /><br />
         <hr>
-        Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>, 
+        Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>,
         <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
     </div>
 </body>
