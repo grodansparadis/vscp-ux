@@ -107,7 +107,7 @@ vscp.service.whoIsThere = function( options ) {
             return;
         }
 
-        // Especially the extended register read/write responses
+        // Especially the who is there responses
         if ( vscp.constants.types.VSCP_TYPE_PROTOCOL_WHO_IS_THERE_RESPONSE !== evt.vscpType ) {
             return;
         }
@@ -166,7 +166,7 @@ vscp.service.whoIsThere = function( options ) {
                         current = nodeData[ nodeDataIndex ].guid;
                         
                         // Get node id
-                        nodeId = parseInt( nodeData[ nodeDataIndex ].guid.split( ":" )[ 15 ] );
+                        nodeId = vscp.utility.getNodeId( nodeData[ nodeDataIndex ].guid );
                     }
                     
                     // Event missing?
@@ -279,4 +279,159 @@ vscp.service.whoIsThere = function( options ) {
             }
         }
     });
+};
+
+/**
+ * Scan for nodes.
+ *
+ * @param[in] options   Options
+ *
+ * Options:
+ * - connection: VSCP connection
+ * - onSuccess: Callback
+ * - onError: Callback
+ * - begin: Node id where to start scanning
+ * - end: Node id where to stop scanning
+ */
+vscp.service.scan = function( options ) {
+
+    var onError         = null;
+    var eventListener   = null;
+    var fnProbe         = null;
+    var timerHandle     = null;
+    var nodes           = [];
+    var currentNodeId   = 0;
+    var scanTimeout     = 1000;
+
+    if ( "undefined" === typeof options ) {
+        console.error( vscp.utility.getTime() + " Options are missing. " );
+        return;
+    }
+
+    if ( false === ( options.connection instanceof vscp.Connection ) ) {
+        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+        return;
+    }
+
+    if ( "number" !== typeof options.begin ) {
+        console.error( vscp.utility.getTime() + " begin is missing." );
+        return;
+    }
+    
+    if ( "number" !== typeof options.end ) {
+        console.error( vscp.utility.getTime() + " end is missing." );
+        return;
+    }
+    
+    if ( "function" !== typeof options.onSuccess ) {
+        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+        return;
+    }
+
+    if ( "function" === typeof options.onError ) {
+        onError = options.onError;
+    }
+
+    // Event listener to catch all CLASS1.PROTOCOL probe responses
+    eventListener = function( conn, evt ) {
+
+        if ( "undefined" === typeof evt ) {
+            return;
+        }
+
+        if ( false === ( evt instanceof vscp.Event ) ) {
+            return;
+        }
+
+        // Only CLASS1.PROTOCOL events are interesting
+        if ( vscp.constants.classes.VSCP_CLASS1_PROTOCOL !== evt.vscpClass ) {
+            return;
+        }
+
+        // Especially the probe acknowledge
+        if ( vscp.constants.types.VSCP_TYPE_PROTOCOL_PROBE_ACK !== evt.vscpType ) {
+            return;
+        }
+
+        // Clear timer
+        clearTimeout( timerHandle );
+        
+        // Store node GUID
+        nodes.push( evt.vscpGuid );
+
+        options.connection.removeEventListener( eventListener );
+        
+        if ( options.end > currentNodeId ) {
+        
+            ++currentNodeId;
+                
+            fnProbe( currentNodeId );
+        }
+        else {
+        
+            // Sort data array for GUID
+            nodes.sort();
+            
+            console.info( vscp.utility.getTime() + " Found " + nodes.length + " nodes." );
+            
+            options.onSuccess( nodes );
+        }
+    };
+
+    fnProbe = function( nodeId ) {
+    
+        options.connection.sendEvent({
+
+            event: new vscp.Event({
+                vscpClass:      vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
+                vscpType:       vscp.constants.types.VSCP_TYPE_PROTOCOL_NEW_NODE_ONLINE,
+                vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
+                vscpData:       [ nodeId ]
+            }),
+
+            onSuccess: function( conn ) {
+
+                options.connection.addEventListener( eventListener );
+
+                timerHandle = setTimeout(
+                    function() {
+
+                        options.connection.removeEventListener( eventListener );
+                        
+                        if ( options.end === currentNodeId ) {
+                        
+                            // Sort data array for GUID
+                            nodes.sort();
+                            
+                            console.info( vscp.utility.getTime() + " Found " + nodes.length + " nodes." );
+                            
+                            options.onSuccess( nodes );
+                        }
+                        else {
+                            ++currentNodeId;
+                            
+                            fnProbe( currentNodeId );
+                        }
+
+                    },
+                    scanTimeout
+                );
+                
+            },
+
+            onError: function( conn ) {
+                console.error( vscp.utility.getTime() + " Scan failed." );
+
+                if ( null !== onError ) {
+                    onError();
+                }
+            }
+        });
+    };
+    
+    console.info( vscp.utility.getTime() + " Scanning starts ..." );
+
+    currentNodeId = options.begin;
+    
+    fnProbe( currentNodeId );
 };
