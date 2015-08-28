@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>VSCP event logger</title>
+
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!-- Favorite icon -->
+    <link rel="icon" href="../favicon.ico">
+    
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="../testws/settings.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket bases library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+    
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+    
+    <script type="text/javascript">
+        /*jshint bitwise: false */
+
+        (function() {
+            // VSCP websocket connection
+            var vscpConn = null;
+                        
+            // VSCP event array max. size
+            var maxEvent = 20;
+
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
+
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
+
+                // Connect to VSCP server
+                vscpConn.connect({
+
+                    url: settings.url,
+
+                    userName: settings.user,
+
+                    password: settings.passwordHash,
+
+                    onSuccess: function( conn ) {
+
+                        // Start receiving VSCP events
+                        vscpConn.start({
+
+                            onSuccess: function( conn ) {
+
+                                vscpConn.addEventListener( eventListener );
+
+                            },
+
+                            onError: function( conn ) {
+                                alert("Couldn't start receiving events.");
+                            }
+
+                        });
+
+                    },
+
+                    onError: function( conn ) {
+                        alert("Couldn't establish a connection.");
+                    }
+
+                });
+            });
+
+            var eventListener = function( conn, evt ) {
+
+                var dateTime = new Date();
+                var rowCount = $( "#eventTable > tbody > tr" ).length;
+                var index    = 0;
+                var row      = "";
+            
+                // Remove first row in case that the max. number of rows are reached
+                if ( maxEvent <= rowCount ) {
+                    $( "#eventTable > tbody > tr:first" ).remove();
+                }
+            
+                // Build row
+                row =   "<tr>" +
+                        "<td>" + dateTime + "</td>" +
+                        "<td>" + evt.vscpTimeStamp + "</td>" +
+                        "<td>" + evt.vscpClass + " (" + convertToHex( evt.vscpClass ) + ") </td>" +
+                        "<td>" + evt.vscpType + " (" + convertToHex( evt.vscpType ) + ") </td>" +
+                        "<td>" + evt.getPriority() + "</td>" +
+                        "<td>" + evt.isHardCodedAddr() + "</td>" +
+                        "<td>" + evt.vscpObId + "</td>" +
+                        "<td>" + evt.vscpGuid + "</td>" +
+                        "<td>";
+                        
+                for( index = 0; index < evt.vscpData.length; ++index ) {
+                    row += "" + evt.vscpData[ index ];
+                    row += " (" + convertToHex( evt.vscpData[ index ] ) + ")";
+                    
+                    if ( evt.vscpData.length > ( index + 1) ) {
+                        row += ", ";
+                    }
+                }
+                
+                row += "</td>"
+                row += "</tr>"
+                    
+                // Append event
+                $( "#eventTable > tbody" ).append( row );
+                                
+            };
+            
+            function convertToHex( number ) {
+                var hex = Number( number ).toString( 16 );
+
+                while( hex.length < 2 ) {
+                
+                    hex = "0" + hex;
+                }
+                
+                hex = "0x" + hex.toUpperCase();
+
+                return hex;
+            }
+            
+        })();
+        
+    </script>
+</head>
+<body>
+   <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <h1>VSCP event logger</h1>
+        <table id="eventTable" class="table table-striped">
+            <thead>
+                <tr>
+                    <th>Time</th>
+                    <th>Timestamp [us]</th>
+                    <th>Class</th>
+                    <th>Type</th>
+                    <th>Priority</th>
+                    <th>Hard coded</th>
+                    <th>Object id</th>
+                    <th>GUID</th>
+                    <th>Data</th>
+                </tr>
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+    </div>
+</body>
+</html>

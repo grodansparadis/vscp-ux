@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>VSCP service</title>
+    
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+    
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!-- Favorite icon -->
+    <link rel="icon" href="../favicon.ico">
+    
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
+
+    <script type="text/javascript">
+    
+       (function() {
+            // VSCP websocket connection
+            var vscpConn = null;
+
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
+            });
+        })();
+
+    </script>
+    
+</head>
+<body>
+   <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <h1>VSCP Service</h1>
+        <p>
+        </p>
+
+        <br /><br />
+        <hr>
+        Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>, 
+        <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
+    </div>
+</body>
+</html>
