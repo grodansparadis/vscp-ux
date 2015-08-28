@@ -230,7 +230,7 @@ vscp.register.read = function( options ) {
                     console.info( vscp.utility.getTime() + " Read register timeout." );
 
                     options.connection.removeEventListener( eventListener );
-                    
+
                     if ( null !== onError ) {
                         onError();
                     }
@@ -378,7 +378,7 @@ vscp.register.write = function( options ) {
                             console.info( vscp.utility.getTime() + " Write register timeout." );
 
                             options.connection.removeEventListener( eventListener );
-                            
+
                             if ( null !== onError ) {
                                 onError();
                             }
@@ -458,6 +458,152 @@ vscp.register.write = function( options ) {
 };
 
 /**
+ * Change some bits of a register.
+ *
+ * @param[in] options   Options
+ *
+ * Options:
+ * - connection: VSCP connection
+ * - nodeId: Node id
+ * - page: Register page
+ * - offset: Register page offset
+ * - pos: Bit position
+ * - width: Bit width
+ * - value: Value
+ * - onSuccess: Callback
+ * - onError: Callback
+ */
+vscp.register.writeBits = function( options ) {
+
+    var page    = 0;
+    var onError = null;
+    var index   = 0;
+    var width   = 1;
+    var value   = 0;
+    var mask    = 0;
+
+    if ( "undefined" === typeof options ) {
+        console.error( vscp.utility.getTime() + " Options are missing. " );
+        return;
+    }
+
+    if ( false === ( options.connection instanceof vscp.Connection ) ) {
+        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+        return;
+    }
+
+    if ( "number" !== typeof options.nodeId ) {
+        console.error( vscp.utility.getTime() + " Node id is missing." );
+        return;
+    }
+
+    if ( "number" !== typeof options.offset ) {
+        console.error( vscp.utility.getTime() + " Register page offset is missing." );
+        return;
+    }
+
+    if ( "number" === typeof options.offset ) {
+        page = options.page;
+    }
+
+    if ( "number" !== typeof options.pos ) {
+        console.error( vscp.utility.getTime() + " Bit position is missing." );
+        return;
+    }
+
+    if ( "number" === typeof options.width ) {
+        width = options.width;
+    }
+
+    if ( "number" !== typeof options.value ) {
+        console.error( vscp.utility.getTime() + " Value is missing." );
+        return;
+    }
+
+    if ( "function" !== typeof options.onSuccess ) {
+        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+        return;
+    }
+
+    if ( "function" === typeof options.onError ) {
+        onError = options.onError;
+    }
+
+    // Read register value
+    vscp.register.read({
+    
+        connection: options.connection,
+
+        nodeId: options.nodeId,
+
+        page: page,
+
+        offset: options.offset,
+
+        count: 1,
+
+        onSuccess: function( data ) {
+            value = data[ 0 ];
+
+            // Change the bits of the read register value
+            mask = 1 << options.pos;
+            for( index = 0; index < width; ++index ) {
+
+                // Clear bit?
+                if ( 0 === ( options.value & ( 1 << index ) ) ) {
+
+                    value = value & ( ~mask );
+                }
+                // Set bit
+                else {
+
+                    value = value | mask;
+                }
+
+                mask = mask << 1;
+            }
+
+            // Write changed register value back
+            vscp.register.write({
+            
+                connection: options.connection,
+
+                nodeId: options.nodeId,
+
+                page: page,
+
+                offset: options.offset,
+
+                count: 1,
+                
+                data: [ value ],
+
+                onSuccess: function() {
+
+                    options.onSuccess();
+
+                }.bind( this ),
+
+                onError: function() {
+
+                    if ( null !== onError ) {
+                        onError();
+                    }
+                }.bind( this )
+            });
+
+        }.bind( this ),
+
+        onError: function() {
+
+            if ( null !== onError ) {
+                onError();
+            }
+        }.bind( this )
+    });
+};
+
+/**
  * Read the alarm status from a node.
  *
  * @param[in] options   Options
@@ -495,7 +641,7 @@ vscp.register.readAlarmStatus = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read alarm status from node " + options.nodeId );
 
     // Read register
@@ -561,7 +707,7 @@ vscp.register.readVscpVersion = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read VSCP version from node " + options.nodeId );
 
     // Read register
@@ -630,7 +776,7 @@ vscp.register.readNodeControlFlags = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read node control flags from node " + options.nodeId );
 
     // Read register
@@ -696,7 +842,7 @@ vscp.register.readUserId = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read user id from node " + options.nodeId );
 
     // Read register
@@ -713,15 +859,15 @@ vscp.register.readUserId = function( options ) {
         count: 5,
 
         onSuccess: function( data ) {
-        
+
             var index   = 0;
             var userId  = 0;
-            
+
             for( index = 0; index < data.length; ++index ) {
                 userId *= 256;
                 userId += data[ data.length - index - 1 ];
             }
-        
+
             options.onSuccess( userId );
         },
 
@@ -771,7 +917,7 @@ vscp.register.readManufacturerDevId = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read manufacturer device id from node " + options.nodeId );
 
     // Read register
@@ -788,15 +934,15 @@ vscp.register.readManufacturerDevId = function( options ) {
         count: 4,
 
         onSuccess: function( data ) {
-        
+
             var index               = 0;
             var manufacturerDevId   = 0;
-            
+
             for( index = 0; index < data.length; ++index ) {
                 manufacturerDevId *= 256;
                 manufacturerDevId += data[ data.length - index - 1 ];
             }
-        
+
             options.onSuccess( manufacturerDevId );
         },
 
@@ -846,7 +992,7 @@ vscp.register.readManufacturerSubDevId = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read manufacturer sub device id from node " + options.nodeId );
 
     // Read register
@@ -863,15 +1009,15 @@ vscp.register.readManufacturerSubDevId = function( options ) {
         count: 4,
 
         onSuccess: function( data ) {
-        
+
             var index                   = 0;
             var manufacturerSubDevId    = 0;
-            
+
             for( index = 0; index < data.length; ++index ) {
                 manufacturerSubDevId *= 256;
                 manufacturerSubDevId += data[ data.length - index - 1 ];
             }
-        
+
             options.onSuccess( manufacturerSubDevId );
         },
 
@@ -921,7 +1067,7 @@ vscp.register.readNicknameId = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read nickname id from node " + options.nodeId );
 
     // Read register
@@ -987,7 +1133,7 @@ vscp.register.readSelectedPage = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read selected page from node " + options.nodeId );
 
     // Read register
@@ -1004,15 +1150,15 @@ vscp.register.readSelectedPage = function( options ) {
         count: 2,
 
         onSuccess: function( data ) {
-        
+
             var index   = 0;
             var page    = 0;
-            
+
             for( index = 0; index < data.length; ++index ) {
                 page *= 256;
                 page += data[ data.length - index - 1 ];
             }
-        
+
             options.onSuccess( page );
         },
 
@@ -1062,7 +1208,7 @@ vscp.register.readFirmwareVersion = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read firmware version from node " + options.nodeId );
 
     // Read register
@@ -1132,7 +1278,7 @@ vscp.register.readBootloaderAlgorithm = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read bootloader algorithm from node " + options.nodeId );
 
     // Read register
@@ -1198,7 +1344,7 @@ vscp.register.readUsedPages = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read used pages from node " + options.nodeId );
 
     // Read register
@@ -1264,7 +1410,7 @@ vscp.register.readStdDevFamCode = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read standard device family code from node " + options.nodeId );
 
     // Read register
@@ -1283,12 +1429,12 @@ vscp.register.readStdDevFamCode = function( options ) {
         onSuccess: function( data ) {
             var index               = 0;
             var stdDevFamilyCode    = 0;
-            
+
             for( index = 0; index < data.length; ++index ) {
                 stdDevFamilyCode *= 256;
                 stdDevFamilyCode += data[ data.length - index - 1 ];
             }
-        
+
             options.onSuccess( stdDevFamilyCode );
         },
 
@@ -1338,7 +1484,7 @@ vscp.register.readStdDevType = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read standard device type from node " + options.nodeId );
 
     // Read register
@@ -1357,12 +1503,12 @@ vscp.register.readStdDevType = function( options ) {
         onSuccess: function( data ) {
             var index       = 0;
             var stdDevType  = 0;
-            
+
             for( index = 0; index < data.length; ++index ) {
                 stdDevType *= 256;
                 stdDevType += data[ data.length - index - 1 ];
             }
-        
+
             options.onSuccess( stdDevType );
         },
 
@@ -1412,7 +1558,7 @@ vscp.register.readGUID = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read GUID from node " + options.nodeId );
 
     // Read register
@@ -1478,7 +1624,7 @@ vscp.register.readMdfUrl = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Read MDF URL from node " + options.nodeId );
 
     // Read register

@@ -55,6 +55,10 @@ navBarMenu.content = [
             {
                 title: "Node discovery",
                 url: "node_discovery.html"
+            },
+            {
+                title: "Wizard",
+                url: "wizard.html"
             }
         ]
     },
