@@ -1813,12 +1813,26 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
     var registersCnt            = 0;
     var abstractionsCnt         = 0;
     var onError                 = null;
+    var messageBoxIndex         = 0;
+    var index                   = 0;
+    var onProgress              = null;
+    var steps                   = 0;
+    var progress                = 0;
 
+    var updateProgress = function( percent ) {
+        if ( null !== onProgress ) {
+            onProgress( percent );
+        }
+    };
+    
     var process = function() {
 
+        progress += Math.floor( 100 / steps );
+        updateProgress( progress );
+    
         if ( this.bitInRegs.length > bitInRegsCnt ) {
             console.info( "Write bit in register value." );
-
+            
             vscp.register.writeBits({
 
                 connection: options.connection,
@@ -1940,6 +1954,10 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
         return;
     }
     
+    if ( "function" === typeof options.onProgress ) {
+        onProgress = options.onProgress;
+    }
+    
     if ( "function" !== typeof options.onSuccess ) {
         console.error( vscp.utility.getTime() + " onSuccess callback is missing." );
         return;
@@ -1948,7 +1966,43 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
+    
+    // Get all messagebox variables and set the variable value to the access method objects
+    for( messageBoxIndex = 0; messageBoxIndex < this.messageBoxes.length; ++messageBoxIndex ) {
 
+        for( index = 0; index < this.bitInRegs.length; ++index ) {
+            if ( this.messageBoxes[ messageBoxIndex ].variableName === this.bitInRegs[ index ].variableName ) {
+                this.bitInRegs[ index ].value = this.messageBoxes[ messageBoxIndex ].variableValue;
+            }
+        }
+        
+        for( index = 0; index < this.bitInAbstractions.length; ++index ) {
+            if ( this.messageBoxes[ messageBoxIndex ].variableName === this.bitInAbstractions[ index ].variableName ) {
+                this.bitInAbstractions[ index ].value = this.messageBoxes[ messageBoxIndex ].variableValue;
+            }
+        }
+
+        for( index = 0; index < this.registers.length; ++index ) {
+            if ( this.messageBoxes[ messageBoxIndex ].variableName === this.registers[ index ].variableName ) {
+                this.registers[ index ].value = this.messageBoxes[ messageBoxIndex ].variableValue;
+            }
+        }
+        
+        for( index = 0; index < this.abstractions.length; ++index ) {
+            if ( this.messageBoxes[ messageBoxIndex ].variableName === this.abstractions[ index ].variableName ) {
+                this.abstractions[ index ].value = this.messageBoxes[ messageBoxIndex ].variableValue;
+            }
+        }
+    }
+    
+    // How many steps are necessary to write the whole recipe?
+    steps += this.bitInRegs.length;
+    steps += this.bitInAbstractions.length;
+    steps += this.registers.length;
+    steps += this.abstractions.length;
+    steps += 1;
+    
+    // Start writing the recipe
     process();
 };
 
