@@ -62,7 +62,6 @@
             '                    <function>input</function>' +
             '                    <head lang="en">Beijing I/O node</head>' +
             '                    <description lang="en">With what frequency should channel blink?</description>' +
-            '                    <function>Input</function>' +
             '                    <variable type="byte" name="frequency" />' +
             '                </messagebox>' +
             '                <!-- Write frequency to abstraction register -->' +
@@ -206,6 +205,8 @@
             var header  = "";
             var body    = "";
             var footer  = "";
+            var index   = 0;
+            var script  = "";
 
             if ( ( 0 > id ) || ( recipes.length <= id ) ) {
                 return;
@@ -214,54 +215,85 @@
             // Get recipe
             recipe = recipes[ id ];
 
-            // Create dialog header
-            header += recipe.messageBoxes[ 0 ].head;
+            // Create all message boxes
+            for( index = 0; index < recipe.messageBoxes.length; ++index ) {
+            
+                header  = "";
+                body    = "";
+                footer  = "";
+            
+                // Create dialog header
+                header += recipe.messageBoxes[ index ].head;
 
-            // Create dialog body
-            body += "<p>";
-            body += recipe.messageBoxes[ 0 ].description;
-            body += "</p>";
+                // Create dialog body
+                body += "<p>";
+                body += recipe.messageBoxes[ index ].description;
+                body += "</p>";
 
-            body += "<p>";
+                body += "<p>";
 
-            if ( "input" === recipe.messageBoxes[ 0 ].func ) {
+                if ( "input" === recipe.messageBoxes[ index ].func ) {
 
-                body += "<input id=\"" + recipe.messageBoxes[ 0 ].variableName + "\" type=\"";
+                    body += "<input id=\"" + recipe.messageBoxes[ index ].variableName + "\" type=\"";
 
-                if ( "string" === recipe.messageBoxes[ 0 ].variableType ) {
-                    body += "text\" value=\"\"";
+                    if ( "string" === recipe.messageBoxes[ index ].variableType ) {
+                        body += "text\" value=\"\"";
+                    }
+                    else {
+                        body += "number\" value=\"0\"";
+
+                        if ( recipe.messageBoxes[ index ].variableMin !== recipe.messageBoxes[ index ].variableMax ) {
+                            body += "min=\"" + recipe.messageBoxes[ index ].variableMin + "\" max=\"" + recipe.messageBoxes[ index ].variableMax + "\"";
+                        }
+                    }
+
+                    body += " />";
                 }
                 else {
-                    body += "number\" value=\"0\"";
-
-                    if ( recipe.messageBoxes[ 0 ].variableMin !== recipe.messageBoxes[ 0 ].variableMax ) {
-                        body += "min=\"" + recipe.messageBoxes[ 0 ].variableMin + "\" max=\"" + recipe.messageBoxes[ 0 ].variableMax + "\"";
-                    }
+                    body += "Message box function not supported: " + recipe.messageBoxes[ index ].func;
                 }
 
-                body += " />";
+                body += "</p>";
+
+                // Create dialog footer
+                if ( recipe.messageBoxes.length === ( index + 1 ) ) {
+                    script = "recipes[ " + id + " ].messageBoxes[ " + index + " ].variableValue = $( '#" + recipe.messageBoxes[ index ].variableName + "' ).val(); waitUntilDialogHidden( 'messageBoxDialog" + index + "', function() { writeRecipe( " + id + " ); });";
+                }
+                else {
+                    script = "recipes[ " + id + " ].messageBoxes[ " + index + " ].variableValue = $( '#" + recipe.messageBoxes[ index ].variableName + "' ).val(); nextDialog( 'messageBoxDialog" + index + "', 'messageBoxDialog" + ( index + 1 ) + "' );";
+                }
+                footer += "<input type=\"button\" value=\"Next\" class=\"btn btn-default\" data-dismiss=\"modal\" onclick=\"";
+                footer += script;
+                footer += "\" />";
+                footer += "<input type=\"button\" value=\"Cancel\" class=\"btn btn-default\" data-dismiss=\"modal\" />";
+                
+                // Create modal dialog
+                htmlStr += modalDialog( "messageBoxDialog" + index, header, body, footer );
             }
-            else {
-                body += "Message box function not supported: " + recipe.messageBoxes[ 0 ].func;
-            }
 
-            body += "</p>";
-
-            // Create dialog footer
-            footer += "<input type=\"button\" value=\"Next\" class=\"btn btn-default\" onclick=\"recipes[ " + id + " ].messageBoxes[ " + 0 + " ].variableValue = $( \'#" + recipe.messageBoxes[ 0 ].variableName + "\' ).val(); writeRecipe( " + id + ");\" data-dismiss=\"modal\" />";
-            footer += "<input type=\"button\" value=\"Cancel\" class=\"btn btn-default\" data-dismiss=\"modal\" />";
-
-            // Create modal dialog
-            htmlStr = modalDialog( "messageBoxDialog", header, body, footer );
             $( "#output" ).html( htmlStr );
 
             // Show dialog
-            $( "#messageBoxDialog" ).modal({
+            $( "#messageBoxDialog0" ).modal({
                 backdrop: "static",
                 keyboard: false
             });
         }
-
+        
+        function nextDialog( from, to ) {
+            waitUntilDialogHidden( from, function() {
+                $( "#" + to ).modal({
+                    backdrop: "static",
+                    keyboard: false
+                });
+            });
+        }
+        
+        function waitUntilDialogHidden( id, action ) {
+        
+            $( "#" + id ).on( "hidden.bs.modal", action );
+        }
+        
         function writeRecipe( id ) {
 
             var recipe  = null;
@@ -271,63 +303,60 @@
                 return;
             }
             
-            $( "#messageBoxDialog" ).on( "hidden.bs.modal", function () {
-            
-                // Create modal dialogs
-                htmlStr += modalDialog( "progressDialog", "", progressBar( "progressBar" ), "" );
-                htmlStr += modalDialog(
-                    "successDialog",
-                    "<h4 class=\"modal-title\">Info</h4>", 
-                    "<p>Successful</p>", 
-                    "<input type=\"button\" value=\"Ok\" class=\"btn btn-default\" data-dismiss=\"modal\" />"
-                );
-                htmlStr += modalDialog(
-                    "errorDialog",
-                    "<h4 class=\"modal-title\">Error</h4>", 
-                    "<p>Failed!</p>",
-                    "<input type=\"button\" value=\"Ok\" class=\"btn btn-default\" data-dismiss=\"modal\" />"
-                );
-                $( "#output" ).html( htmlStr );
+            // Create modal dialogs
+            htmlStr += modalDialog( "progressDialog", "", progressBar( "progressBar" ), "" );
+            htmlStr += modalDialog(
+                "successDialog",
+                "<h4 class=\"modal-title\">Info</h4>", 
+                "<p>Successful</p>", 
+                "<input type=\"button\" value=\"Ok\" class=\"btn btn-default\" data-dismiss=\"modal\" />"
+            );
+            htmlStr += modalDialog(
+                "errorDialog",
+                "<h4 class=\"modal-title\">Error</h4>", 
+                "<p>Failed!</p>",
+                "<input type=\"button\" value=\"Ok\" class=\"btn btn-default\" data-dismiss=\"modal\" />"
+            );
+            $( "#output" ).html( htmlStr );
 
-                // Show dialog
-                $( "#progressDialog" ).modal({
-                    backdrop: "static",
-                    keyboard: false
-                });
-                
-                // Get recipe
-                recipe = recipes[ id ];
-                            
-                // Write recipe
-                recipe.write({
-
-                    connection: vscpConn,
-
-                    nodeId: 1,
-                    
-                    onProgress: function( percent ) {
-                        updateProgressBar( "progressBar", percent );
-                    },
-                    
-                    onSuccess: function() {
-                        $( "#progressDialog" ).modal( "hide" );
-                        $( "#successDialog" ).modal({
-                            backdrop: "static",
-                            keyboard: false
-                        });
-                    },
-
-                    onError: function() {
-                        $( "#progressDialog" ).modal( "hide" );
-                        $( "#errorDialog" ).modal({
-                            backdrop: "static",
-                            keyboard: false
-                        });
-                    }
-
-                });
-            
+            // Show dialog
+            $( "#progressDialog" ).modal({
+                backdrop: "static",
+                keyboard: false
             });
+            
+            // Get recipe
+            recipe = recipes[ id ];
+                        
+            // Write recipe
+            recipe.write({
+
+                connection: vscpConn,
+
+                nodeId: 1,
+                
+                onProgress: function( percent ) {
+                    updateProgressBar( "progressBar", percent );
+                },
+                
+                onSuccess: function() {
+                    $( "#progressDialog" ).modal( "hide" );
+                    $( "#successDialog" ).modal({
+                        backdrop: "static",
+                        keyboard: false
+                    });
+                },
+
+                onError: function() {
+                    $( "#progressDialog" ).modal( "hide" );
+                    $( "#errorDialog" ).modal({
+                        backdrop: "static",
+                        keyboard: false
+                    });
+                }
+
+            });
+        
         }
 
     </script>
