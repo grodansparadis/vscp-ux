@@ -3056,6 +3056,7 @@ vscp.Connection.prototype.saveVar = function ( options ) {
  * - name: Table name
  * - begin: Date when to begin ( ISO form YY-MM-DD HH:MM:SS )
  * - end: Date when to end ( ISO form YY-MM-DD HH:MM:SS )
+ * - onTableRow: Function which is called on every received table row
  * - onSuccess: Function which is called on a successful operation
  * - onError: Function which is called on a failed operation
  *
