@@ -2573,7 +2573,7 @@ vscp.Connection.prototype.setFilter = function ( options ) {
         filterGuid = guid;
 
         for( index = 0; index < guid.length; ++index) {
-            filterGuid[ index ] = parseInt( guid[ index ] );
+            filterGuid[ index ] = parseInt( guid[ index ], 16 );
         }
     }
 
@@ -2608,7 +2608,7 @@ vscp.Connection.prototype.setFilter = function ( options ) {
         maskGuid = guid;
 
         for( index = 0; index < guid.length; ++index) {
-            maskGuid[ index ] = parseInt( guid[ index ] );
+            maskGuid[ index ] = parseInt( guid[ index ], 16 );
         }
     }
 
