@@ -32,113 +32,249 @@
     <script type="text/javascript">
         /*jshint bitwise: false */
 
-        (function() {
-            // VSCP websocket connection
-            var vscpConn = null;
-                        
-            // VSCP event array max. size
-            var maxEvent = 20;
+        // VSCP websocket connection
+        var vscpConn = null;
+                    
+        // VSCP event array max. size
+        var maxEvent = 20;
 
-            // Wait until the whole website is loaded
-            $( document ).ready( function() {
+        // Current filter
+        var filter = {
+            filterPriority: 0,
+            filterClass: 0,
+            filterType: 0,
+            filterGuid: [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ],
+            maskPriority: 0,
+            maskClass: 0,
+            maskType: 0,
+            maskGuid: [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
+        }
+        
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
 
-                // Show navigation bar menu
-                navBarMenu.show( "menu", navBarMenu.content );
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
 
-                // Create a VSCP websocket
-                vscpConn = new vscp.Connection();
+            // Show filter
+            showFilter();
+            
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
 
-                // Connect to VSCP server
-                vscpConn.connect({
+            // Connect to VSCP server
+            vscpConn.connect({
 
-                    url: settings.url,
+                url: settings.url,
 
-                    userName: settings.user,
+                userName: settings.user,
 
-                    password: settings.passwordHash,
+                password: settings.passwordHash,
 
-                    onSuccess: function( conn ) {
+                onSuccess: function( conn ) {
 
-                        // Start receiving VSCP events
-                        vscpConn.start({
+                    // Start receiving VSCP events
+                    vscpConn.start({
 
-                            onSuccess: function( conn ) {
+                        onSuccess: function( conn ) {
 
-                                vscpConn.addEventListener( eventListener );
+                            vscpConn.addEventListener( eventListener );
 
-                            },
+                        },
 
-                            onError: function( conn ) {
-                                alert("Couldn't start receiving events.");
-                            }
+                        onError: function( conn ) {
+                            alert("Couldn't start receiving events.");
+                        }
 
-                        });
+                    });
 
-                    },
+                },
 
-                    onError: function( conn ) {
-                        alert("Couldn't establish a connection.");
-                    }
+                onError: function( conn ) {
+                    alert("Couldn't establish a connection.");
+                }
 
-                });
             });
+        });
+        
+        // Catch all events and show them in the trace tab.
+        var eventListener = function( conn, evt ) {
 
-            var eventListener = function( conn, evt ) {
-
-                var dateTime = new Date();
-                var rowCount = $( "#eventTable > tbody > tr" ).length;
-                var index    = 0;
-                var row      = "";
-            
-                // Remove first row in case that the max. number of rows are reached
-                if ( maxEvent <= rowCount ) {
-                    $( "#eventTable > tbody > tr:first" ).remove();
-                }
-            
-                // Build row
-                row =   "<tr>" +
-                        "<td>" + dateTime + "</td>" +
-                        "<td>" + evt.vscpTimeStamp + "</td>" +
-                        "<td>" + evt.vscpClass + " (" + convertToHex( evt.vscpClass ) + ") </td>" +
-                        "<td>" + evt.vscpType + " (" + convertToHex( evt.vscpType ) + ") </td>" +
-                        "<td>" + evt.getPriority() + "</td>" +
-                        "<td>" + evt.isHardCodedAddr() + "</td>" +
-                        "<td>" + evt.vscpObId + "</td>" +
-                        "<td>" + evt.vscpGuid + "</td>" +
-                        "<td>";
-                        
-                for( index = 0; index < evt.vscpData.length; ++index ) {
-                    row += "" + evt.vscpData[ index ];
-                    row += " (" + convertToHex( evt.vscpData[ index ] ) + ")";
+            var dateTime = new Date();
+            var rowCount = $( "#eventTable > tbody > tr" ).length;
+            var index    = 0;
+            var row      = "";
+        
+            // Remove first row in case that the max. number of rows are reached
+            if ( maxEvent <= rowCount ) {
+                $( "#eventTable > tbody > tr:first" ).remove();
+            }
+        
+            // Build row
+            row =   "<tr>" +
+                    "<td>" + dateTime.toLocaleString() + "</td>" +
+                    "<td>" + evt.vscpTimeStamp + "</td>" +
+                    "<td>" + evt.vscpClass + " (" + convertToHex( evt.vscpClass, 4 ) + ") </td>" +
+                    "<td>" + evt.vscpType + " (" + convertToHex( evt.vscpType, 2 ) + ") </td>" +
+                    "<td>" + evt.getPriority() + "</td>" +
+                    "<td>" + evt.isHardCodedAddr() + "</td>" +
+                    "<td>" + evt.vscpObId + "</td>" +
+                    "<td>" + evt.vscpGuid + "</td>" +
+                    "<td>";
                     
-                    if ( evt.vscpData.length > ( index + 1) ) {
-                        row += ", ";
-                    }
+            for( index = 0; index < evt.vscpData.length; ++index ) {
+                row += "" + evt.vscpData[ index ];
+                row += " (" + convertToHex( evt.vscpData[ index ], 2 ) + ")";
+                
+                if ( evt.vscpData.length > ( index + 1) ) {
+                    row += ", ";
                 }
-                
-                row += "</td>";
-                row += "</tr>";
-                    
-                // Append event
-                $( "#eventTable > tbody" ).append( row );
-                                
-            };
-            
-            function convertToHex( number ) {
-                var hex = Number( number ).toString( 16 );
-
-                while( hex.length < 2 ) {
-                
-                    hex = "0" + hex;
-                }
-                
-                hex = "0x" + hex.toUpperCase();
-
-                return hex;
             }
             
-        })();
+            row += "</td>";
+            row += "</tr>";
+                
+            // Append event
+            $( "#eventTable > tbody" ).append( row );
+                            
+        };
         
+        // Convert a number to hexdecimal with the given width.
+        function convertToHex( number, width ) {
+            var hex = Number( number ).toString( 16 );
+
+            while( hex.length < width ) {
+            
+                hex = "0" + hex;
+            }
+            
+            hex = "0x" + hex.toUpperCase();
+
+            return hex;
+        }
+        
+        // Show the even input filter in the filter tab.
+        function showFilter() {
+        
+            var row = "";
+            
+            row += "<tr>";
+            row += "<td>";
+            row += "<input id=\"filterPriority\" type=\"text\" class=\"form-control\" value=\"" + filter.filterPriority + "\" />";
+            row += "</td>";
+            row += "<td>";
+            row += "<input id=\"filterClass\" type=\"text\" class=\"form-control\" size=\"10\" value=\"" + convertToHex( filter.filterClass, 4 ) + "\" />";
+            row += "</td>";
+            row += "<td>";
+            row += "<input id=\"filterType\" type=\"text\" class=\"form-control\" size=\"10\" value=\"" + convertToHex( filter.filterType, 2 ) + "\" />";
+            row += "</td>";
+            row += "<td>";
+            row += "<input id=\"filterGuid\" type=\"text\" class=\"form-control\" size=\"50\" value=\"" + vscp.utility.guidToStr( filter.filterGuid ) + "\" />";
+            row += "</td>";
+            row += "<td>";
+            row += "<input id=\"maskPriority\" type=\"text\" class=\"form-control\" value=\"" + filter.maskPriority + "\" />";
+            row += "</td>";
+            row += "<td>";
+            row += "<input id=\"maskClass\" type=\"text\" class=\"form-control\" size=\"10\" value=\"" + convertToHex( filter.maskClass, 4 ) + "\" />";
+            row += "</td>";
+            row += "<td>";
+            row += "<input id=\"maskType\" type=\"text\" class=\"form-control\" size=\"10\" value=\"" + convertToHex( filter.maskType, 2 ) + "\" />";
+            row += "</td>";
+            row += "<td>";
+            row += "<input id=\"maskGuid\" type=\"text\" class=\"form-control\" size=\"50\" value=\"" + vscp.utility.guidToStr( filter.maskGuid ) + "\" />";
+            row += "</td>";
+            row += "<td>";
+            row += "<input type=\"submit\" class=\"form-control\" value=\"Set\" onclick=\"setFilter();\" />";
+            row += "</td>";
+            row += "</tr>";
+        
+            $( "#filterTable > tbody" ).append( row );
+        }
+        
+        // Set a filter according to the values from the filter tab.
+        function setFilter() {
+        
+            var filterPriority  = $( "#filterPriority" ).val();
+            var filterClass     = $( "#filterClass" ).val();
+            var filterType      = $( "#filterType" ).val();
+            var filterGuid      = $( "#filterGuid" ).val();
+            var filterGuidArray = filterGuid.split( ":" );
+            var maskPriority    = $( "#maskPriority" ).val();
+            var maskClass       = $( "#maskClass" ).val();
+            var maskType        = $( "#maskType" ).val();
+            var maskGuid        = $( "#maskGuid" ).val();
+            var maskGuidArray   = maskGuid.split( ":" );
+            var index           = 0;
+            
+            if ( "0x" === filterPriority.substring( 0, 2 ) ) {
+                filter.filterPriority = parseInt( filterPriority.substring( 2 ), 16 );
+            }
+            else {
+                filter.filterPriority = parseInt( filterPriority );
+            }
+            
+            if ( "0x" === filterClass.substring( 0, 2 ) ) {
+                filter.filterClass = parseInt( filterClass.substring( 2 ), 16 );
+            }
+            else {
+                filter.filterClass = parseInt( filterClass );
+            }
+            
+            if ( "0x" === filterType.substring( 0, 2 ) ) {
+                filter.filterType = parseInt( filterType.substring( 2 ), 16 );
+            }
+            else {
+                filter.filterType = parseInt( filterType );
+            }
+            
+            for( index = 0; index < filterGuidArray.length; ++index ) {
+                filter.filterGuid[ index ] = parseInt( filterGuidArray[ index ], 16 );
+            }
+            
+            if ( "0x" === maskPriority.substring( 0, 2 ) ) {
+                filter.maskPriority = parseInt( maskPriority.substring( 2 ), 16 );
+            }
+            else {
+                filter.maskPriority = parseInt( maskPriority );
+            }
+            
+            if ( "0x" === maskClass.substring( 0, 2 ) ) {
+                filter.maskClass = parseInt( maskClass.substring( 2 ), 16 );
+            }
+            else {
+                filter.maskClass = parseInt( maskClass );
+            }
+            
+            if ( "0x" === maskType.substring( 0, 2 ) ) {
+                filter.maskType = parseInt( maskType.substring( 2 ), 16 );
+            }
+            else {
+                filter.maskType = parseInt( maskType );
+            }
+            
+            for( index = 0; index < maskGuidArray.length; ++index ) {
+                filter.maskGuid[ index ] = parseInt( maskGuidArray[ index ], 16 );
+            }
+        
+            vscpConn.setFilter({
+                filterPriority: filter.filterPriority,
+                filterClass: filter.filterClass,
+                filterType: filter.filterType,
+                filterGuid: filter.filterGuid,
+                maskPriority: filter.maskPriority,
+                maskClass: filter.maskClass,
+                maskType: filter.maskType,
+                maskGuid: filter.maskGuid,
+                onSuccess: function() {
+                    alert( "Filter successful set." );
+                },
+                onError: function() {
+                    alert( "Failed to set filter." );
+                }
+            });
+        
+        }
+                    
     </script>
 </head>
 <body>
@@ -153,23 +289,55 @@
     </nav>
     <div class="container-fluid">
         <h1>VSCP event logger</h1>
-        <table id="eventTable" class="table table-striped">
-            <thead>
-                <tr>
-                    <th>Time</th>
-                    <th>Timestamp [us]</th>
-                    <th>Class</th>
-                    <th>Type</th>
-                    <th>Priority</th>
-                    <th>Hard coded</th>
-                    <th>Object id</th>
-                    <th>GUID</th>
-                    <th>Data</th>
-                </tr>
-            </thead>
-            <tbody>
-            </tbody>
-        </table>
+        <!-- Tabs -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#trace" data-toggle="tab">Trace</a></li>
+            <li><a href="#filter" data-toggle="tab">Filter</a></li>
+        </ul>
+        <!-- Tab contents -->
+        <div class="tab-content">
+            <!-- Trace tab -->
+            <div class="tab-pane fade in active" id="trace">
+                <input type="button" class="btn btn-default" value="Clear" onclick="$( '#eventTable > tbody > tr' ).remove();" />
+                <table id="eventTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Time</th>
+                            <th>Timestamp [us]</th>
+                            <th>Class</th>
+                            <th>Type</th>
+                            <th>Priority</th>
+                            <th>Hard coded</th>
+                            <th>Object id</th>
+                            <th>GUID</th>
+                            <th>Data</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Filter tab -->
+            <div class="tab-pane fade" id="filter">
+                <table id="filterTable" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Filter priority</th>
+                            <th>Filter class</th>
+                            <th>Filter type</th>
+                            <th>Filter GUID</th>
+                            <th>Mask priority</th>
+                            <th>Mask class</th>
+                            <th>Mask type</th>
+                            <th>Mask GUID</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+        </div>
     </div>
 </body>
 </html>
