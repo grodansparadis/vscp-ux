@@ -1831,7 +1831,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
         updateProgress( progress );
     
         if ( this.bitInRegs.length > bitInRegsCnt ) {
-            console.info( "Write bit in register value." );
+            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write bit in register value." );
             
             vscp.register.writeBits({
 
@@ -1857,7 +1857,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
             ++bitInRegsCnt;
         }
         else if ( this.bitInAbstractions.length > bitInAbstractionsCnt ) {
-            console.info( "Write bit in abstract value." );
+            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write bit in abstract value." );
 
             vscp.mdf.writeAbstractBits({
 
@@ -1884,7 +1884,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
             ++bitInAbstractionsCnt;
         }
         else if ( this.registers.length > registersCnt ) {
-            console.info( "Write register value." );
+            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write register value." );
 
             vscp.register.write({
 
@@ -1909,7 +1909,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
             ++registersCnt;
         }
         else if ( this.abstractions.length > abstractionsCnt ) {
-            console.info( "Write abstract value." );
+            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write abstract value." );
 
             vscp.mdf.writeAbstractValue({
 
@@ -2003,6 +2003,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
     steps += 1;
     
     // Start writing the recipe
+    console.info( vscp.utility.getTime() + " Writing recipe " + this.name + "." );
     process();
 };
 
@@ -2026,22 +2027,13 @@ vscp.mdf.getRecipes = function( options ) {
         console.error( vscp.utility.getTime() + " MDF object is missing." );
         return recipes;
     }
-
-    if ( "undefined" === typeof options.mdf.vscp ) {
-        console.error( vscp.utility.getTime() + " MDF vscp section is missing." );
-        return recipes;
-    }
     
-    if ( "undefined" === typeof options.mdf.vscp.module ) {
-        console.error( vscp.utility.getTime() + " MDF module section is missing." );
-        return recipes;
-    }
-    
-    if ( "undefined" === typeof options.mdf.vscp.module.setup ) {
+    if ( false === vscp.mdf.isSafeObjectPath( options, "mdf.vscp.module.setup.recipe" ) ) {
         console.warning( vscp.utility.getTime() + " No recipes available." );
         return recipes;
     }
 
+    // Only one single recipe available?
     if ( false === ( options.mdf.vscp.module.setup.recipe instanceof Array ) ) {
 
         recipe = new vscp.mdf.Recipe({
@@ -2051,6 +2043,7 @@ vscp.mdf.getRecipes = function( options ) {
 
         recipes.push( recipe );
     }
+    // Several recipes available
     else {
 
         for( index = 0; index < options.mdf.vscp.module.setup.recipe.length; ++index ) {
