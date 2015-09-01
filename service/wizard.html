@@ -62,7 +62,6 @@
             '                    <function>input</function>' +
             '                    <head lang="en">Beijing I/O node</head>' +
             '                    <description lang="en">With what frequency should channel blink?</description>' +
-            '                    <function>Input</function>' +
             '                    <variable type="byte" name="frequency" />' +
             '                </messagebox>' +
             '                <!-- Write frequency to abstraction register -->' +
@@ -156,6 +155,7 @@
             }
         }
 
+        // Create a modal dialog and return its html code.
         function modalDialog( id, header, body, footer ) {
             var htmlStr = "";
 
@@ -177,15 +177,36 @@
 
             return htmlStr;
         }
+        
+        // Create a progress bar and return its html code.
+        function progressBar( id ) {
+            var htmlStr = "";
+            
+            htmlStr += "    <div id=\"" + id + "\" class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" aria-valuenow=\"0\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:0%\">";
+            htmlStr += "<div class=\"progress\">";
+            htmlStr += "        0%";
+            htmlStr += "    </div>";
+            htmlStr += "</div>";
+            
+            return htmlStr;
+        }
+        
+        // Update the progress bar
+        function updateProgressBar( id, value ) {
+            $( "#" + id ).attr( "aria-valuenow", value );
+            $( "#" + id ).text( value + "%" );
+            $( "#" + id ).attr( "style", "width: " + value + "%" );
+        }
 
         function showRecipe( id ) {
 
-            var index   = 0;
             var recipe  = null;
             var htmlStr = "";
             var header  = "";
             var body    = "";
             var footer  = "";
+            var index   = 0;
+            var script  = "";
 
             if ( ( 0 > id ) || ( recipes.length <= id ) ) {
                 return;
@@ -194,90 +215,118 @@
             // Get recipe
             recipe = recipes[ id ];
 
-            // Create dialog header
-            header += recipe.messageBoxes[ 0 ].head;
+            // Create all message boxes
+            for( index = 0; index < recipe.messageBoxes.length; ++index ) {
+            
+                header  = "";
+                body    = "";
+                footer  = "";
+            
+                // Create dialog header
+                header += recipe.messageBoxes[ index ].head;
 
-            // Create dialog body
-            body += "<p>";
-            body += recipe.messageBoxes[ 0 ].description;
-            body += "</p>";
+                // Create dialog body
+                body += "<p>";
+                body += recipe.messageBoxes[ index ].description;
+                body += "</p>";
 
-            body += "<p>";
+                body += "<p>";
 
-            if ( "input" === recipe.messageBoxes[ 0 ].func ) {
+                if ( "input" === recipe.messageBoxes[ index ].func ) {
 
-                body += "<input id=\"" + recipe.messageBoxes[ 0 ].variableName + "\" type=\"";
+                    body += "<input id=\"" + recipe.messageBoxes[ index ].variableName + "\" type=\"";
 
-                if ( "string" === recipe.messageBoxes[ 0 ].variableType ) {
-                    body += "text\" value=\"\"";
+                    if ( "string" === recipe.messageBoxes[ index ].variableType ) {
+                        body += "text\" value=\"\"";
+                    }
+                    else {
+                        body += "number\" value=\"0\"";
+
+                        if ( recipe.messageBoxes[ index ].variableMin !== recipe.messageBoxes[ index ].variableMax ) {
+                            body += "min=\"" + recipe.messageBoxes[ index ].variableMin + "\" max=\"" + recipe.messageBoxes[ index ].variableMax + "\"";
+                        }
+                    }
+
+                    body += " />";
                 }
                 else {
-                    body += "number\" value=\"0\"";
-
-                    if ( recipe.messageBoxes[ 0 ].variableMin !== recipe.messageBoxes[ 0 ].variableMax ) {
-                        body += "min=\"" + recipe.messageBoxes[ 0 ].variableMin + "\" max=\"" + recipe.messageBoxes[ 0 ].variableMax + "\"";
-                    }
+                    body += "Message box function not supported: " + recipe.messageBoxes[ index ].func;
                 }
 
-                body += " />";
+                body += "</p>";
+
+                // Create dialog footer
+                if ( recipe.messageBoxes.length === ( index + 1 ) ) {
+                    script = "recipes[ " + id + " ].messageBoxes[ " + index + " ].variableValue = $( '#" + recipe.messageBoxes[ index ].variableName + "' ).val(); waitUntilDialogHidden( 'messageBoxDialog" + index + "', function() { writeRecipe( " + id + " ); });";
+                }
+                else {
+                    script = "recipes[ " + id + " ].messageBoxes[ " + index + " ].variableValue = $( '#" + recipe.messageBoxes[ index ].variableName + "' ).val(); nextDialog( 'messageBoxDialog" + index + "', 'messageBoxDialog" + ( index + 1 ) + "' );";
+                }
+                footer += "<input type=\"button\" value=\"Next\" class=\"btn btn-default\" data-dismiss=\"modal\" onclick=\"";
+                footer += script;
+                footer += "\" />";
+                footer += "<input type=\"button\" value=\"Cancel\" class=\"btn btn-default\" data-dismiss=\"modal\" />";
+                
+                // Create modal dialog
+                htmlStr += modalDialog( "messageBoxDialog" + index, header, body, footer );
             }
-            else {
-                body += "Message box function not supported: " + recipe.messageBoxes[ 0 ].func;
-            }
 
-            body += "</p>";
-
-            // Create dialog footer
-            footer += "<input type=\"submit\" class=\"form-control\" value=\"Ok\" onclick=\"recipes[ " + id + " ].messageBoxes[ " + 0 + " ].variableValue = $( \'#" + recipe.messageBoxes[ 0 ].variableName + "\' ).val(); $( \'#myModal\' ).modal( \'toggle\' ); writeRecipe( " + id + ");\" />";
-
-            // Create modal dialog
-            htmlStr = modalDialog( "myModal", header, body, footer );
             $( "#output" ).html( htmlStr );
 
             // Show dialog
-            $( "#myModal" ).modal();
+            $( "#messageBoxDialog0" ).modal({
+                backdrop: "static",
+                keyboard: false
+            });
         }
-
+        
+        function nextDialog( from, to ) {
+            waitUntilDialogHidden( from, function() {
+                $( "#" + to ).modal({
+                    backdrop: "static",
+                    keyboard: false
+                });
+            });
+        }
+        
+        function waitUntilDialogHidden( id, action ) {
+        
+            $( "#" + id ).on( "hidden.bs.modal", action );
+        }
+        
         function writeRecipe( id ) {
 
-            var index   = 0;
             var recipe  = null;
-            var messageBoxIndex = 0;
+            var htmlStr = "";
 
             if ( ( 0 > id ) || ( recipes.length <= id ) ) {
                 return;
             }
+            
+            // Create modal dialogs
+            htmlStr += modalDialog( "progressDialog", "", progressBar( "progressBar" ), "" );
+            htmlStr += modalDialog(
+                "successDialog",
+                "<h4 class=\"modal-title\">Info</h4>", 
+                "<p>Successful</p>", 
+                "<input type=\"button\" value=\"Ok\" class=\"btn btn-default\" data-dismiss=\"modal\" />"
+            );
+            htmlStr += modalDialog(
+                "errorDialog",
+                "<h4 class=\"modal-title\">Error</h4>", 
+                "<p>Failed!</p>",
+                "<input type=\"button\" value=\"Ok\" class=\"btn btn-default\" data-dismiss=\"modal\" />"
+            );
+            $( "#output" ).html( htmlStr );
 
+            // Show dialog
+            $( "#progressDialog" ).modal({
+                backdrop: "static",
+                keyboard: false
+            });
+            
             // Get recipe
             recipe = recipes[ id ];
-
-            for( messageBoxIndex = 0; messageBoxIndex < recipe.messageBoxes.length; ++messageBoxIndex ) {
-            
-                for( index = 0; index < recipe.bitInRegs.length; ++index ) {
-                    if ( recipe.messageBoxes[ messageBoxIndex ].variableName === recipe.bitInRegs[ index ].variableName ) {
-                        recipe.bitInRegs[ index ].value = recipe.messageBoxes[ messageBoxIndex ].variableValue;
-                    }
-                }
-                
-                for( index = 0; index < recipe.bitInAbstractions.length; ++index ) {
-                    if ( recipe.messageBoxes[ messageBoxIndex ].variableName === recipe.bitInAbstractions[ index ].variableName ) {
-                        recipe.bitInAbstractions[ index ].value = recipe.messageBoxes[ messageBoxIndex ].variableValue;
-                    }
-                }
-            
-                for( index = 0; index < recipe.registers.length; ++index ) {
-                    if ( recipe.messageBoxes[ messageBoxIndex ].variableName === recipe.registers[ index ].variableName ) {
-                        recipe.registers[ index ].value = recipe.messageBoxes[ messageBoxIndex ].variableValue;
-                    }
-                }
-                
-                for( index = 0; index < recipe.abstractions.length; ++index ) {
-                    if ( recipe.messageBoxes[ messageBoxIndex ].variableName === recipe.abstractions[ index ].variableName ) {
-                        recipe.abstractions[ index ].value = recipe.messageBoxes[ messageBoxIndex ].variableValue;
-                    }
-                }
-            
-            }
                         
             // Write recipe
             recipe.write({
@@ -285,16 +334,29 @@
                 connection: vscpConn,
 
                 nodeId: 1,
-
+                
+                onProgress: function( percent ) {
+                    updateProgressBar( "progressBar", percent );
+                },
+                
                 onSuccess: function() {
-                    alert( "Succesful." );
+                    $( "#progressDialog" ).modal( "hide" );
+                    $( "#successDialog" ).modal({
+                        backdrop: "static",
+                        keyboard: false
+                    });
                 },
 
                 onError: function() {
-                    alert( "Failed." );
+                    $( "#progressDialog" ).modal( "hide" );
+                    $( "#errorDialog" ).modal({
+                        backdrop: "static",
+                        keyboard: false
+                    });
                 }
 
             });
+        
         }
 
     </script>
