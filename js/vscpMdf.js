@@ -720,7 +720,6 @@ vscp.mdf.get = function( options ) {
 vscp.mdf.readAbstractValue = function( options ) {
 
     var onError         = null;
-    var index           = 0;
     var page            = 0;
     var offset          = 0;
     var type            = "";
@@ -920,7 +919,6 @@ vscp.mdf.readAbstractValue = function( options ) {
 vscp.mdf.writeAbstractValue = function( options ) {
 
     var onError         = null;
-    var index           = 0;
     var page            = 0;
     var offset          = 0;
     var type            = "";
@@ -1365,8 +1363,6 @@ vscp.mdf.BitInReg = function( options ) {
  */
 vscp.mdf.BitInReg.prototype.parse = function( $bitInReg ) {
 
-    var value   = "";
-
     if ( "undefined" === typeof $bitInReg ) {
         return;
     }
@@ -1629,7 +1625,6 @@ vscp.mdf.Recipe = function( options ) {
  */
 vscp.mdf.Recipe.prototype.parse = function( $recipe ) {
 
-    var index               = 0;
     var bitInRegs           = this.bitInRegs;
     var bitInReg            = null;
     var bitInAbstractions   = this.bitInAbstractions;
