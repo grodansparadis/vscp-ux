@@ -435,3 +435,168 @@ vscp.service.scan = function( options ) {
     
     fnProbe( currentNodeId );
 };
+
+/**
+ * The container is used to store several data elements in one single daemon variable.
+ */
+vscp.service.Container = function( options ) {
+    
+    this.connection = null; // VSCP connection
+    this.name       = "";   // Container name
+    this.data       = [];   // Data container itself
+    this.separator  = ",";  // Data element separator
+    
+    if ( "undefined" !== typeof options ) {
+    
+        if ( true === ( options.connection instanceof vscp.Connection ) ) {
+            this.connection = options.connection;
+        }
+        
+        if ( "string" === typeof options.name ) {
+            this.name = options.name;
+        }        
+    }
+        
+};
+
+vscp.service.Container.prototype.create = function( options ) {
+
+    var onError     = null;
+    var index       = 0;
+    var container   = "";
+
+    if ( "undefined" === typeof options ) {
+        console.error( vscp.utility.getTime() + " Options are missing. " );
+        return;
+    }
+               
+    if ( "function" !== typeof options.onSuccess ) {
+        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+        return;
+    }
+    
+    if ( "function" === typeof options.onError ) {
+        onError = options.onError;
+    }
+    
+    // Build container, which contains all data in string form, separated by semicolon.
+    for( index = 0; index < this.data.length; ++index ) {
+        container += "" + this.data[ index ];
+        
+        if ( this.data.length > ( index + 1 ) ) {
+            container += this.separator;
+        }
+    }
+    
+    // Store the container in a variable
+    this.connection.createVar({
+        
+        name: "Container_" + this.name,
+        
+        type: vscp.constants.varTypes.STRING,
+        
+        value: container,
+        
+        persistency: true,
+        
+        onSuccess: function( conn, variable ) {
+            
+            options.onSuccess();
+        },
+        
+        onError: function( conn ) {
+        
+            if ( null !== onError ) {
+                onError();
+            }
+        }
+    });
+};
+
+vscp.service.Container.prototype.write = function( options ) {
+
+    var onError     = null;
+    var index       = 0;
+    var container   = "";
+
+    if ( "undefined" === typeof options ) {
+        console.error( vscp.utility.getTime() + " Options are missing. " );
+        return;
+    }
+               
+    if ( "function" !== typeof options.onSuccess ) {
+        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+        return;
+    }
+    
+    if ( "function" === typeof options.onError ) {
+        onError = options.onError;
+    }
+    
+    // Build container, which contains all data in string form, separated by semicolon.
+    for( index = 0; index < this.data.length; ++index ) {
+        container += "" + this.data[ index ];
+        
+        if ( this.data.length > ( index + 1 ) ) {
+            container += this.separator;
+        }
+    }
+
+    // Store the container in a variable
+    this.connection.writeVar({
+        
+        name: "Container_" + this.name,
+        
+        value: container,
+        
+        onSuccess: function( conn, variable ) {
+            
+            options.onSuccess();
+        },
+        
+        onError: function( conn ) {
+        
+            if ( null !== onError ) {
+                onError();
+            }
+        }
+    });
+};
+
+vscp.service.Container.prototype.read = function( options ) {
+
+    var onError = null;
+
+    if ( "undefined" !== typeof options ) {
+            
+        if ( "function" !== typeof options.onSuccess ) {
+            return;
+        }
+        
+        if ( "function" === typeof options.onError ) {
+            onError = options.onError;
+        }
+    }
+    
+    // Read container from variable
+    this.connection.readVar({
+        
+        name: "Container_" + this.name,
+        
+        onSuccess: function( conn, variable ) {
+            
+            // Clear data container
+            this.data = variable.value.split( this.separator );
+                        
+            options.onSuccess();
+        }.bind( this ),
+        
+        onError: function( conn ) {
+        
+            if ( null !== onError ) {
+                onError();
+            }
+        }
+    });
+
+};
