@@ -1381,12 +1381,54 @@ vscp.utility.guidToStr = function( guid ) {
 };
 
 /**
- * Get node id from a node GUID.
+ * Converts a GUID string to a GUID number array.
+ *
+ * @param[in] guid  GUID string
+ * @return GUID number array
+ */
+vscp.utility.strToGuid = function( str ) {
+
+    var guid    = [];
+    var items   = [];
+    var index   = 0;
+
+    if ( "undefined" === typeof str ) {
+        return guid;
+    }
+
+    if ( "string" !== typeof str ) {
+        return guid;
+    }
+
+    items = str.split( ":" );
+
+    if ( 16 !== items.length ) {
+        return guid;
+    }
+
+    for( index = 0; index < items.length; ++index) {
+        guid.push( parseInt( items[ index ], 16 ) );
+    }
+
+    return guid;
+};
+
+/**
+ * Get node id from a node GUID string.
  *
  * @param[in] guid  Node GUID (string)
  * @return Node id
  */
 vscp.utility.getNodeId = function( guid ) {
+
+    if ( "undefined" === typeof guid ) {
+        return 0;
+    }
+
+    if ( "string" !== typeof guid ) {
+        return 0;
+    }
+
     return parseInt( guid.split( ":" )[ 15 ] );
 };
 
@@ -1427,7 +1469,7 @@ vscp.Connection = function() {
 
     /** Callback called on any received table row (see GT command) */
     this.onTableRow = null;
-    
+
     /** VSCP websocket is not connected right now */
     this.state = this.states.DISCONNECTED;
 
@@ -1725,7 +1767,7 @@ vscp.Connection = function() {
             this.onTableRow( this, row );
         }
     };
-    
+
     /**
      * Add a event listener.
      *
@@ -2563,17 +2605,12 @@ vscp.Connection.prototype.setFilter = function ( options ) {
         filterGuid = options.filterGuid;
     }
     else if ( "string" === typeof options.filterGuid ) {
-        guid = options.filterGuid.split(":");
 
-        if ( 16 != guid.length ) {
-            console.error( vscp.utility.getTime() + " GUID filter length is invalid. " );
+        filterGuid = vscp.utility.strToGuid( options.filterGuid );
+
+        if ( 16 !== filterGuid.length ) {
+            console.error( vscp.utility.getTime() + " GUID filter is invalid. " );
             return;
-        }
-
-        filterGuid = guid;
-
-        for( index = 0; index < guid.length; ++index) {
-            filterGuid[ index ] = parseInt( guid[ index ], 16 );
         }
     }
 
@@ -2598,17 +2635,12 @@ vscp.Connection.prototype.setFilter = function ( options ) {
         maskGuid = options.maskGuid;
     }
     else if ( "string" === typeof options.maskGuid ) {
-        guid = options.maskGuid.split(":");
 
-        if ( 16 != guid.length ) {
-            console.error( vscp.utility.getTime() + " GUID filter length is invalid. " );
+        maskGuid = vscp.utility.strToGuid( options.maskGuid );
+
+        if ( 16 !== maskGuid.length ) {
+            console.error( vscp.utility.getTime() + " GUID mask is invalid. " );
             return;
-        }
-
-        maskGuid = guid;
-
-        for( index = 0; index < guid.length; ++index) {
-            maskGuid[ index ] = parseInt( guid[ index ], 16 );
         }
     }
 
@@ -3079,22 +3111,22 @@ vscp.Connection.prototype.readTable = function ( options ) {
         console.error( vscp.utility.getTime() + " Table name is missing. " );
         return;
     }
-    
+
     if ( "function" !== typeof options.onTableRow ) {
         console.error( vscp.utility.getTime() + " onTableRow function is missing. " );
         return;
     }
-    
+
     this.onTableRow = options.onTableRow;
-    
+
     if ( "string" === typeof options.begin ) {
         rowBegin = options.begin;
     }
-    
+
     if ( "string" === typeof options.end ) {
         rowEnd = options.end;
     }
-    
+
     if ( "function" === typeof options.onSuccess ) {
         onSuccess = options.onSuccess;
     }
@@ -3102,12 +3134,12 @@ vscp.Connection.prototype.readTable = function ( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     data = options.name;
-    
+
     if ( ( null !== rowBegin ) &
          ( null !== rowEnd ) ) {
-        
+
         data += ";" + rowBegin + ";" + rowEnd;
     }
 
