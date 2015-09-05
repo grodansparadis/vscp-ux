@@ -630,7 +630,7 @@ vscp.mdf.constants = {
  * - onSuccess: Callback
  * - onError: Callback
  */
-vscp.mdf.get = function( options ) {
+vscp.mdf.load = function( options ) {
 
     var onError = null;
 
