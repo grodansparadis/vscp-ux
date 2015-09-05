@@ -75,11 +75,22 @@
             vscpConn = new vscp.Connection();
 
             // Connect to VSCP daemon
-            connect();
+            connect()
+            .then( setFilter )
+            .then( startReceivingEvents )
+            .then( initNodeList )
+            .done( function() {
+                // Show the nodes in the list
+                showNodeList();
+                
+                // Enable user interface
+                ui.enable();
+            });
         });
 
-        // Connect to the VSCP daemon, set a filter and start receiving events.
+        // Connect to the VSCP daemon
         function connect() {
+            var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
@@ -91,53 +102,85 @@
                 password: settings.passwordHash,
 
                 onSuccess: function( conn ) {
-
-                    // Set filter for CLASS1.Protocol
-                    vscpConn.setFilter({
-                        filterClass: 0x0000,
-                        maskClass: 0xffff,
-                        filterType: 0x0000,
-                        maskType: 0x0000
-                    });
-
-                    // Start receiving VSCP events
-                    vscpConn.start({
-                        
-                        onSuccess: function( conn ) {
-
-                            // Initialize node list
-                            nodeList.init({
-                                
-                                connection: conn,
-                                
-                                onSuccess: function() {
-                                    
-                                    // Show the nodes in the list
-                                    showNodeList();
-                                    
-                                    // Enable user interface
-                                    ui.enable();
-                                }
-                            });
-                        },
-                        
-                        onError: function( conn ) {
-                            alert("Server error!");
-                        }
-                    });
-                    
+                    deferred.resolve();                    
                 },
 
                 onError: function( conn ) {
-
-                    // Disable the user interface
-                    ui.disable();
-
                     alert("Connection lost. Please reload website.");
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
+        
+        // Set a filter for CLASS1.Protocol
+        function setFilter() {
+            var deferred = new $.Deferred();
+            
+            // Set filter for CLASS1.Protocol
+            vscpConn.setFilter({
+            
+                filterClass: 0x0000,
+                maskClass: 0xffff,
+                filterType: 0x0000,
+                maskType: 0x0000,
                 
+                onSuccess: function() {
+                    deferred.resolve();
+                },
+                
+                onError: function() {
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Start receiving VSCP events
+        function startReceivingEvents() {
+            var deferred = new $.Deferred();
+            
+            // Start receiving VSCP events
+            vscpConn.start({
+                
+                onSuccess: function( conn ) {
+                    deferred.resolve();
+                },
+                
+                onError: function( conn ) {
+                    alert("Server error!");
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Initialize global node list
+        function initNodeList() {
+            var deferred = new $.Deferred();
+            
+            // Initialize node list
+            nodeList.init({
+                
+                connection: vscpConn,
+                
+                onSuccess: function() {
+                    deferred.resolve();
+                },
+                
+                onError: function() {
+                    alert("Server error!");
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Show the node list
         function showNodeList() {
             var index   = 0;
             var nodes   = nodeList.get();
@@ -150,6 +193,7 @@
             }
         }
 
+        // Discover nodes by who is there broadcast
         function whoIsThere() {
             var index = 0;
             
@@ -209,6 +253,7 @@
             });
         }
         
+        // Discover nodes by scanning for them
         function scan() {
         
             // Disable user interface
