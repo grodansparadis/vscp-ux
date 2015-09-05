@@ -38,6 +38,9 @@
 
         // VSCP websocket connection
         var vscpConn = null;
+        
+        // Node list container
+        var nodeListContainer = null;
 
         // User interface data
         var ui = {
@@ -76,6 +79,7 @@
             connect();
         });
 
+        // Connect to the VSCP daemon, set a filter and start receiving events.
         function connect() {
 
             // Connect to VSCP server
@@ -108,6 +112,9 @@
                             alert("Server error!");
                         }
                     });
+                    
+                    // Initialize the node list
+                    initNodeList();
                 },
 
                 onError: function( conn ) {
@@ -119,6 +126,48 @@
                 }
             });
         }
+        
+        function initNodeList() {
+        
+            // Create node list container
+            nodeListContainer = new vscp.service.Container({
+                connection: vscpConn,
+                name: "nodeList"
+            });
+            
+            // Fill the node list container
+            nodeListContainer.read({
+            
+                onSuccess: function() {
+                    console.info( "Node list container read." );
+                    showNodeList();
+                },
+                
+                onError: function() {
+                    // Node list doesn't exists, create a empty one
+                    nodeListContainer.create({
+                        onSuccess: function() {
+                            console.info( "Empty node list container created." );
+                        }
+                    });
+                }
+            });
+        }
+        
+        function showNodeList() {
+            var index   = 0;
+            
+            // Clear nodes
+            ui.clearNodes();
+            
+            if ( null === nodeListContainer ) {
+                return;
+            }
+            
+            for( index = 0; index < nodeListContainer.data.length; ++index ) {
+                $( "#output tbody" ).append( "<tr><td>" + ( index + 1 ) + "</td><td>" + nodeListContainer.data[ index ] + "</td></tr>" );
+            }
+        }
 
         function whoIsThere() {
             var index = 0;
@@ -126,23 +175,43 @@
             // Disable user interface
             ui.disable();
             
-            // Clear nodes
-            ui.clearNodes();
-
+            // Clear nodes in the list
+            nodeListContainer.data = [];
+            showNodeList();
+            
             vscp.service.whoIsThere({
 
                 connection: vscpConn,
 
                 onSuccess: function( nodes ) {
-
+                    
                     for( index = 0; index < nodes.length; ++index ) {
-                        $( "#output tbody" ).append( "<tr><td>" + ( index + 1 ) + "</td><td>" + vscp.utility.guidToStr( nodes[ index ].guid ) + "</td></tr>" );
+                    
+                        nodeListContainer.data.push( vscp.utility.guidToStr( nodes[ index ].guid ) );
                     }
                     
-                    alert( "Nodes: " + nodes.length );
-                
-                    // Enable the user interface
-                    ui.enable();
+                    showNodeList();
+                    
+                    if ( 1 === nodes.length ) {
+                        alert( "One node found." );
+                    }
+                    else {
+                        alert( "" + nodes.length + " nodes found." );
+                    }
+                    
+                    nodeListContainer.write({
+                        onSuccess: function() {
+                            console.info( "Node list stored." );
+                            
+                            // Enable the user interface
+                            ui.enable();
+                        },
+                        onError: function() {
+                            // Enable the user interface
+                            ui.enable();
+                        }
+                    });
+
                 },
 
                 onError: function() {
@@ -159,8 +228,9 @@
             // Disable user interface
             ui.disable();
             
-            // Clear nodes
-            ui.clearNodes();
+            // Clear nodes in the list
+            nodeListContainer.data = [];
+            showNodeList();
 
             vscp.service.scan({
 
@@ -173,13 +243,32 @@
                 onSuccess: function( nodes ) {
 
                     for( index = 0; index < nodes.length; ++index ) {
-                        $( "#output tbody" ).append( "<tr><td>" + ( index + 1 ) + "</td><td>" + nodes[ index ] + "</td></tr>" );
+                    
+                        nodeListContainer.data.push( nodes[ index ] );
                     }
                     
-                    alert( "Nodes: " + nodes.length );
+                    showNodeList();
+                                    
+                    if ( 1 === nodes.length ) {
+                        alert( "One node found." );
+                    }
+                    else {
+                        alert( "" + nodes.length + " nodes found." );
+                    }
                 
-                    // Enable the user interface
-                    ui.enable();
+                    nodeListContainer.write({
+                        onSuccess: function() {
+                            console.info( "Node list stored." );
+                            
+                            // Enable the user interface
+                            ui.enable();
+                        },
+                        onError: function() {
+                            // Enable the user interface
+                            ui.enable();
+                        }
+                    });
+                    
                 },
 
                 onError: function() {
