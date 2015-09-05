@@ -27,6 +27,8 @@
     <script type="text/javascript" src="../js/vscpRegister.js"></script>
     <!-- VSCP service access, depends on the websocket base library -->
     <script type="text/javascript" src="../js/vscpService.js"></script>
+    <!-- Node list -->
+    <script type="text/javascript" src="../js/nodeList.js"></script>
     
     <!-- Boostrap navigation bar helper functions -->
     <script src="../js/navBar.js"></script>
@@ -39,9 +41,6 @@
         // VSCP websocket connection
         var vscpConn = null;
         
-        // Node list container
-        var nodeListContainer = null;
-
         // User interface data
         var ui = {
 
@@ -103,18 +102,30 @@
 
                     // Start receiving VSCP events
                     vscpConn.start({
+                        
                         onSuccess: function( conn ) {
 
-                            // Enable user interface
-                            ui.enable();
+                            // Initialize node list
+                            nodeList.init({
+                                
+                                connection: conn,
+                                
+                                onSuccess: function() {
+                                    
+                                    // Show the nodes in the list
+                                    showNodeList();
+                                    
+                                    // Enable user interface
+                                    ui.enable();
+                                }
+                            });
                         },
+                        
                         onError: function( conn ) {
                             alert("Server error!");
                         }
                     });
                     
-                    // Initialize the node list
-                    initNodeList();
                 },
 
                 onError: function( conn ) {
@@ -126,46 +137,16 @@
                 }
             });
         }
-        
-        function initNodeList() {
-        
-            // Create node list container
-            nodeListContainer = new vscp.service.Container({
-                connection: vscpConn,
-                name: "nodeList"
-            });
-            
-            // Fill the node list container
-            nodeListContainer.read({
-            
-                onSuccess: function() {
-                    console.info( "Node list container read." );
-                    showNodeList();
-                },
                 
-                onError: function() {
-                    // Node list doesn't exists, create a empty one
-                    nodeListContainer.create({
-                        onSuccess: function() {
-                            console.info( "Empty node list container created." );
-                        }
-                    });
-                }
-            });
-        }
-        
         function showNodeList() {
             var index   = 0;
+            var nodes   = nodeList.get();
             
             // Clear nodes
             ui.clearNodes();
-            
-            if ( null === nodeListContainer ) {
-                return;
-            }
-            
-            for( index = 0; index < nodeListContainer.data.length; ++index ) {
-                $( "#output tbody" ).append( "<tr><td>" + ( index + 1 ) + "</td><td>" + nodeListContainer.data[ index ] + "</td></tr>" );
+                        
+            for( index = 0; index < nodes.length; ++index ) {
+                $( "#output tbody" ).append( "<tr><td>" + ( index + 1 ) + "</td><td>" + nodes[ index ] + "</td></tr>" );
             }
         }
 
@@ -176,7 +157,7 @@
             ui.disable();
             
             // Clear nodes in the list
-            nodeListContainer.data = [];
+            nodeList.clear();
             showNodeList();
             
             vscp.service.whoIsThere({
@@ -187,7 +168,10 @@
                     
                     for( index = 0; index < nodes.length; ++index ) {
                     
-                        nodeListContainer.data.push( vscp.utility.guidToStr( nodes[ index ].guid ) );
+                        nodeList.append({
+                            guid: vscp.utility.guidToStr( nodes[ index ].guid )
+                        });
+                        
                     }
                     
                     showNodeList();
@@ -199,13 +183,15 @@
                         alert( "" + nodes.length + " nodes found." );
                     }
                     
-                    nodeListContainer.write({
+                    nodeList.write({
+                    
                         onSuccess: function() {
                             console.info( "Node list stored." );
                             
                             // Enable the user interface
                             ui.enable();
                         },
+                        
                         onError: function() {
                             // Enable the user interface
                             ui.enable();
@@ -229,7 +215,7 @@
             ui.disable();
             
             // Clear nodes in the list
-            nodeListContainer.data = [];
+            nodeList.clear();
             showNodeList();
 
             vscp.service.scan({
@@ -241,11 +227,10 @@
                 end: ui.scanTo(),
 
                 onSuccess: function( nodes ) {
-
-                    for( index = 0; index < nodes.length; ++index ) {
-                    
-                        nodeListContainer.data.push( nodes[ index ] );
-                    }
+                
+                    nodeList.set({
+                        guids: nodes
+                    });
                     
                     showNodeList();
                                     
@@ -256,13 +241,15 @@
                         alert( "" + nodes.length + " nodes found." );
                     }
                 
-                    nodeListContainer.write({
+                    nodeList.write({
+                    
                         onSuccess: function() {
                             console.info( "Node list stored." );
                             
                             // Enable the user interface
                             ui.enable();
                         },
+                        
                         onError: function() {
                             // Enable the user interface
                             ui.enable();
