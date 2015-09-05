@@ -453,7 +453,7 @@ vscp.service.Container = function( options ) {
         }
         
         if ( "string" === typeof options.name ) {
-            this.name = options.name;
+            this.name = "Container_" + options.name;
         }        
     }
         
@@ -491,7 +491,7 @@ vscp.service.Container.prototype.create = function( options ) {
     // Store the container in a variable
     this.connection.createVar({
         
-        name: "Container_" + this.name,
+        name: this.name,
         
         type: vscp.constants.varTypes.STRING,
         
@@ -545,7 +545,7 @@ vscp.service.Container.prototype.write = function( options ) {
     // Store the container in a variable
     this.connection.writeVar({
         
-        name: "Container_" + this.name,
+        name: this.name,
         
         value: container,
         
@@ -581,7 +581,7 @@ vscp.service.Container.prototype.read = function( options ) {
     // Read container from variable
     this.connection.readVar({
         
-        name: "Container_" + this.name,
+        name: this.name,
         
         onSuccess: function( conn, variable ) {
             
