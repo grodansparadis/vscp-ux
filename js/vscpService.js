@@ -114,7 +114,7 @@ vscp.service.whoIsThere = function( options ) {
 
         // Clear timer
         clearTimeout( timerHandle );
-        
+
         // Store node data
         nodeData.push({
             guid: evt.vscpGuid,
@@ -124,53 +124,53 @@ vscp.service.whoIsThere = function( options ) {
         timerHandle = setTimeout(
             function() {
                 options.connection.removeEventListener( eventListener );
-                
+
                 // Sort data array for GUID and sequence number
                 nodeData.sort( function( a, b ) {
-                
+
                     // 1. Sort after GUID
                     if ( a.guid < b.guid ) {
                         return -1;
                     }
-                    
+
                     if ( a.guid > b.guid ) {
                         return 1;
                     }
-                    
+
                     // 2. Sort after sequence number
                     if ( a.data[ 0 ] < b.data[ 0 ] ) {
                         return -1;
                     }
-                    
+
                     if ( a.data[ 0 ] > b.data[ 0 ] ) {
                         return 1;
                     }
-                    
+
                     return 0;
                 });
-                
+
                 for( nodeDataIndex = 0; nodeDataIndex < nodeData.length; ++nodeDataIndex ) {
-                    
+
                     if ( current !== nodeData[ nodeDataIndex ].guid ) {
-                    
+
                         if ( 0 < nodeDataIndex ) {
                             if ( 7 !== seqId ) {
                                 console.warn( vscp.utility.getTime() + " Missing who is there response detected." );
                             }
                         }
-                    
+
                         // Reset
                         seqId = 0;
-                        
+
                         // Next node
                         current = nodeData[ nodeDataIndex ].guid;
-                        
+
                         // Get node id
                         nodeId = vscp.utility.getNodeId( nodeData[ nodeDataIndex ].guid );
                     }
-                    
+
                     // Event missing?
-                    if ( seqId !== nodeData[ nodeDataIndex ].data[ 0 ] ) {                        
+                    if ( seqId !== nodeData[ nodeDataIndex ].data[ 0 ] ) {
                         // Throw all other events from this node away until the event comes from another node
                         seqId = -1;
                     }
@@ -213,26 +213,26 @@ vscp.service.whoIsThere = function( options ) {
                         for( index = 1; index < 7; ++index ) {
                             mdfUrl.push( nodeData[ nodeDataIndex ].data[ index ] );
                         }
-                        
+
                         // Remove all trailing zeros
                         while( 0 === mdfUrl[ mdfUrl.length - 1] ) {
                             mdfUrl.pop();
                         }
-                        
+
                         nodes.push({
                             nodeId: nodeId,
                             guid: guid,
                             mdfUrl: "http://" + String.fromCharCode.apply( null, mdfUrl )
                         });
                     }
-                    
+
                     if ( 0 <= seqId ) {
                         ++seqId;
                     }
                 }
-                
+
                 console.info( vscp.utility.getTime() + " Found " + nodes.length + " nodes." );
-                
+
                 options.onSuccess( nodes );
             },
             vscp.service.timeout
@@ -262,7 +262,7 @@ vscp.service.whoIsThere = function( options ) {
                     console.info( vscp.utility.getTime() + " Who is there timeout." );
 
                     options.connection.removeEventListener( eventListener );
-                    
+
                     if ( null !== onError ) {
                         onError();
                     }
@@ -317,12 +317,12 @@ vscp.service.scan = function( options ) {
         console.error( vscp.utility.getTime() + " begin is missing." );
         return;
     }
-    
+
     if ( "number" !== typeof options.end ) {
         console.error( vscp.utility.getTime() + " end is missing." );
         return;
     }
-    
+
     if ( "function" !== typeof options.onSuccess ) {
         console.error( vscp.utility.getTime() + " onSuccess is missing." );
         return;
@@ -355,31 +355,31 @@ vscp.service.scan = function( options ) {
 
         // Clear timer
         clearTimeout( timerHandle );
-        
+
         // Store node GUID
         nodes.push( evt.vscpGuid );
 
         options.connection.removeEventListener( eventListener );
-        
+
         if ( options.end > currentNodeId ) {
-        
+
             ++currentNodeId;
-                
+
             fnProbe( currentNodeId );
         }
         else {
-        
+
             // Sort data array for GUID
             nodes.sort();
-            
+
             console.info( vscp.utility.getTime() + " Found " + nodes.length + " nodes." );
-            
+
             options.onSuccess( nodes );
         }
     };
 
     fnProbe = function( nodeId ) {
-    
+
         options.connection.sendEvent({
 
             event: new vscp.Event({
@@ -397,26 +397,26 @@ vscp.service.scan = function( options ) {
                     function() {
 
                         options.connection.removeEventListener( eventListener );
-                        
+
                         if ( options.end === currentNodeId ) {
-                        
+
                             // Sort data array for GUID
                             nodes.sort();
-                            
+
                             console.info( vscp.utility.getTime() + " Found " + nodes.length + " nodes." );
-                            
+
                             options.onSuccess( nodes );
                         }
                         else {
                             ++currentNodeId;
-                            
+
                             fnProbe( currentNodeId );
                         }
 
                     },
                     scanTimeout
                 );
-                
+
             },
 
             onError: function( conn ) {
@@ -428,35 +428,36 @@ vscp.service.scan = function( options ) {
             }
         });
     };
-    
+
     console.info( vscp.utility.getTime() + " Scanning starts ..." );
 
     currentNodeId = options.begin;
-    
+
     fnProbe( currentNodeId );
 };
 
 /**
- * The container is used to store several data elements in one single daemon variable.
+ * The container is used to store javascript objects in a daemon variable as string.
+ * It supports one or more objects in a single variable!
  */
 vscp.service.Container = function( options ) {
-    
+
     this.connection = null; // VSCP connection
     this.name       = "";   // Container name
     this.data       = [];   // Data container itself
     this.separator  = ",";  // Data element separator
-    
+
     if ( "undefined" !== typeof options ) {
-    
+
         if ( true === ( options.connection instanceof vscp.Connection ) ) {
             this.connection = options.connection;
         }
-        
+
         if ( "string" === typeof options.name ) {
             this.name = "Container_" + options.name;
-        }        
+        }
     }
-        
+
 };
 
 vscp.service.Container.prototype.create = function( options ) {
@@ -469,43 +470,45 @@ vscp.service.Container.prototype.create = function( options ) {
         console.error( vscp.utility.getTime() + " Options are missing. " );
         return;
     }
-               
+
     if ( "function" !== typeof options.onSuccess ) {
         console.error( vscp.utility.getTime() + " onSuccess is missing." );
         return;
     }
-    
+
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
     
     // Build container, which contains all data in string form, separated by semicolon.
     for( index = 0; index < this.data.length; ++index ) {
-        container += "" + this.data[ index ];
-        
+
+        // Convert object to string
+        container += JSON.stringify( this.data[ index ] );
+
         if ( this.data.length > ( index + 1 ) ) {
             container += this.separator;
         }
     }
-    
+
     // Store the container in a variable
     this.connection.createVar({
-        
+
         name: this.name,
-        
+
         type: vscp.constants.varTypes.STRING,
-        
+
         value: container,
-        
+
         persistency: true,
-        
+
         onSuccess: function( conn, variable ) {
-            
+
             options.onSuccess();
         },
-        
+
         onError: function( conn ) {
-        
+
             if ( null !== onError ) {
                 onError();
             }
@@ -523,20 +526,22 @@ vscp.service.Container.prototype.write = function( options ) {
         console.error( vscp.utility.getTime() + " Options are missing. " );
         return;
     }
-               
+
     if ( "function" !== typeof options.onSuccess ) {
         console.error( vscp.utility.getTime() + " onSuccess is missing." );
         return;
     }
-    
+
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     // Build container, which contains all data in string form, separated by semicolon.
     for( index = 0; index < this.data.length; ++index ) {
-        container += "" + this.data[ index ];
-        
+
+        // Convert object to string
+        container += JSON.stringify( this.data[ index ] );
+
         if ( this.data.length > ( index + 1 ) ) {
             container += this.separator;
         }
@@ -544,18 +549,18 @@ vscp.service.Container.prototype.write = function( options ) {
 
     // Store the container in a variable
     this.connection.writeVar({
-        
+
         name: this.name,
-        
+
         value: container,
-        
+
         onSuccess: function( conn, variable ) {
-            
+
             options.onSuccess();
         },
-        
+
         onError: function( conn ) {
-        
+
             if ( null !== onError ) {
                 onError();
             }
@@ -565,34 +570,43 @@ vscp.service.Container.prototype.write = function( options ) {
 
 vscp.service.Container.prototype.read = function( options ) {
 
-    var onError = null;
+    var onError     = null;
+    var elements    = null;
 
     if ( "undefined" !== typeof options ) {
-            
+
         if ( "function" !== typeof options.onSuccess ) {
             return;
         }
-        
+
         if ( "function" === typeof options.onError ) {
             onError = options.onError;
         }
     }
-    
+
     // Read container from variable
     this.connection.readVar({
-        
+
         name: this.name,
-        
+
         onSuccess: function( conn, variable ) {
-            
+
             // Clear data container
-            this.data = variable.value.split( this.separator );
-                        
+            this.data = [];
+            
+            // Separate data elements
+            elements = variable.value.split( this.separator );
+            
+            // Convert the strings to objects
+            for( index = 0; index < elements.length; ++index ) {
+                this.data.push( JSON.parse( elements[ index ] ) );
+            }
+
             options.onSuccess();
         }.bind( this ),
-        
+
         onError: function( conn ) {
-        
+
             if ( null !== onError ) {
                 onError();
             }
