@@ -35,11 +35,29 @@
 
 /*jshint bitwise: false */
 
+/**
+ * Node list (singleton)
+ *
+ * Call the init() function before any other function is called.
+ */
 var nodeList = (function() {
 
     var connection = null;  // VSCP connection
     var container  = null;  // Container for the node list
     
+    /**
+     * Initializes the node list by
+     * - Setup a container
+     * - Reading the node list from the daemon
+     * - If the node list variable not exists, it will create one
+     *
+     * @param[in] options Options
+     *
+     * Options:
+     * - connection: VSCP connection object
+     * - onSuccess: Callback which is called after successful initialization
+     * - onError: Callback which is called in case that the initialization failed
+     */
     function init( options ) {
 
         if ( "undefined" === typeof options ) {
@@ -71,10 +89,23 @@ var nodeList = (function() {
         }
     }
     
+    /**
+     * Get a list with current known nodes.
+     *
+     * @return Node list (GUID string array)
+     */
     function get() {
         return container.data;
     }
     
+    /**
+     * Set a new list of nodes.
+     *
+     * @param[in] options Options
+     *
+     * Options:
+     * - guid: Array of GUID strings (one per node)
+     */
     function set( options ) {
     
         if ( "undefined" === typeof options ) {
@@ -88,6 +119,14 @@ var nodeList = (function() {
         container.data = options.guids;
     }
     
+    /**
+     * Append a node to the list.
+     *
+     * @param[in] options Options
+     *
+     * Options:
+     * - guid: GUID string
+     */
     function append( options ) {
         
         if ( "undefined" === typeof options ) {
@@ -101,11 +140,23 @@ var nodeList = (function() {
         container.data.push( options.guid );
     }
     
+    /**
+     * Clears the node list.
+     */
     function clear() {
         
         container.data = [];
     }
     
+    /**
+     * Write the node list persistent to a daemon variable.
+     *
+     * @param[in] options Options
+     *
+     * Options:
+     * - onSuccess: Callback which is called after successful written
+     * - onError: Callback which is called in case that the operation failed
+     */
     function write( options ) {
         
         if ( "undefined" === typeof options ) {
@@ -118,6 +169,7 @@ var nodeList = (function() {
         });
     }
     
+    // Return the public interface
     return {
         init: init,
         get: get,

@@ -439,6 +439,12 @@ vscp.service.scan = function( options ) {
 /**
  * The container is used to store javascript objects in a daemon variable as string.
  * It supports one or more objects in a single variable!
+ *
+ * @param[in] options Options
+ *
+ * Options:
+ * - connection: VSCP connection object
+ * - name: Container name
  */
 vscp.service.Container = function( options ) {
 
@@ -460,6 +466,15 @@ vscp.service.Container = function( options ) {
 
 };
 
+/**
+ * Create a container at the daemon.
+ *
+ * @param[in] options Options
+ *
+ * Options:
+ * - onSuccess: Callback which is called after successful operation
+ * - onError: Callback which is called in case that the operation failed
+ */
 vscp.service.Container.prototype.create = function( options ) {
 
     var onError     = null;
@@ -516,6 +531,16 @@ vscp.service.Container.prototype.create = function( options ) {
     });
 };
 
+/**
+ * Write the container to a daemon variable.
+ * The container must exist at the daemon!
+ *
+ * @param[in] options Options
+ *
+ * Options:
+ * - onSuccess: Callback which is called after successful operation
+ * - onError: Callback which is called in case that the operation failed
+ */
 vscp.service.Container.prototype.write = function( options ) {
 
     var onError     = null;
@@ -568,6 +593,15 @@ vscp.service.Container.prototype.write = function( options ) {
     });
 };
 
+/**
+ * Read the container from the daemon variable.
+ *
+ * @param[in] options Options
+ *
+ * Options:
+ * - onSuccess: Callback which is called after successful operation
+ * - onError: Callback which is called in case that the operation failed
+ */
 vscp.service.Container.prototype.read = function( options ) {
 
     var onError     = null;
