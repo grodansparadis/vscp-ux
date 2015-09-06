@@ -149,6 +149,7 @@
                 },
 
                 onError: function() {
+                    BootstrapDialog.alert( "Server error!" );
                     deferred.reject();
                 }
             });
