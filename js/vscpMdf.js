@@ -705,6 +705,44 @@ vscp.mdf.load = function( options ) {
 };
 
 /**
+ * Get the MDF as xml document.
+ *
+ * @param[in] options   Options
+ *
+ * @return MDF file as xml document
+ *
+ * Options:
+ * - name: MDF file name, including path
+ */
+vscp.mdf.loadLocal = function( options ) {
+
+    if ( "undefined" === typeof options ) {
+        console.error( vscp.utility.getTime() + " Options are missing. " );
+        return null;
+    }
+
+    if ( "string" !== typeof options.name ) {
+        console.error( vscp.utility.getTime() + " MDF file name is missing." );
+        return null;
+    }
+
+    console.info( vscp.utility.getTime() + " Load MDF from file " + options.url );
+
+    if ( window.XMLHttpRequest ) {
+        xhttp = new XMLHttpRequest();
+    }
+    // code for IE5 and IE6
+    else {
+        xhttp = new ActiveXObject( "Microsoft.XMLHTTP" );
+    }
+    
+    xhttp.open( "GET", name, false );
+    xhttp.send();
+    
+    return xhttp.responseXML;
+};
+
+/**
  * Read a abstract value.
  *
  * @param[in] options   Options

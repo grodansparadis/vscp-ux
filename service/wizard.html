@@ -17,6 +17,28 @@
     <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/css/bootstrap-dialog.min.css">
     <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/js/bootstrap-dialog.min.js"></script>
     
+    <style>
+        .btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-file input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: inherit;
+            display: block;
+        }
+    </style>
+    
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
 
@@ -192,11 +214,8 @@
         
         // User selected a node GUID, get provided recipes
         function nodeSelected() {
-            var guid    = $( "#nodeList" ).val();
-            var header  = "";
-            var body    = "";
-            var footer  = "";
-            var htmlStr = "";
+            var guid                    = $( "#nodeList" ).val();
+            var loadMdfRemoteOrLocalMdf = "cancel";
         
             if ( "-" === guid ) {
                 return;
@@ -205,33 +224,11 @@
             // Disable user interface
             ui.disable();
             
-            header += "<h1>Question</h1>";
-            
-            body +="<form role=\"form\">";
-            body += "<div class=\"radio\">";
-            body += "<label><input type=\"radio\" name=\"loadRemoteOrLocalMdf\" value=\"remote\" checked>Load remote MDF.</label>";
-            body += "</div>";
-            body += "<div class=\"radio\">";
-            body += "<label><input type=\"radio\" name=\"loadRemoteOrLocalMdf\" value=\"local\">Load local MDF.</label>";
-            body += "</div>";
-            body += "</form>";
-            
-            footer += "<input type=\"button\" value=\"Next\" class=\"btn btn-default\" data-dismiss=\"modal\" />";
-            
-            htmlStr += modalDialog( "localOrRemoteMdfDialog", header, body, footer );
-            $( "#output" ).html( htmlStr );
-            
-            // Show dialog
-            $( "#localOrRemoteMdfDialog" )
-            .modal({
-                backdrop: "static",
-                keyboard: false
-            })
-            .on( "hide.bs.modal", function () {
+            dialogLoadMdfRemoteOrLocal()
+            .done(function( howToLoad ) {
+                loadMdfRemoteOrLocalMdf = howToLoad;
                 
-                var loadRemoteOrLocalMdf = $( "input:radio[name ='loadRemoteOrLocalMdf']:checked" ).val();
-                
-                if ( "remote" === loadRemoteOrLocalMdf ) {
+                if ( "remote" === howToLoad ) {
                 
                     readMdfUrl( guid )
                     .then( loadMdfFromUrl )
@@ -244,17 +241,104 @@
                         // Enable user interface
                         ui.enable();
                     });
-                    
+                
                 }
-                else if ( "local" === loadRemoteOrLocalMdf ) {
-                    // Enable user interface
-                    ui.enable();
+                else if ( "local" === howToLoad ) {
+                
+                    dialogLoadMdfLocal()
+                    .done( function( fileName ) {
+                        var xmlDoc  = null;
+                        var $mdf    = null;
+                        
+                        if ( "" === fileName ) {
+                            return;
+                        }
+                    
+                        xmlDoc = vscp.mdf.loadLocal({
+                            name: fileName
+                        });
+                        
+                        $mdf = $( xmlDoc ); // Create jquery object from xml document
+                        
+                        showRecipes( $mdf );
+                    })
+                    .always( function() {
+                        // Enable user interface
+                        ui.enable();
+                    });
                 }
                 else {
-                    // Enable user interface
-                    ui.enable();
+                    return;
                 }
+                
             });
+        }
+        
+        function dialogLoadMdfRemoteOrLocal() {
+            var deferred = new $.Deferred();
+            
+            BootstrapDialog.show({
+                title: "Question",
+                message: "Load the MDF from remote or local?",
+                buttons: [{
+                    label: "Remote",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        deferred.resolve( "remote" );
+                    }
+                }, {
+                    label: "Local",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        
+                        deferred.resolve( "local" );
+                    }
+                }, {
+                    label: "Cancel",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        deferred.reject();
+                    }
+                }]
+            });
+            
+            return deferred.promise();
+        }
+        
+        function dialogLoadMdfLocal() {
+            var deferred        = new $.Deferred();
+            var selectedFile    = "";
+            
+            BootstrapDialog.show({
+                title: "Question",
+                message: function( dialogItself ) {
+                    var $content = $( '<span class="btn btn-default btn-file">Browse <input type="file" id="browseFile"></span><div id="selectedFile">...</div>' );
+                    
+                    $content.find( "input" ).change( function() {
+                        // Get selected file
+                        selectedFile = $( "#browseFile").val();
+                        // Give feedback to the user, which file was selected
+                        $( "#selectedFile" ).text( selectedFile );
+                    });
+                    
+                    return $content;
+                },
+                buttons: [{
+                    label: "Load",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        deferred.resolve( selectedFile );
+                    }
+                }, {
+                    label: "Cancel",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        deferred.reject();
+                    }
+                }]
+            });
+            
+            return deferred.promise();
         }
         
         // Get MDF URL from node
