@@ -280,6 +280,7 @@
             BootstrapDialog.show({
                 title: "Question",
                 message: "Load the MDF from remote or local?",
+                closable: false,
                 buttons: [{
                     label: "Remote",
                     action: function( dialogItself ){
@@ -323,6 +324,7 @@
                     
                     return $content;
                 },
+                closable: false,
                 buttons: [{
                     label: "Load",
                     action: function( dialogItself ){
