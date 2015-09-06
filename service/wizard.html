@@ -13,7 +13,10 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/css/bootstrap-dialog.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/js/bootstrap-dialog.min.js"></script>
+    
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
 
@@ -99,7 +102,7 @@
                 },
 
                 onError: function( conn ) {
-                    alert("Connection lost. Please reload website.");
+                    BootstrapDialog.alert( "Connection lost. Please reload website." );
                     deferred.reject();
                 }
             });
@@ -143,7 +146,7 @@
                 },
 
                 onError: function( conn ) {
-                    alert("Server error!");
+                    BootstrapDialog.alert( "Server error!" );
                     deferred.reject();
                 }
             });
@@ -165,7 +168,7 @@
                 },
 
                 onError: function() {
-                    alert("Server error!");
+                    BootstrapDialog.alert( "Server error!" );
                     deferred.reject();
                 }
             });
@@ -269,8 +272,8 @@
                 },
                 
                 onError: function() {
+                    BootstrapDialog.alert( "Couldn't read MDF URL from node." );
                     deferred.reject();
-                    alert( "Couldn't read MDF URL from node." );
                 }
             });
             
