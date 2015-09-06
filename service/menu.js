@@ -59,6 +59,10 @@ navBarMenu.content = [
             {
                 title: "Wizard",
                 url: "wizard.html"
+            },
+            {
+                title: "Registers",
+                url: "vscp_registers.html"
             }
         ]
     },

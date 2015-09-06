@@ -13,12 +13,15 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/css/bootstrap-dialog.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/js/bootstrap-dialog.min.js"></script>
 
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
     
     <!-- VSCP settings -->
-    <script type="text/javascript" src="settings.js"></script>
+    <script type="text/javascript" src="../testws/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
     <!-- VSCP websocket bases library -->
@@ -27,6 +30,13 @@
     <script type="text/javascript" src="../js/vscpRegister.js"></script>
     <!-- VSCP service access, depends on the websocket base library -->
     <script type="text/javascript" src="../js/vscpService.js"></script>
+    <!-- Node list, depends on the VSCP service library -->
+    <script type="text/javascript" src="../js/nodeList.js"></script>
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
     
     <script type="text/javascript">
         /*jshint bitwise: false */
@@ -37,32 +47,8 @@
         // User interface data
         var ui = {
 
-            login: {
-
-                enable: function() {
-                    $( "#login :input" ).attr( "disabled", false );
-                },
-
-                disable: function() {
-                    $( "#login :input" ).attr( "disabled", true );
-                },
-
-                getDaemonUrl: function() {
-                    return $( "#daemonUrl" ).val();
-                },
-
-                getUserName: function() {
-                    return $( "#userName" ).val();
-                },
-
-                getPasswordHash: function() {
-                    return $( "#passwordHash" ).val();
-                }
-
-            },
-
             getNodeId: function() {
-                return parseInt( $( "#nodeId option:selected" ).text() );
+                return vscp.utility.getNodeId( $( "#nodeList" ).val() );
             },
 
             enable: function() {
@@ -77,62 +63,167 @@
         // Wait until the whole website is loaded
         $( document ).ready( function() {
 
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
+        
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
 
-            // Enable user interface for login
-            ui.login.enable();
+            // Connect to VSCP daemon
+            connect()
+            .then( setFilter )
+            .then( startReceivingEvents )
+            .then( initNodeList )
+            .done( function() {
+                // Show the nodes in the list
+                showNodeList();
+                
+                // Enable user interface
+                ui.enable();
+            });
         });
 
+        // Connect to the VSCP daemon
         function connect() {
-
-            ui.login.disable();
+            var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
 
-                url: ui.login.getDaemonUrl(),
+                url: settings.url,
 
-                userName: ui.login.getUserName(),
+                userName: settings.user,
 
-                password: ui.login.getPasswordHash(),
+                password: settings.passwordHash,
 
                 onSuccess: function( conn ) {
-
-                    // Set filter for CLASS1.Protocol
-                    vscpConn.setFilter({
-                        filterClass: 0x0000,
-                        maskClass: 0xffff,
-                        filterType: 0x0000,
-                        maskType: 0x0000
-                    });
-
-                    // Start receiving VSCP events
-                    vscpConn.start({
-                        onSuccess: function( conn ) {
-
-                            // Enable user interface
-                            ui.enable();
-                        },
-                        onError: function( conn ) {
-                            alert("Server error!");
-
-                            // Enable user interface for login
-                            ui.login.enable();
-                        }
-                    });
+                    deferred.resolve();                    
                 },
 
                 onError: function( conn ) {
-
-                    // Disable the user interface
-                    ui.disable();
-
-                    alert("Connection lost. Please reload website.");
+                    BootstrapDialog.alert( "Connection lost. Please reload website." );
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
+        }
+        
+        // Set a filter for CLASS1.Protocol
+        function setFilter() {
+            var deferred = new $.Deferred();
+            
+            // Set filter for CLASS1.Protocol
+            vscpConn.setFilter({
+            
+                filterClass: 0x0000,
+                maskClass: 0xffff,
+                filterType: 0x0000,
+                maskType: 0x0000,
+                
+                onSuccess: function() {
+                    deferred.resolve();
+                },
+                
+                onError: function() {
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Start receiving VSCP events
+        function startReceivingEvents() {
+            var deferred = new $.Deferred();
+            
+            // Start receiving VSCP events
+            vscpConn.start({
+                
+                onSuccess: function( conn ) {
+                    deferred.resolve();
+                },
+                
+                onError: function( conn ) {
+                    BootstrapDialog.alert( "Server error!" );
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Initialize global node list
+        function initNodeList() {
+            var deferred = new $.Deferred();
+            
+            // Initialize node list
+            nodeList.init({
+                
+                connection: vscpConn,
+                
+                onSuccess: function() {
+                    deferred.resolve();
+                },
+                
+                onError: function() {
+                    BootstrapDialog.alert( "Server error!" );
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Show the node list
+        function showNodeList() {
+            var index   = 0;
+            var nodes   = nodeList.get();
+
+            // Clear nodes
+            $( "#nodeList" ).empty();
+            $( "#nodeList" ).append( "<option value=\"-\">-</option>" );
+
+            for( index = 0; index < nodes.length; ++index ) {
+                $( "#nodeList" ).append( "<option value=\"" + nodes[ index ] + "\">" + nodes[ index ] + "</option>" );
+            }
         }
 
+        // User selected a node GUID, get provided recipes
+        function nodeSelected() {
+            var guid = $( "#nodeList" ).val();
+        
+            if ( "-" === guid ) {
+                return;
+            }
+        
+            // Disable user interface
+            ui.disable();
+            
+            readAlarmStatus()
+            .then( readVscpVersion )
+            .then( readNodeControlFlags )
+            .then( readUserId )
+            .then( readManufacturerDevId )
+            .then( readManufacturerSubDevId )
+            .then( readNicknameId )
+            .then( readSelectedPage )
+            .then( readFirmwareVersion )
+            .then( readBootloaderAlgorithm )
+            .then( readUsedPages )
+            .then( readStdDevFamCode )
+            .then( readStdDevType )
+            .then( readGUID )
+            .then( readMdfUrl )
+            .fail( function() {
+                $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
+            })
+            .always( function() {
+                // Enable user interface
+                ui.enable();
+            });
+        }
+        
         function convertToHex( value, length ) {
             var str = value.toString( 16 );
 
@@ -145,42 +236,9 @@
             return str;
         }
 
-        function whoIsThere() {
-            var index = 0;
-            
-            // Disable user interface
-            ui.disable();
-            
-            // Clear nodes
-            $('#nodeId').empty();
-
-            vscp.service.whoIsThere({
-
-                connection: vscpConn,
-
-                onSuccess: function( nodes ) {
-
-                    for( index = 0; index < nodes.length; ++index ) {
-                        $('#nodeId').append("<option value=\"" + nodes[ index ].nodeId + "\">" + nodes[ index ].nodeId + "</option>");
-                    }
-                    
-                    alert( nodes.length + " nodes found." );
-
-                    // Enable the user interface
-                    ui.enable();
-                },
-
-                onError: function() {
-                    alert( "No nodes found." );
-                    
-                    // Enable the user interface
-                    ui.enable();
-                }
-            });
-        }
-
         function readAlarmStatus() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readAlarmStatus({
                 connection: vscpConn,
 
@@ -189,20 +247,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Alarm status:</td><td>" + convertToHex( data, 2 ) + "</td></tr>");
 
-                    readVscpVersion();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readVscpVersion() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readVscpVersion({
                 connection: vscpConn,
 
@@ -211,20 +269,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>VSCP version:</td><td>" + data.major + "." + data.minor + "</td></tr>");
 
-                    readNodeControlFlags();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readNodeControlFlags() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readNodeControlFlags({
                 connection: vscpConn,
 
@@ -233,20 +291,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Node Control Flags:</td><td>" + convertToHex( data, 2 ) + "</td></tr>");
 
-                    readUserId();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readUserId() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readUserId({
                 connection: vscpConn,
 
@@ -255,20 +313,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>User ID:</td><td>" + convertToHex( data, 10 ) + "</td></tr>");
 
-                    readManufacturerDevId();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readManufacturerDevId() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readManufacturerDevId({
                 connection: vscpConn,
 
@@ -277,20 +335,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Manufacturer device ID:</td><td>" + convertToHex( data, 8 ) + "</td></tr>");
 
-                    readManufacturerSubDevId();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readManufacturerSubDevId() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readManufacturerDevId({
                 connection: vscpConn,
 
@@ -299,20 +357,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Manufacturer sub device ID:</td><td>" + convertToHex( data, 8 ) + "</td></tr>");
 
-                    readNicknameId();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readNicknameId() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readNicknameId({
                 connection: vscpConn,
 
@@ -321,20 +379,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Nickname ID:</td><td>" + data + "</td></tr>");
 
-                    readSelectedPage();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readSelectedPage() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readSelectedPage({
                 connection: vscpConn,
 
@@ -343,20 +401,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Selected page:</td><td>" + data + "</td></tr>");
 
-                    readFirmwareVersion();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readFirmwareVersion() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readFirmwareVersion({
                 connection: vscpConn,
 
@@ -365,20 +423,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Firmware version:</td><td>" + data.major + "." + data.minor + "." + data.subMinor + "</td></tr>");
 
-                    readBootloaderAlgorithm();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readBootloaderAlgorithm() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readBootloaderAlgorithm({
                 connection: vscpConn,
 
@@ -387,20 +445,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Bootloader algorithm:</td><td>" + convertToHex( data, 2 ) + "</td></tr>");
 
-                    readUsedPages();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readUsedPages() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readUsedPages({
                 connection: vscpConn,
 
@@ -409,20 +467,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Used pages:</td><td>" + data + "</td></tr>");
 
-                    readStdDevFamCode();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readStdDevFamCode() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readStdDevFamCode({
                 connection: vscpConn,
 
@@ -431,20 +489,20 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Standard device family code:</td><td>" + convertToHex( data, 8 ) + "</td></tr>");
 
-                    readStdDevType();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readStdDevType() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readStdDevType({
                 connection: vscpConn,
 
@@ -453,43 +511,42 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>Standard device type:</td><td>" + convertToHex( data, 8 ) + "</td></tr>");
 
-                    readGUID();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readGUID() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readGUID({
                 connection: vscpConn,
 
                 nodeId: ui.getNodeId(),
 
                 onSuccess: function( data ) {
-
                     $( "#output" ).append( "<tr><td>GUID:</td><td>" + vscp.utility.guidToStr( data ) + "</td></tr>");
 
-                    readMdfUrl();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
 
         function readMdfUrl() {
-
+            var deferred = new $.Deferred();
+            
             vscp.register.readMdfUrl({
                 connection: vscpConn,
 
@@ -498,68 +555,42 @@
                 onSuccess: function( data ) {
                     $( "#output" ).append( "<tr><td>MDF URL:</td><td>" + data + "</td></tr>");
 
-                    // Enable user interface
-                    ui.enable();
+                    deferred.resolve();
                 },
 
                 onError: function() {
-                    $( "#output" ).append( "<tr><td colspan=\"2\">Error!</td></tr>" );
-
-                    // Enable user interface
-                    ui.enable();
+                    deferred.reject();
                 }
             });
-        }
-
-        function readVscpRegisters() {
-
-            if ( isNaN( ui.getNodeId() ) ) {
-                return;
-            }
-
-            // Disable user interface
-            ui.disable();
-
-            // Remove all table rows
-            $( "#output" ).find("tr").remove();
-
-            readAlarmStatus();
+            
+            return deferred.promise();
         }
 
     </script>
 </head>
 <body>
-    <div class="container">
+   <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
         <h1>VSCP registers</h1>
-        <p>Enter the URL of your VSCP daemon with credentials and connect to it.</p>
-        <div id="login">
-            <table class="table table-hover">
-                <tr>
-                    <td>URL:</td>
-                    <td><input id="daemonUrl" class="form-control" type="text" value="ws://104.236.235.81:8080" size="40" disabled /></td>
-                </tr>
-                <tr>
-                    <td>User name:</td>
-                    <td><input id="userName" class="form-control" type="text" value="admin" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Password hash:</td>
-                    <td><input id="passwordHash" class="form-control" type="text" value="d50c3180375c27927c22e42a379c3f67" size="40" disabled /></td>
-                </tr>
-            </table>
-            <input type="submit" class="btn btn-default" value="Connect" onclick="connect()" disabled />
-        </div>
-        <hr />
         <div id="ui">
-            <p>Scan for nodes (via CLASS1.Protocol.WhoIsThere event), select one and read its VSCP defined registers.</p>
-            <input type="submit" class="btn btn-default" value="Scan for nodes" onclick="whoIsThere()" disabled /><br />
-            <p>Node id:
-                <select id="nodeId">
-                    <option value="-" selected>-</option>
+            <div class="form-group">
+                <label for="sel1">Select a node:</label>
+                <select id="nodeList" class="form-control">
+                    <option>-</option>
                 </select>
-                <input type="submit" class="btn btn-default" value="Read VSCP registers" onclick="readVscpRegisters()" disabled /></td>
-            </p>
+                <button type="button" class="btn btn-default" onclick="nodeSelected();">Select</button>
+                <p>If the node list is empty, discover them first by selecting <b>Node discovery</b> in the service menu.</p>
+            </div>
         </div>
+        <h2>Standard registers</h2>
         <table id="output" class="table table-striped">
         </table>
     </div>
