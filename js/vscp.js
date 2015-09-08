@@ -2572,7 +2572,6 @@ vscp.Connection.prototype.setFilter = function ( options ) {
     var maskClass       = 0xffff;
     var maskType        = 0xffff;
     var maskGuid        = [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ];
-    var guid            = "";
 
     if ( this.states.AUTHENTICATED !== this.state ) {
         console.error( vscp.utility.getTime() + " Connection is not authenticated." );
