@@ -621,64 +621,7 @@ vscp.mdf.constants = {
 };
 
 /**
- * Check for deep key in a object.
- *
- * @param[in] object Object
- * @param[in] properties Path as string or array
- *
- * @return If the key exists, it will return true otherwise false.
- */
-vscp.mdf.isSafeObjectPath = function( object, properties ) {
-    var path    = [];
-    var root    = object;
-    var prop;
-
-    if ( !root ) {
-        // if the root object is null we immediately returns
-        return false;
-    }
-
-    if ( typeof properties === 'string' ) {
-        // if a string such as 'foo.bar.baz' is passed,
-        // first we convert it into an array of property names
-        path = properties ? properties.split('.') : [];
-    } else {
-        if ( Object.prototype.toString.call( properties ) === '[object Array]' ) {
-            // if an array is passed, we don't need to do anything but
-            // to assign it to the internal array
-            path = properties;
-        } else {
-            if ( properties ) {
-                // if not a string or an array is passed, and the parameter
-                // is not null or undefined, we return with false
-                return false;
-            }
-        }
-    }
-
-    // if the path is valid or empty we return with true (because the
-    // root object is itself a valid path); otherwise false is returned.
-    while ( prop = path.shift() ) {
-        // Before it was used an if..else statement only, but it
-        // could generate an exception in case of inexistent
-        // object member. We can fix it using a try..catch
-        // statement. Thanks to @xecute for the contribution!
-        try {
-            if ( prop in root ) {
-                root = root[ prop ];
-            } else {
-                return false;
-            }
-        } catch(e) {
-            return false;
-        }
-    }
-
-    return true;
-}
-
-/**
- * Get the MDF of a node as javascript object.
+ * Get the MDF as xml document.
  *
  * @param[in] options   Options
  *
@@ -687,7 +630,7 @@ vscp.mdf.isSafeObjectPath = function( object, properties ) {
  * - onSuccess: Callback
  * - onError: Callback
  */
-vscp.mdf.get = function( options ) {
+vscp.mdf.load = function( options ) {
 
     var onError = null;
 
@@ -745,9 +688,9 @@ vscp.mdf.get = function( options ) {
         },
 
         success: function( xml ) {
-            var jsonObj = $.xml2json( xml ); // Convert XML to JSON object
+            var xmlDoc = $.parseXML( xml );
 
-            options.onSuccess( jsonObj );
+            options.onSuccess( xmlDoc );
         },
 
         error: function() {
@@ -762,6 +705,44 @@ vscp.mdf.get = function( options ) {
 };
 
 /**
+ * Get the MDF as xml document.
+ *
+ * @param[in] options   Options
+ *
+ * @return MDF file as xml document
+ *
+ * Options:
+ * - name: MDF file name, including path
+ */
+vscp.mdf.loadLocal = function( options ) {
+
+    if ( "undefined" === typeof options ) {
+        console.error( vscp.utility.getTime() + " Options are missing. " );
+        return null;
+    }
+
+    if ( "string" !== typeof options.name ) {
+        console.error( vscp.utility.getTime() + " MDF file name is missing." );
+        return null;
+    }
+
+    console.info( vscp.utility.getTime() + " Load MDF from file " + options.url );
+
+    if ( window.XMLHttpRequest ) {
+        xhttp = new XMLHttpRequest();
+    }
+    // code for IE5 and IE6
+    else {
+        xhttp = new ActiveXObject( "Microsoft.XMLHTTP" );
+    }
+    
+    xhttp.open( "GET", name, false );
+    xhttp.send();
+    
+    return xhttp.responseXML;
+};
+
+/**
  * Read a abstract value.
  *
  * @param[in] options   Options
@@ -769,7 +750,7 @@ vscp.mdf.get = function( options ) {
  * Options:
  * - connection: VSCP connection
  * - nodeId: Node id
- * - mdf: MDF object
+ * - mdf: MDF as xml jquery object
  * - id: Abstraction id
  * - onSuccess: Callback
  * - onError: Callback
@@ -777,14 +758,12 @@ vscp.mdf.get = function( options ) {
 vscp.mdf.readAbstractValue = function( options ) {
 
     var onError         = null;
-    var index           = 0;
     var page            = 0;
     var offset          = 0;
     var type            = "";
     var size            = 0;
-    var abstraction     = null;
+    var $abstraction    = null;
     var convFunc        = null;
-    var abstractions    = [];
 
     if ( "undefined" === typeof options ) {
         console.error( vscp.utility.getTime() + " Options are missing. " );
@@ -820,7 +799,8 @@ vscp.mdf.readAbstractValue = function( options ) {
         onError = options.onError;
     }
     
-    if ( false === vscp.mdf.isSafeObjectPath( options, "mdf.vscp.module.abstractions.abstraction" ) ) {
+    if ( "undefined" === typeof options.mdf.find( "mdf > vscp > module > abstractions > abstraction" ) ) {
+    
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " is unknown." );
 
         if ( null !== onError ) {
@@ -830,41 +810,34 @@ vscp.mdf.readAbstractValue = function( options ) {
         return;
     }
     
-    if ( false === ( options.mdf.vscp.module.abstractions.abstraction instanceof Array ) ) {
-        abstractions.push( options.mdf.vscp.module.abstractions.abstraction );
-    }
-    else {
-        abstractions = options.mdf.vscp.module.abstractions.abstraction;
+    // Find abstract value by id
+    options.mdf.find( "vscp > module > abstractions > abstraction" ).each( function() {
+
+        if ( "undefined" !== typeof $( this ).attr( "id" ) ) {
+        
+            if ( options.id === $( this ).attr( "id" ) ) {
+            
+                $abstraction = $( this );
+                
+                // Break each loop
+                return false;
+            }
+        }
+
+    });
+    
+    if ( null === $abstraction ) {
+        console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " not found." );
+
+        if ( null !== onError ) {
+            onError();
+        }
+
+        return;
     }
     
-    if ( 0 === abstractions.length ) {
-        console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " is unknown." );
-
-        if ( null !== onError ) {
-            onError();
-        }
-
-        return;
-    }
-
-    for( index = 0; index < abstractions.length; ++index ) {
-        if ( options.id === abstractions[ index ].id ) {
-            abstraction = abstractions[ index ];
-            break;
-        }
-    }
-
-    if ( null === abstraction ) {
-        console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " is unknown." );
-
-        if ( null !== onError ) {
-            onError();
-        }
-
-        return;
-    }
-
-    if ( "undefined" === typeof abstraction.page ) {
+    if ( "undefined" === typeof $abstraction.attr( "page" ) ) {
+    
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " page is missing." );
 
         if ( null !== onError ) {
@@ -874,10 +847,11 @@ vscp.mdf.readAbstractValue = function( options ) {
         return;
     }
     else {
-        page = parseInt( abstraction.page );
+        page = parseInt( $abstraction.attr( "page" ) );
     }
 
-    if ( "undefined" === typeof abstraction.offset ) {
+    if ( "undefined" === typeof $abstraction.attr( "offset" ) ) {
+    
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " offset is missing." );
 
         if ( null !== onError ) {
@@ -887,10 +861,11 @@ vscp.mdf.readAbstractValue = function( options ) {
         return;
     }
     else {
-        offset = parseInt( abstraction.offset );
+        offset = parseInt( $abstraction.attr( "offset" ) );
     }
-
-    if ( "undefined" === typeof abstraction.type ) {
+    
+    if ( "undefined" === typeof $abstraction.attr( "type" ) ) {
+    
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " type is missing." );
 
         if ( null !== onError ) {
@@ -900,12 +875,13 @@ vscp.mdf.readAbstractValue = function( options ) {
         return;
     }
     else {
-        type = abstraction.type;
+        type = $abstraction.attr( "type" );
     }
-
+    
     if ( "string" === type ) {
 
-        if ( "undefined" === typeof abstraction.size ) {
+        if ( "undefined" === typeof $abstraction.attr( "size" ) ) {
+
             console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " size is missing." );
 
             if ( null !== onError ) {
@@ -915,7 +891,7 @@ vscp.mdf.readAbstractValue = function( options ) {
             return;
         }
 
-        size = parseInt( abstraction.size );
+        size = parseInt( $abstraction.attr( "size" ).text() );
     }
     else {
         size = vscp.mdf.constants.TYPE_SIZES[ type ];
@@ -972,7 +948,7 @@ vscp.mdf.readAbstractValue = function( options ) {
  * Options:
  * - connection: VSCP connection
  * - nodeId: Node id
- * - mdf: MDF object
+ * - mdf: MDF as xml jquery object
  * - id: Abstraction id
  * - value: Value
  * - onSuccess: Callback
@@ -981,14 +957,12 @@ vscp.mdf.readAbstractValue = function( options ) {
 vscp.mdf.writeAbstractValue = function( options ) {
 
     var onError         = null;
-    var index           = 0;
     var page            = 0;
     var offset          = 0;
     var type            = "";
     var size            = 0;
-    var abstraction     = null;
+    var $abstraction    = null;
     var convFunc        = null;
-    var abstractions    = [];
 
     if ( "undefined" === typeof options ) {
         console.error( vscp.utility.getTime() + " Options are missing. " );
@@ -1029,7 +1003,8 @@ vscp.mdf.writeAbstractValue = function( options ) {
         onError = options.onError;
     }
     
-    if ( false === vscp.mdf.isSafeObjectPath( options, "mdf.vscp.module.abstractions.abstraction" ) ) {
+    if ( "undefined" === typeof options.mdf.find( "mdf > vscp > module > abstractions > abstraction" ) ) {
+    
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " is unknown." );
 
         if ( null !== onError ) {
@@ -1039,15 +1014,24 @@ vscp.mdf.writeAbstractValue = function( options ) {
         return;
     }
     
-    if ( false === ( options.mdf.vscp.module.abstractions.abstraction instanceof Array ) ) {
-        abstractions.push( options.mdf.vscp.module.abstractions.abstraction );
-    }
-    else {
-        abstractions = options.mdf.vscp.module.abstractions.abstraction;
-    }
+    // Find abstract value by id
+    options.mdf.find( "vscp > module > abstractions > abstraction" ).each( function() {
 
-    if ( 0 === abstractions.length ) {
-        console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " is unknown." );
+        if ( "undefined" !== typeof $( this ).attr( "id" ) ) {
+        
+            if ( options.id === $( this ).attr( "id" ) ) {
+            
+                $abstraction = $( this );
+                
+                // Break each loop
+                return false;
+            }
+        }
+
+    });
+    
+    if ( null === $abstraction ) {
+        console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " not found." );
 
         if ( null !== onError ) {
             onError();
@@ -1055,25 +1039,9 @@ vscp.mdf.writeAbstractValue = function( options ) {
 
         return;
     }
-
-    for( index = 0; index < abstractions.length; ++index ) {
-        if ( options.id === abstractions[ index ].id ) {
-            abstraction = abstractions[ index ];
-            break;
-        }
-    }
-
-    if ( null === abstraction ) {
-        console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " is unknown." );
-
-        if ( null !== onError ) {
-            onError();
-        }
-
-        return;
-    }
-
-    if ( "undefined" === typeof abstraction.page ) {
+ 
+    if ( "undefined" === typeof $abstraction.attr( "page" ) ) {
+    
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " page is missing." );
 
         if ( null !== onError ) {
@@ -1083,10 +1051,11 @@ vscp.mdf.writeAbstractValue = function( options ) {
         return;
     }
     else {
-        page = parseInt( abstraction.page );
+        page = parseInt( $abstraction.attr( "page" ) );
     }
 
-    if ( "undefined" === typeof abstraction.offset ) {
+    if ( "undefined" === typeof $abstraction.attr( "offset" ) ) {
+    
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " offset is missing." );
 
         if ( null !== onError ) {
@@ -1096,10 +1065,11 @@ vscp.mdf.writeAbstractValue = function( options ) {
         return;
     }
     else {
-        offset = parseInt( abstraction.offset );
+        offset = parseInt( $abstraction.attr( "offset" ) );
     }
-
-    if ( "undefined" === typeof abstraction.type ) {
+    
+    if ( "undefined" === typeof $abstraction.attr( "type" ) ) {
+    
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " type is missing." );
 
         if ( null !== onError ) {
@@ -1109,12 +1079,13 @@ vscp.mdf.writeAbstractValue = function( options ) {
         return;
     }
     else {
-        type = abstraction.type;
+        type = $abstraction.attr( "type" );
     }
 
     if ( "string" === type ) {
 
-        if ( "undefined" === typeof abstraction.size ) {
+        if ( "undefined" === typeof $abstraction.attr( "size" ) ) {
+
             console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " size is missing." );
 
             if ( null !== onError ) {
@@ -1124,7 +1095,7 @@ vscp.mdf.writeAbstractValue = function( options ) {
             return;
         }
 
-        size = parseInt( abstraction.size );
+        size = parseInt( $abstraction.attr( "size" ).text() );
     }
     else {
         size = vscp.mdf.constants.TYPE_SIZES[ type ];
@@ -1181,7 +1152,7 @@ vscp.mdf.writeAbstractValue = function( options ) {
  * Options:
  * - connection: VSCP connection
  * - nodeId: Node id
- * - mdf: MDF object
+ * - mdf: MDF as xml jquery object
  * - id: Abstraction id
  * - pos: Bit position
  * - width: Bit width
@@ -1307,7 +1278,7 @@ vscp.mdf.writeAbstractBits = function( options ) {
  * @param[in] options   Options
  *
  * Options:
- * - messageBox: XML object in JSON format
+ * - messageBox: Messagebox as jquery xml object
  */
 vscp.mdf.MessageBox = function( options ) {
 
@@ -1332,64 +1303,69 @@ vscp.mdf.MessageBox = function( options ) {
 /**
  * Parse a messagebox object.
  *
- * @param[in] messageBox XML object in JSON format
+ * @param[in] $messageBox Messagebox as jquery xml object
  */
-vscp.mdf.MessageBox.prototype.parse = function( messageBox ) {
+vscp.mdf.MessageBox.prototype.parse = function( $messageBox ) {
 
-    if ( "undefined" === typeof messageBox ) {
+    if ( "undefined" === typeof $messageBox ) {
         return;
     }
 
-    if ( "string" === typeof messageBox.function ) {
-        this.func = messageBox.function;
+    if ( "undefined" !== typeof $messageBox.find( "function" ) ) {
+        this.func = $messageBox.find( "function" ).text();
+    }
+    
+    if ( "undefined" !== typeof $messageBox.find( "head" ) ) {
+        this.head = $messageBox.find( "head" ).text();
+    }
+    
+    if ( "undefined" !== typeof $messageBox.find( "description" ) ) {
+        this.description = $messageBox.find( "description" ).text();
+    }
+    
+    if ( "undefined" !== typeof $messageBox.find( "variable" ) ) {
+    
+        if ( "undefined" !== typeof $messageBox.find( "variable" ).attr( "name" ) ) {
+            this.variableName = $messageBox.find( "variable" ).attr( "name" );
+        }
+    
+        if ( "undefined" !== typeof $messageBox.find( "variable" ).attr( "type" ) ) {
+        
+            this.variableType = $messageBox.find( "variable" ).attr( "type" );
+        
+            if ( ( "int8_t" === this.variableType ) ||
+                 ( "char" === this.variableType ) ||
+                 ( "byte" === this.variableType ) ) {
+                this.variableMin = -128;
+                this.variableMax = 127;
+            }
+            else if ( "uint8_t" === this.variableType ) {
+                this.variableMin = 0;
+                this.variableMax = 255;
+            }
+            if ( ( "int16_t" === this.variableType ) ||
+                 ( "short" === this.variableType ) ||
+                 ( "integer" === this.variableType ) ) {
+                this.variableMin = -32768;
+                this.variableMax = 32767;
+            }
+            else if ( "uint16_t" === this.variableType ) {
+                this.variableMin = 0;
+                this.variableMax = 65535;
+            }
+            if ( ( "int32_t" === this.variableType ) ||
+                 ( "long" === this.variableType ) ) {
+                this.variableMin = -2147483648;
+                this.variableMax = 2147483647;
+            }
+            else if ( "uint32_t" === this.variableType ) {
+                this.variableMin = 0;
+                this.variableMax = 4294967295;
+            }
+        
+        }
     }
 
-    if ( "string" === typeof messageBox.head.text ) {
-        this.head = messageBox.head.text;
-    }
-
-    if ( "string" === typeof messageBox.description.text ) {
-        this.description = messageBox.description.text;
-    }
-
-    if ( "string" === typeof messageBox.variable.type ) {
-        this.variableType = messageBox.variable.type;
-
-        if ( ( "int8_t" === this.variableType ) ||
-             ( "char" === this.variableType ) ||
-             ( "byte" === this.variableType ) ) {
-            this.variableMin = -128;
-            this.variableMax = 127;
-        }
-        else if ( "uint8_t" === this.variableType ) {
-            this.variableMin = 0;
-            this.variableMax = 255;
-        }
-        if ( ( "int16_t" === this.variableType ) ||
-             ( "short" === this.variableType ) ||
-             ( "integer" === this.variableType ) ) {
-            this.variableMin = -32768;
-            this.variableMax = 32767;
-        }
-        else if ( "uint16_t" === this.variableType ) {
-            this.variableMin = 0;
-            this.variableMax = 65535;
-        }
-        if ( ( "int32_t" === this.variableType ) ||
-             ( "long" === this.variableType ) ) {
-            this.variableMin = -2147483648;
-            this.variableMax = 2147483647;
-        }
-        else if ( "uint32_t" === this.variableType ) {
-            this.variableMin = 0;
-            this.variableMax = 4294967295;
-        }
-
-    }
-
-    if ( "string" === typeof messageBox.variable.name ) {
-        this.variableName = messageBox.variable.name;
-    }
 };
 
 /**
@@ -1398,7 +1374,7 @@ vscp.mdf.MessageBox.prototype.parse = function( messageBox ) {
  * @param[in] options Options
  *
  * Options:
- * - bitInReg: XML object in JSON format
+ * - bitInReg: Bit-in-register as jquery xml object
  */
 vscp.mdf.BitInReg = function( options ) {
 
@@ -1421,48 +1397,50 @@ vscp.mdf.BitInReg = function( options ) {
 /**
  * Parse a bit in register access method object.
  *
- * @param[in] bitInReg XML object in JSON format
+ * @param[in] bitInReg Bit-in-register as jquery xml object
  */
-vscp.mdf.BitInReg.prototype.parse = function( bitInReg ) {
+vscp.mdf.BitInReg.prototype.parse = function( $bitInReg ) {
 
-    if ( "undefined" === typeof bitInReg ) {
+    if ( "undefined" === typeof $bitInReg ) {
         return;
     }
-
-    if ( "string" === typeof bitInReg.pos ) {
-        this.pos = parseInt( bitInReg.pos );
-    }
-
-    if ( "string" === typeof bitInReg.page ) {
-        this.page = parseInt( bitInReg.page );
-    }
-
-    if ( "string" === typeof bitInReg.offset ) {
-        this.offset = parseInt( bitInReg.offset );
-    }
-
-    if ( "string" === typeof bitInReg.width ) {
-        this.width = parseInt( bitInReg.width );
-    }
-
-    if ( "string" === typeof bitInReg.value ) {
-
-        this.variableName = "";
-        this.value = 0;
     
-        if ( "false" === bitInReg.value ) {
+    if ( "undefined" !== typeof $bitInReg.attr( "pos" ) ) {
+        this.pos = parseInt( $bitInReg.attr( "pos" ) );
+    }
+
+    if ( "undefined" !== typeof $bitInReg.attr( "page" ) ) {
+        this.page = parseInt( $bitInReg.attr( "page" ) );
+    }
+    
+    if ( "undefined" !== typeof $bitInReg.attr( "offset" ) ) {
+        this.offset = parseInt( $bitInReg.attr( "offset" ) );
+    }
+    
+    if ( "undefined" !== typeof $bitInReg.attr( "width" ) ) {
+        this.width = parseInt( $bitInReg.attr( "width" ) );
+    }
+    
+    if ( "undefined" !== typeof $bitInReg.attr( "value" ) ) {
+
+        // Does the value contains a variable?
+        if ( "$" === $bitInReg.attr( "value" ).charAt( 0 ) ) {
+            this.variableName = $bitInReg.attr( "value" ).substring( 1 );
+        }
+        // Does the value contains a boolean value?
+        else if ( "false" === $bitInReg.attr( "value" ) ) {
             this.value = 0;
         }
-        else if ( "true" === bitInReg.value ) {
+        // Does the value contains a boolean value?
+        else if ( "true" === $bitInReg.attr( "value" ) ) {
             this.value = 1;
         }
-        else if ( "$" === bitInReg.value.charAt( 0 ) ) {
-            this.variableName = bitInReg.value.substring( 1 );
-        }
+        // Value contains a number
         else {
-            this.value = parseInt( bitInReg.value );
+            this.value = parseInt( $bitInReg.attr( "value" ) );
         }
     }
+
 };
 
 /**
@@ -1471,7 +1449,7 @@ vscp.mdf.BitInReg.prototype.parse = function( bitInReg ) {
  * @param[in] options Options
  *
  * Options:
- * - bitInAbstraction: XML object in JSON format
+ * - bitInAbstraction: Bit-in-abstraction as jquery xml object
  */
 vscp.mdf.BitInAbstraction = function( options ) {
 
@@ -1493,44 +1471,46 @@ vscp.mdf.BitInAbstraction = function( options ) {
 /**
  * Parse a bit in abstraction access method object.
  *
- * @param[in] bitInAbstraction XML object in JSON format
+ * @param[in] $bitInAbstraction Bit-in-abstraction as jquery xml object
  */
-vscp.mdf.BitInAbstraction.prototype.parse = function( bitInAbstraction ) {
+vscp.mdf.BitInAbstraction.prototype.parse = function( $bitInAbstraction ) {
 
-    if ( "undefined" === typeof bitInAbstraction ) {
+    if ( "undefined" === typeof $bitInAbstraction ) {
         return;
     }
 
-    if ( "string" === typeof bitInAbstraction.id ) {
-        this.id = bitInAbstraction.id;
+    if ( "undefined" !== typeof $bitInAbstraction.attr( "id" ) ) {
+        this.id = $bitInAbstraction.attr( "id" );
     }
-
-    if ( "string" === typeof bitInAbstraction.pos ) {
-        this.pos = parseInt( bitInAbstraction.pos );
-    }
-
-    if ( "string" === typeof bitInAbstraction.width ) {
-        this.width = parseInt( bitInAbstraction.width );
-    }
-
-    if ( "string" === typeof bitInAbstraction.value ) {
-
-        this.variableName = "";
-        this.value = 0;
     
-        if ( "false" === bitInAbstraction.value ) {
+    if ( "undefined" !== typeof $bitInAbstraction.attr( "pos" ) ) {
+        this.pos = parseInt( $bitInAbstraction.attr( "pos" ) );
+    }
+    
+    if ( "undefined" !== typeof $bitInAbstraction.attr( "width" ) ) {
+        this.width = parseInt( $bitInAbstraction.attr( "width" ) );
+    }
+    
+    if ( "undefined" !== typeof $bitInAbstraction.attr( "value" ) ) {
+
+        // Does the value contains a variable?
+        if ( "$" === $bitInAbstraction.attr( "value" ).charAt( 0 ) ) {
+            this.variableName = $bitInAbstraction.attr( "value" ).substring( 1 );
+        }
+        // Does the value contains a boolean value?
+        else if ( "false" === $bitInAbstraction.attr( "value" ) ) {
             this.value = 0;
         }
-        else if ( "true" === bitInAbstraction.value ) {
+        // Does the value contains a boolean value?
+        else if ( "true" === $bitInAbstraction.attr( "value" ) ) {
             this.value = 1;
         }
-        else if ( "$" === bitInAbstraction.value.charAt( 0 ) ) {
-            this.variableName = bitInAbstraction.value.substring( 1 );
-        }
+        // Value contains a number
         else {
-            this.value = parseInt( bitInAbstraction.value );
+            this.value = parseInt( $bitInAbstraction.attr( "value" ) );
         }
     }
+    
 };
 
 /**
@@ -1539,7 +1519,7 @@ vscp.mdf.BitInAbstraction.prototype.parse = function( bitInAbstraction ) {
  * @param[in] options Options
  *
  * Options:
- * - register: XML object in JSON format
+ * - register: Register as jquery xml object
  */
 vscp.mdf.Register = function( options ) {
 
@@ -1560,34 +1540,34 @@ vscp.mdf.Register = function( options ) {
 /**
  * Parse a register access method object.
  *
- * @param[in] register XML object in JSON format
+ * @param[in] $register Register as jquery xml object
  */
-vscp.mdf.Register.prototype.parse = function( register ) {
+vscp.mdf.Register.prototype.parse = function( $register ) {
 
-    if ( "undefined" === typeof register ) {
+    if ( "undefined" === typeof $register ) {
         return;
     }
-
-    if ( "string" === typeof register.page ) {
-        this.page = parseInt( register.page );
-    }
-
-    if ( "string" === typeof register.offset ) {
-        this.offset = parseInt( register.offset );
-    }
-
-    if ( "string" === typeof register.value ) {
-        
-        this.variableName = "";
-        this.value = 0;
     
-        if ( "$" === register.value.charAt( 0 ) ) {
-            this.variableName = register.value.substring( 1 );
+    if ( "undefined" !== typeof $register.attr( "page" ) ) {
+        this.page = parseInt( $register.attr( "page" ) );
+    }
+    
+    if ( "undefined" !== typeof $register.attr( "offset" ) ) {
+        this.offset = parseInt( $register.attr( "offset" ) );
+    }
+    
+    if ( "undefined" !== typeof $register.attr( "value" ) ) {
+
+        // Does the value contains a variable?
+        if ( "$" === $register.attr( "value" ).charAt( 0 ) ) {
+            this.variableName = $register.attr( "value" ).substring( 1 );
         }
+        // Value contains a number
         else {
-            this.value = parseInt( register.value );
+            this.value = parseInt( $register.attr( "value" ) );
         }
     }
+
 };
 
 /**
@@ -1596,7 +1576,7 @@ vscp.mdf.Register.prototype.parse = function( register ) {
  * @param[in] options Options
  *
  * Options:
- * - abstraction: XML object in JSON format
+ * - abstraction: Abstraction as jquery xml object
  */
 vscp.mdf.Abstraction = function( options ) {
 
@@ -1616,30 +1596,30 @@ vscp.mdf.Abstraction = function( options ) {
 /**
  * Parse a abstraction access method object.
  *
- * @param[in] abstraction XML object in JSON format
+ * @param[in] $abstraction Abstraction as jquery xml object
  */
-vscp.mdf.Abstraction.prototype.parse = function( abstraction ) {
+vscp.mdf.Abstraction.prototype.parse = function( $abstraction ) {
 
-    if ( "undefined" === typeof abstraction ) {
+    if ( "undefined" === typeof $abstraction ) {
         return;
     }
-
-    if ( "string" === typeof abstraction.id ) {
-        this.id = abstraction.id;
+    
+    if ( "undefined" !== typeof $abstraction.attr( "id" ) ) {
+        this.id = $abstraction.attr( "id" );
     }
+    
+    if ( "undefined" !== typeof $abstraction.attr( "value" ) ) {
 
-    if ( "string" === typeof abstraction.value ) {
-    
-        this.variableName = "";
-        this.value = 0;
-    
-        if ( "$" === abstraction.value.charAt( 0 ) ) {
-            this.variableName = abstraction.value.substring( 1 );
+        // Does the value contains a variable?
+        if ( "$" === $abstraction.attr( "value" ).charAt( 0 ) ) {
+            this.variableName = $abstraction.attr( "value" ).substring( 1 );
         }
+        // Value contains a number
         else {
-            this.value = parseInt( abstraction.value );
+            this.value = parseInt( $abstraction.attr( "value" ) );
         }
     }
+    
 };
 
 /**
@@ -1648,7 +1628,8 @@ vscp.mdf.Abstraction.prototype.parse = function( abstraction ) {
  * @param[in] options Options
  *
  * Options:
- * - recipe: XML object in JSON format
+ * - recipe: Recipe as jquery xml object
+ * - mdf: MDF as jquery xml object
  */
 vscp.mdf.Recipe = function( options ) {
 
@@ -1678,123 +1659,83 @@ vscp.mdf.Recipe = function( options ) {
 /**
  * Parse a recipe object.
  *
- * @param[in] recipe XML object in JSON format
+ * @param[in] $recipe Recipe as jquery xml object
  */
-vscp.mdf.Recipe.prototype.parse = function( recipe ) {
+vscp.mdf.Recipe.prototype.parse = function( $recipe ) {
 
-    var index               = 0;
-    var bitInRegs           = [];
+    var bitInRegs           = this.bitInRegs;
     var bitInReg            = null;
-    var bitInAbstractions   = [];
+    var bitInAbstractions   = this.bitInAbstractions;
     var bitInAbstraction    = null;
-    var registers           = [];
+    var registers           = this.registers;
     var register            = null;
-    var abstractions        = [];
+    var abstractions        = this.abstractions;
     var abstraction         = null;
-    var messageBoxes        = [];
+    var messageBoxes        = this.messageBoxes;
     var messageBox          = null;
 
-    if ( "undefined" === typeof recipe ) {
+    if ( "undefined" === typeof $recipe ) {
         return;
     }
 
-    if ( "string" === typeof recipe.name ) {
-        this.name = recipe.name;
+    if ( "undefined" !== typeof $recipe.find( "name" ) ) {
+        this.name = $recipe.find( "name" ).text();
     }
-
-    if ( "string" === typeof recipe.description.text ) {
-        this.description = recipe.description.text;
+    
+    if ( "undefined" !== typeof $recipe.find( "description" ) ) {
+        this.description = $recipe.find( "description" ).text();
     }
+    
+    $recipe.find( "bit-in-reg" ).each( function() {
+        
+        bitInReg = new vscp.mdf.BitInReg({
+            bitInReg: $( this )
+        });
 
-    if ( "undefined" !== typeof recipe.bit_in_reg ) {
-        if ( false === ( recipe.bit_in_reg instanceof Array ) ) {
-            bitInRegs.push( recipe.bit_in_reg );
-        }
-        else {
-            bitInRegs = recipe.bit_in_reg;
-        }
+        bitInRegs.push( bitInReg );
+        
+    });
 
-        for( index = 0; index < bitInRegs.length; ++index ) {
+    $recipe.find( "bit-in-abstraction" ).each( function() {
+        
+        bitInAbstraction = new vscp.mdf.BitInAbstraction({
+            bitInAbstraction: $( this )
+        });
 
-            bitInReg = new vscp.mdf.BitInReg({
-                bitInReg: bitInRegs[ index ]
-            });
+        bitInAbstractions.push( bitInAbstraction );
+        
+    });
 
-            this.bitInRegs.push( bitInReg );
-        }
-    }
+    $recipe.find( "register" ).each( function() {
+        
+        register = new vscp.mdf.Register({
+            register: $( this )
+        });
 
-    if ( "undefined" !== typeof recipe.bit_in_abstraction ) {
-        if ( false === ( recipe.bit_in_abstraction instanceof Array ) ) {
-            bitInAbstractions.push( recipe.bit_in_abstraction );
-        }
-        else {
-            bitInAbstractions = recipe.bit_in_abstraction;
-        }
+        registers.push( register );
+        
+    });
+    
+    $recipe.find( "abstraction" ).each( function() {
+        
+        abstraction = new vscp.mdf.Abstraction({
+            abstraction: $( this )
+        });
 
-        for( index = 0; index < bitInAbstractions.length; ++index ) {
+        abstractions.push( abstraction );
+        
+    });
 
-            bitInAbstraction = new vscp.mdf.BitInAbstraction({
-                bitInAbstraction: bitInAbstractions[ index ]
-            });
+    $recipe.find( "messagebox" ).each( function() {
+        
+        messageBox = new vscp.mdf.MessageBox({
+            messageBox: $( this )
+        });
 
-            this.bitInAbstractions.push( bitInAbstraction );
-        }
-    }
-
-    if ( "undefined" !== typeof recipe.register ) {
-        if ( false === ( recipe.register instanceof Array ) ) {
-            registers.push( recipe.register );
-        }
-        else {
-            registers = recipe.register;
-        }
-
-        for( index = 0; index < registers.length; ++index ) {
-
-            register = new vscp.mdf.Register({
-                register: registers[ index ]
-            });
-
-            this.registers.push( register );
-        }
-    }
-
-    if ( "undefined" !== typeof recipe.abstraction ) {
-        if ( false === ( recipe.abstraction instanceof Array ) ) {
-            abstractions.push( recipe.abstraction );
-        }
-        else {
-            abstractions = recipe.abstraction;
-        }
-
-        for( index = 0; index < abstractions.length; ++index ) {
-
-            abstraction = new vscp.mdf.Abstraction({
-                abstraction: abstractions[ index ]
-            });
-
-            this.abstractions.push( abstraction );
-        }
-    }
-
-    if ( "undefined" !== typeof recipe.messagebox ) {
-        if ( false === ( recipe.messagebox instanceof Array ) ) {
-            messageBoxes.push( recipe.messagebox );
-        }
-        else {
-            messageBoxes = recipe.messagebox;
-        }
-
-        for( index = 0; index < messageBoxes.length; ++index ) {
-
-            messageBox = new vscp.mdf.MessageBox({
-                messageBox: messageBoxes[ index ]
-            });
-
-            this.messageBoxes.push( messageBox );
-        }
-    }
+        messageBoxes.push( messageBox );
+        
+    });
+    
 };
 
 /**
@@ -1831,7 +1772,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
         updateProgress( progress );
     
         if ( this.bitInRegs.length > bitInRegsCnt ) {
-            console.info( "Write bit in register value." );
+            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write bit in register value." );
             
             vscp.register.writeBits({
 
@@ -1857,7 +1798,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
             ++bitInRegsCnt;
         }
         else if ( this.bitInAbstractions.length > bitInAbstractionsCnt ) {
-            console.info( "Write bit in abstract value." );
+            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write bit in abstract value." );
 
             vscp.mdf.writeAbstractBits({
 
@@ -1884,7 +1825,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
             ++bitInAbstractionsCnt;
         }
         else if ( this.registers.length > registersCnt ) {
-            console.info( "Write register value." );
+            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write register value." );
 
             vscp.register.write({
 
@@ -1909,7 +1850,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
             ++registersCnt;
         }
         else if ( this.abstractions.length > abstractionsCnt ) {
-            console.info( "Write abstract value." );
+            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write abstract value." );
 
             vscp.mdf.writeAbstractValue({
 
@@ -2003,6 +1944,7 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
     steps += 1;
     
     // Start writing the recipe
+    console.info( vscp.utility.getTime() + " Writing recipe " + this.name + "." );
     process();
 };
 
@@ -2014,11 +1956,10 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
  * @return Recipe array
  *
  * Options:
- * - mdf: XML in JSON format
+ * - mdf: The mdf as jquery xml object
  */
 vscp.mdf.getRecipes = function( options ) {
 
-    var index   = 0;
     var recipes = [];
     var recipe  = null;
 
@@ -2026,44 +1967,19 @@ vscp.mdf.getRecipes = function( options ) {
         console.error( vscp.utility.getTime() + " MDF object is missing." );
         return recipes;
     }
-
-    if ( "undefined" === typeof options.mdf.vscp ) {
-        console.error( vscp.utility.getTime() + " MDF vscp section is missing." );
-        return recipes;
-    }
     
-    if ( "undefined" === typeof options.mdf.vscp.module ) {
-        console.error( vscp.utility.getTime() + " MDF module section is missing." );
-        return recipes;
-    }
-    
-    if ( "undefined" === typeof options.mdf.vscp.module.setup ) {
-        console.warning( vscp.utility.getTime() + " No recipes available." );
-        return recipes;
-    }
-
-    if ( false === ( options.mdf.vscp.module.setup.recipe instanceof Array ) ) {
-
+    // Get all recipes
+    options.mdf.find( "vscp > module > setup > recipe" ).each( function() {
+        
         recipe = new vscp.mdf.Recipe({
-            recipe: options.mdf.vscp.module.setup.recipe,
+            recipe: $( this ),
             mdf: options.mdf
         });
-
+        
         recipes.push( recipe );
-    }
-    else {
 
-        for( index = 0; index < options.mdf.vscp.module.setup.recipe.length; ++index ) {
-
-            recipe = new vscp.mdf.Recipe({
-                recipe: options.mdf.vscp.module.setup.recipe[ index ],
-                mdf: options.mdf
-            });
-
-            recipes.push( recipe );
-        }
-    }
-
+    });
+    
     return recipes;
 };
 

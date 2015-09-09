@@ -13,6 +13,9 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/css/bootstrap-dialog.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/js/bootstrap-dialog.min.js"></script>
 
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
@@ -27,6 +30,8 @@
     <script type="text/javascript" src="../js/vscpRegister.js"></script>
     <!-- VSCP service access, depends on the websocket base library -->
     <script type="text/javascript" src="../js/vscpService.js"></script>
+    <!-- Node list, depends on the VSCP service library -->
+    <script type="text/javascript" src="../js/nodeList.js"></script>
     
     <!-- Boostrap navigation bar helper functions -->
     <script src="../js/navBar.js"></script>
@@ -38,7 +43,7 @@
 
         // VSCP websocket connection
         var vscpConn = null;
-
+        
         // User interface data
         var ui = {
 
@@ -73,10 +78,22 @@
             vscpConn = new vscp.Connection();
 
             // Connect to VSCP daemon
-            connect();
+            connect()
+            .then( setFilter )
+            .then( startReceivingEvents )
+            .then( initNodeList )
+            .done( function() {
+                // Show the nodes in the list
+                showNodeList();
+                
+                // Enable user interface
+                ui.enable();
+            });
         });
 
+        // Connect to the VSCP daemon
         function connect() {
+            var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
@@ -88,65 +105,148 @@
                 password: settings.passwordHash,
 
                 onSuccess: function( conn ) {
-
-                    // Set filter for CLASS1.Protocol
-                    vscpConn.setFilter({
-                        filterClass: 0x0000,
-                        maskClass: 0xffff,
-                        filterType: 0x0000,
-                        maskType: 0x0000
-                    });
-
-                    // Start receiving VSCP events
-                    vscpConn.start({
-                        onSuccess: function( conn ) {
-
-                            // Enable user interface
-                            ui.enable();
-                        },
-                        onError: function( conn ) {
-                            alert("Server error!");
-                        }
-                    });
+                    deferred.resolve();                    
                 },
 
                 onError: function( conn ) {
-
-                    // Disable the user interface
-                    ui.disable();
-
-                    alert("Connection lost. Please reload website.");
+                    BootstrapDialog.alert( "Connection lost. Please reload website." );
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
+        }
+        
+        // Set a filter for CLASS1.Protocol
+        function setFilter() {
+            var deferred = new $.Deferred();
+            
+            // Set filter for CLASS1.Protocol
+            vscpConn.setFilter({
+            
+                filterClass: 0x0000,
+                maskClass: 0xffff,
+                filterType: 0x0000,
+                maskType: 0x0000,
+                
+                onSuccess: function() {
+                    deferred.resolve();
+                },
+                
+                onError: function() {
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Start receiving VSCP events
+        function startReceivingEvents() {
+            var deferred = new $.Deferred();
+            
+            // Start receiving VSCP events
+            vscpConn.start({
+                
+                onSuccess: function( conn ) {
+                    deferred.resolve();
+                },
+                
+                onError: function( conn ) {
+                    BootstrapDialog.alert( "Server error!" );
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Initialize global node list
+        function initNodeList() {
+            var deferred = new $.Deferred();
+            
+            // Initialize node list
+            nodeList.init({
+                
+                connection: vscpConn,
+                
+                onSuccess: function() {
+                    deferred.resolve();
+                },
+                
+                onError: function() {
+                    BootstrapDialog.alert( "Server error!" );
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Show the node list
+        function showNodeList() {
+            var index   = 0;
+            var nodes   = nodeList.get();
+            
+            // Clear nodes
+            ui.clearNodes();
+                        
+            for( index = 0; index < nodes.length; ++index ) {
+                $( "#output tbody" ).append( "<tr><td>" + ( index + 1 ) + "</td><td>" + nodes[ index ] + "</td></tr>" );
+            }
         }
 
+        // Discover nodes by who is there broadcast
         function whoIsThere() {
             var index = 0;
             
             // Disable user interface
             ui.disable();
             
-            // Clear nodes
-            ui.clearNodes();
-
+            // Clear nodes in the list
+            nodeList.clear();
+            showNodeList();
+            
             vscp.service.whoIsThere({
 
                 connection: vscpConn,
 
                 onSuccess: function( nodes ) {
-
+                    
                     for( index = 0; index < nodes.length; ++index ) {
-                        $( "#output tbody" ).append( "<tr><td>" + ( index + 1 ) + "</td><td>" + vscp.utility.guidToStr( nodes[ index ].guid ) + "</td></tr>" );
+                    
+                        nodeList.append({
+                            guid: vscp.utility.guidToStr( nodes[ index ].guid )
+                        });
+                        
                     }
                     
-                    alert( "Nodes: " + nodes.length );
-                
-                    // Enable the user interface
-                    ui.enable();
+                    showNodeList();
+                    
+                    if ( 1 === nodes.length ) {
+                        BootstrapDialog.alert( "One node found." );
+                    }
+                    else {
+                        BootstrapDialog.alert( "" + nodes.length + " nodes found." );
+                    }
+                    
+                    nodeList.write({
+                    
+                        onSuccess: function() {                            
+                            // Enable the user interface
+                            ui.enable();
+                        },
+                        
+                        onError: function() {
+                            // Enable the user interface
+                            ui.enable();
+                        }
+                    });
+
                 },
 
                 onError: function() {
-                    alert( "No nodes found." );
+                    BootstrapDialog.alert( "No nodes found." );
                     
                     // Enable the user interface
                     ui.enable();
@@ -154,13 +254,15 @@
             });
         }
         
+        // Discover nodes by scanning for them
         function scan() {
         
             // Disable user interface
             ui.disable();
             
-            // Clear nodes
-            ui.clearNodes();
+            // Clear nodes in the list
+            nodeList.clear();
+            showNodeList();
 
             vscp.service.scan({
 
@@ -171,19 +273,37 @@
                 end: ui.scanTo(),
 
                 onSuccess: function( nodes ) {
-
-                    for( index = 0; index < nodes.length; ++index ) {
-                        $( "#output tbody" ).append( "<tr><td>" + ( index + 1 ) + "</td><td>" + nodes[ index ] + "</td></tr>" );
-                    }
-                    
-                    alert( "Nodes: " + nodes.length );
                 
-                    // Enable the user interface
-                    ui.enable();
+                    nodeList.set({
+                        guids: nodes
+                    });
+                    
+                    showNodeList();
+                                    
+                    if ( 1 === nodes.length ) {
+                        BootstrapDialog.alert( "One node found." );
+                    }
+                    else {
+                        BootstrapDialog.alert( "" + nodes.length + " nodes found." );
+                    }
+                
+                    nodeList.write({
+                    
+                        onSuccess: function() {
+                            // Enable the user interface
+                            ui.enable();
+                        },
+                        
+                        onError: function() {
+                            // Enable the user interface
+                            ui.enable();
+                        }
+                    });
+                    
                 },
 
                 onError: function() {
-                    alert( "No nodes found." );
+                    BootstrapDialog.alert( "No nodes found." );
                     
                     // Enable the user interface
                     ui.enable();
