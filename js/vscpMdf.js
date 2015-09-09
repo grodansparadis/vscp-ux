@@ -34,21 +34,33 @@
 
 /*jshint bitwise: false */
 
-/** Create the root namespace and making sure we're not overwriting it */
+/* Create the root namespace and making sure we're not overwriting it */
 var vscp = vscp || {};
 
 /* ---------------------------------------------------------------------- */
 
+/** VSCP module description file handling functionality
+ * @namespace vscp.mdf
+ */
 vscp._createNS( "vscp.mdf" );
 
-/** VSCP response timeout in ms */
+/** VSCP response timeout in ms
+ * @type {number}
+ * @const
+ */
 vscp.mdf.timeout = 5000;
 
+/** MDF specific constants
+ * @namespace vscp.mdf.constants
+ */
 vscp._createNS( "vscp.mdf.constants" );
 
-/** MDF specific constants */
 vscp.mdf.constants = {
 
+    /** MDF type sizes in bytes
+     * @enum {number}
+     * @const
+     */
     TYPE_SIZES: {
         "string": 0,
         "bitfield": 1,
@@ -73,6 +85,9 @@ vscp.mdf.constants = {
         "long": 4
     },
 
+    /** Conversion functions from decimal
+     * @const
+     */
     CONVERSION_FROM_DECIMAL: {
         "string": function( data ) {
             return String.fromCharCode.apply( null, data );
@@ -398,6 +413,9 @@ vscp.mdf.constants = {
         }
     },
 
+    /** Conversion functions to decimal
+     * @const
+     */
     CONVERSION_TO_DECIMAL: {
         "string": function( data ) {
             var dataArray   = [];
@@ -621,14 +639,12 @@ vscp.mdf.constants = {
 };
 
 /**
- * Get the MDF as xml document.
+ * Get the MDF as xml document from a URL.
  *
- * @param[in] options   Options
- *
- * Options:
- * - url: MDF URL
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options              - Options
+ * @param {function} options.url        - URL to MDF file
+ * @param {function} options.onSuccess  - Function which is called on a successful operation
+ * @param {function} [options.onError]  - Function which is called on a failed operation
  */
 vscp.mdf.load = function( options ) {
 
@@ -705,14 +721,12 @@ vscp.mdf.load = function( options ) {
 };
 
 /**
- * Get the MDF as xml document.
+ * Get the MDF as xml document from local file system.
  *
- * @param[in] options   Options
+ * @param {object} options          - Options
+ * @param {function} options.name   - MDF file name, including path
  *
- * @return MDF file as xml document
- *
- * Options:
- * - name: MDF file name, including path
+ * @return {object} MDF file as xml document
  */
 vscp.mdf.loadLocal = function( options ) {
 
@@ -745,15 +759,13 @@ vscp.mdf.loadLocal = function( options ) {
 /**
  * Read a abstract value.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - mdf: MDF as xml jquery object
- * - id: Abstraction id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {object} options.mdf                  - MDF as xml jquery object
+ * @param {number} options.id                   - Abstract value id
+ * @param {function} options.onSuccess          - Function which is called on a successful operation
+ * @param {function} [options.onError]          - Function which is called on a failed operation
  */
 vscp.mdf.readAbstractValue = function( options ) {
 
@@ -943,16 +955,14 @@ vscp.mdf.readAbstractValue = function( options ) {
 /**
  * Write a abstract value.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - mdf: MDF as xml jquery object
- * - id: Abstraction id
- * - value: Value
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {object} options.mdf                  - MDF as xml jquery object
+ * @param {number} options.id                   - Abstract value id
+ * @param {string} options.value                - Abstract value
+ * @param {function} options.onSuccess          - Function which is called on a successful operation
+ * @param {function} [options.onError]          - Function which is called on a failed operation
  */
 vscp.mdf.writeAbstractValue = function( options ) {
 
@@ -1147,18 +1157,16 @@ vscp.mdf.writeAbstractValue = function( options ) {
 /**
  * Change some bits in a abstract value.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - mdf: MDF as xml jquery object
- * - id: Abstraction id
- * - pos: Bit position
- * - width: Bit width
- * - value: Value
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {object} options.mdf                  - MDF as xml jquery object
+ * @param {number} options.id                   - Abstract value id
+ * @param {number} options.pos                  - Bit position
+ * @param {number} options.width                - Bit width
+ * @param {string} options.value                - Abstract value
+ * @param {function} options.onSuccess          - Function which is called on a successful operation
+ * @param {function} [options.onError]          - Function which is called on a failed operation
  */
 vscp.mdf.writeAbstractBits = function( options ) {
 
@@ -1274,22 +1282,53 @@ vscp.mdf.writeAbstractBits = function( options ) {
 
 /**
  * A message box.
+ * @class
  *
- * @param[in] options   Options
- *
- * Options:
- * - messageBox: Messagebox as jquery xml object
+ * @param {object} options              - Options
+ * @param {object} options.messageBox   - Messagebox as jquery xml object
  */
 vscp.mdf.MessageBox = function( options ) {
 
-    this.func           = "input";  // Function input or output
-    this.head           = "";       // Head
-    this.description    = "";       // Description
-    this.variableType   = "";       // Variable type
-    this.variableName   = "";       // Variable name
-    this.variableValue  = "";       // Variable value
-    this.variableMin    = 0;        // Min. value (for numbers only)
-    this.variableMax    = 0;        // Max. value (for numbers only)
+    /**
+     * Function input or output
+     * @member {string}
+     */
+    this.func           = "input";
+    /**
+     * Head
+     * @member {string}
+     */
+    this.head           = "";
+    /**
+     * Description
+     * @member {string}
+     */
+    this.description    = "";
+    /**
+     * Variable type
+     * @member {string}
+     */
+    this.variableType   = "";
+    /**
+     * Variable name
+     * @member {string}
+     */
+    this.variableName   = "";
+    /**
+     * Variable value
+     * @member {string}
+     */
+    this.variableValue  = "";
+    /**
+     * Min. value (for numbers only)
+     * @member {number}
+     */
+    this.variableMin    = 0;
+    /**
+     * Max. value (for numbers only)
+     * @member {number}
+     */
+    this.variableMax    = 0;
 
     if ( "undefined" !== typeof options ) {
 
@@ -1303,7 +1342,7 @@ vscp.mdf.MessageBox = function( options ) {
 /**
  * Parse a messagebox object.
  *
- * @param[in] $messageBox Messagebox as jquery xml object
+ * @param {object} $messageBox - Messagebox as jquery xml object
  */
 vscp.mdf.MessageBox.prototype.parse = function( $messageBox ) {
 
@@ -1370,19 +1409,36 @@ vscp.mdf.MessageBox.prototype.parse = function( $messageBox ) {
 
 /**
  * Bit in register access method.
+ * @class
  *
- * @param[in] options Options
- *
- * Options:
- * - bitInReg: Bit-in-register as jquery xml object
+ * @param {object} options          - Options
+ * @param {object} options.bitInReg - Bit-in-register as jquery xml object
  */
 vscp.mdf.BitInReg = function( options ) {
 
+    /** Bit position
+     * @member {number}
+     */
     this.pos            = 0;
+    /** Register page
+     * @member {number}
+     */
     this.page           = 0;
+    /** Register offset
+     * @member {number}
+     */
     this.offset         = 0;
+    /** Bit width
+     * @member {number}
+     */
     this.width          = 1;
+    /** Value of bit width
+     * @member {number}
+     */
     this.value          = 0;
+    /** Variable name
+     * @member {string}
+     */
     this.variableName   = "";
 
     if ( "undefined" !== typeof options ) {
@@ -1397,7 +1453,7 @@ vscp.mdf.BitInReg = function( options ) {
 /**
  * Parse a bit in register access method object.
  *
- * @param[in] bitInReg Bit-in-register as jquery xml object
+ * @param {object} bitInReg - Bit-in-register as jquery xml object
  */
 vscp.mdf.BitInReg.prototype.parse = function( $bitInReg ) {
 
@@ -1445,18 +1501,32 @@ vscp.mdf.BitInReg.prototype.parse = function( $bitInReg ) {
 
 /**
  * Bit in abstraction access method.
+ * @class
  *
- * @param[in] options Options
- *
- * Options:
- * - bitInAbstraction: Bit-in-abstraction as jquery xml object
+ * @param {object} options                  - Options
+ * @param {object} options.bitInAbstraction - Bit-in-abstraction as jquery xml object
  */
 vscp.mdf.BitInAbstraction = function( options ) {
 
+    /** Abstract value id
+     * @member {string}
+     */
     this.id             = "";
+    /** Bit position
+     * @member {number}
+     */
     this.pos            = 0;
+    /** Bit width
+     * @member {number}
+     */
     this.width          = 1;
+    /** Value of bit width
+     * @member {number}
+     */
     this.value          = 0;
+    /** Variable name
+     * @member {string}
+     */
     this.variableName   = "";
 
     if ( "undefined" !== typeof options ) {
@@ -1471,7 +1541,7 @@ vscp.mdf.BitInAbstraction = function( options ) {
 /**
  * Parse a bit in abstraction access method object.
  *
- * @param[in] $bitInAbstraction Bit-in-abstraction as jquery xml object
+ * @param {object} $bitInAbstraction - Bit-in-abstraction as jquery xml object
  */
 vscp.mdf.BitInAbstraction.prototype.parse = function( $bitInAbstraction ) {
 
@@ -1515,17 +1585,28 @@ vscp.mdf.BitInAbstraction.prototype.parse = function( $bitInAbstraction ) {
 
 /**
  * Register access method.
+ * @class
  *
- * @param[in] options Options
- *
- * Options:
- * - register: Register as jquery xml object
+ * @param {object} options          - Options
+ * @param {object} options.register - Register as jquery xml object
  */
 vscp.mdf.Register = function( options ) {
 
+    /** Register page
+     * @member {number}
+     */
     this.page           = 0;
+    /** Register offset
+     * @member {number}
+     */
     this.offset         = 0;
+    /** Register value
+     * @member {number}
+     */
     this.value          = 0;
+    /** Variable name
+     * @member {string}
+     */
     this.variableName   = "";
 
     if ( "undefined" !== typeof options ) {
@@ -1540,7 +1621,7 @@ vscp.mdf.Register = function( options ) {
 /**
  * Parse a register access method object.
  *
- * @param[in] $register Register as jquery xml object
+ * @param {object} $register - Register as jquery xml object
  */
 vscp.mdf.Register.prototype.parse = function( $register ) {
 
@@ -1572,16 +1653,24 @@ vscp.mdf.Register.prototype.parse = function( $register ) {
 
 /**
  * Abstraction access method.
+ * @class
  *
- * @param[in] options Options
- *
- * Options:
- * - abstraction: Abstraction as jquery xml object
+ * @param {object} options              - Options
+ * @param {object} options.abstraction  - Abstraction as jquery xml object
  */
 vscp.mdf.Abstraction = function( options ) {
 
+    /** Abstract value id
+     * @member {string}
+     */
     this.id             = "";
+    /** Abstract value
+     * @member {number}
+     */
     this.value          = 0;
+    /** Variable name
+     * @member {number}
+     */
     this.variableName   = "";
 
     if ( "undefined" !== typeof options ) {
@@ -1596,7 +1685,7 @@ vscp.mdf.Abstraction = function( options ) {
 /**
  * Parse a abstraction access method object.
  *
- * @param[in] $abstraction Abstraction as jquery xml object
+ * @param {object} $abstraction Abstraction as jquery xml object
  */
 vscp.mdf.Abstraction.prototype.parse = function( $abstraction ) {
 
@@ -1624,12 +1713,11 @@ vscp.mdf.Abstraction.prototype.parse = function( $abstraction ) {
 
 /**
  * A recipe.
+ * @class
  *
- * @param[in] options Options
- *
- * Options:
- * - recipe: Recipe as jquery xml object
- * - mdf: MDF as jquery xml object
+ * @param {object} options          - Options
+ * @param {object} options.recipe   - Recipe as jquery xml object
+ * @param {object} options.mdf      - MDF as jquery xml object
  */
 vscp.mdf.Recipe = function( options ) {
 
@@ -1659,7 +1747,7 @@ vscp.mdf.Recipe = function( options ) {
 /**
  * Parse a recipe object.
  *
- * @param[in] $recipe Recipe as jquery xml object
+ * @param {object} $recipe - Recipe as jquery xml object
  */
 vscp.mdf.Recipe.prototype.parse = function( $recipe ) {
 
@@ -1741,11 +1829,9 @@ vscp.mdf.Recipe.prototype.parse = function( $recipe ) {
 /**
  * Write a recipe.
  *
- * @param[in] options Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
+ * @param {object] options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number] options.nodeId               - Node id
  */
 vscp.mdf.Recipe.prototype.write = function( options ) {
 
@@ -1951,12 +2037,10 @@ vscp.mdf.Recipe.prototype.write = function( options ) {
 /**
  * Get recipes from a MDF in JSON format.
  *
- * @param[in] options Options
+ * @param {object] options      - Options
+ * @param {object} options.mdf  - The mdf as jquery xml object
  *
- * @return Recipe array
- *
- * Options:
- * - mdf: The mdf as jquery xml object
+ * @return {vscp.mdf.Recipe[]} Recipe array
  */
 vscp.mdf.getRecipes = function( options ) {
 

@@ -37,10 +37,16 @@
 
 /*jshint bitwise: false */
 
-/** Create the root namespace and making sure we're not overwriting it */
+/** Create the root namespace and making sure we're not overwriting it
+ * @namespace vscp
+ */
 var vscp = vscp || {};
 
-/** VSCP websocket library version */
+/** VSCP websocket library version
+ * @property {number} major     - Major version number
+ * @property {number} minor     - Minor version number
+ * @property {number} subMinor  - Sub-minor version number
+ */
 vscp.version = {
     major: 0,
     minor: 1,
@@ -49,6 +55,8 @@ vscp.version = {
 
 /** Create a general purpose namespace method. This will allow us to create
  * namespace a bit easier.
+ *
+ * @param {string} namespace Complete namespace, e.g. "a.b.c.d"
  */
 vscp._createNS = function ( namespace ) {
     var nsparts = namespace.split(".");
@@ -80,9 +88,15 @@ vscp._createNS = function ( namespace ) {
     return parent;
 };
 
+/** VSCP constants
+ * @namespace vscp.constants
+ */
 vscp._createNS( "vscp.constants" );
 
-/** VSCP classes */
+/** VSCP classes
+ * @enum {number}
+ * @const
+ */
 vscp.constants.classes = {
 
     VSCP_CLASS1_PROTOCOL: 0,
@@ -156,7 +170,10 @@ vscp.constants.classes = {
     VSCP_CLASS2_VSCPD: ( 65535 )
 };
 
-/** VSCP class types */
+/** VSCP class types
+ * @enum {number}
+ * @const
+ */
 vscp.constants.types = {
 
     VSCP_TYPE_UNDEFINED: 0,
@@ -1116,7 +1133,10 @@ vscp.constants.types = {
     VSCP2_TYPE_VSCPD_TIMER_ELLAPSED: 29
 };
 
-/** VSCP class priorities */
+/** VSCP class priorities
+ * @enum {number}
+ * @const
+ */
 vscp.constants.priorities = {
     PRIORITY_0_HIGH: 0,
     PRIORITY_1: 1,
@@ -1128,7 +1148,10 @@ vscp.constants.priorities = {
     PRIORITY_7_LOW: 7
 };
 
-/** VSCP variable types */
+/** VSCP variable types
+ * @enum {number}
+ * @const
+ */
 vscp.constants.varTypes = {
     UNASSIGNED: 0,          // Unassigned variable
     STRING: 1,              // String value
@@ -1146,7 +1169,10 @@ vscp.constants.varTypes = {
     DATE_TIME: 13           // Date + Time in ISO format 2008-11-07 20:10.00
 };
 
-/** VSCP variable type names */
+/** VSCP variable type names
+ * @type {string[]}
+ * @const
+ */
 vscp.constants.varTypeNames = [
     "Unassigned",
     "String",
@@ -1168,28 +1194,43 @@ vscp.constants.varTypeNames = [
 
 /**
  * VSCP event.
+ * @class
  */
 vscp.Event = function ( options ) {
 
-    /** VSCP event head */
+    /** VSCP event head
+     * @member {number}
+     */
     this.vscpHead       = 0;
 
-    /** VSCP class */
+    /** VSCP class
+     * @member {number}
+     */
     this.vscpClass      = 0;
 
-    /** VSCP type */
+    /** VSCP type
+     * @member {number}
+     */
     this.vscpType       = 0;
 
-    /** VSCP object id used by driver for channel info and etc. */
+    /** VSCP object id used by driver for channel info and etc.
+     * @member {number}
+     */
     this.vscpObId       = 0;
 
-    /** Relative timestamp for package in us */
+    /** Relative timestamp for package in us
+     * @member {number}
+     */
     this.vscpTimeStamp  = 0;
 
-    /** Node globally unique id LSB(0) -> MSB(15) */
+    /** Node global unique id LSB(0) -> MSB(15)
+     * @member {string}
+     */
     this.vscpGuid       = "-";
 
-    /** Data array or string */
+    /** Data array or string
+     * @member {(number[]|string)}
+     */
     this.vscpData       = [];
 
     if ( "undefined" !== typeof options ) {
@@ -1264,9 +1305,9 @@ vscp.Event = function ( options ) {
 };
 
 /**
- * If the GUID is a IP v6 address, it will return true, otherwise false.
+ * Is GUID a IP v6 address or not?
  *
- * @return Is GUID a IP v6 address or not
+ * @return {boolean} If the GUID is a IP v6 address, it will return true, otherwise false.
  */
 vscp.Event.prototype.isIPV6Addr = function() {
     var result = false;
@@ -1279,18 +1320,18 @@ vscp.Event.prototype.isIPV6Addr = function() {
 };
 
 /**
- * Returns the VSCP event priority.
+ * Get the VSCP event priority.
  *
- * @return Priority
+ * @return {number} Priority of the event.
  */
 vscp.Event.prototype.getPriority = function() {
     return ( this.vscpHead >> 5 ) & 0x0007;
 };
 
 /**
- * If the node id is hard coded, it will return true, otherwise false.
+ * Is the node id of the event sender hard coded or not?
  *
- * @return Is the node id hard coded or not
+ * @return {boolean} If the node id is hard coded, it will return true, otherwise false.
  */
 vscp.Event.prototype.isHardCodedAddr = function() {
     var result = false;
@@ -1304,12 +1345,16 @@ vscp.Event.prototype.isHardCodedAddr = function() {
 
 /* ---------------------------------------------------------------------- */
 
+/**
+ * Utility functions
+ * @namespace vscp.utility
+ */
 vscp._createNS( "vscp.utility" );
 
 /**
  * Utility function which returns the current time in the following format:
  *
- * @return hh:mm:ss.us
+ * @return {string} Current time in the format hh:mm:ss.us
  */
 vscp.utility.getTime = function() {
 
@@ -1341,11 +1386,11 @@ vscp.utility.getTime = function() {
 /**
  * Calculates the VSCP server websocket authentication hash.
  *
- * @param[in] userName  User name
- * @param[in] password  Password
- * @param[in] sid       Session id
+ * @param {string} userName - User name
+ * @param {string} password - Password
+ * @param {string} sid      - Session id
  *
- * @return Authentication hash
+ * @return {string} Authentication hash
  */
 vscp.utility.getWebSocketAuthHash = function( userName, password, sid ) {
 
@@ -1355,8 +1400,8 @@ vscp.utility.getWebSocketAuthHash = function( userName, password, sid ) {
 /**
  * Converts a GUID number array to a GUID string.
  *
- * @param[in] guid  GUID number array
- * @return GUID string
+ * @param {number[]} guid - GUID number array
+ * @return {string} GUID string, e.g. 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
  */
 vscp.utility.guidToStr = function( guid ) {
 
@@ -1383,8 +1428,8 @@ vscp.utility.guidToStr = function( guid ) {
 /**
  * Converts a GUID string to a GUID number array.
  *
- * @param[in] guid  GUID string
- * @return GUID number array
+ * @param {string} guid - GUID string, e.g. 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+ * @return {number[]} GUID number array
  */
 vscp.utility.strToGuid = function( str ) {
 
@@ -1416,8 +1461,8 @@ vscp.utility.strToGuid = function( str ) {
 /**
  * Get node id from a node GUID string.
  *
- * @param[in] guid  Node GUID (string)
- * @return Node id
+ * @param {string} guid - GUID string, e.g. 00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00
+ * @return {number} Node id
  */
 vscp.utility.getNodeId = function( guid ) {
 
@@ -1436,60 +1481,98 @@ vscp.utility.getNodeId = function( guid ) {
 
 /**
  * VSCP websocket, used for connection establishment to a VSCP server.
+ * @class
  */
 vscp.Connection = function() {
 
-    /** States of the VSCP websocket */
+    /** States of the VSCP websocket
+     * @enum {number}
+     */
     this.states = {
-        DISCONNECTED: 0,    /**< Not connected */
-        CONNECTED: 1,       /**< Standard websocket connection established */
-        AUTHENTICATED: 2    /**< Authentication with VSCP server successful */
+        /** Not connected */
+        DISCONNECTED: 0,
+        /** Standard websocket connection established */
+        CONNECTED: 1,
+        /** Authentication with VSCP server successful */
+        AUTHENTICATED: 2
     };
 
-    /** Websocket */
+    /** Websocket
+     * @member {object}
+     */
     this.socket = null;
 
-    /** User name used for connection establishment */
+    /** User name used for connection establishment
+     * @member {string}
+     */
     this.userName = "";
 
-    /** Password hash used for connection establishment */
+    /** Password hash used for connection establishment
+     * @member {string}
+     */
     this.passwordHash = "";
 
-    /** Callback called on any connection error */
+    /** Callback called on any connection error
+     * @member {function}
+     */
     this.onConnError = null;
 
-    /** Callback called on any received VSCP response message */
+    /** Callback called on any received VSCP response message
+     * @member {function}
+     */
     this.onMessage = null;
 
-    /** Callbacks called on any received VSCP event message */
+    /** Callbacks called on any received VSCP event message
+     * @member {function[]}
+     */
     this.onEvent = [];
 
-    /** Callback called on any received variable (see LISTVAR command) */
+    /** Callback called on any received variable (see LISTVAR command)
+     * @member {function}
+     */
     this.onVariable = null;
 
-    /** Callback called on any received table row (see GT command) */
+    /** Callback called on any received table row (see GT command)
+     * @member {function}
+     */
     this.onTableRow = null;
 
-    /** VSCP websocket is not connected right now */
+    /** VSCP websocket is not connected right now
+     * @member {number}
+     */
     this.state = this.states.DISCONNECTED;
 
-    /** VSCP server command */
+    /** VSCP server command
+     * @class
+     * @param {string} command      - Server command string
+     * @param {function} onSuccess  - Function which is called on successful operation
+     * @param {function} onerror    - Function which is called on failed operation
+     */
     var Command = function( command, onSuccess, onError ) {
+        /** Server command string
+         * @member {string}
+         */
         this.command = command;
+        /** Function which is called on successful operation
+         * @member {function}
+         */
         this.onSuccess = onSuccess;
+        /** Function which is called on failed operation
+         * @member {function}
+         */
         this.onError = onError;
     };
 
-    /** Queue contains all pending VSCP server commands */
+    /** Queue contains all pending VSCP server commands
+     * @member {Command[]}
+     */
     var cmdQueue = [];
 
     /** Get the index of a command in the queue.
      *
-     * @param[in] command   Command string
+     * @param {string} command - Server command string
      *
-     * @return Index
-     * @retval <0   Command not found
-     * @retval >=0  Command index in the queue
+     * @return {number} Index of command in the queue. If index is < 0, the command was not found.
      */
     var getPendingCommandIndex = function( command ) {
         var index = 0;
@@ -1509,12 +1592,9 @@ vscp.Connection = function() {
 
     /** Get command from queue with pending commands.
      *
-     * @param[in] command   Command string
+     * @param {string} command - Server command string
      *
-     * @return Command object
-     * @retval command      Command string
-     * @retval onSuccess    Callback which is called on success
-     * @retval onError      Callback which is called on error
+     * @return {Command} Command object
      */
     this.getPendingCommand = function( command ) {
 
@@ -1525,11 +1605,7 @@ vscp.Connection = function() {
             cmd = cmdQueue[ index ];
             cmdQueue.splice( index, 1 );
 
-            return {
-                command: cmd.command,
-                onSuccess: cmd.onSuccess,
-                onError: cmd.onError
-            };
+            return cmd;
         }
 
         return null;
@@ -1538,14 +1614,12 @@ vscp.Connection = function() {
     /**
      * Send command to VSCP server.
      *
-     * @param[in] options   Options
-     *
-     * Options:
-     * - command:   Command string
-     * - data:      Data string
-     * - simulate:  Simulate the command (true/false)
-     * - onSuccess: Callback
-     * - onError:   Callback
+     * @param {object} options              - Options
+     * @param {string} options.command      - Command string
+     * @param {string} options.data         - Data string
+     * @param {boolean} options.simulate    - Simulate the command (true/false)
+     * @param {function} options.onSuccess  - Callback on success
+     * @param {function} options.onError    - Callback on error
      */
     this._sendCommand = function( options ) {
 
@@ -1608,12 +1682,10 @@ vscp.Connection = function() {
     /**
      * Send event to VSCP server.
      *
-     * @param[in] options   Options
-     *
-     * Options:
-     * - data:      Data string
-     * - onSuccess: Callback
-     * - onError:   Callback
+     * @param {object} options              - Options
+     * @param {string} options.data         - Data string
+     * @param {function} options.onSuccess  - Callback on success
+     * @param {function} options.onError    - Callback on error
      */
     this._sendEvent = function( options ) {
 
@@ -1654,6 +1726,9 @@ vscp.Connection = function() {
 
     /**
      * Signal success of the current asynchronous operation.
+     *
+     * @param {string} command  - Server command string
+     * @param {object} [obj]    - Options for on success callback
      */
     this.signalSuccess = function( command, obj ) {
 
@@ -1675,6 +1750,9 @@ vscp.Connection = function() {
 
     /**
      * Signal failed of the current asynchronous operation.
+     *
+     * @param {string} command  - Server command string
+     * @param {object} [obj]    - Options for on error callback
      */
     this.signalError = function( command, obj ) {
 
@@ -1710,8 +1788,8 @@ vscp.Connection = function() {
      * true, which means no further actions shall take place in this object.
      * Otherwise the message is handled by the standard onMessage handler here.
      *
-     * @param[in] msg   VSCP server response message
-     * @return Message is handled or not
+     * @param {string} msg - VSCP server response message
+     * @return {boolean} Message is handled (true) or not (false).
      */
     this.signalMessage = function( msg ) {
         var status = false;
@@ -1730,7 +1808,7 @@ vscp.Connection = function() {
     /**
      * Signal a received VSCP event.
      *
-     * @param[in] VSCP event
+     * @param {vscp.Event} vscpEvent - VSCP event
      */
     this.signalEvent = function( vscpEvent ) {
         var index = 0;
@@ -1747,7 +1825,12 @@ vscp.Connection = function() {
     /**
      * Signal a received variable.
      *
-     * @param[in] variable Variable object
+     * @param {object} variable                 - Variable object
+     * @param {number} variable.id              - Consecutive number
+     * @param {string} variable.name            - Variable name
+     * @param {string} variable.type            - Variable type
+     * @param {boolean} variable.persistency    - Variable is persistent (true) or not (false)
+     * @param {string} variable.value           - Variable value
      */
     this.signalVariable = function( variable ) {
         if ( ( "function" === typeof this.onVariable ) &&
@@ -1759,7 +1842,9 @@ vscp.Connection = function() {
     /**
      * Signal a received table row.
      *
-     * @param[in] row Table row object
+     * @param {object} row          - Table row object
+     * @param {string} row.date     - Date and time
+     * @param {string} row.value    - Value
      */
     this.signalTableRow = function( row ) {
         if ( ( "function" === typeof this.onTableRow ) &&
@@ -1771,7 +1856,7 @@ vscp.Connection = function() {
     /**
      * Add a event listener.
      *
-     * @param[in] eventListener Event listener function
+     * @param {function} eventListener - Event listener function
      */
     this.addEventListener = function( eventListener ) {
         if ( "function" === typeof eventListener ) {
@@ -1782,7 +1867,7 @@ vscp.Connection = function() {
     /**
      * Remove a event listener.
      *
-     * @param[in] eventListener Event listener function
+     * @param {function} eventListener - Event listener function
      */
     this.removeEventListener = function( eventListener ) {
         var index = 0;
@@ -1830,7 +1915,7 @@ vscp.Connection.prototype.onWebSocketClose = function() {
 /**
  * This function is called for any websocket message (VSCP server response message).
  *
- * @param[in] msg   VSCP server response message
+ * @param {string} msg - VSCP server response message
  */
 vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
 
@@ -2226,15 +2311,13 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
 /**
  * Connect to a VSCP server with the given URL.
  *
- * Options:
- * - url: URL to the VSCP server, e.g. ws://
- * - userName: User name used for authentication
- * - password: Password used for authentication
- * - onMessage: Function which is called on any received VSCP response message.
- * - onSuccess: Function which is called on a successful connection establishment.
- * - onError: Function which is called on a failed connection establishment or in case the connection is lost during the session.
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {string} options.url              - URL to the VSCP server, e.g. ws://
+ * @param {string} options.userName         - User name used for authentication
+ * @param {string} options.password         - Password used for authentication
+ * @param {function} [options.onMessage]    - Function which is called on any received VSCP response message.
+ * @param {function} [options.onSuccess]    - Function which is called on a successful connection establishment.
+ * @param {function} [options.onError]      - Function which is called on a failed connection establishment or in case the connection is lost during the session.
  */
 vscp.Connection.prototype.connect = function( options ) {
 
@@ -2336,11 +2419,9 @@ vscp.Connection.prototype.disconnect = function() {
 /**
  * Start receiving events.
  *
- * Options:
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.start = function( options ) {
 
@@ -2376,11 +2457,9 @@ vscp.Connection.prototype.start = function( options ) {
 /**
  * Stop receiving events.
  *
- * Options:
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.stop = function( options ) {
 
@@ -2416,11 +2495,9 @@ vscp.Connection.prototype.stop = function( options ) {
 /**
  * Clear the VSCP event queue on the server side.
  *
- * Options:
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.clearQueue = function( options ) {
 
@@ -2456,12 +2533,10 @@ vscp.Connection.prototype.clearQueue = function( options ) {
 /**
  * Send a VSCP event to the VSCP server.
  *
- * Options:
- * - event: VSCP event to send
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {vscp.Event} options.event        - VSCP event to send
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.sendEvent = function ( options ) {
 
@@ -2544,19 +2619,17 @@ vscp.Connection.prototype.sendEvent = function ( options ) {
 /**
  * Set a filter in the VSCP server for VSCP events.
  *
- * Options:
- * - filterPriority:
- * - filterClass:
- * - filterType:
- * - filterGuid:
- * - maskPriority:
- * - maskClass:
- * - maskType:
- * - maskGuid:
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                      - Options
+ * @param {number} options.filterPriority       - Priority filter
+ * @param {number} options.filterClass          - Class filter
+ * @param {number} options.filterType           - Type filter
+ * @param {number[]|string} options.filterGuid  - GUID filter
+ * @param {number} options.maskPriority         - Priority mask
+ * @param {number} options.maskClass            - Class mask
+ * @param {number} options.maskType             - Type mask
+ * @param {number[]|string} options.maskGuid    - GUID mask
+ * @param {function} [options.onSuccess]        - Function which is called on a successful operation
+ * @param {function} [options.onError]          - Function which is called on a failed operation
  */
 vscp.Connection.prototype.setFilter = function ( options ) {
 
@@ -2689,12 +2762,10 @@ vscp.Connection.prototype.setFilter = function ( options ) {
 /**
  * Read a value from a VSCP server variable.
  *
- * Options:
- * - name: Variable name
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {string} options.name             - Variable name
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.readVar = function ( options ) {
 
@@ -2730,13 +2801,11 @@ vscp.Connection.prototype.readVar = function ( options ) {
 /**
  * Write a value to a VSCP server variable.
  *
- * Options:
- * - name: Variable name
- * - value: Variable value
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {string} options.name             - Variable name
+ * @param {string} options.value            - Variable value
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.writeVar = function ( options ) {
 
@@ -2777,15 +2846,13 @@ vscp.Connection.prototype.writeVar = function ( options ) {
 /**
  * Create a a VSCP server variable.
  *
- * Options:
- * - name: Variable name
- * - type: Variable type
- * - value: Variable value
- * - persistency: Variable is persistency (true/false)
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {string} options.name             - Variable name
+ * @param {number} options.type             - Variable type
+ * @param {string} options.value            - Variable value
+ * @param {boolean} options.persistency     - Variable is persistent (true) or not (false)
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.createVar = function ( options ) {
 
@@ -2841,12 +2908,10 @@ vscp.Connection.prototype.createVar = function ( options ) {
 /**
  * Reset a VSCP server variable.
  *
- * Options:
- * - name: Variable name
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {string} options.name             - Variable name
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.resetVar = function ( options ) {
 
@@ -2882,12 +2947,10 @@ vscp.Connection.prototype.resetVar = function ( options ) {
 /**
  * Remove a VSCP server variable.
  *
- * Options:
- * - name: Variable name
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {string} options.name             - Variable name
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.removeVar = function ( options ) {
 
@@ -2923,12 +2986,10 @@ vscp.Connection.prototype.removeVar = function ( options ) {
 /**
  * Get a VSCP server variable length.
  *
- * Options:
- * - name: Variable name
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {string} options.name             - Variable name
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.lengthVar = function ( options ) {
 
@@ -2964,12 +3025,10 @@ vscp.Connection.prototype.lengthVar = function ( options ) {
 /**
  * Get last change of a VSCP server variable.
  *
- * Options:
- * - name: Variable name
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {string} options.name             - Variable name
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.lastChangeVar = function ( options ) {
 
@@ -3003,13 +3062,11 @@ vscp.Connection.prototype.lastChangeVar = function ( options ) {
 };
 
 /**
- * List a VSCP server variable.
+ * List all VSCP server variables.
  *
- * Options:
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.listVar = function ( options ) {
 
@@ -3047,11 +3104,9 @@ vscp.Connection.prototype.listVar = function ( options ) {
 /**
  * Save persistent variables.
  *
- * Options:
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.saveVar = function ( options ) {
 
@@ -3083,15 +3138,13 @@ vscp.Connection.prototype.saveVar = function ( options ) {
  * Get data from a table.
  * If "begin" and "end" are omitted, the whole table is returned.
  *
- * Options:
- * - name: Table name
- * - begin: Date when to begin ( ISO form YY-MM-DD HH:MM:SS )
- * - end: Date when to end ( ISO form YY-MM-DD HH:MM:SS )
- * - onTableRow: Function which is called on every received table row
- * - onSuccess: Function which is called on a successful operation
- * - onError: Function which is called on a failed operation
- *
- * @param[in] options   Options
+ * @param {object} options                  - Options
+ * @param {string} options.name             - Table name
+ * @param {string} options.begin            - Date when to begin ( ISO form YY-MM-DD HH:MM:SS )
+ * @param {string} options.end              - Date when to end ( ISO form YY-MM-DD HH:MM:SS )
+ * @param {function} options.onTableRow     - Function which is called on every received table row
+ * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.Connection.prototype.readTable = function ( options ) {
 

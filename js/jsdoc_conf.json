@@ -1,0 +1,29 @@
+{
+    "tags": {
+        "allowUnknownTags": true
+    },
+    "source": {
+        "include": ["./"],
+        "includePattern": "vscp.+\\.js$",
+        "excludePattern": "(^|\\/|\\\\)_|docs|node_modules|d3|epoch"
+    },
+    "plugins": [],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": true,
+        "systemName": "remoteFileExplorer",
+        "footer": "Created by Andreas Merkle",
+        "copyright": "2015",
+        "navType": "vertical",
+        "theme": "spacelab",
+        "linenums": true,
+        "collapseSymbols": true,
+        "inverseNav": false
+    },
+    "opts": {
+        "encoding": "utf8",
+        "destination": "docs/js",
+        "recurse": true,
+        "private": true
+    }
+}

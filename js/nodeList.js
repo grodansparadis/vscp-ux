@@ -51,12 +51,10 @@ var nodeList = (function() {
      * - Reading the node list from the daemon
      * - If the node list variable not exists, it will create one
      *
-     * @param[in] options Options
-     *
-     * Options:
-     * - connection: VSCP connection object
-     * - onSuccess: Callback which is called after successful initialization
-     * - onError: Callback which is called in case that the initialization failed
+     * @param {object} options                      - Options
+     * @param {vscp.Connection} options.connection  - VSCP connection
+     * @param {function} options.onSuccess          - Callback which is called on successful operation
+     * @param {function} [options.onError]          - Callback which is called on failed operation
      */
     function init( options ) {
 
@@ -92,7 +90,7 @@ var nodeList = (function() {
     /**
      * Get a list with current known nodes.
      *
-     * @return Node list (GUID string array)
+     * @return {string[]} Node list (GUID string array)
      */
     function get() {
         return container.data;
@@ -101,10 +99,8 @@ var nodeList = (function() {
     /**
      * Set a new list of nodes.
      *
-     * @param[in] options Options
-     *
-     * Options:
-     * - guid: Array of GUID strings (one per node)
+     * @param {object} options - Options
+     * @param {string[]} guids - Array of GUID strings (one per node)
      */
     function set( options ) {
     
@@ -122,10 +118,8 @@ var nodeList = (function() {
     /**
      * Append a node to the list.
      *
-     * @param[in] options Options
-     *
-     * Options:
-     * - guid: GUID string
+     * @param {object} options - Options
+     * @param {string} guid - GUID string
      */
     function append( options ) {
         
@@ -151,11 +145,9 @@ var nodeList = (function() {
     /**
      * Write the node list persistent to a daemon variable.
      *
-     * @param[in] options Options
-     *
-     * Options:
-     * - onSuccess: Callback which is called after successful written
-     * - onError: Callback which is called in case that the operation failed
+     * @param {object} options                      - Options
+     * @param {function} options.onSuccess          - Callback which is called on successful operation
+     * @param {function} [options.onError]          - Callback which is called on failed operation
      */
     function write( options ) {
         
