@@ -2858,7 +2858,7 @@ vscp.Connection.prototype.createVar = function ( options ) {
 
     var onSuccess   = null;
     var onError     = null;
-    var persistency = true;
+    var persistency = 1;
 
     if ( "undefined" === typeof options ) {
         console.error( vscp.utility.getTime() + " Options are missing. " );
@@ -2882,10 +2882,10 @@ vscp.Connection.prototype.createVar = function ( options ) {
 
     if ( "boolean" === typeof options.persistency ) {
         if ( false === options.persistency ) {
-            persistency = false;
+            persistency = 0;
         }
         else {
-            persistency = true;
+            persistency = 1;
         }
     }
 
