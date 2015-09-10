@@ -34,11 +34,32 @@
 
 /*jshint bitwise: false */
 
-/** Create the root namespace and making sure we're not overwriting it */
+/* Create the root namespace and making sure we're not overwriting it */
 var vscp = vscp || {};
 
-/** VSCP units */
-vscp.constants.units = [
+/* ---------------------------------------------------------------------- */
+
+/**
+ * VSCP measurement stuff
+ * @namespace vscp.measurement
+ */
+vscp._createNS( "vscp.measurement" );
+
+/** VSCP response timeout in ms
+ * @type {number}
+ * @const
+ */
+vscp.measurement.timeout = 5000;
+
+/** Measurement specific constants
+ * @namespace vscp.measurement.constants
+ */
+vscp._createNS( "vscp.measurement.constants" );
+
+/** VSCP units
+ * @type {string[]}
+ */
+vscp.measurement.constants.units = [
 
     // Generic
     [],
@@ -160,17 +181,13 @@ vscp.constants.units = [
 
 /* ---------------------------------------------------------------------- */
 
-vscp._createNS( "vscp.measurement" );
-
-/** VSCP measurement timeout in ms */
-vscp.measurement.timeout = 5000;
-
 /**
  * Round value to a fixed precision.
  *
- * @param[in] value Value
- * @param[in] precision Precision
- * Rounded value
+ * @param {number} value        - Value
+ * @param {number} precision    - Precision
+ *
+ * @return {number} Rounded value
  */
 vscp.measurement.toFixed = function( value, precision ) {
     var power = Math.pow( 10, precision || 0 );
@@ -180,8 +197,8 @@ vscp.measurement.toFixed = function( value, precision ) {
 /**
  * Convert a integer value to float
  *
- * @param[in] data  Byte array
- * @return Float value
+ * @param {number[]} data - Byte array
+ * @return {number} Float value
  */
 vscp.measurement.varInteger2Float = function( data ) {
     var rval        = 0.0;
@@ -211,8 +228,8 @@ vscp.measurement.varInteger2Float = function( data ) {
 /**
  * Get data coding.
  *
- * @param[in] data  Data
- * @return Coding
+ * @param {number} data - Data
+ * @return {number} Coding
  */
 vscp.measurement.getDataCoding = function( data ) {
     return ( data >> 5 ) & 7;
@@ -221,8 +238,8 @@ vscp.measurement.getDataCoding = function( data ) {
 /**
  * Get unit from data coding.
  *
- * @param[in] data  Data coding
- * @return Unit
+ * @param {number} data - Data coding
+ * @return {number} Unit
  */
 vscp.measurement.getUnitFromDataCoding = function( data ) {
     return ( data >> 3 ) & 3;
@@ -231,8 +248,8 @@ vscp.measurement.getUnitFromDataCoding = function( data ) {
 /**
  * Get sensor index from data coding.
  *
- * @param[in] data  Data coding
- * @return Sensor index
+ * @param {number} data - Data coding
+ * @return {number} Sensor index
  */
 vscp.measurement.getSensorIndexFromDataCoding = function( data ) {
     return data & 7;
@@ -241,8 +258,8 @@ vscp.measurement.getSensorIndexFromDataCoding = function( data ) {
 /**
  * Decode a class 10 measurement.
  *
- * @param[in] data  Data (event data array where first data byte is the data coding)
- * @return Value as float
+ * @param {number[]} data - Data (event data array where first data byte is the data coding)
+ * @return {number} Value as float
  */
 vscp.measurement.decodeClass10 = function( data ) {
     var rval        = 0.0;
@@ -319,8 +336,8 @@ vscp.measurement.decodeClass10 = function( data ) {
 /**
  * Decode a class 60 measurement.
  *
- * @param[in] data  Data
- * @return Value as float
+ * @param {number}  data - Data
+ * @return {number} Value as float
  */
 vscp.measurement.decodeClass60Number = function( data ) {
     var rval        = 0;
@@ -354,8 +371,8 @@ vscp.measurement.decodeClass60Number = function( data ) {
 /**
  * Decode a class 65 measurement.
  *
- * @param[in] data  Data
- * @return Value as float
+ * @param {number} data - Data
+ * @return {number} Value as float
  */
 vscp.measurement.decodeClass65Number = function( data ) {
     var rval    = 0;
@@ -364,7 +381,7 @@ vscp.measurement.decodeClass65Number = function( data ) {
 
     for (i = 4; i < data.length; i++) {
         rval = rval << 8;
-        rval += data[i];
+        rval += data[ i ];
     }
 
     // Handle exponent
@@ -382,8 +399,8 @@ vscp.measurement.decodeClass65Number = function( data ) {
 /**
  * Convert from unit fahrenheit to unit kelvin.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertFahrenheitToKelvin = function( value ) {
     var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -394,8 +411,8 @@ vscp.measurement.convertFahrenheitToKelvin = function( value ) {
 /**
  * Convert from unit fahrenheit to unit celsius.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertFahrenheitToCelsius = function( value ) {
     var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -406,8 +423,8 @@ vscp.measurement.convertFahrenheitToCelsius = function( value ) {
 /**
  * Convert from unit celsius to unit fahrenheit.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertCelsiusToFahrenheit = function( value ) {
     var cTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -418,8 +435,8 @@ vscp.measurement.convertCelsiusToFahrenheit = function( value ) {
 /**
  * Convert from unit kelvin to unit celsius.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertKelvinToCelsius = function( value ) {
     var kTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -430,8 +447,8 @@ vscp.measurement.convertKelvinToCelsius = function( value ) {
 /**
  * Convert from unit celsius to unit kelvin.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertCelsiusToKelvin = function( value ) {
     var kTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -442,8 +459,8 @@ vscp.measurement.convertCelsiusToKelvin = function( value ) {
 /**
  * Convert from unit kelvin to unit fahrenheit.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertKelvinToFahrenheit = function( value ) {
     var kTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -454,8 +471,8 @@ vscp.measurement.convertKelvinToFahrenheit = function( value ) {
 /**
  * Convert from unit meter to unit feet.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertMeterToFeet = function( value ) {
     var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -465,8 +482,8 @@ vscp.measurement.convertMeterToFeet = function( value ) {
 /**
  * Convert from unit feet to unit meter.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertFeetToMeter = function( value ) {
     var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -476,8 +493,8 @@ vscp.measurement.convertFeetToMeter = function( value ) {
 /**
  * Convert from unit meter to unit inch.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertMeterToInch = function( value ) {
     var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -487,8 +504,8 @@ vscp.measurement.convertMeterToInch = function( value ) {
 /**
  * Convert from unit inch to unit meter.
  *
- * @param[in] value Value
- * @return Converted value
+ * @param {string|number} value - Value
+ * @return {number} Converted value
  */
 vscp.measurement.convertInchToMeter = function( value ) {
     var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
@@ -496,25 +513,39 @@ vscp.measurement.convertInchToMeter = function( value ) {
 };
 
 /**
- * Measurment decoder
+ * Measurement decoder
+ * @class
  *
- * @param[in] options Options
- *
- * Options:
- * - connection: VSCP connection
- * - onValue: Function which will be called for every received measurement value.
- * - filter: {
- *   - vscpGuid: Node GUID string
- *   - vscpClass: VSCP class
- *   - vscpType: VSCP type
- *   - sensorIndex: Sensor index
- *   - zone: Zone
- *   - subZone: Sub-zone
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {function} options.onValue            - Function which will be called for every received measurement value.
+ * @param {object} options.filter               - Filter
+ * @param {string} options.filter.vscpGuid      - Node GUID string
+ * @param {number} options.filter.vscpClass     - VSCP class
+ * @param {number} options.filter.vscpType      - VSCP type
+ * @param {number} options.filter.sensorIndex   - Sensor index
+ * @param {number} options.filter.zone          - Zone
+ * @param {number} options.filter.subZone       - Sub-zone
  */
 vscp.measurement.Decoder = function( options ) {
 
+    /** VSCP connection
+     * @member {Connection}
+     */
     this.connection = null;
+    /** Callback which will be called for every received value.
+     * @member {function}
+     */
     this.onValue    = null;
+    /** Filter
+     * @member {object}
+     * @property {string} vscpGuid      - Node GUID string
+     * @property {number} vscpClass     - VSCP class
+     * @property {number} vscpType      - VSCP type
+     * @property {number} sensorIndex   - Sensor index
+     * @property {number} zone          - Zone
+     * @property {number} subZone       - Sub-zone
+     */
     this.filter     = null;
 
     if ( "undefined" !== typeof options ) {
@@ -539,9 +570,10 @@ vscp.measurement.Decoder = function( options ) {
 
 /**
  * VSCP event listener, which receives, filters and converts every received measurement event.
+ * @private
  *
- * @param[in] conn  VSCP connection
- * @param[in] evt   VSCP event
+ * @param {vscp.Connection} conn    - VSCP connection
+ * @param {vscp.Event} evt          - VSCP event
  */
 vscp.measurement.Decoder.prototype.eventListener = function( conn, evt ) {
 
@@ -588,13 +620,13 @@ vscp.measurement.Decoder.prototype.eventListener = function( conn, evt ) {
         sensorIndex = vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
         value = vscp.measurement.decodeClass10( evt.vscpData );
         unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
-        unit = vscp.constants.units[ evt.vscpType ][ unitId ];
+        unit = vscp.measurement.constants.units[ evt.vscpType ][ unitId ];
     }
     // Floating point
     else if ( vscp.constants.classes.VSCP_CLASS1_MEASUREMENT64 === evt.vscpClass ) {
         value = vscp.measurement.decodeClass60Number( evt.vscpData );
         unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
-        unit = vscp.constants.units[ evt.vscpType ][ unitId ];
+        unit = vscp.measurement.constants.units[ evt.vscpType ][ unitId ];
     }
     // Measurement with zone information
     else if ( ( vscp.constants.classes.VSCP_CLASS1_MEASUREZONE === evt.vscpClass ) ||
@@ -606,9 +638,9 @@ vscp.measurement.Decoder.prototype.eventListener = function( conn, evt ) {
         }
               
         sensorIndex = vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
-        value = vscp.measurement.decodeClass10Number( mimicData );
+        value = vscp.measurement.decodeClass10( mimicData );
         unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
-        unit = vscp.constants.units[ evt.vscpType ][ unitId ];
+        unit = vscp.measurement.constants.units[ evt.vscpType ][ unitId ];
         zone = evt.vscpData[ 1 ];
         subZone = evt.vscpData[ 2 ];
     }

@@ -85,8 +85,8 @@ function dmNG() {
 /**
  * This method inserts a rule at the given index.
  *
- * @param[in] index Index (0..)
- * @param[in] rule Decision matrix NG rule
+ * @param {number} index    - Index (0..)
+ * @param {dmNGRule} rule   - Decision matrix NG rule
  */
 dmNG.prototype.insertRule = function ( index, rule ) {
     if ( rule instanceof dmNGRule ) {
@@ -100,7 +100,7 @@ dmNG.prototype.insertRule = function ( index, rule ) {
 /**
  * This method deletes the rule at the given index.
  *
- * @param[in] index Index (0..)
+ * @param {number} index - Index (0..)
  */
 dmNG.prototype.deleteRule = function ( index ) {
     this.rules.splice( index, 1 );
@@ -109,7 +109,7 @@ dmNG.prototype.deleteRule = function ( index ) {
 /**
  * This method returns the current rule set size in byte.
  *
- * @return Rule set size in byte
+ * @return {number} Rule set size in byte
  */
 dmNG.prototype.getSize = function() {
     
@@ -127,7 +127,7 @@ dmNG.prototype.getSize = function() {
 /**
  * This method returns the configuration of the decision matrix next generation.
  *
- * @return Configuration as array
+ * @return {number[]} Configuration as array
  */
 dmNG.prototype.getConfig = function () {
     var config          = [];
@@ -188,6 +188,8 @@ dmNG.prototype.getConfig = function () {
 
 /**
  * This method sets the configuration of the decision matrix next generation.
+ *
+ * @param {number[]} config - Configuration
  */
 dmNG.prototype.setConfig = function ( config ) {
 
@@ -287,6 +289,7 @@ dmNG.prototype.setConfig = function ( config ) {
 
 /**
  * This class implements a decision matrix NG rule.
+ * @class
  */
 function dmNGRule() {
     this.actionId = 0;
@@ -297,8 +300,8 @@ function dmNGRule() {
 /**
  * This method inserts a condition at the given index.
  *
- * @param[in] index Index (0..)
- * @param[in] condition Decision matrix NG rule condition
+ * @param {number} index                - Index (0..)
+ * @param {dmNGRuleCondition} condition - Decision matrix NG rule condition
  */
 dmNGRule.prototype.insertCondition = function ( index, condition ) {
     if ( condition instanceof dmNGRuleCondition ) {
@@ -312,7 +315,7 @@ dmNGRule.prototype.insertCondition = function ( index, condition ) {
 /**
  * This method deletes the condition at the given index.
  *
- * @param[in] index Index (0..)
+ * @param {number} index - Index (0..)
  */
 dmNGRule.prototype.deleteCondition = function ( index ) {
     this.conditions.splice( index, 1 );
@@ -321,7 +324,7 @@ dmNGRule.prototype.deleteCondition = function ( index ) {
 /**
  * This method returns the size of the rule.
  *
- * @return Rule size in byte
+ * @return {number} Rule size in byte
  */
 dmNGRule.prototype.getSize = function() {
     
@@ -348,6 +351,7 @@ dmNGRule.prototype.getSize = function() {
 
 /**
  * This class implements a decision matrix NG rule condition.
+ * @class
  */
 function dmNGRuleCondition() {
     this.event = 0;

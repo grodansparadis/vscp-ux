@@ -1,0 +1,7 @@
+How to generate a documentation from sourcecode description?
+============================================================
+
+1. Download and install node.js (https://nodejs.org), which comes with the packet manager npm.
+2. Change to the directory vscp_html5/js
+3. Download and install jsdoc (https://github.com/jsdoc3/jsdoc) by "npm install jsdoc"
+4. Generate the documentation by calling (on windows) "node_modules\.bin\jsdoc -a all -c jsdoc_conf.json"

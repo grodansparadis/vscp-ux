@@ -34,7 +34,9 @@
 
 /*jshint bitwise: false */
 
-/** Create the root namespace and making sure we're not overwriting it */
+/** Create the root namespace and making sure we're not overwriting it
+ * @namespace navBarMenu
+ */
 var navBarMenu = navBarMenu || {};
 
 /* ---------------------------------------------------------------------- */
@@ -42,7 +44,7 @@ var navBarMenu = navBarMenu || {};
 /**
  * Show a menu in bootstrap style.
  *
- * @param[in] menu  Menu structure
+ * @param {object} menu  Menu structure
  */
 navBarMenu.show = function( id, menu ) {
 
@@ -65,6 +67,14 @@ navBarMenu.show = function( id, menu ) {
 
 };
 
+/**
+ * Create a drop-down menu and return it.
+ * @private
+ *
+ * @param {object} menu  Menu structure
+ *
+ * @return {string} HTML drop-down menu part
+ */
 navBarMenu._dropDown = function( menu ) {
     
     var index       = 0;
