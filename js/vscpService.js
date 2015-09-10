@@ -636,12 +636,16 @@ vscp.service.Container.prototype.read = function( options ) {
             // Clear data container
             this.data = [];
             
-            // Separate data elements
-            elements = variable.value.split( this.separator );
+            // Container not empty?
+            if ( "" !== variable.value ) {
             
-            // Convert the strings to objects
-            for( index = 0; index < elements.length; ++index ) {
-                this.data.push( JSON.parse( elements[ index ] ) );
+                // Separate data elements
+                elements = variable.value.split( this.separator );
+                               
+                // Convert the strings to objects
+                for( index = 0; index < elements.length; ++index ) {
+                    this.data.push( JSON.parse( elements[ index ] ) );
+                }
             }
 
             options.onSuccess();
