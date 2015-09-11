@@ -200,6 +200,9 @@
             // Disable user interface
             ui.disable();
             
+            // Clear table
+            $( "#output" ).empty();
+            
             readAlarmStatus()
             .then( readVscpVersion )
             .then( readNodeControlFlags )
