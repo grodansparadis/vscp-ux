@@ -1283,7 +1283,7 @@ vscp.Event = function ( options ) {
      */
     this.vscpTimeStamp  = 0;
 
-    /** Node global unique id LSB(0) -> MSB(15)
+    /** Node global unique id LSB(15) -> MSB(0)
      * @member {string}
      */
     this.vscpGuid       = "-";
