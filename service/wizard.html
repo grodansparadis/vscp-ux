@@ -272,6 +272,10 @@
                     return;
                 }
                 
+            })
+            .always( function() {
+                // Enable user interface
+                ui.enable();
             });
         }
         
