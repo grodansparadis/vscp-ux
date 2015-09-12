@@ -37,7 +37,7 @@
 
 /*jshint bitwise: false */
 
-/** Create the root namespace and making sure we're not overwriting it
+/** Namespace for all functionality of the VSCP provided libraries.
  * @namespace vscp
  */
 var vscp = vscp || {};
@@ -1255,6 +1255,21 @@ vscp.constants.varTypeNames = [
 /**
  * VSCP event.
  * @class
+ *
+ * @param {object} options                              - Options
+ * @param {number} options.vscpHead                     - Event head
+ * @param {number} options.vscpPriority                 - Priority
+ * @param {boolean} options.vscpHardCoded               - Hard coded node id
+ * @param {boolean} options.vscpCalcCRC                 - Calculate CRC
+ * @param {boolean} options.vscpIsCANMessage            - Is CAN message or not
+ * @param {boolean} options.vscpIsExtendedCANMessage    - Is extended CAN message or not
+ * @param {boolean} options.vscpIsRemoteFrame           - Is a CAN remote frame or not
+ * @param {number} options.vscpClass                    - VSCP class
+ * @param {number} options.vscpType                     - VSCP type
+ * @param {number} options.vscpObId                     - Object id
+ * @param {number} options.vscpTimeStamp                - Timestamp
+ * @param {string} options.vscpGuid                     - GUID string
+ * @param {(number[]|string)} options.vscpData          - Event data
  */
 vscp.Event = function ( options ) {
 
@@ -1412,7 +1427,7 @@ vscp.Event.prototype.isHardCodedAddr = function() {
 vscp._createNS( "vscp.utility" );
 
 /**
- * Utility function which returns the current time in the following format:
+ * Utility function which returns the current time in the following format: hh:mm:ss.us
  *
  * @return {string} Current time in the format hh:mm:ss.us
  */
