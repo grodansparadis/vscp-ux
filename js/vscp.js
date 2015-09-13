@@ -3264,7 +3264,7 @@ vscp.Connection.prototype.readTable = function ( options ) {
 
     data = options.name;
 
-    if ( ( null !== rowBegin ) &
+    if ( ( null !== rowBegin ) &&
          ( null !== rowEnd ) ) {
 
         data += ";" + rowBegin + ";" + rowEnd;
