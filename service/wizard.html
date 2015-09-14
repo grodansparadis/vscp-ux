@@ -58,9 +58,9 @@
     <script type="text/javascript" src="../js/nodeList.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
-    <script src="../js/navBar.js"></script>
+    <script type="text/javascript" src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
-    <script src="menu.js"></script>
+    <script type="text/javascript" src="menu.js"></script>
 
     <script type="text/javascript">
         /*jshint bitwise: false */
@@ -272,6 +272,10 @@
                     return;
                 }
                 
+            })
+            .always( function() {
+                // Enable user interface
+                ui.enable();
             });
         }
         

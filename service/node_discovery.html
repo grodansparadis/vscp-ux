@@ -34,9 +34,9 @@
     <script type="text/javascript" src="../js/nodeList.js"></script>
     
     <!-- Boostrap navigation bar helper functions -->
-    <script src="../js/navBar.js"></script>
+    <script type="text/javascript" src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
-    <script src="menu.js"></script>
+    <script type="text/javascript" src="menu.js"></script>
     
     <script type="text/javascript">
         /*jshint bitwise: false */
@@ -216,7 +216,7 @@
                     for( index = 0; index < nodes.length; ++index ) {
                     
                         nodeList.append({
-                            guid: vscp.utility.guidToStr( nodes[ index ].guid )
+                            guid: vscp.utility.guidToStr( nodes[ index ].interfaceGuid )
                         });
                         
                     }

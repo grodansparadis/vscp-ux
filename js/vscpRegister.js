@@ -34,11 +34,27 @@
 
 /*jshint bitwise: false */
 
-/** Create the root namespace and making sure we're not overwriting it */
+/* Create the root namespace and making sure we're not overwriting it */
 var vscp = vscp || {};
 
-/** VSCP registers */
-vscp.constants.registers = {
+/* ---------------------------------------------------------------------- */
+
+/**
+ * VSCP register access functions
+ * @namespace vscp.register
+ */
+vscp._createNS( "vscp.register" );
+
+/** VSCP response timeout in ms
+ * @type {number}
+ * @const
+ */
+vscp.register.timeout = 5000;
+
+/** VSCP registers
+ * @enum {number}
+ */
+vscp.register.constants = {
 
     ALARM_STATUS: 128,
     VSCP_VERSION_MAJOR: 129,
@@ -79,26 +95,17 @@ vscp.constants.registers = {
     MDF_URL: 224
 };
 
-/* ---------------------------------------------------------------------- */
-
-vscp._createNS( "vscp.register" );
-
-/** Register read/write timeout in ms */
-vscp.register.timeout = 5000;
-
 /**
  * Read one or more register values.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - page: Register page
- * - offset: Register page offset
- * - count: Number of registers to read
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {number} [options.page]               - Register page
+ * @param {number} options.offset               - Register page offset
+ * @param {number} options.count                - Number of registers to read
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.read = function( options ) {
 
@@ -252,16 +259,14 @@ vscp.register.read = function( options ) {
 /**
  * Write one or more register values.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - page: Register page
- * - offset: Register page offset
- * - data: Data array
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {number} options.page                 - Register page
+ * @param {number} options.offset               - Register page offset
+ * @param {number[]} options.data               - Data array
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.write = function( options ) {
 
@@ -460,18 +465,16 @@ vscp.register.write = function( options ) {
 /**
  * Change some bits of a register.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - page: Register page
- * - offset: Register page offset
- * - pos: Bit position
- * - width: Bit width
- * - value: Value
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {number} options.page                 - Register page
+ * @param {number} options.offset               - Register page offset
+ * @param {number} options.pos                  - Bit position
+ * @param {number} options.width                - Bit width
+ * @param {number[]} options.data               - Data array
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.writeBits = function( options ) {
 
@@ -606,13 +609,11 @@ vscp.register.writeBits = function( options ) {
 /**
  * Read the alarm status from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readAlarmStatus = function( options ) {
 
@@ -653,7 +654,7 @@ vscp.register.readAlarmStatus = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.ALARM_STATUS,
+        offset: vscp.register.constants.ALARM_STATUS,
 
         count: 1,
 
@@ -672,13 +673,11 @@ vscp.register.readAlarmStatus = function( options ) {
 /**
  * Read the supported VSCP version from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readVscpVersion = function( options ) {
 
@@ -719,7 +718,7 @@ vscp.register.readVscpVersion = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.VSCP_VERSION_MAJOR,
+        offset: vscp.register.constants.VSCP_VERSION_MAJOR,
 
         count: 2,
 
@@ -741,13 +740,11 @@ vscp.register.readVscpVersion = function( options ) {
 /**
  * Read the node control flags from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readNodeControlFlags = function( options ) {
 
@@ -788,7 +785,7 @@ vscp.register.readNodeControlFlags = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.NODE_CONTROL_FLAGS,
+        offset: vscp.register.constants.NODE_CONTROL_FLAGS,
 
         count: 1,
 
@@ -807,13 +804,11 @@ vscp.register.readNodeControlFlags = function( options ) {
 /**
  * Read the user id from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readUserId = function( options ) {
 
@@ -854,7 +849,7 @@ vscp.register.readUserId = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.USER_ID_0,
+        offset: vscp.register.constants.USER_ID_0,
 
         count: 5,
 
@@ -882,13 +877,11 @@ vscp.register.readUserId = function( options ) {
 /**
  * Read the manufacturer device id from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readManufacturerDevId = function( options ) {
 
@@ -929,7 +922,7 @@ vscp.register.readManufacturerDevId = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.MANUFACTURER_DEV_ID_0,
+        offset: vscp.register.constants.MANUFACTURER_DEV_ID_0,
 
         count: 4,
 
@@ -957,13 +950,11 @@ vscp.register.readManufacturerDevId = function( options ) {
 /**
  * Read the manufacturer sub device id from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readManufacturerSubDevId = function( options ) {
 
@@ -1004,7 +995,7 @@ vscp.register.readManufacturerSubDevId = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.MANUFACTURER_SUB_DEV_ID_0,
+        offset: vscp.register.constants.MANUFACTURER_SUB_DEV_ID_0,
 
         count: 4,
 
@@ -1032,13 +1023,11 @@ vscp.register.readManufacturerSubDevId = function( options ) {
 /**
  * Read the nickname id from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readNicknameId = function( options ) {
 
@@ -1079,7 +1068,7 @@ vscp.register.readNicknameId = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.NICKNAME_ID,
+        offset: vscp.register.constants.NICKNAME_ID,
 
         count: 1,
 
@@ -1098,13 +1087,11 @@ vscp.register.readNicknameId = function( options ) {
 /**
  * Read the current selected page from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readSelectedPage = function( options ) {
 
@@ -1145,7 +1132,7 @@ vscp.register.readSelectedPage = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.PAGE_SELECT_MSB,
+        offset: vscp.register.constants.PAGE_SELECT_MSB,
 
         count: 2,
 
@@ -1173,13 +1160,11 @@ vscp.register.readSelectedPage = function( options ) {
 /**
  * Read the firmware version from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readFirmwareVersion = function( options ) {
 
@@ -1220,7 +1205,7 @@ vscp.register.readFirmwareVersion = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.FIRMWARE_VERSION_MAJOR,
+        offset: vscp.register.constants.FIRMWARE_VERSION_MAJOR,
 
         count: 3,
 
@@ -1243,13 +1228,11 @@ vscp.register.readFirmwareVersion = function( options ) {
 /**
  * Read the bootloader algorithm from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readBootloaderAlgorithm = function( options ) {
 
@@ -1290,7 +1273,7 @@ vscp.register.readBootloaderAlgorithm = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.BOOT_LOADER_ALGORITHM,
+        offset: vscp.register.constants.BOOT_LOADER_ALGORITHM,
 
         count: 1,
 
@@ -1309,13 +1292,11 @@ vscp.register.readBootloaderAlgorithm = function( options ) {
 /**
  * Read the number of used pages from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readUsedPages = function( options ) {
 
@@ -1356,7 +1337,7 @@ vscp.register.readUsedPages = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.PAGES_USED,
+        offset: vscp.register.constants.PAGES_USED,
 
         count: 1,
 
@@ -1375,13 +1356,11 @@ vscp.register.readUsedPages = function( options ) {
 /**
  * Read the standard device family code from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readStdDevFamCode = function( options ) {
 
@@ -1422,7 +1401,7 @@ vscp.register.readStdDevFamCode = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.STD_DEV_FAMILY_CODE_0,
+        offset: vscp.register.constants.STD_DEV_FAMILY_CODE_0,
 
         count: 4,
 
@@ -1449,13 +1428,11 @@ vscp.register.readStdDevFamCode = function( options ) {
 /**
  * Read the standard device type from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readStdDevType = function( options ) {
 
@@ -1496,7 +1473,7 @@ vscp.register.readStdDevType = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.STD_DEV_TYPE_0,
+        offset: vscp.register.constants.STD_DEV_TYPE_0,
 
         count: 4,
 
@@ -1523,13 +1500,11 @@ vscp.register.readStdDevType = function( options ) {
 /**
  * Read the GUID from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readGUID = function( options ) {
 
@@ -1570,7 +1545,7 @@ vscp.register.readGUID = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.GUID,
+        offset: vscp.register.constants.GUID,
 
         count: 16,
 
@@ -1589,13 +1564,11 @@ vscp.register.readGUID = function( options ) {
 /**
  * Read the MDF URL from a node.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - nodeId: Node id
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.nodeId               - Node id
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.register.readMdfUrl = function( options ) {
 
@@ -1636,7 +1609,7 @@ vscp.register.readMdfUrl = function( options ) {
 
         page: 0,
 
-        offset: vscp.constants.registers.MDF_URL,
+        offset: vscp.register.constants.MDF_URL,
 
         count: 32,
 

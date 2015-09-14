@@ -34,22 +34,42 @@
 
 /*jshint bitwise: false */
 
-/** Create the root namespace and making sure we're not overwriting it */
+/* Create the root namespace and making sure we're not overwriting it */
 var vscp = vscp || {};
 
 /* ---------------------------------------------------------------------- */
 
+/**
+ * VSCP widgets
+ * @namespace vscp.widget
+ */
 vscp._createNS( "vscp.widget" );
 
-/** VSCP response timeout in ms */
+/** VSCP response timeout in ms
+ * @type {number}
+ * @const
+ */
 vscp.widget.timeout = 5000;
 
+/**
+ * VSCP images
+ * @namespace vscp.widget.images
+ */
+/**
+ * VSCP images of buttons
+ * @namespace vscp.widget.images.button
+ */
 vscp._createNS( "vscp.widget.images.button" );
 
-/** Base path of the button images */
+/** Base path of the button images
+ * @type {string}
+ * @const
+ */
 vscp.widget.images.button.BASE_PATH = "../lib/widgets";
 
-/** Button images */
+/** Button images
+ * @enum {object}
+ */
 vscp.widget.images.button = [
     {
         off: vscp.widget.images.button.BASE_PATH + "/button/pressoffg.png",
@@ -425,12 +445,21 @@ vscp.widget.images.button = [
     }
 ];
 
+/**
+ * VSCP images of thermometer
+ * @namespace vscp.widget.images.thermometer
+ */
 vscp._createNS( "vscp.widget.images.thermometer" );
 
-/** Base path of the thermometer images */
+/** Base path of the thermometer images
+ * @type {string}
+ * @const
+ */
 vscp.widget.images.thermometer.BASE_PATH = "../lib/widgets/thermometer";
 
-/** Thermometer images */
+/** Thermometer images
+ * @enum {string}
+ */
 vscp.widget.images.thermometer = [
     vscp.widget.images.thermometer.BASE_PATH + "/thermometer1.png",
     vscp.widget.images.thermometer.BASE_PATH + "/thermometer2.png",
@@ -439,11 +468,11 @@ vscp.widget.images.thermometer = [
 ];
 
 /**
- * Create a UUID.
+ * Generate a UUID.
  *
- * @return UUID
+ * @return {string} UUID
  */
-vscp.widget.getUUID = function() {
+vscp.widget.generateUUID = function() {
 
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0;
@@ -457,13 +486,11 @@ vscp.widget.getUUID = function() {
 /**
  * Add a image to the canvas.
  *
- * @param[in] options   Options
- *
- * Options:
- * - canvasName: Name of the canvas, normally the canvas id
- * - url: Path to the image
- * - x: x position of the image in the canvas
- * - y: y position of the image in the canvas
+ * @param {object} options              - Options
+ * @param {string} options.canvasName   - Name of the canvas, normally the canvas id
+ * @param {string} options.url          - Path to the image
+ * @param {number} options.x            - x position of the image in the canvas
+ * @param {number} options.y            - y position of the image in the canvas
  */
 vscp.widget.Image = function( options ) {
 
@@ -471,7 +498,7 @@ vscp.widget.Image = function( options ) {
     this.url        = "";
     this.x          = 0;
     this.y          = 0;
-    this._id        = vscp.widget.getUUID();    // Id used to identify the layer
+    this._id        = vscp.widget.generateUUID();   // Id used to identify the layer
 
     if ( "undefined" !== typeof options ) {
         if ( "string" === typeof options.canvasName ) {
@@ -500,24 +527,23 @@ vscp.widget.Image = function( options ) {
 };
 
 /**
- * Add a button to the canvas.
+ * A button widget.
+ * @class
  *
- * @param[in] options   Options
- *
- * Options:
- * - canvasName: Name of the canvas, normally the canvas id
- * - type: Button type, see vscp.widget.images.button
- * - x: x position of the button in the canvas
- * - y: y position of the button in the canvas
- * - scale: Scale factor applied to the button image
- * - connection: VSCP connection, used for event communication
- * - bindToRemoteState: Bind the button state to the remote state or not
- * - receiveZone: Zone where state events will come from
- * - receiveSubZone: Sub-zone where state events will come from
- * - transmitZone: Zone where button event will be sent to
- * - transmitSubZone: Sub-zone where button event will be sent to
- * - index: Button index
- * - enable: Enable or disable button
+ * @param {object} options                      - Options
+ * @param {string} options.canvasName           - Name of the canvas, normally the canvas id
+ * @param {number} options.type                 - Button type, see vscp.widget.images.button
+ * @param {number} options.x                    - x position of the image in the canvas
+ * @param {number} options.y                    - y position of the image in the canvas
+ * @param {number} options.scale                - Scale factor applied to the button image
+ * @param {vscp.Connection} options.connection  - VSCP connection, used for event communication
+ * @param {boolean} options.bindToRemoteState   - Bind the button state to the remote state or not
+ * @param {number} options.receiveZone          - Zone where state events will come from
+ * @param {number} options.receiveSubZone       - Sub-zone where state events will come from
+ * @param {number} options.transmitZone         - Zone where button event will be sent to
+ * @param {number} options.transmitSubZone      - Sub-zone where button event will be sent to
+ * @param {number} options.index                - Button index
+ * @param {boolean} options.enable              - Enable or disable button
  */
 vscp.widget.Button = function( options ) {
 
@@ -527,9 +553,9 @@ vscp.widget.Button = function( options ) {
     this.y              = 0;                        // y-coordinate in the canvas
     this.scale          = 1;                        // Scale factor
     this._isEnabled     = true;                     // Button is enabled or disabled
-    this._idOn          = vscp.widget.getUUID();    // Id used to identify the layer
-    this._idOff         = vscp.widget.getUUID();    // Id used to identify the layer
-    this._idDisabled    = vscp.widget.getUUID();    // Id used to identify the layer
+    this._idOn          = vscp.widget.generateUUID();    // Id used to identify the layer
+    this._idOff         = vscp.widget.generateUUID();    // Id used to identify the layer
+    this._idDisabled    = vscp.widget.generateUUID();    // Id used to identify the layer
 
     this.connection         = null;     // VSCP connection
     this.bindToRemoteState  = false;    // Button state changes only local
@@ -789,7 +815,7 @@ vscp.widget.Button.prototype.draw = function() {
 /**
  * Enable or disable the button.
  *
- * @param[in] value Enable (true) or disable (false) it
+ * @param {boolean} value - Enable (true) or disable (false) it
  */
 vscp.widget.Button.prototype.setEnabled = function( value ) {
 
@@ -802,23 +828,22 @@ vscp.widget.Button.prototype.setEnabled = function( value ) {
 };
 
 /**
- * Add a thermometer to the canvas.
+ * A thermometer widget.
+ * @class
  *
- * @param[in] options   Options
- *
- * Options:
- * - canvasName: Name of the canvas, normally the canvas id
- * - type: Thermometer type, see vscp.widget.images.thermometer
- * - x: x position of the button in the canvas
- * - y: y position of the button in the canvas
- * - scale: Scale factor applied to the thermometer image
- * - connection: VSCP connection, used for event communication
- * - receiveZone: Zone where state events will come from
- * - receiveSubZone: Sub-zone where state events will come from
- * - sensorIndex: Sensor index
- * - vscpClass: VSCP measurement class
- * - vscpType: VSCP measurement type
- * - enable: Enable or disable button
+ * @param {object} options                      - Options
+ * @param {string} options.canvasName           - Name of the canvas, normally the canvas id
+ * @param {number} options.type                 - Thermometer type, see vscp.widget.images.thermometer
+ * @param {number} options.x                    - x position of the image in the canvas
+ * @param {number} options.y                    - y position of the image in the canvas
+ * @param {number} options.scale                - Scale factor applied to the thermometer image
+ * @param {vscp.Connection} options.connection  - VSCP connection, used for event communication
+ * @param {number} options.receiveZone          - Zone where state events will come from
+ * @param {number} options.receiveSubZone       - Sub-zone where state events will come from
+ * @param {number} options.sensorIndex          - Sensor index
+ * @param {number} options.vscpClass            - VSCP measurement class
+ * @param {number} options.vscpType             - VSCP measurement type
+ * @param {boolean} options.enable              - Enable or disable button
  */
 vscp.widget.Thermometer = function( options ) {
 
@@ -828,9 +853,9 @@ vscp.widget.Thermometer = function( options ) {
     this.y              = 0;                        // y-coordinate in the canvas
     this.scale          = 1;                        // Scale factor
     this._isEnabled     = true;                     // Widget is enabled or disabled
-    this._idThermometer = vscp.widget.getUUID();    // Id used to identify the layer
-    this._idDisabled    = vscp.widget.getUUID();    // Id used to identify the layer
-    this._idData        = vscp.widget.getUUID();    // Id used to identify the layer
+    this._idThermometer = vscp.widget.generateUUID();   // Id used to identify the layer
+    this._idDisabled    = vscp.widget.generateUUID();   // Id used to identify the layer
+    this._idData        = vscp.widget.generateUUID();   // Id used to identify the layer
     this._temperature   = 0;                        // Temperature
 
     this.connection         = null;     // VSCP connection
@@ -1087,7 +1112,7 @@ vscp.widget.Thermometer.prototype.draw = function() {
 /**
  * Enable or disable the thermometer.
  *
- * @param[in] value Enable (true) or disable (false) it
+ * @param {boolean} value - Enable (true) or disable (false) it
  */
 vscp.widget.Thermometer.prototype.setEnabled = function( value ) {
 

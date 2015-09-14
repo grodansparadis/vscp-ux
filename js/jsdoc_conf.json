@@ -1,4 +1,6 @@
-// Menu definition
+//
+// JSDoc configuration file
+//
 // Copyright (c) 2015 Andreas Merkle
 // <vscp@blue-andi.de>
 //
@@ -32,46 +34,30 @@
 // Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
 //
 
-/*jshint bitwise: false */
-
-/** Create the root namespace and making sure we're not overwriting it */
-var navBarMenu = navBarMenu || {};
-
-/* ---------------------------------------------------------------------- */
-
-navBarMenu.content = [
-    {
-        title: "Home",
-        url: "index.html"
+{
+    "tags": {
+        "allowUnknownTags": true
     },
-    {
-        title: "Service",
-        url: "index.html",
-        dropDown: [
-            {
-                title: "Event logger",
-                url: "event_logger.html"
-            },
-            {
-                title: "Node discovery",
-                url: "node_discovery.html"
-            },
-            {
-                title: "Registers",
-                url: "vscp_registers.html"
-            },
-            {
-                title: "Variable configuration",
-                url: "variable_configuration.html"
-            },
-            {
-                title: "Wizard",
-                url: "wizard.html"
-            }
-        ]
+    "source": {
+        "include": ["vscp.js", "vscpRegister.js", "vscpMdf.js", "vscpMeasurement.js", "vscpService.js", "vscpWidgets.js"]
     },
-    {
-        title: "Demos",
-        url: "../testws/index.html"
+    "plugins": ["node_modules/jsdoc/plugins/underscore.js"],
+    "templates": {
+        "cleverLinks": false,
+        "monospaceLinks": true,
+        "systemName": "remoteFileExplorer",
+        "footer": "Created by Andreas Merkle",
+        "copyright": "2015",
+        "navType": "vertical",
+        "theme": "spacelab",
+        "linenums": true,
+        "collapseSymbols": true,
+        "inverseNav": false
+    },
+    "opts": {
+        "encoding": "utf8",
+        "destination": "docs/js",
+        "recurse": true,
+        "private": false
     }
-];
+}

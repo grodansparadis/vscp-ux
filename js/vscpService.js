@@ -34,26 +34,31 @@
 
 /*jshint bitwise: false */
 
-/** Create the root namespace and making sure we're not overwriting it */
+/* Create the root namespace and making sure we're not overwriting it */
 var vscp = vscp || {};
 
 /* ---------------------------------------------------------------------- */
 
+/**
+ * VSCP service supporting functions
+ * @namespace vscp.service
+ */
 vscp._createNS( "vscp.service" );
 
-/** VSCP response timeout in ms */
+/** VSCP response timeout in ms
+ * @type {number}
+ * @const
+ */
 vscp.service.timeout = 5000;
 
 /**
  * Request a response from all nodes on the communication bus and returns
  * their GUID and MDF URL.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - onSuccess: Callback
- * - onError: Callback
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.service.whoIsThere = function( options ) {
 
@@ -123,6 +128,8 @@ vscp.service.whoIsThere = function( options ) {
 
         timerHandle = setTimeout(
             function() {
+                var interfaceGuid = [];
+            
                 options.connection.removeEventListener( eventListener );
 
                 // Sort data array for GUID and sequence number
@@ -165,6 +172,9 @@ vscp.service.whoIsThere = function( options ) {
                         // Next node
                         current = nodeData[ nodeDataIndex ].guid;
 
+                        // Interface GUID
+                        interfaceGuid = vscp.utility.strToGuid( nodeData[ nodeDataIndex ].guid );
+                        
                         // Get node id
                         nodeId = vscp.utility.getNodeId( nodeData[ nodeDataIndex ].guid );
                     }
@@ -221,6 +231,7 @@ vscp.service.whoIsThere = function( options ) {
 
                         nodes.push({
                             nodeId: nodeId,
+                            interfaceGuid: interfaceGuid,
                             guid: guid,
                             mdfUrl: "http://" + String.fromCharCode.apply( null, mdfUrl )
                         });
@@ -284,14 +295,12 @@ vscp.service.whoIsThere = function( options ) {
 /**
  * Scan for nodes.
  *
- * @param[in] options   Options
- *
- * Options:
- * - connection: VSCP connection
- * - onSuccess: Callback
- * - onError: Callback
- * - begin: Node id where to start scanning
- * - end: Node id where to stop scanning
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {number} options.begin                - Node id where to start scanning
+ * @param {number} options.end                  - Node id where to stop scanning
+ * @param {function} options.onSuccess          - Callback which is called on successful operation
+ * @param {function} [options.onError]          - Callback which is called on failed operation
  */
 vscp.service.scan = function( options ) {
 
@@ -439,19 +448,30 @@ vscp.service.scan = function( options ) {
 /**
  * The container is used to store javascript objects in a daemon variable as string.
  * It supports one or more objects in a single variable!
+ * @class
  *
- * @param[in] options Options
- *
- * Options:
- * - connection: VSCP connection object
- * - name: Container name
+ * @param {object} options                      - Options
+ * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {string} options.name                 - Container name
  */
 vscp.service.Container = function( options ) {
 
-    this.connection = null; // VSCP connection
-    this.name       = "";   // Container name
-    this.data       = [];   // Data container itself
-    this.separator  = ",";  // Data element separator
+    /** VSCP connection
+     * @member {vscp.Connection}
+     */
+    this.connection = null;
+    /** Complete container name (prefix + user defined name)
+     * @member {string}
+     */
+    this.name       = "";
+    /** Data container itself
+     * @member {object[]}
+     */
+    this.data       = [];
+    /** Data element separator
+     * @member {object[]}
+     */
+    this.separator  = ",";
 
     if ( "undefined" !== typeof options ) {
 
@@ -469,11 +489,9 @@ vscp.service.Container = function( options ) {
 /**
  * Create a container at the daemon.
  *
- * @param[in] options Options
- *
- * Options:
- * - onSuccess: Callback which is called after successful operation
- * - onError: Callback which is called in case that the operation failed
+ * @param {object} options              - Options
+ * @param {function} options.onSuccess  - Callback which is called on successful operation
+ * @param {function} [options.onError]  - Callback which is called on failed operation
  */
 vscp.service.Container.prototype.create = function( options ) {
 
@@ -535,11 +553,9 @@ vscp.service.Container.prototype.create = function( options ) {
  * Write the container to a daemon variable.
  * The container must exist at the daemon!
  *
- * @param[in] options Options
- *
- * Options:
- * - onSuccess: Callback which is called after successful operation
- * - onError: Callback which is called in case that the operation failed
+ * @param {object} options              - Options
+ * @param {function} options.onSuccess  - Callback which is called on successful operation
+ * @param {function} [options.onError]  - Callback which is called on failed operation
  */
 vscp.service.Container.prototype.write = function( options ) {
 
@@ -596,11 +612,9 @@ vscp.service.Container.prototype.write = function( options ) {
 /**
  * Read the container from the daemon variable.
  *
- * @param[in] options Options
- *
- * Options:
- * - onSuccess: Callback which is called after successful operation
- * - onError: Callback which is called in case that the operation failed
+ * @param {object} options              - Options
+ * @param {function} options.onSuccess  - Callback which is called on successful operation
+ * @param {function} [options.onError]  - Callback which is called on failed operation
  */
 vscp.service.Container.prototype.read = function( options ) {
 
@@ -628,12 +642,16 @@ vscp.service.Container.prototype.read = function( options ) {
             // Clear data container
             this.data = [];
             
-            // Separate data elements
-            elements = variable.value.split( this.separator );
+            // Container not empty?
+            if ( "" !== variable.value ) {
             
-            // Convert the strings to objects
-            for( index = 0; index < elements.length; ++index ) {
-                this.data.push( JSON.parse( elements[ index ] ) );
+                // Separate data elements
+                elements = variable.value.split( this.separator );
+                               
+                // Convert the strings to objects
+                for( index = 0; index < elements.length; ++index ) {
+                    this.data.push( JSON.parse( elements[ index ] ) );
+                }
             }
 
             options.onSuccess();
