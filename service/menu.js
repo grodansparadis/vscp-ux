@@ -57,12 +57,16 @@ navBarMenu.content = [
                 url: "node_discovery.html"
             },
             {
-                title: "Wizard",
-                url: "wizard.html"
-            },
-            {
                 title: "Registers",
                 url: "vscp_registers.html"
+            },
+            {
+                title: "Variable configuration",
+                url: "variable_configuration.html"
+            },
+            {
+                title: "Wizard",
+                url: "wizard.html"
             }
         ]
     },

@@ -13,16 +13,24 @@
     <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
     <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
     <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/css/bootstrap-dialog.min.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/bootstrap3-dialog/1.34.5/js/bootstrap-dialog.min.js"></script>
 
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
     
     <!-- VSCP settings -->
-    <script type="text/javascript" src="settings.js"></script>
+    <script type="text/javascript" src="../testws/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script src="menu.js"></script>
 
     <script type="text/javascript">
         /*jshint bitwise: false */
@@ -59,31 +67,7 @@
         
         // User interface data
         var ui = {
-            
-            login: {
-
-                enable: function() {
-                    $( "#login :input" ).attr( "disabled", false );
-                },
-
-                disable: function() {
-                    $( "#login :input" ).attr( "disabled", true );
-                },
-
-                getDaemonUrl: function() {
-                    return $( "#daemonUrl" ).val();
-                },
-
-                getUserName: function() {
-                    return $( "#userName" ).val();
-                },
-
-                getPasswordHash: function() {
-                    return $( "#passwordHash" ).val();
-                }
-
-            },
-            
+                        
             enable: function() {
                 $( "#ui :input" ).attr( "disabled", false );
             },
@@ -96,43 +80,48 @@
         // Wait until the whole website is loaded
         $( document ).ready( function() {
 
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
+        
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
 
-            // Enable user interface for login
-            ui.login.enable();
+            // Connect to VSCP daemon
+            connect()
+            .done( function() {
+                // Show empty configuration
+                update( 'configuration' );
+                
+                // Enable user interface
+                ui.enable();
+            });
             
-            // Show empty configuration
-            update( 'configuration' );
         });
 
+        // Connect to the VSCP daemon
         function connect() {
-
-            ui.login.disable();
+            var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
 
-                url: ui.login.getDaemonUrl(),
+                url: settings.url,
 
-                userName: ui.login.getUserName(),
+                userName: settings.user,
 
-                password: ui.login.getPasswordHash(),
+                password: settings.passwordHash,
 
                 onSuccess: function( conn ) {
-
-                    // Enable the user interface
-                    ui.enable();
+                    deferred.resolve();                    
                 },
 
                 onError: function( conn ) {
-
-                    // Disable the user interface
-                    ui.disable();
-
-                    alert("Connection lost. Please reload website.");
+                    BootstrapDialog.alert( "Connection lost. Please reload website." );
+                    deferred.reject();
                 }
             });
+            
+            return deferred.promise();
         }
         
         // Update the configuration, which is shown the user
@@ -228,7 +217,7 @@
                 },
                 
                 onError: function( conn ) {
-                    alert( "Failed to list all variables." );
+                    BootstrapDialog.alert( "Failed to list all variables." );
                     
                     // Enable the user interface
                     ui.enable();
@@ -266,18 +255,18 @@
                     
                     // Invalid value written?
                     if ( value !== options.value ) {
-                        alert( "Invalid value: " + value );
+                        BootstrapDialog.alert( "Invalid value: " + value );
                     }
                     // Successful written?
                     else {
-                        alert( options.name + " successful written." );
+                        BootstrapDialog.alert( options.name + " successful written." );
                     }
                                                 
                     // Enable user interface
                     ui.enable();
                 },
                 onError: function( conn ) {
-                    alert( "Failed to write " + name + "." );
+                    BootstrapDialog.alert( "Failed to write " + name + "." );
                     
                     // Enable user interface
                     ui.enable();
@@ -309,13 +298,13 @@
                     // Show the current value now to the user
                     $( '#' + id ).val( options.value );
                     
-                    alert( options.name + " successful read." );
+                    BootstrapDialog.alert( options.name + " successful read." );
                     
                     // Enable user interface
                     ui.enable();
                 },
                 onError: function( conn ) {
-                    alert( "Failed to read " + name + "." );
+                    BootstrapDialog.alert( "Failed to read " + name + "." );
                     
                     // Enable user interface
                     ui.enable();
@@ -347,13 +336,13 @@
                     // Show the current value now to the user
                     $( '#' + id ).val( options.value );
                     
-                    alert( options.name + " successful reset." );
+                    BootstrapDialog.alert( options.name + " successful reset." );
                     
                     // Enable user interface
                     ui.enable();
                 },
                 onError: function( conn ) {
-                    alert( "Failed to reset " + name + "." );
+                    BootstrapDialog.alert( "Failed to reset " + name + "." );
                     
                     // Enable user interface
                     ui.enable();
@@ -382,7 +371,7 @@
                         }
                     }
                                         
-                    alert( options.name + " successful removed." );
+                    BootstrapDialog.alert( options.name + " successful removed." );
                     
                     update( 'configuration' );
                     
@@ -390,7 +379,7 @@
                     ui.enable();
                 },
                 onError: function( conn ) {
-                    alert( "Failed to remove " + name + "." );
+                    BootstrapDialog.alert( "Failed to remove " + name + "." );
                     
                     // Enable user interface
                     ui.enable();
@@ -409,13 +398,13 @@
                 name: name,
                 onSuccess: function( conn, options ) {
                                                                                        
-                    alert( name + " length is " + options.length + "." );
+                    BootstrapDialog.alert( name + " length is " + options.length + "." );
                     
                     // Enable user interface
                     ui.enable();
                 },
                 onError: function( conn ) {
-                    alert( "Failed to get length of " + name + "." );
+                    BootstrapDialog.alert( "Failed to get length of " + name + "." );
                     
                     // Enable user interface
                     ui.enable();
@@ -434,13 +423,13 @@
                 name: name,
                 onSuccess: function( conn, options ) {
                                                                                        
-                    alert( name + " was last changed " + options.lastChange + "." );
+                    BootstrapDialog.alert( name + " was last changed " + options.lastChange + "." );
                     
                     // Enable user interface
                     ui.enable();
                 },
                 onError: function( conn ) {
-                    alert( "Failed to get last changed of " + name + "." );
+                    BootstrapDialog.alert( "Failed to get last changed of " + name + "." );
                     
                     // Enable user interface
                     ui.enable();
@@ -458,13 +447,13 @@
             vscpConn.saveVar({
                 onSuccess: function( conn, options ) {
                                                                                        
-                    alert( "All persistent variables saved successful." );
+                    BootstrapDialog.alert( "All persistent variables saved successful." );
                     
                     // Enable user interface
                     ui.enable();
                 },
                 onError: function( conn ) {
-                    alert( "Failed to save all persistent variables." );
+                    BootstrapDialog.alert( "Failed to save all persistent variables." );
                     
                     // Enable user interface
                     ui.enable();
@@ -475,27 +464,17 @@
     </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Variable Configuration</h1>
-        <p>Enter the URL of your VSCP daemon with credentials and connect to it.</p>
-        <div id="login">
-            <table class="table table-hover">
-                <tr>
-                    <td>URL:</td>
-                    <td><input id="daemonUrl" class="form-control" type="text" value="ws://104.236.235.81:8080" size="40" disabled /></td>
-                </tr>
-                <tr>
-                    <td>User name:</td>
-                    <td><input id="userName" class="form-control" type="text" value="admin" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Password hash:</td>
-                    <td><input id="passwordHash" class="form-control" type="text" value="d50c3180375c27927c22e42a379c3f67" size="40" disabled /></td>
-                </tr>
-            </table>
-            <input type="submit" class="btn btn-default" value="Connect" onclick="connect()" disabled />
+   <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
         </div>
-        <hr />
+    </nav>
+    <div class="container-fluid">
+        <h1>Server Variable Configuration</h1>
         <div id="ui">
             <input type="submit" class="btn btn-default" value="Read all variables" onclick="readAllVariables()" disabled /><br />
             <input type="submit" class="btn btn-default" value="Save persistent variables" onclick="savePersistentVariables()" disabled /><br />

@@ -468,11 +468,11 @@ vscp.widget.images.thermometer = [
 ];
 
 /**
- * Create a UUID.
+ * Generate a UUID.
  *
  * @return {string} UUID
  */
-vscp.widget.getUUID = function() {
+vscp.widget.generateUUID = function() {
 
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0;
@@ -498,7 +498,7 @@ vscp.widget.Image = function( options ) {
     this.url        = "";
     this.x          = 0;
     this.y          = 0;
-    this._id        = vscp.widget.getUUID();    // Id used to identify the layer
+    this._id        = vscp.widget.generateUUID();   // Id used to identify the layer
 
     if ( "undefined" !== typeof options ) {
         if ( "string" === typeof options.canvasName ) {
@@ -553,9 +553,9 @@ vscp.widget.Button = function( options ) {
     this.y              = 0;                        // y-coordinate in the canvas
     this.scale          = 1;                        // Scale factor
     this._isEnabled     = true;                     // Button is enabled or disabled
-    this._idOn          = vscp.widget.getUUID();    // Id used to identify the layer
-    this._idOff         = vscp.widget.getUUID();    // Id used to identify the layer
-    this._idDisabled    = vscp.widget.getUUID();    // Id used to identify the layer
+    this._idOn          = vscp.widget.generateUUID();    // Id used to identify the layer
+    this._idOff         = vscp.widget.generateUUID();    // Id used to identify the layer
+    this._idDisabled    = vscp.widget.generateUUID();    // Id used to identify the layer
 
     this.connection         = null;     // VSCP connection
     this.bindToRemoteState  = false;    // Button state changes only local
@@ -853,9 +853,9 @@ vscp.widget.Thermometer = function( options ) {
     this.y              = 0;                        // y-coordinate in the canvas
     this.scale          = 1;                        // Scale factor
     this._isEnabled     = true;                     // Widget is enabled or disabled
-    this._idThermometer = vscp.widget.getUUID();    // Id used to identify the layer
-    this._idDisabled    = vscp.widget.getUUID();    // Id used to identify the layer
-    this._idData        = vscp.widget.getUUID();    // Id used to identify the layer
+    this._idThermometer = vscp.widget.generateUUID();   // Id used to identify the layer
+    this._idDisabled    = vscp.widget.generateUUID();   // Id used to identify the layer
+    this._idData        = vscp.widget.generateUUID();   // Id used to identify the layer
     this._temperature   = 0;                        // Temperature
 
     this.connection         = null;     // VSCP connection

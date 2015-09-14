@@ -128,6 +128,8 @@ vscp.service.whoIsThere = function( options ) {
 
         timerHandle = setTimeout(
             function() {
+                var interfaceGuid = [];
+            
                 options.connection.removeEventListener( eventListener );
 
                 // Sort data array for GUID and sequence number
@@ -170,6 +172,9 @@ vscp.service.whoIsThere = function( options ) {
                         // Next node
                         current = nodeData[ nodeDataIndex ].guid;
 
+                        // Interface GUID
+                        interfaceGuid = vscp.utility.strToGuid( nodeData[ nodeDataIndex ].guid );
+                        
                         // Get node id
                         nodeId = vscp.utility.getNodeId( nodeData[ nodeDataIndex ].guid );
                     }
@@ -226,6 +231,7 @@ vscp.service.whoIsThere = function( options ) {
 
                         nodes.push({
                             nodeId: nodeId,
+                            interfaceGuid: interfaceGuid,
                             guid: guid,
                             mdfUrl: "http://" + String.fromCharCode.apply( null, mdfUrl )
                         });
