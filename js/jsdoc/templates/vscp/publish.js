@@ -247,7 +247,7 @@ function dumpParameter( obj ) {
         optional = 'optional';
     }
 
-    console.log( '|' + obj.name + '|' + obj.type + '|' + optional + '|' + obj.description + '|' );
+    console.log( '|' + obj.name + '  |' + obj.type + '  |' + optional + '  |' + obj.description + '  |' );
 }
 
 function dumpFunction( obj, depth ) {
@@ -268,7 +268,7 @@ function dumpFunction( obj, depth ) {
 
 function dumpProperty( obj ) {
 
-    console.log( '|' + obj.name + '|' + obj.type.names[0] + '|' + obj.description + '|' );
+    console.log( '|' + obj.name + '  |' + obj.type.names[0] + '  |' + obj.description + '  |' );
 }
 
 function dumpClass( obj, depth ) {
@@ -282,7 +282,7 @@ function dumpClass( obj, depth ) {
          ( 0 < obj.constructor.parameters.length ) ) {
          
         console.log( heading( 'Constructor', depth + 1 ) );
-        console.log( '^Name^Type^^Description^' );
+        console.log( '^Name^Type^ ^Description^' );
         for( index = 0; index < obj.constructor.parameters.length; ++index ) {
             dumpParameter( obj.constructor.parameters[ index ] );
         }
