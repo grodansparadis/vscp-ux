@@ -241,7 +241,7 @@ function heading( name, level ) {
 
 function dumpParameter( obj ) {
 
-    var optional = '';
+    var optional = ' ';
     
     if ( true === obj.optional ) {
         optional = 'optional';
@@ -259,7 +259,7 @@ function dumpFunction( obj, depth ) {
     
     if ( ( 'undefined' !== typeof obj.parameters ) &&
          ( 0 < obj.parameters.length ) ) {
-        console.log( '^Name^Type^^Description^' );
+        console.log( '^Name^Type^ ^Description^' );
         for( index = 0; index < obj.parameters.length; ++index ) {
             dumpParameter( obj.parameters[ index ] );
         }
