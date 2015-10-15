@@ -1,110 +1,129 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta charset="UTF-8">
-<title>VSCP WebSocket authentication test</title>
-<!-- Don't cache the page -->
-<META HTTP-EQUIV="Pragma" CONTENT="no-cache">
-<META HTTP-EQUIV="Expires" CONTENT="-1">
+    <meta charset="UTF-8">
+    <title>VSCP websocket authentication test</title>
 
-<script type="text/javascript" src="settings.js"></script>
-<script type="text/javascript" src="../lib/md5.js"></script>
-<script type="text/javascript" src="../lib/vscpwslib.js"></script>
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
 
+    <!-- JQuery -->
+    <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
+    
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script type="text/javascript" src="../js/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!-- Favorite icon -->
+    <link rel="icon" href="../favicon.ico">
+
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="settings.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket base library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script type="text/javascript" src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script type="text/javascript" src="menu.js"></script>
+
+    <script type="text/javascript">
+
+        (function() {
+            // VSCP websocket connection
+            var vscpConn = null;
+
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
+
+                // Redirect console output
+                (function(){
+                    var original = window.console;
+
+                    function handle( method, args ){
+                        var message = Array.prototype.slice.apply(args).join(' ');
+                        $( "#output" ).append( "<br />" + args[ 0 ] );
+                        if ( original ) {
+                            original[method](message);
+                        }
+                    }
+
+                    window.console = {
+                        log: function(){
+                            handle( 'log', arguments );
+                        },
+                        info: function(){
+                            handle( 'info', arguments );
+                        },
+                        warn: function(){
+                            handle( 'warn', arguments );
+                        },
+                        error: function(){
+                            handle( 'error', arguments );
+                        },
+                        debug: function(){
+                            handle( 'debug', arguments );
+                        }
+                    };
+
+                })();
+
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
+
+                // Connect to VSCP server
+                vscpConn.connect({
+
+                    url: settings.url,
+
+                    userName: settings.user,
+
+                    password: settings.passwordHash,
+
+                    onSuccess: function( conn ) {
+                        $( "#output" ).append( "<br /><br />Connection establishment successful." );
+                    },
+
+                    onError: function( conn ) {
+                        $( "#output" ).append( "<br /><br />Connection establishment failed." );
+                    }
+
+                });
+            });
+
+        })();
+
+    </script>
 </head>
 <body>
-<script type="text/javascript">
-	var user = "admin";
-	var authdomain = "mydomain.com";
-	var passwordhash = "d50c3180375c27927c22e42a379c3f67";
+   <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <h1>VSCP websocket authentication test</h1>
+        <p>
+            Please wait until the connection was successful established or failed.
+        </p>
+        <div id="output" style="border: thin solid black; padding: 25px;">
+        </div>
 
-	var vscp_make_websocket_auth_hash = function( user, password, sid ){
-		return hex_md5( user + ":" + password + ":" + sid ); 
-	};
-	
-  var out = function(message) {
-    var div = document.createElement('div');
-    div.innerHTML = message;
-    document.getElementById('output').appendChild(div);
-  };
-
-  window.onload = function() {
-    //var url = 'ws://' + "127.0.0.1:8080"+ '/ws';
-	var url = vscp_setting_url + '/ws';
-    var num_messages = 0;
-
-    websocket = new WebSocket(url);
-    websocket.onopen = function(ev) {
-      out('CONNECTED');
-	  console.log("Connected");
-	  
-	  var msg = 'C;CHALLENGE';
-      out('SENT: ' + msg);
-      websocket.send(msg);
-	  
-      var msg = 'C;NOOP';
-      out('SENT: ' + msg);
-      websocket.send(msg);
-	  
-    };
-	
-    websocket.onclose = function(ev) {
-      out('DISCONNECTED');
-	  console.log("Disconnected");
-    };
-	
-    websocket.onmessage = function(ev) {
-      if (!ev.data) {
-        out('<span style="color: blue;">PING... </span>');
-		console.log("PING...");
-      } 
-	  else {
-		console.log(ev.data);
-        out('<span style="color: blue;">RESPONSE: ' + ev.data + ' </span>');
-        num_messages++;
-		
-		var res = ev.data.split(";");
-		// Check for positive reply
-		if ( '+' == res[0] ) {
-			if ( "AUTH0" == res[1] ) {
-				out('<span style="color: red;">Authentication 0 -  Login challenge</span>');
-				var msg = "C;AUTH;" + user + ";" + vscp_make_websocket_auth_hash( user, passwordhash, res[2] );
-				websocket.send( msg );
-				out('SENT: ' + msg);
-			}
-			else if ( "AUTH1" == res[1] ) {
-				out('<span style="color: red;">Authentication 1 - Logged in</span>');
-			}
-			else if ( "NOOP" == res[1] ) {
-				out('<span style="color: green;">Response on NOOP</span>');
-				var msg = 'C;NOOP';
-				out('SENT: ' + msg);
-				websocket.send(msg);
-			}
-		}
-      }
-      if (num_messages > 10) {
-        var msg = 'C;CLOSE';
-		out('SENT: ' + msg);
-		websocket.send(msg);
-		websocket.close();
-      }
-    };
-    websocket.onerror = function(ev) {
-      out('<span style="color: red; ">ERROR: </span> ' + ev.data);
-    };
-  };
-</script>
-
-<h2>VSCP WebSocket authentication test</h2>
-<p>
-<a href="index.html">Go back to main page</a>
-</p>
-<div id="output" style="font: small Verdana;"></div>
-
-    <br><br>
-    <hr>
-    Copyright &copy; 2000-2015 <a href="mailto:info@grodansparadis.com">email</a>,
-    <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
+        <br /><br />
+        <hr>
+        Copyright &copy; 2000-2015 <a href="mailto:akhe@grodansparadis.com">Ake Hedman</a>,
+        <a href="http://www.grodansparadis.com">Paradise of the Frog / Grodans Paradis AB</a>
+    </div>
 </body>
 </html>

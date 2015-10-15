@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8" />
+    <title>VSCP wizard</title>
+
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
+    
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script type="text/javascript" src="../js/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
+    <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
+    
+    <style>
+        .btn-file {
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-file input[type=file] {
+            position: absolute;
+            top: 0;
+            right: 0;
+            min-width: 100%;
+            min-height: 100%;
+            font-size: 100px;
+            text-align: right;
+            filter: alpha(opacity=0);
+            opacity: 0;
+            outline: none;
+            background: white;
+            cursor: inherit;
+            display: block;
+        }
+    </style>
+    
+    <!-- Favorite icon -->
+    <link rel="icon" href="../favicon.ico">
+
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="../testws/settings.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket bases library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP register access, depends on the VSCP websocket base library -->
+    <script type="text/javascript" src="../js/vscpRegister.js"></script>
+    <!-- VSCP mdf access, depends on the VSCP register access library -->
+    <script type="text/javascript" src="../js/vscpMdf.js"></script>
+    <!-- VSCP service access, depends on the websocket base library -->
+    <script type="text/javascript" src="../js/vscpService.js"></script>
+    <!-- Node list, depends on the VSCP service library -->
+    <script type="text/javascript" src="../js/nodeList.js"></script>
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script type="text/javascript" src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script type="text/javascript" src="menu.js"></script>
+
+    <script type="text/javascript">
+        /*jshint bitwise: false */
+
+        // VSCP websocket connection
+        var vscpConn = null;
+
+        // Recipes
+        var recipes = [];
+
+        // User interface data
+        var ui = {
+
+            enable: function() {
+                $( "#ui :input" ).attr( "disabled", false );
+            },
+
+            disable: function() {
+                $( "#ui :input" ).attr( "disabled", true );
+            }
+        };
+
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
+
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
+
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
+
+            // Connect to VSCP daemon
+            connect()
+            .then( setFilter )
+            .then( startReceivingEvents )
+            .then( initNodeList )
+            .done( function() {
+                // Show the nodes in the list
+                showNodeList();
+
+                // Enable user interface
+                ui.enable();
+            });
+        });
+
+        // Connect to the VSCP daemon
+        function connect() {
+            var deferred = new $.Deferred();
+
+            // Connect to VSCP server
+            vscpConn.connect({
+
+                url: settings.url,
+
+                userName: settings.user,
+
+                password: settings.passwordHash,
+
+                onSuccess: function( conn ) {
+                    deferred.resolve();
+                },
+
+                onError: function( conn ) {
+                    BootstrapDialog.alert( "Connection lost. Please reload website." );
+                    deferred.reject();
+                }
+            });
+
+            return deferred.promise();
+        }
+
+        // Set a filter for CLASS1.Protocol
+        function setFilter() {
+            var deferred = new $.Deferred();
+
+            // Set filter for CLASS1.Protocol
+            vscpConn.setFilter({
+
+                filterClass: 0x0000,
+                maskClass: 0xffff,
+                filterType: 0x0000,
+                maskType: 0x0000,
+
+                onSuccess: function() {
+                    deferred.resolve();
+                },
+
+                onError: function() {
+                    BootstrapDialog.alert( "Server error!" );
+                    deferred.reject();
+                }
+            });
+
+            return deferred.promise();
+        }
+
+        // Start receiving VSCP events
+        function startReceivingEvents() {
+            var deferred = new $.Deferred();
+
+            // Start receiving VSCP events
+            vscpConn.start({
+
+                onSuccess: function( conn ) {
+                    deferred.resolve();
+                },
+
+                onError: function( conn ) {
+                    BootstrapDialog.alert( "Server error!" );
+                    deferred.reject();
+                }
+            });
+
+            return deferred.promise();
+        }
+
+        // Initialize global node list
+        function initNodeList() {
+            var deferred = new $.Deferred();
+
+            // Initialize node list
+            nodeList.init({
+
+                connection: vscpConn,
+
+                onSuccess: function() {
+                    deferred.resolve();
+                },
+
+                onError: function() {
+                    BootstrapDialog.alert( "Server error!" );
+                    deferred.reject();
+                }
+            });
+
+            return deferred.promise();
+        }
+
+        // Show the node list
+        function showNodeList() {
+            var index   = 0;
+            var nodes   = nodeList.get();
+
+            // Clear nodes
+            $( "#nodeList" ).empty();
+            $( "#nodeList" ).append( "<option value=\"-\">-</option>" );
+
+            for( index = 0; index < nodes.length; ++index ) {
+                $( "#nodeList" ).append( "<option value=\"" + nodes[ index ] + "\">" + nodes[ index ] + "</option>" );
+            }
+        }
+        
+        // User selected a node GUID, get provided recipes
+        function nodeSelected() {
+            var guid                    = $( "#nodeList" ).val();
+            var loadMdfRemoteOrLocalMdf = "cancel";
+        
+            if ( "-" === guid ) {
+                return;
+            }
+        
+            // Disable user interface
+            ui.disable();
+            
+            dialogLoadMdfRemoteOrLocal()
+            .done(function( howToLoad ) {
+                loadMdfRemoteOrLocalMdf = howToLoad;
+                
+                if ( "remote" === howToLoad ) {
+                
+                    readMdfUrl( guid )
+                    .then( loadMdfFromUrl )
+                    .done( function( xmlDoc ) {
+                        var $mdf = $( xmlDoc ); // Create jquery object from xml document
+                        
+                        showRecipes( $mdf )
+                    })
+                    .always( function() {
+                        // Enable user interface
+                        ui.enable();
+                    });
+                
+                }
+                else if ( "local" === howToLoad ) {
+                
+                    dialogLoadMdfLocal()
+                    .done( function( fileName ) {
+                        var xmlDoc  = null;
+                        var $mdf    = null;
+                        
+                        if ( "" === fileName ) {
+                            return;
+                        }
+                    
+                        xmlDoc = vscp.mdf.loadLocal({
+                            name: fileName
+                        });
+                        
+                        $mdf = $( xmlDoc ); // Create jquery object from xml document
+                        
+                        showRecipes( $mdf );
+                    })
+                    .always( function() {
+                        // Enable user interface
+                        ui.enable();
+                    });
+                }
+                else {
+                    return;
+                }
+                
+            })
+            .always( function() {
+                // Enable user interface
+                ui.enable();
+            });
+        }
+        
+        function dialogLoadMdfRemoteOrLocal() {
+            var deferred = new $.Deferred();
+            
+            BootstrapDialog.show({
+                title: "Question",
+                message: "Load the MDF from remote or local?",
+                closable: false,
+                buttons: [{
+                    label: "Remote",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        deferred.resolve( "remote" );
+                    }
+                }, {
+                    label: "Local",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        
+                        deferred.resolve( "local" );
+                    }
+                }, {
+                    label: "Cancel",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        deferred.reject();
+                    }
+                }]
+            });
+            
+            return deferred.promise();
+        }
+        
+        function dialogLoadMdfLocal() {
+            var deferred        = new $.Deferred();
+            var selectedFile    = "";
+            
+            BootstrapDialog.show({
+                title: "Question",
+                message: function( dialogItself ) {
+                    var $content = $( '<span class="btn btn-default btn-file">Browse <input type="file" id="browseFile"></span><div id="selectedFile">...</div>' );
+                    
+                    $content.find( "input" ).change( function() {
+                        // Get selected file
+                        selectedFile = $( "#browseFile").val();
+                        // Give feedback to the user, which file was selected
+                        $( "#selectedFile" ).text( selectedFile );
+                    });
+                    
+                    return $content;
+                },
+                closable: false,
+                buttons: [{
+                    label: "Load",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        deferred.resolve( selectedFile );
+                    }
+                }, {
+                    label: "Cancel",
+                    action: function( dialogItself ){
+                        dialogItself.close();
+                        deferred.reject();
+                    }
+                }]
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Get MDF URL from node
+        function readMdfUrl( guid ) {
+            var deferred = new $.Deferred();
+            
+            vscp.register.readMdfUrl({
+            
+                connection: vscpConn,
+                
+                nodeId: vscp.utility.getNodeId( guid ),
+                
+                onSuccess: function( mdfUrl ) {
+                    deferred.resolve( mdfUrl );
+                },
+                
+                onError: function() {
+                    BootstrapDialog.alert( "Couldn't read MDF URL from node." );
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+        
+        // Load MDF from URL
+        function loadMdfFromUrl( mdfUrl ) {
+            var deferred = new $.Deferred();
+            
+            vscp.mdf.load({
+                
+                url: mdfUrl,
+                
+                onSuccess: function( xmlDoc ) {
+                    deferred.resolve( xmlDoc );
+                },
+                
+                onError: function() {
+                    deferred.reject();
+                }
+            });
+            
+            return deferred.promise();
+        }
+
+        // Show recipes to the user, extracted from the mdf
+        function showRecipes( $mdf ) {
+
+            var index   = 0;
+
+            recipes = vscp.mdf.getRecipes({
+                mdf: $mdf
+            });
+            
+            $( "#recipes" ).empty();
+            
+            if ( 0 === recipes.length ) {
+                $( "#recipes" ).append( "<li>Node doesn't provide any recipe.</li>" );
+            }
+            else {
+            
+                for( index = 0; index < recipes.length; ++index ) {
+                    $( "#recipes" ).append(
+                        "<li>" +
+                        "<a href=\"#\" onclick=\"showRecipe(" + index + ");\">" + recipes[ index ].name + "</a>" +
+                        ": " + recipes[ index ].description +
+                        "</li>"
+                    );
+                }
+            }
+        }
+
+        // Create a modal dialog and return its html code.
+        function modalDialog( id, header, body, footer ) {
+            var htmlStr = "";
+
+            htmlStr += "<div id=\"" + id + "\" class=\"modal fade\" role=\"dialog\">";
+            htmlStr += "<div class=\"modal-dialog\">";
+            htmlStr += "<div class=\"modal-content\">";
+            htmlStr += "<div class=\"modal-header\">";
+            htmlStr += header;
+            htmlStr += "</div>";
+            htmlStr += "<div class=\"modal-body\">";
+            htmlStr += body;
+            htmlStr += "</div>";
+            htmlStr += "<div class=\"modal-footer\">";
+            htmlStr += footer;
+            htmlStr += "</div>";
+            htmlStr += "</div>";
+            htmlStr += "</div>";
+            htmlStr += "</div>";
+
+            return htmlStr;
+        }
+
+        // Create a progress bar and return its html code.
+        function progressBar( id ) {
+            var htmlStr = "";
+
+            htmlStr += "    <div id=\"" + id + "\" class=\"progress-bar progress-bar-striped active\" role=\"progressbar\" aria-valuenow=\"0\" aria-valuemin=\"0\" aria-valuemax=\"100\" style=\"width:0%\">";
+            htmlStr += "<div class=\"progress\">";
+            htmlStr += "        0%";
+            htmlStr += "    </div>";
+            htmlStr += "</div>";
+
+            return htmlStr;
+        }
+
+        // Update the progress bar
+        function updateProgressBar( id, value ) {
+            $( "#" + id ).attr( "aria-valuenow", value );
+            $( "#" + id ).text( value + "%" );
+            $( "#" + id ).attr( "style", "width: " + value + "%" );
+        }
+
+        function showRecipe( id ) {
+
+            var recipe  = null;
+            var htmlStr = "";
+            var header  = "";
+            var body    = "";
+            var footer  = "";
+            var index   = 0;
+            var script  = "";
+
+            if ( ( 0 > id ) || ( recipes.length <= id ) ) {
+                return;
+            }
+
+            // Get recipe
+            recipe = recipes[ id ];
+
+            // Create all message boxes
+            for( index = 0; index < recipe.messageBoxes.length; ++index ) {
+
+                header  = "";
+                body    = "";
+                footer  = "";
+
+                // Create dialog header
+                header += recipe.messageBoxes[ index ].head;
+
+                // Create dialog body
+                body += "<p>";
+                body += recipe.messageBoxes[ index ].description;
+                body += "</p>";
+
+                body += "<p>";
+
+                if ( "input" === recipe.messageBoxes[ index ].func ) {
+
+                    body += "<input id=\"" + recipe.messageBoxes[ index ].variableName + "\" type=\"";
+
+                    if ( "string" === recipe.messageBoxes[ index ].variableType ) {
+                        body += "text\" value=\"\"";
+                    }
+                    else {
+                        body += "number\" value=\"0\"";
+
+                        if ( recipe.messageBoxes[ index ].variableMin !== recipe.messageBoxes[ index ].variableMax ) {
+                            body += "min=\"" + recipe.messageBoxes[ index ].variableMin + "\" max=\"" + recipe.messageBoxes[ index ].variableMax + "\"";
+                        }
+                    }
+
+                    body += " />";
+                }
+                else {
+                    body += "Message box function not supported: " + recipe.messageBoxes[ index ].func;
+                }
+
+                body += "</p>";
+
+                // Create dialog footer
+                if ( recipe.messageBoxes.length === ( index + 1 ) ) {
+                    script = "recipes[ " + id + " ].messageBoxes[ " + index + " ].variableValue = $( '#" + recipe.messageBoxes[ index ].variableName + "' ).val(); waitUntilDialogHidden( 'messageBoxDialog" + index + "', function() { writeRecipe( " + id + " ); });";
+                }
+                else {
+                    script = "recipes[ " + id + " ].messageBoxes[ " + index + " ].variableValue = $( '#" + recipe.messageBoxes[ index ].variableName + "' ).val(); nextDialog( 'messageBoxDialog" + index + "', 'messageBoxDialog" + ( index + 1 ) + "' );";
+                }
+                footer += "<input type=\"button\" value=\"Next\" class=\"btn btn-default\" data-dismiss=\"modal\" onclick=\"";
+                footer += script;
+                footer += "\" />";
+                footer += "<input type=\"button\" value=\"Cancel\" class=\"btn btn-default\" data-dismiss=\"modal\" />";
+
+                // Create modal dialog
+                htmlStr += modalDialog( "messageBoxDialog" + index, header, body, footer );
+            }
+
+            $( "#output" ).html( htmlStr );
+
+            // Show dialog
+            $( "#messageBoxDialog0" ).modal({
+                backdrop: "static",
+                keyboard: false
+            });
+        }
+
+        function nextDialog( from, to ) {
+            waitUntilDialogHidden( from, function() {
+                $( "#" + to ).modal({
+                    backdrop: "static",
+                    keyboard: false
+                });
+            });
+        }
+
+        function waitUntilDialogHidden( id, action ) {
+
+            $( "#" + id ).on( "hidden.bs.modal", action );
+        }
+
+        function writeRecipe( id ) {
+
+            var recipe  = null;
+            var htmlStr = "";
+            var guid    = $( "#nodeList" ).val();
+
+            if ( ( 0 > id ) || ( recipes.length <= id ) ) {
+                return;
+            }
+
+            // Create modal dialogs
+            htmlStr += modalDialog( "progressDialog", "", progressBar( "progressBar" ), "" );
+            htmlStr += modalDialog(
+                "successDialog",
+                "<h4 class=\"modal-title\">Info</h4>",
+                "<p>Successful</p>",
+                "<input type=\"button\" value=\"Ok\" class=\"btn btn-default\" data-dismiss=\"modal\" />"
+            );
+            htmlStr += modalDialog(
+                "errorDialog",
+                "<h4 class=\"modal-title\">Error</h4>",
+                "<p>Failed!</p>",
+                "<input type=\"button\" value=\"Ok\" class=\"btn btn-default\" data-dismiss=\"modal\" />"
+            );
+            $( "#output" ).html( htmlStr );
+
+            // Show dialog
+            $( "#progressDialog" ).modal({
+                backdrop: "static",
+                keyboard: false
+            });
+
+            // Get recipe
+            recipe = recipes[ id ];
+
+            // Write recipe
+            recipe.write({
+
+                connection: vscpConn,
+
+                nodeId: vscp.utilities.getNodeId( guid ),
+
+                onProgress: function( percent ) {
+                    updateProgressBar( "progressBar", percent );
+                },
+
+                onSuccess: function() {
+                    $( "#progressDialog" ).modal( "hide" );
+                    $( "#successDialog" ).modal({
+                        backdrop: "static",
+                        keyboard: false
+                    });
+                },
+
+                onError: function() {
+                    $( "#progressDialog" ).modal( "hide" );
+                    $( "#errorDialog" ).modal({
+                        backdrop: "static",
+                        keyboard: false
+                    });
+                }
+
+            });
+
+        }
+
+    </script>
+</head>
+<body>
+   <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <h1>VSCP wizard</h1>
+        <div id="ui">
+            <div class="form-group">
+                <label for="sel1">Select a node:</label>
+                <select id="nodeList" class="form-control">
+                    <option>-</option>
+                </select>
+                <button type="button" class="btn btn-default" onclick="nodeSelected();">Select</button>
+                <p>If the node list is empty, discover them first by selecting <b>Node discovery</b> in the service menu.</p>
+            </div>
+            <!-- Recipes of a selected node -->
+            <h2>Recipes</h2>
+            <ul id="recipes">
+            </ul>
+        </div>
+        <div id="output">
+        </div>
+    </div>
+</body>
+</html>
