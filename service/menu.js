@@ -49,7 +49,11 @@ navBarMenu.content = [
         url: "index.html",
         dropDown: [
             {
-                title: "Decision Matrix NG",
+                title: "Configure decision matrix",
+                url: "dm_std_configuration.html"
+            },
+            {
+                title: "Configure decision matrix NG",
                 url: "dm_ng_configuration.html"
             },
             {
