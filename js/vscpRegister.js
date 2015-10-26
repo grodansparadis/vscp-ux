@@ -114,8 +114,8 @@ vscp.register.read = function( options ) {
     var onError         = null;
     var eventData       = [];
     var eventListener   = null;
-    var registerData    = [];
     var timerHandle     = null;
+    var responseData    = [];
 
     if ( "undefined" === typeof options ) {
         console.error( vscp.utility.getTime() + " Options are missing. " );
@@ -168,7 +168,8 @@ vscp.register.read = function( options ) {
     // Event listener to catch all CLASS1.PROTOCOL extended register read responses
     eventListener = function( conn, evt ) {
 
-        var index = 0;
+        var index   = 0;
+        var data    = [];
 
         if ( "undefined" === typeof evt ) {
             return;
@@ -190,23 +191,46 @@ vscp.register.read = function( options ) {
 
         // Clear timer
         clearTimeout( timerHandle );
-
-        // Copy event data
-        for( index = 0; index < ( evt.vscpData.length - 4 ); ++index ) {
-
-            // Avoid a negative count (paranoia check)
-            if ( 0 === count ) {
-                break;
+        
+        // More data received, than requested?
+        if ( ( evt.vscpData.length - 4 ) > count ) {
+            
+            console.error( vscp.utility.getTime() + " More data received, than requested." );
+            
+            if ( null !== onError ) {
+                onError();
             }
-
-            registerData.push( evt.vscpData[ 4 + index ] );
-            --count;
         }
-
-        // Is register read finished?
-        if ( 0 === count ) {
-            options.connection.removeEventListener( eventListener );
-            options.onSuccess( registerData );
+        else {
+        
+            // Calculate how many bytes are left
+            count = count - ( evt.vscpData.length - 4 );
+        
+            /* Store response data with index. The index is necessary to sort the responses later.
+             * Without sorting the data could be in a wrong order.
+             */
+            responseData.push({
+                index: evt.vscpData[ 0 ],
+                data: evt.vscpData.slice( 4 )
+            });
+            
+            // Is register read finished?
+            if ( 0 === count ) {
+            
+                // Order all responses
+                responseData.sort( function(a, b) {
+                    return a.index - b.index;
+                });
+                
+                // Create one single data container from all responses
+                for( index = 0; index < responseData.length; ++index ) {
+                    data = data.concat( responseData[ index ].data );
+                }
+            
+                // Finished
+                options.connection.removeEventListener( eventListener );
+                options.onSuccess( data );
+            }
         }
     };
 
