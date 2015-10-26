@@ -8,23 +8,36 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+    <!-- JQuery -->
+    <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
+    <script type="text/javascript" src="../js/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
+    <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
 
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- VSCP settings -->
-    <script type="text/javascript" src="settings.js"></script>
+    <script type="text/javascript" src="../testws/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP register access, depends on the websocket base library -->
+    <script type="text/javascript" src="../js/vscpRegister.js"></script>
     <!-- VSCP decision matrix next generation support -->
-    <script type="text/javascript" src="../js/dmNG.js"></script>    
+    <script type="text/javascript" src="../js/dmNG.js"></script>
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script type="text/javascript" src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script type="text/javascript" src="menu.js"></script>
 
     <script type="text/javascript">
         /*jshint bitwise: false */
@@ -34,34 +47,10 @@
 
         // VSCP websocket connection
         var vscpConn = null;
-        
+
         // User interface data
         var ui = {
 
-            login: {
-
-                enable: function() {
-                    $( "#login :input" ).attr( "disabled", false );
-                },
-
-                disable: function() {
-                    $( "#login :input" ).attr( "disabled", true );
-                },
-
-                getDaemonUrl: function() {
-                    return $( "#daemonUrl" ).val();
-                },
-
-                getUserName: function() {
-                    return $( "#userName" ).val();
-                },
-
-                getPasswordHash: function() {
-                    return $( "#passwordHash" ).val();
-                }
-
-            },
-        
             getNodeId: function() {
                 return parseInt( $( "#nodeId" ).val() );
             },
@@ -73,11 +62,11 @@
             getOffset: function() {
                 return parseInt( $("#offset").val() );
             },
-            
+
             enable: function() {
                 $( "#ui :input" ).attr( "disabled", false );
             },
-            
+
             disable: function() {
                 $( "#ui :input" ).attr( "disabled", true );
             }
@@ -86,68 +75,99 @@
         // Wait until the whole website is loaded
         $( document ).ready( function() {
 
-            // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
-
-            // Enable user interface for login
-            ui.login.enable();
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
 
             // Show empty configuration
             update( "configuration" );
+
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
+
+            // Connect to VSCP daemon
+            connect()
+            .then( setFilter )
+            .then( startReceivingEvents )
+            .done( function() {
+            
+                // Add event listener
+                vscpConn.addEventListener( vscpEventCallback );
+            
+                // Enable user interface
+                ui.enable();
+            });
         });
 
+        // Connect to the VSCP daemon
         function connect() {
-
-            ui.login.disable();
+            var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
 
-                url: ui.login.getDaemonUrl(),
+                url: settings.url,
 
-                userName: ui.login.getUserName(),
+                userName: settings.user,
 
-                password: ui.login.getPasswordHash(),
+                password: settings.passwordHash,
 
                 onSuccess: function( conn ) {
-
-                    // Set filter for CLASS1.Protocol
-                    vscpConn.setFilter({
-                        filterClass: 0x0000,
-                        maskClass: 0xffff,
-                        filterType: 0x0000,
-                        maskType: 0x0000
-                    });
-
-                    // Start receiving VSCP events
-                    vscpConn.start({
-                        onSuccess: function( conn ) {
-                        
-                            // Add a event listener
-                            vscpConn.addEventListener( vscpEventCallback );
-                        
-                            // Enable user interface
-                            ui.enable();
-                        },
-                        onError: function( conn ) {
-                            alert("Server error!");
-
-                            // Enable user interface for login
-                            ui.login.enable();
-                        }
-                    });
+                    deferred.resolve();
                 },
 
                 onError: function( conn ) {
-
-                    // Disable the user interface
-                    ui.disable();
-
-                    alert("Connection lost. Please reload website.");
+                    BootstrapDialog.alert( "Connection lost. Please reload website." );
+                    deferred.reject();
                 }
             });
+
+            return deferred.promise();
         }
-        
+
+        // Set a filter for CLASS1.Protocol
+        function setFilter() {
+            var deferred = new $.Deferred();
+
+            // Set filter for CLASS1.Protocol
+            vscpConn.setFilter({
+
+                filterClass: 0x0000,
+                maskClass: 0xffff,
+                filterType: 0x0000,
+                maskType: 0x0000,
+
+                onSuccess: function() {
+                    deferred.resolve();
+                },
+
+                onError: function() {
+                    deferred.reject();
+                }
+            });
+
+            return deferred.promise();
+        }
+
+        // Start receiving VSCP events
+        function startReceivingEvents() {
+            var deferred = new $.Deferred();
+
+            // Start receiving VSCP events
+            vscpConn.start({
+
+                onSuccess: function( conn ) {
+                    deferred.resolve();
+                },
+
+                onError: function( conn ) {
+                    BootstrapDialog.alert( "Server error!" );
+                    deferred.reject();
+                }
+            });
+
+            return deferred.promise();
+        }
+
         // Insert a rule
         function insertRule( index ) {
             console.log( "Insert rule at index " + index );
@@ -201,7 +221,7 @@
 
             // Rule set size
             head += 'Current rule set size: ' + dmNGInst.getSize() + ' byte<br />';
-            
+
             // Head
             head += '<table class="table table-striped">';
             head += '    <thead>';
@@ -364,47 +384,48 @@
             dmNGInst.setConfig( config );
             update( "configuration" );
         }
-        
+
         var operation = {
-            
+
             states: {
                 NO_OPERATION: 0,
                 READ_CONFIGURATION: 1,
                 WRITE_CONFIGURATION: 2
             },
-            
+
             state: 0,
-            
+
             read: {
-            
+
                 states: {
                     READ_RULE_NUMBER: 0,
                     READ_RULE_SIZE: 1,
                     READ_RULE: 2
                 },
-                
+
                 state: 0,
                 ruleNum: 0,
                 ruleSize: 0,
                 offset: 0,
                 config: [],
-                timerHandle: null
-                
+                timerHandle: null,
+                responseData: []
             },
-            
+
             write: {
-            
+
                 offset: 0,
                 config: [],
                 timerHandle: null
-            },            
+            },
         };
 
         // This function is called for every received VSCP event
         function vscpEventCallback( conn, evt ) {
 
-            var index   = 0;
-            var data    = [];
+            var index           = 0;
+            var data            = [];
+            var responseData    = [];
 
             if ( "undefined" === typeof evt ) {
                 return;
@@ -473,6 +494,9 @@
                     else {
                         ++operation.read.offset;
                         operation.read.state = operation.read.states.READ_RULE;
+                        
+                        // Clear response data
+                        operation.read.responseData = [];
 
                         data = [
                             ui.getNodeId(),                 // Node address
@@ -495,19 +519,31 @@
                 else if ( operation.read.states.READ_RULE === operation.read.state ) {
 
                     var dataSize = evt.vscpData.length - 4;
-
-                    for(index = 0; index < dataSize; ++index) {
-                        operation.read.config.push( evt.vscpData[ 4 + index ] );
-                    }
-
+                
+                    // Store response data
+                    operation.read.responseData.push({
+                        index: evt.vscpData[ 0 ],
+                        data: evt.vscpData.slice( 4 )
+                    });
+                    
                     operation.read.ruleSize -= dataSize;
                     operation.read.offset += dataSize;
-
+                    
                     if ( 0 > operation.read.ruleSize ) {
                         alert( "Internal error ocurred." );
                         operation.state = operation.states.NO_OPERATION;
                     }
                     else if ( 0 === operation.read.ruleSize ) {
+                    
+                        // Sort responses according to the response index
+                        operation.read.responseData.sort( function(a, b) {
+                            return a.index - b.index;
+                        });
+                        
+                        for( index = 0; index < operation.read.responseData.length; ++index ) {
+                            operation.read.config = operation.read.config.concat( operation.read.responseData[ index ].data );
+                        }
+                    
                         --operation.read.ruleNum;
 
                         // Next rule?
@@ -550,25 +586,25 @@
             }
             // Writing decision matrix NG configuration?
             else if ( operation.states.WRITE_CONFIGURATION === operation.state ) {
-            
+
                 clearTimeout( operation.write.timerHandle );
-            
+
                 // Finished?
                 if ( operation.write.config.length <= operation.write.index ) {
-                
+
                     // Enable user interface
                     ui.enable();
-                    
+
                     return;
                 }
-            
+
                 var data = [
                     ui.getNodeId(),                 // Node address
                     ( ui.getPage() >> 8 ) & 0xff,   // MSB of page where the register is located.
                     ( ui.getPage() >> 0 ) & 0xff,   // LSB of page where the register is located.
                     operation.write.offset          // Register to write (offset into page).
                 ];
-                
+
                 index = 0;
                 while( ( ( operation.write.index + index ) < operation.write.config.length ) && ( 4 > index ) ) {
                     data.push( operation.write.config[ operation.write.index + index ] );
@@ -645,7 +681,7 @@
 
         // Write configuration to node
         function writeConfigToNode() {
-        
+
             var index = 0;
 
             operation.write.config = dmNGInst.getConfig();
@@ -658,7 +694,7 @@
                 ( ui.getPage() >> 0 ) & 0xff,   // LSB of page where the register is located.
                 operation.write.offset          // Register to write (offset into page).
             ];
-            
+
             index = 0;
             while( ( index < operation.write.config.length ) && ( 4 > ( index - operation.write.index ) ) ) {
                 data.push( operation.write.config[ index ] );
@@ -677,7 +713,7 @@
                 onSuccess: function( conn ) {
 
                     operation.state = operation.states.WRITE_CONFIGURATION;
-                    
+
                     operation.write.offset += index;
 
                     // Disable the user interface
@@ -709,27 +745,17 @@
     </script>
 </head>
 <body>
-    <div class="container">
-        <h1>Decision Matrix NG Configuration</h1>
-        <p>Enter the URL of your VSCP daemon with credentials and connect to it.</p>
-        <div id="login">
-            <table class="table table-hover">
-                <tr>
-                    <td>URL:</td>
-                    <td><input id="daemonUrl" class="form-control" type="text" value="ws://104.236.235.81:8080" size="40" disabled /></td>
-                </tr>
-                <tr>
-                    <td>User name:</td>
-                    <td><input id="userName" class="form-control" type="text" value="admin" disabled /></td>
-                </tr>
-                <tr>
-                    <td>Password hash:</td>
-                    <td><input id="passwordHash" class="form-control" type="text" value="d50c3180375c27927c22e42a379c3f67" size="40" disabled /></td>
-                </tr>
-            </table>
-            <input type="submit" class="btn btn-default" value="Connect" onclick="connect()" disabled />
+   <nav class="navbar">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
         </div>
-        <hr />
+    </nav>
+    <div class="container-fluid">
+        <h1>Decision Matrix NG Configuration</h1>
         <div id="ui">
             <table class="table">
                 <tr>
