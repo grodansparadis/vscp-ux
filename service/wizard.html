@@ -55,6 +55,8 @@
     <script type="text/javascript" src="../js/vscpRegister.js"></script>
     <!-- VSCP mdf access, depends on the VSCP register access library -->
     <script type="text/javascript" src="../js/vscpMdf.js"></script>
+    <!-- VSCP wizard functionality, depends on the VSCP mdf access library -->
+    <script type="text/javascript" src="../js/vscpWizard.js"></script>
     <!-- VSCP service access, depends on the websocket base library -->
     <script type="text/javascript" src="../js/vscpService.js"></script>
     <!-- Node list, depends on the VSCP service library -->
@@ -399,7 +401,7 @@
 
             var index   = 0;
 
-            recipes = vscp.mdf.getRecipes({
+            recipes = vscp.wizard.getRecipes({
                 mdf: $mdf
             });
             
