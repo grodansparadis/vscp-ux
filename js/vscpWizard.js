@@ -114,27 +114,27 @@ vscp.wizard.MessageBox.prototype.parse = function( $messageBox ) {
         return;
     }
 
-    if ( "undefined" !== typeof $messageBox.find( "function" ) ) {
-        this.func = $messageBox.find( "function" ).text();
+    if ( "undefined" !== typeof $messageBox.children( "function" ) ) {
+        this.func = $messageBox.children( "function" ).text();
     }
     
-    if ( "undefined" !== typeof $messageBox.find( "head" ) ) {
-        this.head = $messageBox.find( "head" ).text();
+    if ( "undefined" !== typeof $messageBox.children( "head" ) ) {
+        this.head = $messageBox.children( "head" ).text();
     }
     
-    if ( "undefined" !== typeof $messageBox.find( "description" ) ) {
-        this.description = $messageBox.find( "description" ).text();
+    if ( "undefined" !== typeof $messageBox.children( "description" ) ) {
+        this.description = $messageBox.children( "description" ).text();
     }
     
-    if ( "undefined" !== typeof $messageBox.find( "variable" ) ) {
+    if ( "undefined" !== typeof $messageBox.children( "variable" ) ) {
     
-        if ( "undefined" !== typeof $messageBox.find( "variable" ).attr( "name" ) ) {
-            this.variableName = $messageBox.find( "variable" ).attr( "name" );
+        if ( "undefined" !== typeof $messageBox.children( "variable" ).attr( "name" ) ) {
+            this.variableName = $messageBox.children( "variable" ).attr( "name" );
         }
     
-        if ( "undefined" !== typeof $messageBox.find( "variable" ).attr( "type" ) ) {
+        if ( "undefined" !== typeof $messageBox.children( "variable" ).attr( "type" ) ) {
         
-            this.variableType = $messageBox.find( "variable" ).attr( "type" );
+            this.variableType = $messageBox.children( "variable" ).attr( "type" );
         
             if ( ( "int8_t" === this.variableType ) ||
                  ( "char" === this.variableType ) ||
@@ -530,15 +530,15 @@ vscp.wizard.Recipe.prototype.parse = function( $recipe ) {
         return;
     }
 
-    if ( "undefined" !== typeof $recipe.find( "name" ) ) {
-        this.name = $recipe.find( "name" ).text();
+    if ( "undefined" !== typeof $recipe.children( "name" ) ) {
+        this.name = $recipe.children( "name" ).text();
     }
     
-    if ( "undefined" !== typeof $recipe.find( "description" ) ) {
-        this.description = $recipe.find( "description" ).text();
+    if ( "undefined" !== typeof $recipe.children( "description" ) ) {
+        this.description = $recipe.children( "description" ).text();
     }
     
-    $recipe.find( "bit-in-reg" ).each( function() {
+    $recipe.children( "write-bit-in-reg" ).each( function() {
         
         bitInReg = new vscp.wizard.BitInReg({
             bitInReg: $( this )
@@ -548,7 +548,7 @@ vscp.wizard.Recipe.prototype.parse = function( $recipe ) {
         
     });
 
-    $recipe.find( "bit-in-abstraction" ).each( function() {
+    $recipe.children( "write-bit-in-abstraction" ).each( function() {
         
         bitInAbstraction = new vscp.wizard.BitInAbstraction({
             bitInAbstraction: $( this )
@@ -558,7 +558,7 @@ vscp.wizard.Recipe.prototype.parse = function( $recipe ) {
         
     });
 
-    $recipe.find( "register" ).each( function() {
+    $recipe.children( "write-register" ).each( function() {
         
         register = new vscp.wizard.Register({
             register: $( this )
@@ -568,7 +568,7 @@ vscp.wizard.Recipe.prototype.parse = function( $recipe ) {
         
     });
     
-    $recipe.find( "abstraction" ).each( function() {
+    $recipe.children( "write-abstraction" ).each( function() {
         
         abstraction = new vscp.wizard.Abstraction({
             abstraction: $( this )
@@ -578,7 +578,7 @@ vscp.wizard.Recipe.prototype.parse = function( $recipe ) {
         
     });
 
-    $recipe.find( "messagebox" ).each( function() {
+    $recipe.children( "messagebox" ).each( function() {
         
         messageBox = new vscp.wizard.MessageBox({
             messageBox: $( this )
