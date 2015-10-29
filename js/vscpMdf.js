@@ -679,6 +679,12 @@ vscp.mdf.load = function( options ) {
 
         // The URL to make the request to.
         url: options.url,
+        
+        // Datatype is XML, which forces a $.parseXML for the received data.
+        dataType: "xml",
+        
+        // Don't cache the transfered data.
+        cache: false,
 
         // The 'contentType' property sets the 'Content-Type' header.
         // The jquery default for this property is
@@ -703,9 +709,7 @@ vscp.mdf.load = function( options ) {
         headers: {
         },
 
-        success: function( xml ) {
-            var xmlDoc = $.parseXML( xml );
-
+        success: function( xmlDoc ) {
             options.onSuccess( xmlDoc );
         },
 
