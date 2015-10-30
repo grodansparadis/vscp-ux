@@ -727,37 +727,55 @@ vscp.mdf.load = function( options ) {
 /**
  * Get the MDF as xml document from local file system.
  *
- * @param {object} options          - Options
- * @param {function} options.name   - MDF file name, including path
- *
- * @return {object} MDF file as xml document
+ * @param {object} options              - Options
+ * @param {function} options.fileRef    - File reference to MDF file
+ * @param {function} options.onSuccess  - If the xml file is successful loaded, this function will be called.
+ * @param {function} [options.onError]  - If loading the xml file failed, this function will be called.
  */
 vscp.mdf.loadLocal = function( options ) {
 
+    var reader  = new FileReader();
+    var onError = null;
+
     if ( "undefined" === typeof options ) {
         console.error( vscp.utility.getTime() + " Options are missing. " );
-        return null;
+        return;
     }
 
-    if ( "string" !== typeof options.name ) {
-        console.error( vscp.utility.getTime() + " MDF file name is missing." );
-        return null;
+    if ( "undefined" === typeof options.fileRef ) {
+        console.error( vscp.utility.getTime() + " MDF file reference is missing." );
+        return;
     }
 
-    console.info( vscp.utility.getTime() + " Load MDF from file " + options.name );
-
-    if ( window.XMLHttpRequest ) {
-        xhttp = new XMLHttpRequest();
+    if ( "function" !== typeof options.onSuccess ) {
+        console.error( vscp.utility.getTime() + " onSuccess function is missing." );
+        return;
     }
-    // code for IE5 and IE6
-    else {
-        xhttp = new ActiveXObject( "Microsoft.XMLHTTP" );
+
+    if ( "function" === typeof options.onError ) {
+        onError = options.onError;
     }
     
-    xhttp.open( "GET", name, false );
-    xhttp.send();
+    console.info( vscp.utility.getTime() + " Load MDF from file " + options.fileRef.name );
+
+    reader.readAsText( options.fileRef );
     
-    return xhttp.responseXML;
+    reader.onload = function( e ) {
+        var xml     = $.parseXML( reader.result );
+        var xmlDoc  = $( xml );
+        
+        options.onSuccess( xmlDoc );
+    };
+    
+    reader.onerror = function( e ) {
+        
+        if ( null !== onError ) {
+            onError();
+        }
+        
+    };
+    
+    return;
 };
 
 /**

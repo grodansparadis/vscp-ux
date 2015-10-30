@@ -252,20 +252,8 @@
                 else if ( "local" === howToLoad ) {
                 
                     dialogLoadMdfLocal()
-                    .done( function( fileName ) {
-                        var xmlDoc  = null;
-                        var $mdf    = null;
-                        
-                        if ( "" === fileName ) {
-                            return;
-                        }
-                    
-                        xmlDoc = vscp.mdf.loadLocal({
-                            name: fileName
-                        });
-                        
-                        $mdf = $( xmlDoc ); // Create jquery object from xml document
-                        
+                    .then( loadMdfFromLocalFileSystem )
+                    .done( function( $mdf ) {
                         showRecipes( $mdf );
                     })
                     .always( function() {
@@ -319,17 +307,20 @@
         function dialogLoadMdfLocal() {
             var deferred        = new $.Deferred();
             var selectedFile    = "";
+            var fileRef         = null;
             
             BootstrapDialog.show({
                 title: "Question",
                 message: function( dialogItself ) {
                     var $content = $( '<span class="btn btn-default btn-file">Browse <input type="file" id="browseFile"></span><div id="selectedFile">...</div>' );
                     
-                    $content.find( "input" ).change( function() {
+                    $content.find( "input" ).change( function( evt ) {
                         // Get selected file
                         selectedFile = $( "#browseFile").val();
                         // Give feedback to the user, which file was selected
                         $( "#selectedFile" ).text( selectedFile );
+                        // Save the file reference
+                        fileRef = evt.target.files[ 0 ];
                     });
                     
                     return $content;
@@ -339,7 +330,7 @@
                     label: "Load",
                     action: function( dialogItself ){
                         dialogItself.close();
-                        deferred.resolve( selectedFile );
+                        deferred.resolve( fileRef );
                     }
                 }, {
                     label: "Cancel",
@@ -396,6 +387,26 @@
             return deferred.promise();
         }
 
+        // Load MDF from local file system
+        function loadMdfFromLocalFileSystem( fileRef ) {
+            var deferred = new $.Deferred();
+            
+            vscp.mdf.loadLocal({
+            
+                fileRef: fileRef,
+                
+                onSuccess: function( $xmlDoc ) {
+                    return deferred.resolve( $xmlDoc );
+                },
+                
+                onError: function() {
+                    return deferred.reject();
+                }
+            });                    
+            
+            return deferred.promise();
+        }
+        
         // Show recipes to the user, extracted from the mdf
         function showRecipes( $mdf ) {
 
