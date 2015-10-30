@@ -272,6 +272,7 @@
             });
         }
         
+        // Dialog: Ask user where to get the MDF
         function dialogLoadMdfRemoteOrLocal() {
             var deferred = new $.Deferred();
             
@@ -289,7 +290,6 @@
                     label: "Local",
                     action: function( dialogItself ){
                         dialogItself.close();
-                        
                         deferred.resolve( "local" );
                     }
                 }, {
@@ -304,6 +304,7 @@
             return deferred.promise();
         }
         
+        // Dialog: Browse to local MDF
         function dialogLoadMdfLocal() {
             var deferred        = new $.Deferred();
             var selectedFile    = "";
