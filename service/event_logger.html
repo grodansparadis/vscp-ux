@@ -145,9 +145,17 @@
                     "<td>" + evt.vscpType + " (" + convertToHex( evt.vscpType, 2 ) + ") </td>" +
                     "<td>" + evt.getPriority() + "</td>" +
                     "<td>" + evt.isHardCodedAddr() + "</td>" +
-                    "<td>" + evt.vscpObId + "</td>" +
-                    "<td>" + evt.vscpGuid + "</td>" +
-                    "<td>";
+                    "<td>" + evt.vscpGuid + "</td>";
+                    
+            // L1 event?
+            if ( 512 > evt.vscpClass ) {
+                row += "<td>" + vscp.utility.getNodeId( evt.vscpGuid ) + "</td>";
+            }
+            else {
+                row += "<td>-</td>";
+            }
+            
+            row +=  "<td>";
                     
             for( index = 0; index < evt.vscpData.length; ++index ) {
                 row += "" + evt.vscpData[ index ];
@@ -335,8 +343,8 @@
                             <th>Type</th>
                             <th>Priority</th>
                             <th>Hard coded</th>
-                            <th>Object id</th>
                             <th>GUID</th>
+                            <th>Nickname</th>
                             <th>Data</th>
                         </tr>
                     </thead>
