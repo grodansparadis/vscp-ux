@@ -73,8 +73,17 @@
         // VSCP websocket connection
         var vscpConn = null;
 
+        // MDF as jquery object
+        var $gMDF           = null;
+        
+        // Registers
+        var registers       = [];
+        
+        // Abstractions
+        var abstractions    = [];
+        
         // Recipes
-        var recipes = [];
+        var recipes         = [];
 
         // User interface data
         var ui = {
@@ -223,6 +232,7 @@
             var guid                    = $( "#nodeList" ).val();
             var loadMdfRemoteOrLocalMdf = "cancel";
         
+            // Node GUID selected?
             if ( "-" === guid ) {
                 return;
             }
@@ -230,18 +240,26 @@
             // Disable user interface
             ui.disable();
             
+            // Request user where to get the MDF
             dialogLoadMdfRemoteOrLocal()
             .done(function( howToLoad ) {
                 loadMdfRemoteOrLocalMdf = howToLoad;
                 
+                // Load MDF from URL?
                 if ( "remote" === howToLoad ) {
                 
                     readMdfUrl( guid )
                     .then( loadMdfFromUrl )
                     .done( function( xmlDoc ) {
-                        var $mdf = $( xmlDoc ); // Create jquery object from xml document
+                    
+                        // Create jquery object from xml document
+                        var $mdf = $( xmlDoc );
                         
-                        showRecipes( $mdf )
+                        // Store MDF global
+                        $gMdf = $mdf;
+                        
+                        // Show MDF parts to the user
+                        processMdf( $mdf )
                     })
                     .always( function() {
                         // Enable user interface
@@ -249,18 +267,25 @@
                     });
                 
                 }
+                // Load MDF from local file system?
                 else if ( "local" === howToLoad ) {
                 
                     dialogLoadMdfLocal()
                     .then( loadMdfFromLocalFileSystem )
                     .done( function( $mdf ) {
-                        showRecipes( $mdf );
+                    
+                        // Store MDF global
+                        $gMdf = $mdf;
+                        
+                        // Show MDF parts to the user
+                        processMdf( $mdf );
                     })
                     .always( function() {
                         // Enable user interface
                         ui.enable();
                     });
                 }
+                // Abort
                 else {
                     return;
                 }
@@ -408,33 +433,362 @@
             return deferred.promise();
         }
         
-        // Show recipes to the user, extracted from the mdf
-        function showRecipes( $mdf ) {
+        // Process the MDF
+        function processMdf( $mdf ) {
 
             var index   = 0;
+            
+            // Retrieve all registers
+            registers = vscp.mdf.getRegisters({
+                mdf: $mdf
+            });
+                        
+            // Sort registers after page and offset
+            registers.sort( function( a, b ) {
+                var diff = a.page - b.page;
+                
+                if ( 0 === diff ) {
+                    diff = a.offset - b.offset;
+                }
+                
+                return diff;
+            });
+            
+            // Add additional data to every register.
+            // This is necessary to determine whether the register value is
+            // already read or not.
+            for( index = 0; index < registers.length; ++index ) {
+                registers[ index ].userData = {
+                    isRead: false
+                };
+            }
 
+            // Retrieve all abstractions
+            abstractions = vscp.mdf.getAbstractions({
+                mdf: $mdf
+            });
+
+            // Sort abstractions after page and offset
+            abstractions.sort( function( a, b ) {
+                var diff = a.page - b.page;
+                
+                if ( 0 === diff ) {
+                    diff = a.offset - b.offset;
+                }
+                
+                return diff;
+            });
+            
+            // Add additional data to every abstraction.
+            // This is necessary to determine whether the abstraction value is
+            // already read or not.
+            for( index = 0; index < abstractions.length; ++index ) {
+                abstractions[ index ].userData = {
+                    isRead: false
+                };
+            }
+            
+            // Retrieve all recipes
             recipes = vscp.wizard.getRecipes({
                 mdf: $mdf
             });
             
-            $( "#recipes" ).empty();
+            // Show all the user
+            showRegisters();
+            showAbstractions();
+            showRecipes();
+        }
+        
+        // Update the registers tab
+        function showRegisters() {
+        
+            var index   = 0;
+            var row     = "";
+        
+            $( "#registers > tbody" ).empty();
             
+            if ( 0 < registers.length ) {            
+                for( index = 0; index < registers.length; ++index ) {
+                    
+                    row =   "<tr>" +
+                            "<td>" + registers[ index ].page + "</td>" +
+                            "<td>" + registers[ index ].offset + "</td>" +
+                            "<td>" + registers[ index ].name + "</td>" +
+                            "<td>";
+                            
+                    if ( true === registers[ index ].readAccess ) {
+                        row += "<input type=\"button\" class=\"btn btn-default\" value=\"Read\" onclick=\"readRegister( registers[ " + index + " ] )\" />";
+                    }
+                    
+                    if ( true === registers[ index ].writeAccess ) {
+                        row += "<input type=\"button\" class=\"btn btn-default\" value=\"Write\" onclick=\"writeRegister( registers[ " + index + " ] )\" />";
+                    }
+                    
+                    row += "</td>";
+                    
+                    if ( false === registers[ index ].readAccess ) {
+                        row += "<td>-</td>";
+                    }
+                    else if ( false === registers[ index ].userData.isRead ) {
+                        row += "<td>?</td>";
+                    }
+                    else if ( true === registers[ index ].writeAccess ) {
+                        row += "<td><input type=\"number\" min=\"1\" max=\"255\" value=\"" + registers[ index ].value + "\" onchange=\"registers[ " + index + "].setValue( this.value )\" /></td>";
+                    }
+                    else {
+                        row += "<td>" + registers[ index ].value + "</td>";
+                    }
+                            
+                    row +=  "<td>" + registers[ index ].description + "</td>" +
+                            "</tr>"
+                
+                    $( "#registers > tbody" ).append( row );
+                }
+            }
+        }
+        
+        // Update the abstractions tab
+        function showAbstractions() {
+        
+            var index   = 0;
+            var row     = "";
+        
+            $( "#abstractions > tbody" ).empty();
+        
+            if ( 0 < abstractions.length ) {            
+                for( index = 0; index < abstractions.length; ++index ) {
+                    
+                    row =   "<tr>" +
+                            "<td>" + abstractions[ index ].page + "</td>" +
+                            "<td>" + abstractions[ index ].offset + "</td>" +
+                            "<td>" + abstractions[ index ].name + "</td>" +
+                            "<td>";
+                            
+                    if ( true === abstractions[ index ].readAccess ) {
+                        row += "<input type=\"button\" class=\"btn btn-default\" value=\"Read\" onclick=\"readAbstraction( abstractions[ " + index + " ] )\" />";
+                    }
+                    
+                    if ( true === abstractions[ index ].writeAccess ) {
+                        row += "<input type=\"button\" class=\"btn btn-default\" value=\"Write\" onclick=\"writeAbstraction( abstractions[ " + index + " ] )\" />";
+                    }
+                    
+                    row += "</td>";
+                    
+                    if ( false === abstractions[ index ].readAccess ) {
+                        row += "<td>-</td>";
+                    }
+                    else if ( false === abstractions[ index ].userData.isRead ) {
+                        row += "<td>?</td>";
+                    }
+                    else if ( true === abstractions[ index ].writeAccess ) {
+                    
+                        if ( ( "undefined" !== typeof vscp.mdf.constants.RANGE[ abstractions[ index ].type ] ) &&
+                             ( vscp.mdf.constants.RANGE[ abstractions[ index ].type ].MIN !== vscp.mdf.constants.RANGE[ abstractions[ index ].type ].MAX ) ) {
+                             
+                            row +=  "<td><input type=\"number\" min=\"" +
+                                    vscp.mdf.constants.RANGE[ abstractions[ index ].type ].MIN +
+                                    "\" max=\"" +
+                                    vscp.mdf.constants.RANGE[ abstractions[ index ].type ].MAX +
+                                    "\" value=\"" + abstractions[ index ].value + "\" onchange=\"abstractions[ " + index + "].setValue( this.value )\" /></td>";
+                        }
+                        else {
+                        
+                            row += "<td><input type=\"text\" value=\"" + abstractions[ index ].value + "\" onchange=\"abstractions[ " + index + "].setValue( this.value )\" /></td>";
+                        }
+                    }
+                    else {
+                        row += "<td>" + abstractions[ index ].value + "</td>";
+                    }
+                            
+                    row +=  "<td>" + abstractions[ index ].description + "</td>" +
+                            "</tr>"
+                
+                    $( "#abstractions > tbody" ).append( row );
+                }
+            }
+        }
+        
+        // Update the recipes tab
+        function showRecipes() {
+        
+            var index   = 0;
+            var row     = "";
+        
+            $( "#recipes" ).empty();
+        
             if ( 0 === recipes.length ) {
                 $( "#recipes" ).append( "<li>Node doesn't provide any recipe.</li>" );
             }
             else {
             
                 for( index = 0; index < recipes.length; ++index ) {
-                    $( "#recipes" ).append(
-                        "<li>" +
-                        "<a href=\"#\" onclick=\"showRecipe(" + index + ");\">" + recipes[ index ].name + "</a>" +
-                        ": " + recipes[ index ].description +
-                        "</li>"
-                    );
+                
+                    row =   "<li>" +
+                            "<a href=\"#\" onclick=\"showRecipe(" + index + ");\">" + recipes[ index ].name + "</a>" +
+                            ": " + recipes[ index ].description +
+                            "</li>";
+                        
+                    $( "#recipes" ).append( row );
                 }
             }
         }
+        
+        // Read a register value
+        function readRegister( register ) {
+        
+            var guid = $( "#nodeList" ).val();
+        
+            // Disable user interface
+            ui.disable();
+        
+            vscp.register.read({
+                
+                connection: vscpConn,
+                
+                nodeId: vscp.utility.getNodeId( guid ),
+            
+                page: register.page,
+                
+                offset: register.offset,
+                
+                count: 1,
+            
+                onSuccess: function( data ) {
+                    register.value = data[ 0 ];
+                    register.dirty = false;
+                    register.userData.isRead = true;
+                    
+                    showRegisters();
+                    
+                    // Disable user interface
+                    ui.enable();
+                }.bind( this ),
+                
+                onError: function() {
+                    
+                    // Disable user interface
+                    ui.enable();
+                }
+            });
+        }
 
+        // Write a register value
+        function writeRegister( register ) {
+        
+            var guid = $( "#nodeList" ).val();
+        
+            if ( false === register.dirty ) {
+                return;
+            }
+        
+            // Disable user interface
+            ui.disable();
+        
+            vscp.register.write({
+                
+                connection: vscpConn,
+                
+                nodeId: vscp.utility.getNodeId( guid ),
+            
+                page: register.page,
+                
+                offset: register.offset,
+                
+                data: [ register.value ],
+                
+                count: 1,
+            
+                onSuccess: function() {
+                    register.dirty = false;
+                                        
+                    // Disable user interface
+                    ui.enable();
+                },
+                
+                onError: function() {
+                   
+                    // Disable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        // Read abstraction
+        function readAbstraction( abstraction ) {
+        
+            var guid = $( "#nodeList" ).val();
+        
+            // Disable user interface
+            ui.disable();
+        
+            vscp.mdf.readAbstractValue({
+                
+                connection: vscpConn,
+                
+                nodeId: vscp.utility.getNodeId( guid ),
+            
+                mdf: $gMdf,
+                
+                id: abstraction.id,
+            
+                onSuccess: function( value ) {
+                    abstraction.value = value;
+                    abstraction.dirty = false;
+                    abstraction.userData.isRead = true;
+                    
+                    showAbstractions();
+                    
+                    // Disable user interface
+                    ui.enable();
+                }.bind( this ),
+                
+                onError: function() {
+                    
+                    // Disable user interface
+                    ui.enable();
+                }
+            });
+        }
+
+        // Write abstraction
+        function writeAbstraction( abstraction ) {
+        
+            var guid = $( "#nodeList" ).val();
+        
+            if ( false === abstraction.dirty ) {
+                return;
+            }
+        
+            // Disable user interface
+            ui.disable();
+        
+            vscp.mdf.writeAbstractValue({
+                
+                connection: vscpConn,
+                
+                nodeId: vscp.utility.getNodeId( guid ),
+            
+                mdf: $gMdf,
+                
+                id: abstraction.id,
+                
+                value: abstraction.value,
+            
+                onSuccess: function() {
+                    abstraction.dirty = false;
+                    
+                    // Disable user interface
+                    ui.enable();
+                },
+                
+                onError: function() {
+                   
+                    // Disable user interface
+                    ui.enable();
+                }
+            });
+        }
+        
         // Create a modal dialog and return its html code.
         function modalDialog( id, header, body, footer ) {
             var htmlStr = "";
@@ -574,6 +928,7 @@
             $( "#" + id ).on( "hidden.bs.modal", action );
         }
 
+        // Write recipe
         function writeRecipe( id ) {
 
             var recipe  = null;
@@ -652,21 +1007,67 @@
             </div>
         </div>
     </nav>
-    <div class="container-fluid">
+    <div id="ui" class="container-fluid">
         <h1>VSCP wizard</h1>
-        <div id="ui">
-            <div class="form-group">
-                <label for="sel1">Select a node:</label>
-                <select id="nodeList" class="form-control">
-                    <option>-</option>
-                </select>
-                <button type="button" class="btn btn-default" onclick="nodeSelected();">Select</button>
-                <p>If the node list is empty, discover them first by selecting <b>Node discovery</b> in the service menu.</p>
+        <!-- Tabs -->
+        <ul class="nav nav-tabs">
+            <li class="active"><a href="#nodeSelectionTab" data-toggle="tab">Node Selection</a></li>
+            <li><a href="#registersTab" data-toggle="tab">Registers</a></li>
+            <li><a href="#abstractionsTab" data-toggle="tab">Abstractions</a></li>
+            <li><a href="#recipesTab" data-toggle="tab">Recipes</a></li>
+        </ul>
+        <!-- Tab contents -->
+        <div class="tab-content">
+            <!-- Choose node tab -->
+            <div class="tab-pane fade in active" id="nodeSelectionTab">
+                <div class="form-group">
+                    <label for="sel1">Select a node:</label>
+                    <select id="nodeList" class="form-control">
+                        <option>-</option>
+                    </select>
+                    <button type="button" class="btn btn-default" onclick="nodeSelected();">Select</button>
+                    <p>If the node list is empty, discover them first by selecting <b>Node discovery</b> in the service menu.</p>
+                </div>
             </div>
-            <!-- Recipes of a selected node -->
-            <h2>Recipes</h2>
-            <ul id="recipes">
-            </ul>
+            <!-- Registers tab -->
+            <div class="tab-pane fade" id="registersTab">
+                <table id="registers" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Page</th>
+                            <th>Offset</th>
+                            <th>Name</th>
+                            <th></th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Abstractions tab -->
+            <div class="tab-pane fade" id="abstractionsTab">
+                <table id="abstractions" class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Page</th>
+                            <th>Offset</th>
+                            <th>Name</th>
+                            <th></th>
+                            <th>Value</th>
+                            <th>Description</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    </tbody>
+                </table>
+            </div>
+            <!-- Recipes tab -->
+            <div class="tab-pane fade" id="recipesTab">
+                <ul id="recipes">
+                </ul>
+            </div>            
         </div>
         <div id="output">
         </div>
