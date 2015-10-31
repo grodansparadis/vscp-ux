@@ -444,14 +444,38 @@ vscp.wizard.Abstraction.prototype.parse = function( $abstraction ) {
  */
 vscp.wizard.Recipe = function( options ) {
 
-    this.name               = "";   // Recipe name
-    this.description        = "";   // Recipe description
-    this.bitInRegs          = [];   // Bit access methods in registers
-    this.bitInAbstractions  = [];   // Bit access methods in abstract value
-    this.registers          = [];   // Register access methods
-    this.abstractions       = [];   // Abstract access methods
-    this.messageBoxes       = [];   // Message box array
-    this.mdf                = null; // MDF
+    /** Recipe name
+     * @member {string}
+     */
+    this.name               = "";
+    /** Recipe description
+     * @member {string}
+     */
+    this.description        = "";
+    /** Bit access methods in registers
+     * @member {[]}
+     */
+    this.bitInRegs          = [];
+    /** Bit access methods in abstract value
+     * @member {[]}
+     */
+    this.bitInAbstractions  = [];
+    /** Register access methods
+     * @member {[]}
+     */
+    this.registers          = [];
+    /** Abstract access methods
+     * @member {[]}
+     */
+    this.abstractions       = [];
+    /** Messageboxes
+     * @member {[]}
+     */
+    this.messageBoxes       = [];
+    /** MDF
+     * @member {[]}
+     */
+    this.mdf                = null;
 
     if ( "undefined" !== typeof options ) {
 
