@@ -446,11 +446,11 @@ vscp.mdf.constants = {
             var dataArray   = [];
 
             // Check for limits
-            if ( 127 < data ) {
-                data = 127;
+            if ( vscp.mdf.constants.RANGE[ "int8_t" ].MAX < data ) {
+                data = vscp.mdf.constants.RANGE[ "int8_t" ].MAX;
             }
-            else if ( -128 > data ) {
-                data = -128;
+            else if ( -vscp.mdf.constants.RANGE[ "int8_t" ].MIN > data ) {
+                data = vscp.mdf.constants.RANGE[ "int8_t" ].MIN;
             }
 
             if ( 0 > data ) {
@@ -466,11 +466,11 @@ vscp.mdf.constants = {
             var dataArray   = [];
 
             // Check for limits
-            if ( 255 < data ) {
-                data = 255;
+            if ( vscp.mdf.constants.RANGE[ "uint8_t" ].MAX < data ) {
+                data = vscp.mdf.constants.RANGE[ "uint8_t" ].MAX;
             }
-            else if ( 0 > data ) {
-                data = 0;
+            else if ( vscp.mdf.constants.RANGE[ "uint8_t" ].MIN > data ) {
+                data = vscp.mdf.constants.RANGE[ "uint8_t" ].MIN;
             }
 
             dataArray.push( data );
@@ -481,11 +481,11 @@ vscp.mdf.constants = {
             var dataArray   = [];
 
             // Check for limits
-            if ( 32766 < data ) {
-                data = 32766;
+            if ( vscp.mdf.constants.RANGE[ "int16_t" ].MAX < data ) {
+                data = vscp.mdf.constants.RANGE[ "int16_t" ].MAX;
             }
-            else if ( -32767 > data ) {
-                data = -32767;
+            else if ( vscp.mdf.constants.RANGE[ "int16_t" ].MIN > data ) {
+                data = vscp.mdf.constants.RANGE[ "int16_t" ].MIN;
             }
 
             if ( 0 > data ) {
@@ -501,11 +501,11 @@ vscp.mdf.constants = {
             var dataArray   = [];
 
             // Check for limits
-            if ( 65535 < data ) {
-                data = 65535;
+            if ( vscp.mdf.constants.RANGE[ "uint16_t" ].MAX < data ) {
+                data = vscp.mdf.constants.RANGE[ "uint16_t" ].MAX;
             }
-            else if ( 0 > data ) {
-                data = 0;
+            else if ( vscp.mdf.constants.RANGE[ "uint16_t" ].MIN > data ) {
+                data = vscp.mdf.constants.RANGE[ "uint16_t" ].MIN;
             }
 
             dataArray.push( ( data >> 8 ) & 0xFF );
@@ -517,11 +517,11 @@ vscp.mdf.constants = {
             var dataArray   = [];
 
             // Check for limits
-            if ( 2147483646 < data ) {
-                data = 2147483646;
+            if ( vscp.mdf.constants.RANGE[ "int32_t" ].MAX < data ) {
+                data = vscp.mdf.constants.RANGE[ "int32_t" ].MAX;
             }
-            else if ( -2147483647 > data ) {
-                data = -2147483647;
+            else if ( vscp.mdf.constants.RANGE[ "int32_t" ].MIN > data ) {
+                data = vscp.mdf.constants.RANGE[ "int32_t" ].MIN;
             }
 
             if ( 0 > data ) {
@@ -539,11 +539,11 @@ vscp.mdf.constants = {
             var dataArray   = [];
 
             // Check for limits
-            if ( 4294967295 < data ) {
-                data = 4294967295;
+            if ( vscp.mdf.constants.RANGE[ "uint32_t" ].MAX < data ) {
+                data = vscp.mdf.constants.RANGE[ "uint32_t" ].MAX;
             }
-            else if ( 0 > data ) {
-                data = 0;
+            else if ( vscp.mdf.constants.RANGE[ "uint32_t" ].MIN > data ) {
+                data = vscp.mdf.constants.RANGE[ "uint32_t" ].MIN;
             }
 
             dataArray.push( ( data >> 24 ) & 0xFF );
@@ -634,6 +634,74 @@ vscp.mdf.constants = {
         "long": function( data ) {
             return vscp.mdf.constants.CONVERSION_TO_DECIMAL[ "int32_t" ]( data );
         }
+    },
+
+    /** Type ranges
+     * @const
+     */
+    RANGE: {
+        "int8_t": {
+            MIN: -128,
+            MAX: 128
+        },
+        "uint8_t": {
+            MIN: 0,
+            MAX: 255
+        },
+        "int16_t": {
+            MIN: -32767,
+            MAX: 32766
+        },
+        "uint16_t": {
+            MIN: 0,
+            MAX: 65535
+        },
+        "int32_t": {
+            MIN: -2147483647,
+            MAX: 2147483646
+        },
+        "uint32_t": {
+            MIN: 0,
+            MAX: 4294967295
+        },
+        // Not supported
+        "int64_t": {
+            MIN: 0,
+            MAX: 0
+        },
+        // Not supported
+        "uint64_t": {
+            MIN: 0,
+            MAX: 0
+        },
+        "float": {
+            MIN: 0,
+            MAX: 0
+        },
+        "double": {
+            MIN: 0,
+            MAX: 0
+        },
+        "char": {
+            MIN: -128,
+            MAX: 128
+        },
+        "byte": {
+            MIN: -128,
+            MAX: 128
+        },
+        "short": {
+            MIN: -32767,
+            MAX: 32766
+        },
+        "integer": {
+            MIN: -32767,
+            MAX: 32766
+        },
+        "long": {
+            MIN: -2147483647,
+            MAX: 2147483646
+        }
     }
 
 };
@@ -679,10 +747,10 @@ vscp.mdf.load = function( options ) {
 
         // The URL to make the request to.
         url: options.url,
-        
+
         // Datatype is XML, which forces a $.parseXML for the received data.
         dataType: "xml",
-        
+
         // Don't cache the transfered data.
         cache: false,
 
@@ -755,26 +823,26 @@ vscp.mdf.loadLocal = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     console.info( vscp.utility.getTime() + " Load MDF from file " + options.fileRef.name );
 
     reader.readAsText( options.fileRef );
-    
+
     reader.onload = function( e ) {
         var xml     = $.parseXML( reader.result );
         var xmlDoc  = $( xml );
-        
+
         options.onSuccess( xmlDoc );
     };
-    
+
     reader.onerror = function( e ) {
-        
+
         if ( null !== onError ) {
             onError();
         }
-        
+
     };
-    
+
     return;
 };
 
@@ -832,9 +900,9 @@ vscp.mdf.readAbstractValue = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     if ( "undefined" === typeof options.mdf.find( "vscp > module > abstractions > abstraction" ) ) {
-    
+
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " is unknown." );
 
         if ( null !== onError ) {
@@ -843,23 +911,23 @@ vscp.mdf.readAbstractValue = function( options ) {
 
         return;
     }
-    
+
     // Find abstract value by id
     options.mdf.find( "vscp > module > abstractions > abstraction" ).each( function() {
 
         if ( "undefined" !== typeof $( this ).attr( "id" ) ) {
-        
+
             if ( options.id === $( this ).attr( "id" ) ) {
-            
+
                 $abstraction = $( this );
-                
+
                 // Break for each loop
                 return false;
             }
         }
 
     });
-    
+
     if ( null === $abstraction ) {
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " not found." );
 
@@ -869,9 +937,9 @@ vscp.mdf.readAbstractValue = function( options ) {
 
         return;
     }
-    
+
     if ( "undefined" === typeof $abstraction.attr( "page" ) ) {
-    
+
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " page is missing." );
 
         if ( null !== onError ) {
@@ -885,7 +953,7 @@ vscp.mdf.readAbstractValue = function( options ) {
     }
 
     if ( "undefined" === typeof $abstraction.attr( "offset" ) ) {
-    
+
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " offset is missing." );
 
         if ( null !== onError ) {
@@ -897,9 +965,9 @@ vscp.mdf.readAbstractValue = function( options ) {
     else {
         offset = parseInt( $abstraction.attr( "offset" ) );
     }
-    
+
     if ( "undefined" === typeof $abstraction.attr( "type" ) ) {
-    
+
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " type is missing." );
 
         if ( null !== onError ) {
@@ -911,7 +979,7 @@ vscp.mdf.readAbstractValue = function( options ) {
     else {
         type = $abstraction.attr( "type" );
     }
-    
+
     if ( "string" === type ) {
 
         if ( "undefined" === typeof $abstraction.attr( "size" ) ) {
@@ -1034,9 +1102,9 @@ vscp.mdf.writeAbstractValue = function( options ) {
     if ( "function" === typeof options.onError ) {
         onError = options.onError;
     }
-    
+
     if ( "undefined" === typeof options.mdf.find( "vscp > module > abstractions > abstraction" ) ) {
-    
+
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " is unknown." );
 
         if ( null !== onError ) {
@@ -1045,23 +1113,23 @@ vscp.mdf.writeAbstractValue = function( options ) {
 
         return;
     }
-    
+
     // Find abstract value by id
     options.mdf.find( "vscp > module > abstractions > abstraction" ).each( function() {
 
         if ( "undefined" !== typeof $( this ).attr( "id" ) ) {
-        
+
             if ( options.id === $( this ).attr( "id" ) ) {
-            
+
                 $abstraction = $( this );
-                
+
                 // Break for each loop
                 return false;
             }
         }
 
     });
-    
+
     if ( null === $abstraction ) {
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " not found." );
 
@@ -1071,9 +1139,9 @@ vscp.mdf.writeAbstractValue = function( options ) {
 
         return;
     }
- 
+
     if ( "undefined" === typeof $abstraction.attr( "page" ) ) {
-    
+
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " page is missing." );
 
         if ( null !== onError ) {
@@ -1087,7 +1155,7 @@ vscp.mdf.writeAbstractValue = function( options ) {
     }
 
     if ( "undefined" === typeof $abstraction.attr( "offset" ) ) {
-    
+
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " offset is missing." );
 
         if ( null !== onError ) {
@@ -1099,9 +1167,9 @@ vscp.mdf.writeAbstractValue = function( options ) {
     else {
         offset = parseInt( $abstraction.attr( "offset" ) );
     }
-    
+
     if ( "undefined" === typeof $abstraction.attr( "type" ) ) {
-    
+
         console.error( vscp.utility.getTime() + " Abstract value id " + options.id + " type is missing." );
 
         if ( null !== onError ) {
@@ -1162,7 +1230,7 @@ vscp.mdf.writeAbstractValue = function( options ) {
 
         data: convFunc( options.value ),
 
-        onSuccess: function( data ) {
+        onSuccess: function() {
 
             options.onSuccess();
         },
@@ -1300,4 +1368,358 @@ vscp.mdf.writeAbstractBits = function( options ) {
 
     });
 
+};
+
+/**
+ * MDF register with all parameters.
+ * @class
+ */
+vscp.mdf.Register = function() {
+
+    /** Register name
+     * @member {string}
+     */
+    this.name           = "";
+
+    /** Register description
+     * @member {string}
+     */
+    this.description    = "";
+
+    /** Read access to the register allowed or not
+     * @member {boolean}
+     */
+    this.readAccess     = false;
+
+    /** Write access to the register allowed or not
+     * @member {boolean}
+     */
+    this.writeAccess    = false;
+
+    /** Page where the register is located
+     * @member {number}
+     */
+    this.page           = 0;
+
+    /** Offset where the register is located on the page
+     * @member {number}
+     */
+    this.offset         = 0;
+
+    /** Register value
+     * @member {number}
+     */
+    this.value          = 0;
+
+    /** Marks the register value dirty, which means the user changed it.
+     * It can be used to detect which registers have to be written to the node.
+     * @member {number}
+     */
+    this.dirty          = false;
+
+    /** User specific data
+     * @member {object}
+     */
+    this.userData       = null;
+};
+
+/**
+ * This function set a register value and marks it dirty.
+ *
+ * @param {number} value - New value
+ */
+vscp.mdf.Register.prototype.setValue = function( value ) {
+
+    // Out of range?
+    if ( ( 0 > value ) ||
+         ( 255 < value ) ) {
+
+        // Abort
+        console.error( vscp.utility.getTime() + " Value " + value + " out of range." );
+        return;
+    }
+
+    if ( this.value !== value ) {
+
+        this.value  = value;
+        this.dirty  = true;
+    }
+
+    return;
+};
+
+/**
+ * This function retrieves all register informations from a mdf.
+ *
+ * @param {object} options      - Options
+ * @param {object} options.mdf  - MDF as jquery object
+ *
+ * @return {vscp.mdf.Register[]} Array of MDF registers
+ */
+vscp.mdf.getRegisters = function( options ) {
+
+    var $registers  = null;
+    var registers   = [];
+    var register    = null;
+
+    if ( "undefined" === typeof options ) {
+        return;
+    }
+
+    if ( "undefined" === typeof options.mdf ) {
+        return;
+    }
+
+    $registers = options.mdf.find( "vscp > module > registers" );
+
+    if ( null === $registers ) {
+        return;
+    }
+
+    $registers.children( "reg" ).each( function() {
+
+        var $name           = $( this ).children( "name" );
+        var $description    = $( this ).children( "description" );
+        var $access         = $( this ).children( "access" );
+        var page            = $( this ).attr( "page" );
+        var offset          = $( this ).attr( "offset" );
+
+        register = new vscp.mdf.Register();
+
+        if ( "undefined" !== typeof $name ) {
+            register.name = $name.text();
+        }
+
+        if ( "undefined" !== typeof $description ) {
+            register.description = $description.text();
+        }
+
+        if ( "undefined" !== typeof $access ) {
+            if ( "r" === $access.text() ) {
+                register.readAccess     = true;
+                register.writeAccess    = false;
+            }
+            else if ( "w" === $access.text() ) {
+                register.readAccess     = false;
+                register.writeAccess    = true;
+            }
+            else if ( "rw" === $access.text() ) {
+                register.readAccess     = true;
+                register.writeAccess    = true;
+            }
+        }
+
+        if ( "undefined" !== typeof page ) {
+            register.page = parseInt( page );
+        }
+
+        if ( "undefined" !== typeof offset ) {
+            register.offset = parseInt( offset );
+        }
+
+        registers.push( register );
+    });
+
+    return registers;
+};
+
+/**
+ * MDF abstraction with all parameters.
+ * @class
+ */
+vscp.mdf.Abstraction = function() {
+
+    /** Abstraction name
+     * @member {string}
+     */
+    this.name           = "";
+
+    /** Abstraction description
+     * @member {string}
+     */
+    this.description    = "";
+
+    /** Read access to the abstraction allowed or not
+     * @member {boolean}
+     */
+    this.readAccess     = false;
+
+    /** Write access to the abstraction allowed or not
+     * @member {boolean}
+     */
+    this.writeAccess    = false;
+
+    /** Abstraction id
+     * @member {string}
+     */
+    this.id             = "";
+    
+    /** Page where the abstraction is located
+     * @member {number}
+     */
+    this.page           = 0;
+
+    /** Offset where the abstraction is located
+     * @member {number}
+     */
+    this.offset         = 0;
+
+    /** Abstraction value
+     * @member {number}
+     */
+    this.value          = 0;
+
+    /** Abstraction type
+     * @member {string}
+     */
+    this.type           = "";
+
+    /** Abstraction default value
+     * @member {number}
+     */
+    this.defValue       = 0;
+
+    /** Marks the abstraction value dirty, which means the user changed it.
+     * It can be used to detect which abstractions have to be written to the node.
+     * @member {number}
+     */
+    this.dirty          = false;
+
+    /** User specific data
+     * @member {object}
+     */
+    this.userData       = null;
+};
+
+/**
+ * This function set a abstraction value and marks it dirty.
+ *
+ * @param {number} value - New value
+ */
+vscp.mdf.Abstraction.prototype.setValue = function( value ) {
+
+    var min = 0;
+    var max = 0;
+
+    // Shall the value range be checked?
+    if ( "number" === typeof value ) {
+
+        if ( "undefined" !== typeof vscp.mdf.constants.RANGE[ this.type ] ) {
+
+            // Get range
+            min = vscp.mdf.constants.RANGE[ this.type ].MIN;
+            max = vscp.mdf.constants.RANGE[ this.type ].MAX;
+
+            // Range check supported?
+            if ( min !== max ) {
+
+                // Out of range?
+                if ( ( min > value ) ||
+                     ( max < value ) ) {
+
+                    // Abort
+                    console.error( vscp.utility.getTime() + " Value " + value + " out of range." );
+                    return;
+                }
+            }
+        }
+    }
+
+    if ( this.value !== value ) {
+
+        this.value  = value;
+        this.dirty  = true;
+    }
+
+    return;
+};
+
+/**
+ * This function retrieves all abstraction informations from a mdf.
+ *
+ * @param {object} options      - Options
+ * @param {object} options.mdf  - MDF as jquery object
+ *
+ * @return {vscp.mdf.Abstraction[]} Array of MDF abstractions
+ */
+vscp.mdf.getAbstractions = function( options ) {
+
+    var $abstractions   = null;
+    var abstractions    = [];
+    var abstraction     = null;
+
+    if ( "undefined" === typeof options ) {
+        return;
+    }
+
+    if ( "undefined" === typeof options.mdf ) {
+        return;
+    }
+
+    $abstractions = options.mdf.find( "vscp > module > abstractions" );
+
+    if ( null === $abstractions ) {
+        return;
+    }
+
+    $abstractions.children( "abstraction" ).each( function() {
+
+        var $name           = $( this ).children( "name" );
+        var $description    = $( this ).children( "description" );
+        var $access         = $( this ).children( "access" );
+        var id              = $( this ).attr( "id" );
+        var page            = $( this ).attr( "page" );
+        var offset          = $( this ).attr( "offset" );
+        var type            = $( this ).attr( "type" );
+        var defValue        = $( this ).attr( "default" );
+
+        abstraction = new vscp.mdf.Abstraction();
+
+        if ( "undefined" !== typeof $name ) {
+            abstraction.name = $name.text();
+        }
+
+        if ( "undefined" !== typeof $description ) {
+            abstraction.description = $description.text();
+        }
+
+        if ( "undefined" !== typeof $access ) {
+            if ( "r" === $access.text() ) {
+                abstraction.readAccess     = true;
+                abstraction.writeAccess    = false;
+            }
+            else if ( "w" === $access.text() ) {
+                abstraction.readAccess     = false;
+                abstraction.writeAccess    = true;
+            }
+            else if ( "rw" === $access.text() ) {
+                abstraction.readAccess     = true;
+                abstraction.writeAccess    = true;
+            }
+        }
+
+        if ( "undefined" !== typeof id ) {
+            abstraction.id = id;
+        }
+        
+        if ( "undefined" !== typeof page ) {
+            abstraction.page = parseInt( page );
+        }
+
+        if ( "undefined" !== typeof offset ) {
+            abstraction.offset = parseInt( offset );
+        }
+
+        if ( "undefined" !== typeof type ) {
+            abstraction.type = type;
+        }
+
+        if ( "undefined" !== typeof defValue ) {
+            abstraction.defValue = parseInt( defValue );
+        }
+
+        abstractions.push( abstraction );
+    });
+
+    return abstractions;
 };
