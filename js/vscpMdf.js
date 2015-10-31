@@ -642,23 +642,23 @@ vscp.mdf.constants = {
     RANGE: {
         "int8_t": {
             MIN: -128,
-            MAX: 128
+            MAX: 127
         },
         "uint8_t": {
             MIN: 0,
             MAX: 255
         },
         "int16_t": {
-            MIN: -32767,
-            MAX: 32766
+            MIN: -32768,
+            MAX: 32767
         },
         "uint16_t": {
             MIN: 0,
             MAX: 65535
         },
         "int32_t": {
-            MIN: -2147483647,
-            MAX: 2147483646
+            MIN: -2147483648,
+            MAX: 2147483647
         },
         "uint32_t": {
             MIN: 0,
@@ -684,11 +684,11 @@ vscp.mdf.constants = {
         },
         "char": {
             MIN: -128,
-            MAX: 128
+            MAX: 127
         },
         "byte": {
             MIN: -128,
-            MAX: 128
+            MAX: 127
         },
         "short": {
             MIN: -32767,
@@ -699,8 +699,8 @@ vscp.mdf.constants = {
             MAX: 32766
         },
         "long": {
-            MIN: -2147483647,
-            MAX: 2147483646
+            MIN: -2147483648,
+            MAX: 2147483647
         }
     }
 
