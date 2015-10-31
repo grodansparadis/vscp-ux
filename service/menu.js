@@ -61,15 +61,15 @@ navBarMenu.content = [
                 url: "event_logger.html"
             },
             {
-                title: "Node discovery",
+                title: "Discover nodes",
                 url: "node_discovery.html"
             },
             {
-                title: "Registers",
+                title: "Show standard registers",
                 url: "vscp_registers.html"
             },
             {
-                title: "Variable configuration",
+                title: "Configure server variables",
                 url: "variable_configuration.html"
             },
             {
