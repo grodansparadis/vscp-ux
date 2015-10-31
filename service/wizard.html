@@ -841,6 +841,8 @@
             var footer  = "";
             var index   = 0;
             var script  = "";
+            var min     = 0;
+            var max     = 0;
 
             if ( ( 0 > id ) || ( recipes.length <= id ) ) {
                 return;
@@ -876,8 +878,14 @@
                     else {
                         body += "number\" value=\"0\"";
 
-                        if ( recipe.messageBoxes[ index ].variableMin !== recipe.messageBoxes[ index ].variableMax ) {
-                            body += "min=\"" + recipe.messageBoxes[ index ].variableMin + "\" max=\"" + recipe.messageBoxes[ index ].variableMax + "\"";
+                        if ( "undefined" !== typeof vscp.mdf.constants.RANGE[ recipe.messageBoxes[ index ].variableType ] ) {
+                        
+                            min = vscp.mdf.constants.RANGE[ recipe.messageBoxes[ index ].variableType ].MIN;
+                            max = vscp.mdf.constants.RANGE[ recipe.messageBoxes[ index ].variableType ].MAX;
+                        
+                            if ( min !== max ) {
+                                body += "min=\"" + min + "\" max=\"" + max + "\"";
+                            }
                         }
                     }
 

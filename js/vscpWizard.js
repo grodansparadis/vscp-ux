@@ -83,16 +83,6 @@ vscp.wizard.MessageBox = function( options ) {
      * @member {string}
      */
     this.variableValue  = "";
-    /**
-     * Min. value (for numbers only)
-     * @member {number}
-     */
-    this.variableMin    = 0;
-    /**
-     * Max. value (for numbers only)
-     * @member {number}
-     */
-    this.variableMax    = 0;
 
     if ( "undefined" !== typeof options ) {
 
@@ -135,37 +125,6 @@ vscp.wizard.MessageBox.prototype.parse = function( $messageBox ) {
         if ( "undefined" !== typeof $messageBox.children( "variable" ).attr( "type" ) ) {
         
             this.variableType = $messageBox.children( "variable" ).attr( "type" );
-        
-            if ( ( "int8_t" === this.variableType ) ||
-                 ( "char" === this.variableType ) ||
-                 ( "byte" === this.variableType ) ) {
-                this.variableMin = -128;
-                this.variableMax = 127;
-            }
-            else if ( "uint8_t" === this.variableType ) {
-                this.variableMin = 0;
-                this.variableMax = 255;
-            }
-            if ( ( "int16_t" === this.variableType ) ||
-                 ( "short" === this.variableType ) ||
-                 ( "integer" === this.variableType ) ) {
-                this.variableMin = -32768;
-                this.variableMax = 32767;
-            }
-            else if ( "uint16_t" === this.variableType ) {
-                this.variableMin = 0;
-                this.variableMax = 65535;
-            }
-            if ( ( "int32_t" === this.variableType ) ||
-                 ( "long" === this.variableType ) ) {
-                this.variableMin = -2147483648;
-                this.variableMax = 2147483647;
-            }
-            else if ( "uint32_t" === this.variableType ) {
-                this.variableMin = 0;
-                this.variableMax = 4294967295;
-            }
-        
         }
     }
 
