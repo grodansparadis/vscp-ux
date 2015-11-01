@@ -449,7 +449,7 @@ vscp.mdf.constants = {
             if ( vscp.mdf.constants.RANGE[ "int8_t" ].MAX < data ) {
                 data = vscp.mdf.constants.RANGE[ "int8_t" ].MAX;
             }
-            else if ( -vscp.mdf.constants.RANGE[ "int8_t" ].MIN > data ) {
+            else if ( vscp.mdf.constants.RANGE[ "int8_t" ].MIN > data ) {
                 data = vscp.mdf.constants.RANGE[ "int8_t" ].MIN;
             }
 
