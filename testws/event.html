@@ -33,283 +33,280 @@
 
     <script type="text/javascript">
 
-        (function() {
-            // VSCP websocket connection
-            var vscpConn = null;
+        // VSCP websocket connection
+        var vscpConn = null;
 
-            // Wait until the whole website is loaded
-            $( document ).ready( function() {
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
 
-                // Show navigation bar menu
-                navBarMenu.show( "menu", navBarMenu.content );
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
 
-                // Create a VSCP websocket
-                vscpConn = new vscp.Connection();
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
 
-                // Connect to VSCP server
-                vscpConn.connect({
+            // Connect to VSCP server
+            vscpConn.connect({
 
-                    url: settings.url,
+                url: settings.url,
 
-                    userName: settings.user,
+                userName: settings.user,
 
-                    password: settings.passwordHash,
+                password: settings.passwordHash,
 
-                    onSuccess: function( conn ) {
+                onSuccess: function( conn ) {
 
-                        // Start receiving VSCP events
-                        vscpConn.start({
+                    // Start receiving VSCP events
+                    vscpConn.start({
 
-                            onSuccess: function( conn ) {
+                        onSuccess: function( conn ) {
 
-                                vscpConn.addEventListener( add2EventTable );
+                            vscpConn.addEventListener( add2EventTable );
 
-                                // Enable the user interface
-                                ui.enable();
-                            },
+                            // Enable the user interface
+                            ui.enable();
+                        },
 
-                            onError: function( conn ) {
-                                alert("Couldn't start receiving events.");
-                            }
-
-                        });
-
-                    },
-
-                    onError: function( conn ) {
-                        alert("Couldn't establish a connection.");
-                    },
-
-                    onMessage: function( conn, msg ) {
-                        var msgItems = msg.data.split(";"); /* Data is separated by ; */
-
-                        // Positive reply?
-                        if ( '+' === msgItems[ 0 ] ) {
-                            $( "#myResponseTable" ).append( "<tr><td><b>Positive reply:</b></td><td>" + msgItems + "</td></tr>" );
-                        }
-                        // Negative reply
-                        else {
-                            $( "#myResponseTable" ).append( "<tr><td><b>Positive reply:</b></td><td>" + msgItems + "</td></tr>" );
+                        onError: function( conn ) {
+                            alert("Couldn't start receiving events.");
                         }
 
-                        stripRows( "myResponseTable", 20 );
+                    });
 
-                        // VSCP library shall handle the message
-                        return false;
-                    }
-
-                });
-            });
-
-            // User interface data
-            var ui = {
-
-                enable: function() {
-                    $( "#ui :input" ).attr( "disabled", false );
                 },
 
-                disable: function() {
-                    $( "#ui :input" ).attr( "disabled", true );
+                onError: function( conn ) {
+                    alert("Couldn't establish a connection.");
+                },
+
+                onMessage: function( conn, msg ) {
+                    var msgItems = msg.data.split(";"); /* Data is separated by ; */
+
+                    // Positive reply?
+                    if ( '+' === msgItems[ 0 ] ) {
+                        $( "#myResponseTable" ).append( "<tr><td><b>Positive reply:</b></td><td>" + msgItems + "</td></tr>" );
+                    }
+                    // Negative reply
+                    else {
+                        $( "#myResponseTable" ).append( "<tr><td><b>Positive reply:</b></td><td>" + msgItems + "</td></tr>" );
+                    }
+
+                    stripRows( "myResponseTable", 20 );
+
+                    // VSCP library shall handle the message
+                    return false;
                 }
-            };
 
-            function vscpTurnOnEvent() {
+            });
+        });
 
-                ui.disable();
+        // User interface data
+        var ui = {
 
-                vscpConn.sendEvent({
-                    event: new vscp.Event({
-                        vscpClass:      vscp.constants.classes.VSCP_CLASS1_CONTROL,
-                        vscpType:       vscp.constants.types.VSCP_TYPE_CONTROL_TURNON,
-                        vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                        vscpData:       [ 0, 1, 12 ]
-                    }),
+            enable: function() {
+                $( "#ui :input" ).attr( "disabled", false );
+            },
 
-                    onSuccess: function( conn ) {
-                        console.info( "TURNON event sent." );
-                        ui.enable();
-                    },
-
-                    onError: function( conn ) {
-                        alert( "Failed to send TURNON event." );
-                        ui.enable();
-                    }
-
-                });
-
+            disable: function() {
+                $( "#ui :input" ).attr( "disabled", true );
             }
+        };
 
-            function vscpTurnOffEvent() {
+        function vscpTurnOnEvent() {
 
-                ui.disable();
+            ui.disable();
 
-                vscpConn.sendEvent({
-                    event: new vscp.Event({
-                        vscpClass:      vscp.constants.classes.VSCP_CLASS1_CONTROL,
-                        vscpType:       vscp.constants.types.VSCP_TYPE_CONTROL_TURNOFF,
-                        vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                        vscpData:       [ 0, 1, 12 ]
-                    }),
+            vscpConn.sendEvent({
+                event: new vscp.Event({
+                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_CONTROL,
+                    vscpType:       vscp.constants.types.VSCP_TYPE_CONTROL_TURNON,
+                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
+                    vscpData:       [ 0, 1, 12 ]
+                }),
 
-                    onSuccess: function( conn ) {
-                        console.info( "TURNOFF event sent." );
-                        ui.enable();
-                    },
+                onSuccess: function( conn ) {
+                    console.info( "TURNON event sent." );
+                    ui.enable();
+                },
 
-                    onError: function( conn ) {
-                        alert( "Failed to send TURNOFF event." );
-                        ui.enable();
-                    }
+                onError: function( conn ) {
+                    alert( "Failed to send TURNON event." );
+                    ui.enable();
+                }
 
-                });
+            });
 
-            }
+        }
 
-            function vscpOnEvent() {
+        function vscpTurnOffEvent() {
 
-                ui.disable();
+            ui.disable();
 
-                vscpConn.sendEvent({
-                    event: new vscp.Event({
-                        vscpClass:      vscp.constants.classes.VSCP_CLASS1_INFORMATION,
-                        vscpType:       vscp.constants.types.VSCP_TYPE_INFORMATION_ON,
-                        vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                        vscpData:       [ 0, 1, 12 ]
-                    }),
+            vscpConn.sendEvent({
+                event: new vscp.Event({
+                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_CONTROL,
+                    vscpType:       vscp.constants.types.VSCP_TYPE_CONTROL_TURNOFF,
+                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
+                    vscpData:       [ 0, 1, 12 ]
+                }),
 
-                    onSuccess: function( conn ) {
-                        console.info( "ON event sent." );
-                        ui.enable();
-                    },
+                onSuccess: function( conn ) {
+                    console.info( "TURNOFF event sent." );
+                    ui.enable();
+                },
 
-                    onError: function( conn ) {
-                        alert( "Failed to send ON event." );
-                        ui.enable();
-                    }
+                onError: function( conn ) {
+                    alert( "Failed to send TURNOFF event." );
+                    ui.enable();
+                }
 
-                });
+            });
 
-            }
+        }
 
-            function vscpOffEvent() {
+        function vscpOnEvent() {
 
-                ui.disable();
+            ui.disable();
 
-                vscpConn.sendEvent({
-                    event: new vscp.Event({
-                        vscpClass:      vscp.constants.classes.VSCP_CLASS1_INFORMATION,
-                        vscpType:       vscp.constants.types.VSCP_TYPE_INFORMATION_OFF,
-                        vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                        vscpData:       [ 0, 1, 12 ]
-                    }),
+            vscpConn.sendEvent({
+                event: new vscp.Event({
+                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_INFORMATION,
+                    vscpType:       vscp.constants.types.VSCP_TYPE_INFORMATION_ON,
+                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
+                    vscpData:       [ 0, 1, 12 ]
+                }),
 
-                    onSuccess: function( conn ) {
-                        console.info( "OFF event sent." );
-                        ui.enable();
-                    },
+                onSuccess: function( conn ) {
+                    console.info( "ON event sent." );
+                    ui.enable();
+                },
 
-                    onError: function( conn ) {
-                        alert( "Failed to send OFF event." );
-                        ui.enable();
-                    }
+                onError: function( conn ) {
+                    alert( "Failed to send ON event." );
+                    ui.enable();
+                }
 
-                });
+            });
 
-            }
+        }
 
-            function add2EventTable( conn, evt ) {
+        function vscpOffEvent() {
 
-                $( "#myEventTable" ).append(
-                    "<tr><td>Received Event:" +
-                    " <b>Class</b>=" + evt.vscpClass +
-                    " <b>Type</b>=" +  evt.vscpType +
-                    " <b>Data</b>=" +  evt.vscpData +
-                    " <b>GUID</b>=" +  evt.vscpGuid +
-                    "</td></tr>"
-                );
+            ui.disable();
 
-                stripRows( "myEventTable", 20 );
-            };
+            vscpConn.sendEvent({
+                event: new vscp.Event({
+                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_INFORMATION,
+                    vscpType:       vscp.constants.types.VSCP_TYPE_INFORMATION_OFF,
+                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
+                    vscpData:       [ 0, 1, 12 ]
+                }),
 
-            // Delete <num> rows in table by tableID
-            function stripRows( tableID, num ) {
-                try {
-                    var table       = document.getElementById( tableID );
-                    var rowCount    = table.rows.length;
+                onSuccess: function( conn ) {
+                    console.info( "OFF event sent." );
+                    ui.enable();
+                },
 
-                    if ( rowCount > num ) {
-                        for(var i=0; i<rowCount-num; i++) {
-                            table.deleteRow(i);
-                        }
+                onError: function( conn ) {
+                    alert( "Failed to send OFF event." );
+                    ui.enable();
+                }
+
+            });
+
+        }
+
+        function add2EventTable( conn, evt ) {
+
+            $( "#myEventTable" ).append(
+                "<tr><td>Received Event:" +
+                " <b>Class</b>=" + evt.vscpClass +
+                " <b>Type</b>=" +  evt.vscpType +
+                " <b>Data</b>=" +  evt.vscpData +
+                " <b>GUID</b>=" +  evt.vscpGuid +
+                "</td></tr>"
+            );
+
+            stripRows( "myEventTable", 20 );
+        }
+
+        // Delete <num> rows in table by tableID
+        function stripRows( tableID, num ) {
+            try {
+                var table       = document.getElementById( tableID );
+                var rowCount    = table.rows.length;
+
+                if ( rowCount > num ) {
+                    for(var i=0; i<rowCount-num; i++) {
+                        table.deleteRow(i);
                     }
                 }
-                catch(e) {
-                    alert(e);
+            }
+            catch(e) {
+                alert(e);
+            }
+        }
+
+        function vscpSendTempSelectEvent() {
+
+            var selectBox   = document.getElementById( "tempEventSelect" );
+            var strEvent    = selectBox.options[ selectBox.selectedIndex ].value;
+            var vscpItems   = strEvent.split( "," );
+            var data        = vscpItems.slice( 6, vscpItems.length );
+
+            ui.disable();
+
+            vscpConn.sendEvent({
+                event: new vscp.Event({
+                    vscpHead:       parseInt( vscpItems[ 0 ] ),
+                    vscpClass:      parseInt( vscpItems[ 1 ] ),
+                    vscpType:       parseInt( vscpItems[ 2 ] ),
+                    vscpObId:       parseInt( vscpItems[ 3 ] ),
+                    vscpTimeStamp:  parseInt( vscpItems[ 4 ] ),
+                    vscpGuid:       parseInt( vscpItems[ 5 ] ),
+                    vscpData:       data
+                }),
+
+                onSuccess: function( conn ) {
+                    ui.enable();
+                },
+
+                onError: function( conn ) {
+                    alert( "Failed to send event." );
+                    ui.enable();
                 }
-            }
 
-            function vscpSendTempSelectEvent() {
+            });
 
-                var selectBox   = document.getElementById( "tempEventSelect" );
-                var strEvent    = selectBox.options[ selectBox.selectedIndex ].value;
-                var vscpItems   = strEvent.split( "," );
-                var data        = vscpItems.slice( 6, vscpItems.length );
+        }
 
-                ui.disable();
+        function sliderUpdate( val ) {
 
-                vscpConn.sendEvent({
-                    event: new vscp.Event({
-                        vscpHead:       parseInt( vscpItems[ 0 ] ),
-                        vscpClass:      parseInt( vscpItems[ 1 ] ),
-                        vscpType:       parseInt( vscpItems[ 2 ] ),
-                        vscpObId:       parseInt( vscpItems[ 3 ] ),
-                        vscpTimeStamp:  parseInt( vscpItems[ 4 ] ),
-                        vscpGuid:       parseInt( vscpItems[ 5 ] ),
-                        vscpData:       data
-                    }),
+            ui.disable();
 
-                    onSuccess: function( conn ) {
-                        ui.enable();
-                    },
+            $( "#sliderText" ).val( val );
 
-                    onError: function( conn ) {
-                        alert( "Failed to send event." );
-                        ui.enable();
-                    }
+            vscpConn.sendEvent({
+                event: new vscp.Event({
+                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_CONTROL,
+                    vscpType:       vscp.constants.types.VSCP_TYPE_CONTROL_DIM_LAMPS,
+                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
+                    vscpData:       [ val, 0, 0 ]
+                }),
 
-                });
+                onSuccess: function( conn ) {
+                    console.info( "DIM_LAMPS event sent." );
+                    ui.enable();
+                },
 
-            }
+                onError: function( conn ) {
+                    alert( "Failed to send DIM_LAMPS event." );
+                    ui.enable();
+                }
 
-            function sliderUpdate( val ) {
+            });
 
-                ui.disable();
-
-                $( "#sliderText" ).val( val );
-
-                vscpConn.sendEvent({
-                    event: new vscp.Event({
-                        vscpClass:      vscp.constants.classes.VSCP_CLASS1_CONTROL,
-                        vscpType:       vscp.constants.types.VSCP_TYPE_CONTROL_DIM_LAMPS,
-                        vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                        vscpData:       [ val, 0, 0 ]
-                    }),
-
-                    onSuccess: function( conn ) {
-                        console.info( "DIM_LAMPS event sent." );
-                        ui.enable();
-                    },
-
-                    onError: function( conn ) {
-                        alert( "Failed to send DIM_LAMPS event." );
-                        ui.enable();
-                    }
-
-                });
-
-            }
-
-        })();
+        }
 
     </script>
 </head>
