@@ -777,13 +777,13 @@
                 onSuccess: function() {
                     abstraction.dirty = false;
                     
-                    // Disable user interface
+                    // Enable user interface
                     ui.enable();
                 },
                 
                 onError: function() {
                    
-                    // Disable user interface
+                    // Enable user interface
                     ui.enable();
                 }
             });
@@ -1003,6 +1003,46 @@
 
         }
 
+        // Restart node
+        function restartNode() {
+        
+            var guid = $( "#nodeList" ).val();        
+        
+            // Node GUID selected?
+            if ( "-" === guid ) {
+                BootstrapDialog.alert( "Select a node first." );
+                return;
+            }
+        
+            // Disable user interface
+            ui.disable();
+        
+            vscpConn.sendEvent({
+                event: new vscp.Event({
+                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
+                    vscpType:       vscp.constants.types.VSCP_TYPE_PROTOCOL_DROP_NICKNAME,
+                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
+                    vscpData:       [
+                                        vscp.utility.getNodeId( guid ),
+                                        0x20 // Just reset, nothing else.
+                                    ]
+                }),
+                    
+                onSuccess: function() {
+                    
+                    // Enable user interface
+                    ui.enable();
+                },
+                
+                onError: function() {
+                    BootstrapDialog.alert( "Server error!" );
+                    
+                    // Enable user interface
+                    ui.enable();
+                }
+            });
+        }
+        
     </script>
 </head>
 <body>
@@ -1039,6 +1079,7 @@
             </div>
             <!-- Registers tab -->
             <div class="tab-pane fade" id="registersTab">
+                <input type="button" class="btn btn-default" onclick="restartNode();" value="Restart node" />
                 <table id="registers" class="table table-striped">
                     <thead>
                         <tr>
@@ -1056,6 +1097,7 @@
             </div>
             <!-- Abstractions tab -->
             <div class="tab-pane fade" id="abstractionsTab">
+                <input type="button" class="btn btn-default" onclick="restartNode();" value="Restart node" />
                 <table id="abstractions" class="table table-striped">
                     <thead>
                         <tr>
