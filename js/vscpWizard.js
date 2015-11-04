@@ -453,27 +453,27 @@ vscp.wizard.Recipe = function( options ) {
      */
     this.description            = "";
     /** Bit access methods in registers
-     * @member {[]}
+     * @member {vscp.wizard.WriteBitInReg[]}
      */
     this.writeBitInRegs         = [];
     /** Bit access methods in abstract value
-     * @member {[]}
+     * @member {vscp.wizard.WriteBitAbstractions[]}
      */
     this.writeBitInAbstractions = [];
     /** Register access methods
-     * @member {[]}
+     * @member {vscp.wizard.WriteRegister[]}
      */
     this.writeRegisters         = [];
     /** Abstract access methods
-     * @member {[]}
+     * @member {vscp.wizard.WriteAbstraction[]}
      */
     this.writeAbstractions      = [];
     /** Messageboxes
-     * @member {[]}
+     * @member {vscp.wizard.MessageBox[]}
      */
     this.messageBoxes           = [];
     /** MDF
-     * @member {[]}
+     * @member {object}
      */
     this.mdf                    = null;
 
