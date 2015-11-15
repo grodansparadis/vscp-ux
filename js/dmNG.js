@@ -193,14 +193,15 @@ dmNG.prototype.getConfig = function () {
  */
 dmNG.prototype.setConfig = function ( config ) {
 
-    var index       = 1;
-    var numRules    = config[ 0 ];
-    var dmNGTmp     = new dmNG();
-    var isError     = false;
-    var byteCnt     = 0;
-    var ruleIndex   = 0;
-    ruleSize        = 0;
-    conditionIndex  = 0;
+    var index           = 1;
+    var numRules        = config[ 0 ];
+    var dmNGTmp         = new dmNG();
+    var isError         = false;
+    var byteCnt         = 0;
+    var ruleIndex       = 0;
+    var abort           = false;
+    var ruleSize        = 0;
+    var conditionIndex  = 0;
         
     if ( ( "undefined" === typeof config ) ||
          ( 0 === config.length ) ) {
@@ -211,9 +212,19 @@ dmNG.prototype.setConfig = function ( config ) {
 
     // Determine configuration size in byte
     ++byteCnt;
-    while( index < config.length ) {
+    while( ( index < config.length ) && ( false === abort ) ) {
+        
+        if ( 0 === config[ index ] ) {
+            abort = true;
+        }
+    
         byteCnt += config[ index ];
         index += config[ index ];
+    }
+    
+    if ( true === abort ) {
+        console.log( "Invalid configuration." );
+        return;
     }
 
     // If the calculated configuration size is not equal than the configuration
