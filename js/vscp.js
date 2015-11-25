@@ -1552,7 +1552,7 @@ vscp.utility.getNodeId = function( guid ) {
         return 0;
     }
 
-    return parseInt( guid.split( ":" )[ 15 ] );
+    return parseInt( guid.split( ":" )[ 15 ], 16 );
 };
 
 /* ---------------------------------------------------------------------- */

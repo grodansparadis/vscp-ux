@@ -1025,7 +1025,7 @@ vscp.widget.Thermometer = function( options ) {
                     maxT: 35,
                     minT: -25,
                     x: 26,
-                    y: 189,
+                    y: 191,
                     height: 181,
                     width: 7,
                     yOffset: 5,
@@ -1034,13 +1034,13 @@ vscp.widget.Thermometer = function( options ) {
             }
             else if ( 1 === this.type ) {
                 thermometerData = {
-                    maxT: 45,
-                    minT: -35,
+                    maxT: 42,
+                    minT: -34,
                     x: 36,
-                    y: 239,
-                    height: 220,
+                    y: 240,
+                    height: 231,
                     width: 10,
-                    yOffset: 11,
+                    yOffset: 0,
                     color: '#FF0000'
                 };
             }
@@ -1049,7 +1049,7 @@ vscp.widget.Thermometer = function( options ) {
                     maxT: 55,
                     minT: -20,
                     x: 32,
-                    y: 158,
+                    y: 161,
                     height: 142,
                     width: 8,
                     yOffset: 2,
