@@ -19,8 +19,11 @@
 <body>
     <div class="container-fluid">
         <p>
-        <img src="images/logo/vscp_new.png" class="img-responsive" width="400px" alt="VSCP logo" />
+        <img src="images/logo/vscp_new.png" class="img-responsive" width="200px" alt="VSCP logo" />
         </p>
+        
+        <hr />
+        
         <h1>It works!</h1>
         <p>
             This is the default web page for the VSCP daemon. This is a fully working 
@@ -35,10 +38,11 @@
         
         <hr />
         
-        <h2>To test things</h2>
+        <h2>Setting up things</h2>
         <p>
             To test the websocket interface of the VSCP daemon you first edit the <b>settings.js</b>
-            file which after installation is located in the <b><i>testws subfolder</i></b> of the web root filesystem.
+            file which after installation is located in the <b><i>js subfolder</i></b> of the web root filesystem
+            which normally is at <u>/srv/vscp/web</u> on a linux system and at <u>C:\Programdata\VSCP\web</u> on a windows system.
         </p>
         <p>
             The default content in this file is:
@@ -52,42 +56,54 @@
         
     };</pre></b>
             which is the default admin credentials for
+            <p>
             <ul>
                 <li><b>Username: <i>admin</i></b></li>
                 <li><b>Password: <i>secret</i></b></li>
                 <li><b>Domain:   <i>mydomain.com</i></b></li>
             </ul>
-            needless to say you should change this as soon as you use your system more seriously.
-            The other part in the <b>settings.js</b> file to change is the url for your server.
+            </p>
+            <p>
+                needless to say you should change login settings as soon as you use your system more seriously.
+            </p>
+            <p>
+                The last part in the <b>settings.js</b> file to change is the url for your server.
+                The default for the websocket samples is to use a non-ssl connection (unsecure). If you want to use ssl you should use 
+                <b>"wss://"</b> as prefix instead of <b>"ws://"</b>
+            </p>
         </p>
+        
+        <hr />
+        
+        <h2>Important first test</h2>
         <p>
-            When you have edited and saved this information you can test the <a href="testws/testauth.html">websocket
-            login test script</a>. Follow the output messages and if the connection is established successful, everything
+            When you have edited and saved this information you should verify that the <a href="testws/testauth.html">websocket
+            login test script</a> works. Nothing else will work if this part does not work.  Follow the output messages and if the 
+            connection is established successful, everything
             is fine, otherwise something is bad with your login informations.
         </p>
-        <p>
-            The default for the websocket samples is non-ssl. If you want to use ssl (with the ssl version 
-            of the VSCP daemon) you should use 
-            <b>"wss://"</b> as prefix instead of <b>"ws://"</b>
-        </p>
+        
         
         <hr />
         
         <h2>Demos</h2>
         <p>
-            When the login works you can <b>test the websocket interface</b> of the VSCP daemon by
+            When the login works as of above you can <b>test the websocket interface</b> of the VSCP daemon by
             <a href="testws/index.html">clicking on this link</a>.
         </p>
-        <p>
-            This file and the other web content change very frequently and you may therefore which to download the latest
-            content. You find it <a href="https://github.com/grodansparadis/vscp_html5">here</a>.
-            Documentation for VSCP & Friends is <a href="http://www.vscp.org/docs.php">here</a>.
-        </p>
         
+        <hr />
+             
         <h2>Service</h2>
         <p>
             For maintaining VSCP nodes you can use the provided <a href="service/index.html">service interfaces</a>.
         </p>
+        
+        <hr />
+     
+         <p><b><pre>This file and the other web content change very frequently and you may therefore want to download the latest 
+content. You find it <a href="https://github.com/grodansparadis/vscp-ux">here</a>. Documentation for VSCP & Friends is 
+<a href="http://vscp.org/#documentation">here</a>.</pre></b></p>
        
         <hr />
         Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Paradise of the Frog/Grodans Paradis AB</a>
