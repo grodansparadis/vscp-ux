@@ -29,9 +29,9 @@
     <script type="text/javascript" src="../js/vscpMeasurement.js"></script>
 
     <!-- JavaScript library for manipulating documents based on data -->
-    <script src="../js/d3/3.5.6/d3.min.js"></script>
-    <script src="../js/epoch/0.6.0/epoch.min.js"></script>
-	<link rel="stylesheet" type="text/css" href="../js/epoch/0.6.0/epoch.min.css">
+    <script src="../js/d3/3.5.17/d3.min.js"></script>
+    <script src="../js/epoch/0.8.4/epoch.min.js"></script>
+	<link rel="stylesheet" type="text/css" href="../js/epoch/0.8.4/epoch.min.css">
 
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navBar.js"></script>
@@ -161,6 +161,15 @@
                 areaChartInstance1.push( data );
             }
         };
+        
+        
+        var formatdate = function(d) { 
+            var now = new Date();
+            /*return now.getHours().toString() + ':' + 
+                    now.getMinutes().toString() + ':' +
+                    now.getSeconds().toString(); */
+            return now.toTimeString();          
+        };
 
     </script>
 </head>
@@ -179,7 +188,7 @@
         <h1>VSCP HTML5 demo of Epoch charts</h1>
         <p>
             This demo demonstrates the websocket library used with
-            <a href="http://fastly.github.io/epoch/">Epoch charts</a>. First the
+            <a href="http://epochjs.github.io/epoch/">Epoch charts</a>. First the
             tables is updated with some static data just to have something to show
             even if no data stream is available. After that the first three charts
             are updated when received CLASS1.MEASUREMENT, Type=6, Temperature
@@ -193,7 +202,11 @@
           var lineBarChart1 = $('#lineBarChart1').epoch({
             type: 'time.bar',
             ticks: { left: 5, bottom: 5, right: 5 },
-            tickFormats: { time: 'AAAA' },
+            /*tickFormats: { time: function(d) { return 'AAAA'; } },*/
+            tickFormats: { 
+                bottom: function(d) { return formatdate(d); }
+            },
+                
             data: lineChartData,
             axes: ['left', 'right', 'bottom']
           });
@@ -205,7 +218,7 @@
           var lineBarChart2 = $('#lineBarChart2').epoch({
             type: 'time.line',
             ticks: { left: 5, bottom: 5, right: 5 },
-            tickFormats: { time: function(d) { return new Date(time*1000).toISOString() } },
+            tickFormats: { bottom: function(d) { return new Date().toISOString() } },
             data: lineChartData,
             axes: ['left', 'right', 'bottom']
           });
@@ -217,7 +230,7 @@
         var areaChartInstance1 = $('#lineAreaChart1').epoch({
             type: 'time.area',
             ticks: { left: 5, bottom: 5, right: 5 },
-            tickFormats: { time: function(d) { return new Date(time*1000).toISOString() } },
+            tickFormats: { bottom: function(d) { return new Date().toISOString() } },
             data: lineChartData,
             axes: ['left', 'right', 'bottom']
         });
