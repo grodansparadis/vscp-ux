@@ -38,8 +38,12 @@
         
         <hr />
         
-        <h2>Setting up things</h2>
-        <p>
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title">Setting things up</h3>
+            </div>
+            <div class="panel-body">
+                <p>
             To test the websocket interface of the VSCP daemon you first edit the <b>settings.js</b>
             file which after installation is located in the <b><i>js subfolder</i></b> of the web root filesystem
             which normally is at <u>/srv/vscp/web</u> on a linux system and at <u>C:\Programdata\VSCP\web</u> on a windows system.
@@ -71,42 +75,38 @@
                 The default for the websocket samples is to use a non-ssl connection (unsecure). If you want to use ssl you should use 
                 <b>"wss://"</b> as prefix instead of <b>"ws://"</b>
             </p>
-        </p>
+            </div>
+        </div>
         
-        <hr />
-        
-        <h2>Important first test</h2>
-        <p>
-            When you have edited and saved this information you should verify that the <a href="testws/testauth.html">websocket
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title">The important first test</h3>
+            </div>
+            <div class="panel-body">
+                When you have edited and saved this information you should verify that the <a href="testws/testauth.html">websocket
             login test script</a> works. Nothing else will work if this part does not work.  Follow the output messages and if the 
             connection is established successful, everything
             is fine, otherwise something is bad with your login informations.
-        </p>
+            </div>
+        </div>        
         
+        <div class="panel panel-warning">
+            <div class="panel-heading">
+                <h3 class="panel-title">Demo time</h3>
+            </div>
+            <div class="panel-body">
+                When the login works as of above you can test the user interface components by
+                <a href="testws/index.html">clicking on this link</a>.
+            </div>
+        </div>
         
-        <hr />
-        
-        <h2>Demos</h2>
-        <p>
-            When the login works as of above you can <b>test the websocket interface</b> of the VSCP daemon by
-            <a href="testws/index.html">clicking on this link</a>.
-        </p>
-        
-        <hr />
-             
-        <h2>Service</h2>
-        <p>
-            For maintaining VSCP nodes you can use the provided <a href="service/index.html">service interfaces</a>.
-        </p>
-        
-        <hr />
      
-         <p><b><pre>This file and the other web content change very frequently and you may therefore want to download the latest 
+        <div class="alert alert-danger" role="alert">This file and the other web content change very frequently and you may therefore want to download the latest 
 content. You find it <a href="https://github.com/grodansparadis/vscp-ux">here</a>. Documentation for VSCP & Friends is 
-<a href="http://vscp.org/#documentation">here</a>.</pre></b></p>
+<a href="http://vscp.org/#documentation">here</a>.</div>
        
         <hr />
-        Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Paradise of the Frog/Grodans Paradis AB</a>
+        Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
     </div>
 </body>
 </html>

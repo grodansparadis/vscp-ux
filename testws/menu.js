@@ -45,7 +45,7 @@ navBarMenu.content = [
         url: "index.html"
     },
     {
-        title: "Demos",
+        title: "Widget & general demos",
         url: "#",
         dropDown: [
             {
@@ -123,7 +123,13 @@ navBarMenu.content = [
         ]
     },
     {
-        title: "Service",
-        url: "../service/index.html"
+        title: "REST interface demos",
+        url: "#",
+        dropDown: [
+            {
+                title: "REST demo",
+                url: "../rest/index.html"
+            }
+        ]
     }
 ];
