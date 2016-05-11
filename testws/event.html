@@ -360,7 +360,7 @@
                     <li>
                         The same is true when the button is on and is pressed which sends
                         <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a> event and waits for 
-                        <a> href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off" CLASS1.INFORMATION, Type=3/OFF</a>
+                        <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off"> CLASS1.INFORMATION, Type=3/OFF</a>
                     </li>
                 </ul>
             </p>
@@ -417,13 +417,19 @@
                 <input id="slider1" style="width: 400px;"  type="range" min="0" max="100" value="0" onchange="sliderUpdate( this.value )" disabled />
                 <input id="sliderText" type="text" value="0" size="2" disabled />
             </p>
+            <p>
+                <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL, Type=20, Dim 
+                Lamps</a> is sent by the slider control in this particular example.      
+            </p>
 
             <hr>
 
             <h2>Demo 5 - Listen to events</h2>
             <p>
                 This demo show how to listen for events. All events received on the system are displayed here. Normally
-                one sets a filter to limit the received events to the ones of interest.
+                one sets a filter to limit the received events to the ones of interest. Event definitions can be found 
+                <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=level_i_events">here to help you decode the events
+                received.</a>
             </p>
             <div>
                 <h3>Received events</h3>
