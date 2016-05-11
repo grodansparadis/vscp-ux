@@ -46,9 +46,9 @@
 
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
-    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script src="http://code.jquery.com/jquery-2.2.1.min.js"></script>
+    <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 
     <script type="text/javascript">
 		
@@ -364,7 +364,9 @@
 			
 			if ( VscpSessionKey.length > 0 ) {	
 				$.ajax({
-					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=setfilter&vscpfilter=' + txtVscpFilter + '&vscpmask=' + txtVscpMask,
+					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
+							'&format=jsonp&op=setfilter&vscpfilter=' + txtVscpFilter + 
+							'&vscpmask=' + txtVscpMask,
 					type : "GET",
 					jsonpCallback: 'handler',
 					cache: true,
@@ -523,7 +525,7 @@
 									", peristence = " + response.varpersistence );
 						}
 						else {
-							$("#events").html( "Unable top read variable" );
+							$("#events").html( "Unable to read variable" );
 						}
 					
 					},
@@ -589,18 +591,23 @@
 		//
 		
 		var do_createVariable = function() {
-			
+						
 			var txtVariableName = window.prompt("Name of variable to create:","newvar");
+			if ( null == txtVariableName ) return;
 			var txtVariableValue = window.prompt("Value:","This is a new string");
+			if ( null == txtVariableValue ) return;
 			var txtVariableType = window.prompt("Type:","string");
-			var txtVariableValue = window.prompt("Persistent (true/false):","false");
+			if ( null == txtVariableType ) return;
+			var txtVariablePersistent = window.prompt("Persistent (true/false):","false");
+			if ( null == txtVariablePersistent ) return;
 			
 			if ( VscpSessionKey.length > 0 ) {	
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=createvar&variable=' + txtVariableName +
 							'&value=' + txtVariableValue +
-							'&type=' + txtVariableValue,
+							'&type=' + txtVariableType +
+							'&persistent=' + txtVariablePersistent,
 					type : "GET",
 					jsonpCallback: 'handler',
 					cache: true,
@@ -619,6 +626,51 @@
 					
 						if ( response.success ) {
 							$("#events").html( "OK Variable written" );
+						}					
+					
+					},
+					error: function( xhr, status, error ) {
+						console.log( "Close:" + error + " Status:" + status );
+					}
+				});
+			}
+			else {
+				alert("Interface is not open!");
+			}
+
+		};
+		
+		///////////////////////////////////////////////////////////////////////
+		// do_deleteVariable
+		//
+		
+		var do_deleteVariable = function() {
+						
+			var txtVariableName = window.prompt("Name of variable to delete:","test");
+			if ( null == txtVariableName ) return;
+			
+			if ( VscpSessionKey.length > 0 ) {	
+				$.ajax({
+					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
+							'&format=jsonp&op=deletevar&variable=' + txtVariableName,
+					type : "GET",
+					jsonpCallback: 'handler',
+					cache: true,
+					dataType: 'jsonp',
+					success: function(response) {
+						// response will be a javascript
+						// array of objects
+						console.log("-----------------------------------------------------------");
+						console.log("                     do_deleteVariable");
+						console.log("-----------------------------------------------------------");
+						console.log("Success = " + response.success );
+						console.log("Code = " + response.code );
+						console.log("Message = " + response.message );
+						console.log("Description = " + response.description );
+						console.log("Info = " + response.info );
+					
+						if ( response.success ) {
+							$("#events").html( "OK Variable deleted" );
 						}					
 					
 					},
@@ -657,6 +709,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
+						
 						// response will be a javascript
 						// array of objects
 						console.log("-----------------------------------------------------------");
@@ -729,7 +782,7 @@
 		<a href="#" onclick="do_createVariable();" >Create variable</a> |
 		<a href="#" onclick="do_readVariable();" >Read variable</a> |
 		<a href="#" onclick="do_writeVariable();" >Write variable</a> |
-		<a href="#" onclick="do_createVariable();" >Create variable</a> |
+		<a href="#" onclick="do_deleteVariable();" >Delete variable</a> |
 		<a href="#" onclick="do_sendMeasurement();" >Send measurement</a> |
 		<a href="#" onclick="do_getTable();" >Get table</a>
 		
@@ -739,8 +792,9 @@
 		<p id="sessionkey">Sessionkey: </p>
 		<p id="nevents"> </p>
 		<p id="events"> </p>
-		<hr>
-        <a href="http://www.paradiseofthefrog.com">Paradise of the Frog AB</a>
+		<br /><br />
+        <hr />
+        Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
     </div>
 	
 </body>
