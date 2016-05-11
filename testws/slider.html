@@ -110,6 +110,7 @@
 
                     $( "#sliderCtrl1" ).val( evt.vscpData[ 0 ] );
                     $( "#sliderText1" ).html( evt.vscpData[ 0 ] );
+                    $( "#sliderCtrl2" ).val( evt.vscpData[ 0 ] );
                 }
 
             };
@@ -152,12 +153,15 @@
         <h1>VSCP HTML5 slider demo</h1>
         <p>
             This demo demonstrates how to use the HTML slider control with VSCP. When you drag the slider it
-            sends <b>CLASS1.CONTROL, Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</b> with zone=1, subzone=20. This event
+            sends <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL, 
+            Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> with zone=1, subzone=20. This event
             have a value between 0-100 in byte zero and zone/subzone in byte 1/2.
         </p>
         <p>
-            The usual response from a <b>CLASS1.CONTROL, Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</b> event is
-            <b>CLASS1.CONTROL, Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</b>. So a mask is set to only receive
+            The usual response from a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL, 
+            Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> event is
+            <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.INFORMATION, 
+            Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>. So a mask is set to only receive
             this event and if it is received it will set the value of the slider after checking that the zone/subzone
             is the expected ones.
         </p>
@@ -169,7 +173,7 @@
             You can update the slider by sending
         </p>
         <p>
-            <b>send 0,20,40,0,0,-,90,1,20</b>
+            <pre>send 0,20,40,0,0,-,90,1,20</pre> 
         </p>
         <p>
             Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
@@ -184,6 +188,7 @@
             The VSCP_TYPE_CONTROL_BIG_CHANGE_LEVEL, VSCP_TYPE_INFORMATION_BIG_ LEVEL_CHANGED events can be used if you need ranges
             other than 0-100
         </p>
+        <p>
         <div>
             <datalist id="datalist">
                 <option>0</option>
@@ -211,12 +216,11 @@
             <input id="sliderCtrl1" style="width: 600px;" type="range" min="0" max="100" value="0" step="5" list="datalist" onchange="sliderChange( this.value )" />
             <span id="sliderText1">0</span>
         <div>
+        </p>    
         <p>
-            <input type="range" name="grade" orient="vertical" list="datalist" style="width: 20px; height: 200px; -webkit-appearance: slider-vertical; writing-mode: bt-lr;">
+            <input id="sliderCtrl2" type="range" min="0" max="100" value="0" step="5" name="grade" orient="vertical" list="datalist" style="width: 20px; height: 200px; -webkit-appearance: slider-vertical; writing-mode: bt-lr;">
         </p>
-        <p>
-            The vertical slider is not connected to the automation.
-        </p>
+        <br>
 
         <br /><br />
         <hr />

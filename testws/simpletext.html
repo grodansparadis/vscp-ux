@@ -118,9 +118,9 @@
 
                 $( "#myTable" ).append(
                     "<tr><td>" +
-                    "Value=" + measurement.value +
-                    " Unit=" + measurement.unit +
-                    " Event=" + JSON.stringify( measurement.event ) +
+                    "<b>Value</b>=" + measurement.value +
+                    ", <b>Unit</b>=" + measurement.unit +
+                    ", <b>Event</b>=" + JSON.stringify( measurement.event ) +
                     "</td></tr>"
                 );
             };
@@ -168,8 +168,11 @@
                 sent from sensor 2 on a remote device and it says 6 degrees Celsius.
             </li>
         </ol>
-        <b>Demo</b>
+        
         <hr>
+        
+        <h3>Demo</h3>
+        
         <div>
             This is just some text in a html element where a temperature set to
             <span id="id1" style="color: blue;"> </span> is displayed in-line and

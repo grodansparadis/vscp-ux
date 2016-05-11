@@ -209,14 +209,15 @@
         <h1>VSCP HTML5 progress bar</h1>
         <p>
             This is just the standard HTML5 progress bar with some extra styling. It is connected to the <b>vscp.Connection</b>
-            and configured to write the value to the progress bars from the <b>CLASS1.CONTROL, Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</b>
+            and configured to write the value to the progress bars from the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.CONTROL, 
+                Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>
             event.
         </p>
         <p>
             You can update the slider by sending
-            <br /><br />
-            <b>send 0,20,40,0,0,"-",90,1,20</b>
-            <br /><br />
+            <p>
+            <pre>send 0,20,40,0,0,"-",90,1,20</pre>
+            </p>
         </p>
         <p>
             Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
