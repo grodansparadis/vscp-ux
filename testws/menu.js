@@ -57,7 +57,7 @@ navBarMenu.content = [
                 url: "event.html"
             },
             {
-                title: "Widget demo",
+                title: "Button widget demo",
                 url: "statebutton.html"
             },
             {
