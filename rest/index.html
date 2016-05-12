@@ -506,6 +506,112 @@
 		};
 		
 		///////////////////////////////////////////////////////////////////////
+		// do_sendMeasurement
+		//
+		
+		var do_sendMeasurement = function() {
+			
+			var txtValue = window.prompt("Send CLASS2.MEASUREMENT_FLOAT. Type=6 (temperature) i degrees Celsius:","23.98");
+			
+			if ( VscpSessionKey.length > 0 ) {	
+				$.ajax({
+					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
+							'&format=jsonp&op=measurement&value=' + txtValue +
+							'&guid=""' + 		// GUID (use GUID of interface)
+							'&type=6' + 		// Temperature
+							'&level=2' +		// Level II
+							'&sensoridx=2' +	// Sensor number 2
+							'&unit=1' +			// Unit = 1 Degrees Celsius
+							'&zone=22' +		// Zone = 22
+							'&subzone=33',		// Sub Zone = 33
+					type : "GET",
+					jsonpCallback: 'handler',
+					cache: true,
+					dataType: 'jsonp',
+					success: function(response) {
+						
+						// response will be a javascript
+						// array of objects
+						console.log("-----------------------------------------------------------");
+						console.log("                     do_sendMeasurement");
+						console.log("-----------------------------------------------------------");
+						console.log("Success = " + response.success );
+						console.log("Code = " + response.code );
+						console.log("Message = " + response.message );
+						console.log("Description = " + response.description );
+						console.log("Info = " + response.info );
+					
+						if ( response.success ) {
+							$("#events").html( "OK Variable written" );
+						}					
+					
+					},
+					error: function( xhr, status, error ) {
+						console.log( "Close:" + error + " Status:" + status );
+					}
+				});
+			}
+			else {
+				alert("Interface is not open!");
+			}
+
+		};
+		
+		///////////////////////////////////////////////////////////////////////
+		// do_createVariable
+		//
+		
+		var do_createVariable = function() {
+						
+			var txtVariableName = window.prompt("Name of variable to create:","newvar");
+			if ( null == txtVariableName ) return;
+			var txtVariableValue = window.prompt("Value:","This is a new string");
+			if ( null == txtVariableValue ) return;
+			var txtVariableType = window.prompt("Type:","string");
+			if ( null == txtVariableType ) return;
+			var txtVariablePersistent = window.prompt("Persistent (true/false):","false");
+			if ( null == txtVariablePersistent ) return;
+			
+			if ( VscpSessionKey.length > 0 ) {	
+				$.ajax({
+					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
+							'&format=jsonp&op=createvar&variable=' + txtVariableName +
+							'&value=' + txtVariableValue +
+							'&type=' + txtVariableType +
+							'&persistent=' + txtVariablePersistent,
+					type : "GET",
+					jsonpCallback: 'handler',
+					cache: true,
+					dataType: 'jsonp',
+					success: function(response) {
+						// response will be a javascript
+						// array of objects
+						console.log("-----------------------------------------------------------");
+						console.log("                     do_createVariable");
+						console.log("-----------------------------------------------------------");
+						console.log("Success = " + response.success );
+						console.log("Code = " + response.code );
+						console.log("Message = " + response.message );
+						console.log("Description = " + response.description );
+						console.log("Info = " + response.info );
+					
+						if ( response.success ) {
+							$("#events").html( "OK Variable written" );
+						}					
+					
+					},
+					error: function( xhr, status, error ) {
+						console.log( "Close:" + error + " Status:" + status );
+					}
+				});
+			}
+			else {
+				alert("Interface is not open!");
+			}
+
+		};
+		
+		///////////////////////////////////////////////////////////////////////
 		// do_readVariable
 		//
 		
@@ -605,59 +711,7 @@
 
 		};
 		
-		///////////////////////////////////////////////////////////////////////
-		// do_createVariable
-		//
 		
-		var do_createVariable = function() {
-						
-			var txtVariableName = window.prompt("Name of variable to create:","newvar");
-			if ( null == txtVariableName ) return;
-			var txtVariableValue = window.prompt("Value:","This is a new string");
-			if ( null == txtVariableValue ) return;
-			var txtVariableType = window.prompt("Type:","string");
-			if ( null == txtVariableType ) return;
-			var txtVariablePersistent = window.prompt("Persistent (true/false):","false");
-			if ( null == txtVariablePersistent ) return;
-			
-			if ( VscpSessionKey.length > 0 ) {	
-				$.ajax({
-					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
-							'&format=jsonp&op=createvar&variable=' + txtVariableName +
-							'&value=' + txtVariableValue +
-							'&type=' + txtVariableType +
-							'&persistent=' + txtVariablePersistent,
-					type : "GET",
-					jsonpCallback: 'handler',
-					cache: true,
-					dataType: 'jsonp',
-					success: function(response) {
-						// response will be a javascript
-						// array of objects
-						console.log("-----------------------------------------------------------");
-						console.log("                     do_createVariable");
-						console.log("-----------------------------------------------------------");
-						console.log("Success = " + response.success );
-						console.log("Code = " + response.code );
-						console.log("Message = " + response.message );
-						console.log("Description = " + response.description );
-						console.log("Info = " + response.info );
-					
-						if ( response.success ) {
-							$("#events").html( "OK Variable written" );
-						}					
-					
-					},
-					error: function( xhr, status, error ) {
-						console.log( "Close:" + error + " Status:" + status );
-					}
-				});
-			}
-			else {
-				alert("Interface is not open!");
-			}
-
-		};
 		
 		///////////////////////////////////////////////////////////////////////
 		// do_deleteVariable
@@ -704,57 +758,7 @@
 
 		};
 		
-		///////////////////////////////////////////////////////////////////////
-		// do_sendMeasurement
-		//
 		
-		var do_sendMeasurement = function() {
-			
-			var txtValue = window.prompt("Send CLASS2.MEASUREMENT_FLOAT. Type=6 (temperature) i degrees Celsius:","23.98");
-			
-			if ( VscpSessionKey.length > 0 ) {	
-				$.ajax({
-					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
-							'&format=jsonp&op=measurement&value=' + txtValue +
-							'&guid=""' + 		// GUID (use GUID of interface)
-							'&type=6' + 		// Temperature
-							'&level=2' +		// Level II
-							'&sensoridx=2' +	// Sensor number 2
-							'&unit=1' +			// Unit = 1 Degrees Celsius
-							'&zone=22' +		// Zone = 22
-							'&subzone=33',		// Sub Zone = 33
-					type : "GET",
-					jsonpCallback: 'handler',
-					cache: true,
-					dataType: 'jsonp',
-					success: function(response) {
-						
-						// response will be a javascript
-						// array of objects
-						console.log("-----------------------------------------------------------");
-						console.log("                     do_sendMeasurement");
-						console.log("-----------------------------------------------------------");
-						console.log("Success = " + response.success );
-						console.log("Code = " + response.code );
-						console.log("Message = " + response.message );
-						console.log("Description = " + response.description );
-						console.log("Info = " + response.info );
-					
-						if ( response.success ) {
-							$("#events").html( "OK Variable written" );
-						}					
-					
-					},
-					error: function( xhr, status, error ) {
-						console.log( "Close:" + error + " Status:" + status );
-					}
-				});
-			}
-			else {
-				alert("Interface is not open!");
-			}
-
-		};
 		
 	/*	
 		function getQueryParams(qs) {
@@ -797,7 +801,14 @@
     </nav>
 	
     <div class="container-fluid">
-        <h1>VSCP REST interface demo code</h1>
+        <h3>VSCP REST interface demo code</h3>
+		
+		<p>
+			This demo demonstrates the VSCP daemon REST interface functionality. The VSCP daemon REST interface is documented
+			<a href="http://www.vscp.org/docs/vscpd/doku.php?id=vscp_daemon_vscp_daemon_rest_interface">here</a> and you can find the code for this example at 
+			<a href="https://github.com/grodansparadis/vscp-ux">GitHub.</a>
+		</p>
+		<!--
 		<a href="#" onclick="do_setServer();" >Set server</a> |
 		<a href="#" onclick="do_open();" >Open</a> | 
 		<a href="#" onclick="do_close();" >Close</a> | 
@@ -815,8 +826,14 @@
 		<a href="#" onclick="do_deleteVariable();" >Delete variable</a> |
 		<a href="#" onclick="do_sendMeasurement();" >Send measurement</a> |
 		<a href="#" onclick="do_getTable();" >Get table</a>
-		
-		<p>You should open the console log window of your browser to see status from this demo<p>
+		-->
+		<p>
+			Open a session and possible define a server (set Server) before you start to work with the other available menu items.
+		</p>
+		<p>
+			Open the console log window of your browser to see status from this demo as it use log functionality for info about what is done under 
+			the hood.
+		<p>
         <hr>
 		<p id="host">Host: </p>
 		<p id="sessionkey">Sessionkey: </p>

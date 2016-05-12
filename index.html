@@ -6,14 +6,31 @@
     
     <!-- JQuery -->
     <script type="text/javascript" src="js/jquery/2.2.1/jquery-2.2.1.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="js/bootstrap/3.3.6/css/bootstrap.min.css">
     <script type="text/javascript" src="js/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     
+    <!-- VSCP UX version -->
+    <script type="text/javascript" src="js/version.js"></script>
+    
     <!-- Favorite icon -->
     <link rel="icon" href="favicon.ico">
+    
+    <script type="text/javascript">
+        (function() {
+
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+                // Set version
+                $("#version").text("Version: " + vscp_ux_version.full );
+            });
+
+        })();
+   </script>     
+            
+
     
 </head>
 <body>
@@ -23,6 +40,9 @@
         </p>
         
         <hr />
+            
+        <div id="version">
+        </div>
         
         <h1>It works!</h1>
         <p>
@@ -95,8 +115,8 @@
                 <h3 class="panel-title">Demo time</h3>
             </div>
             <div class="panel-body">
-                When the login works as of above you can test the user interface components by
-                <a href="testws/index.html">clicking on this link</a>.
+                OK login works, click the demo button and start exploring
+                <input type="button" class="btn btn-warning" value="GO TO DEMO" onclick="window.location.href='testws/index.html';" enabled />
             </div>
         </div>
         

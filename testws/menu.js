@@ -42,7 +42,7 @@ var navBarMenu = navBarMenu || {};
 navBarMenu.content = [
     {
         title: "Home",
-        url: "index.html"
+        url: "../index.html"
     },
     {
         title: "Widget & general demos",

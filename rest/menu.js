@@ -50,7 +50,7 @@ navBarMenu.content = [
         dropDown: [
             {
                 title: "Set Server",
-                url: "testauth.html"
+                url: "javascript:do_setServer();"
             },
             {
                 title: "Open REST session",
@@ -62,39 +62,39 @@ navBarMenu.content = [
             },
             {
                 title: "Get status",
-                url: "variable.html"
+                url: "javascript:do_status();"
             },
             {
-                title: "Read on event",
-                url: "node_discovery.html"
+                title: "Read one event",
+                url: "javascript:do_readEventOne();"
             },
             {
                 title: "Read all events",
-                url: "slider.html"
+                url: "javascript:do_readEventAll();"
             },
             {
                 title: "Send event",
-                url: "progress.html"
+                url: "javascript:do_sendEvent();"
             },
             {
                 title: "Set filter",
-                url: "simpletext.html"
+                url: "javascript:do_setFilter();"
             },
             {
                 title: "Clear filter",
-                url: "thermometercelsius.html"
+                url: "javascript:do_clrFilter();"
             },
             {
                 title: "Clear event queue",
-                url: "lmsensors.html"
+                url: "javascript:do_clrQueue();"
             },
             {
                 title: "Send measurement",
-                url: "lmsensors.html"
+                url: "javascript:do_sendMeasurement();"
             },
             {
                 title: "Get table",
-                url: "lmsensors.html"
+                url: "javascript:alert('Not available yet');"
             },
         ]
     },
@@ -104,19 +104,19 @@ navBarMenu.content = [
         dropDown: [
             {
                 title: "Create variable",
-                url: "epoch_simple.html"
+                url: "javascript:do_createVariable();"
             },
             {
                 title: "Read variable",
-                url: "epoch_simple.html"
+                url: "javascript:do_readVariable();"
             },
             {
                 title: "Write variable",
-                url: "epoch_simple.html"
+                url: "javascript:do_writeVariable();"
             },
             {
                 title: "Delete variable",
-                url: "epoch_simple.html"
+                url: "javascript:do_deleteVariable();"
             },
         ]
     },
