@@ -1,5 +1,5 @@
 //
-// vscpwslib javascript websocket library
+// vscplib javascript websocket library
 // Copyright (C) 2012-2016 Ake Hedman, Grodans Paradis AB
 // <akhe@grodansparadis.com>
 // Copyright (c) 2015 Andreas Merkle
@@ -41,17 +41,12 @@
 
 "use strict"; // jshint ignore:line
 
-// Version information
-var vscpws_version_major = 0;
-var vscpws_version_minor = 1;
-var vscpws_version_subminor = 0;
-
 // Uncomment to get debug messages
-var vscpws_debug = true;
+var vscp_debug = true;
 
 // Log messages for debug purposes
-function vscpws_log( text ) {
-    if ( true === vscpws_debug ) {
+function vscp_log( text ) {
+    if ( true === vscp_debug ) {
         console.log( text );
     }
 }
@@ -1124,7 +1119,7 @@ String.prototype.format = function(i, safe, arg) {
 
 // Based on code from Jonas Raoni Soares Silva
 // http://jsfromhell.com/classes/binary-parser
-function vscpws_encodeFloat(number) {
+function vscp_encodeFloat(number) {
     var n = +number,
         status = (n !== n) || n == -Infinity || n == +Infinity ? n : 0,
         exp = 0,
@@ -1204,24 +1199,24 @@ function vscpws_encodeFloat(number) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_littleEndian
+// vscp_littleEndian
 //
 // Return true for little endian/false for big endian
 //
 
-var vscpws_littleEndian = (function() {
+var vscp_littleEndian = (function() {
     var buffer = new ArrayBuffer(2);
     new DataView(buffer).setInt16(0, 256, true);
     return new Int16Array(buffer)[0] === 256;
 })();
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_checkEndian
+// vscp_checkEndian
 //
 // Byte swap word and dword
 //
 
-function vscpws_swapBytes(buf, size)
+function vscp_swapBytes(buf, size)
 {
 
     var bytes = new Uint8Array(buf);
@@ -1249,10 +1244,10 @@ function vscpws_swapBytes(buf, size)
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_sleep
+// vscp_sleep
 //
 
-function vscpws_sleep( milliseconds ) {
+function vscp_sleep( milliseconds ) {
   var start = new Date().getTime();
   for (var i = 0; i < 1e7; i++) {
     if ((new Date().getTime() - start) > milliseconds){
@@ -1262,19 +1257,19 @@ function vscpws_sleep( milliseconds ) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_toFixed
+// vscp_toFixed
 //
 
-function vscpws_toFixed(value, precision) {
+function vscp_toFixed(value, precision) {
     var power = Math.pow(10, precision || 0);
     return String((Math.round(value * power) / power).toFixed(precision));
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_get_appropriate_ws_url
+// vscp_get_appropriate_ws_url
 //
 
-function vscpws_get_appropriate_ws_url(url) {
+function vscp_get_appropriate_ws_url(url) {
 
     var pcol;
     var u = document.URL;
@@ -1314,7 +1309,13 @@ function vscp_make_websocket_auth_hash( user, password, sid ){
 }
 
 
-function vscpws_varInteger2Float( data ) {
+///////////////////////////////////////////////////////////////////////////////
+// vscp_varInteger2Float
+//
+// Conbert integer to float
+//
+
+function vscp_varInteger2Float( data ) {
     var rval = 0.0;
 
     var bNegative = false;
@@ -1343,36 +1344,36 @@ function vscpws_varInteger2Float( data ) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_getDatacoding
+// vscp_getDatacoding
 //
 
-function vscpws_getDatacoding(data) {
+function vscp_getDatacoding(data) {
     return (data >> 5) & 7;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_getDatacodingUnit
+// vscp_getDatacodingUnit
 //
 
-function vscpws_getDatacodingUnit(data) {
+function vscp_getDatacodingUnit(data) {
     return (data >> 3) & 3;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_getSensorIndexFromDataCodin
+// vscp_getSensorIndexFromDataCodin
 //
 
-function vscpws_getSensorIndexFromDataCoding(data) {
+function vscp_getSensorIndexFromDataCoding(data) {
     return data & 7;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_measurementClass10Decode
+// vscp_measurementClass10Decode
 //
 // data is event data array where first data byte is data coding
 // Always return float.
 
-function vscpws_measurementClass10Decode(data){
+function vscp_measurementClass10Decode(data){
 
     var rval = 0.0;
     var mask = 0;
@@ -1383,7 +1384,7 @@ function vscpws_measurementClass10Decode(data){
     var str = "";
     var i = 0;
 
-    switch ( vscpws_getDatacoding( data[0] ) ){
+    switch ( vscp_getDatacoding( data[0] ) ){
         case 0: // Bits
         case 1: // Bytes
         case 3: // Integer
@@ -1393,7 +1394,7 @@ function vscpws_measurementClass10Decode(data){
                 for (i=1;i<data.length;i++) {
                     newdata[i-1] = data[i];
                 }
-                rval = vscpws_varInteger2Float( newdata );
+                rval = vscp_varInteger2Float( newdata );
             }
             break;
 
@@ -1414,7 +1415,7 @@ function vscpws_measurementClass10Decode(data){
                     newdata[i-2] = data[i];
                 }
 
-                rval = vscpws_varInteger2Float( newdata );
+                rval = vscp_varInteger2Float( newdata );
 
                 // Handle mantissa
                 if ( exp & 0x80 ) {
@@ -1450,11 +1451,11 @@ function vscpws_measurementClass10Decode(data){
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_measurementClass60DecodeNumber
+// vscp_measurementClass60DecodeNumber
 //
 //
 
-function vscpws_measurementClass60DecodeNumber(data) {
+function vscp_measurementClass60DecodeNumber(data) {
     var rval = 0;
     if (8 == data.length) {
 
@@ -1477,11 +1478,11 @@ function vscpws_measurementClass60DecodeNumber(data) {
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_measurementClass65DecodeNumber
+// vscp_measurementClass65DecodeNumber
 //
 //
 
-function vscpws_measurementClass65DecodeNumber(data)
+function vscp_measurementClass65DecodeNumber(data)
 {
     var rval = 0;
     var exp = data[3];
@@ -1505,224 +1506,224 @@ function vscpws_measurementClass65DecodeNumber(data)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertFahrenheitToKelvin
+// vscp_convertFahrenheitToKelvin
 //
 
-function vscpws_convertFahrenheitToKelvin(value) {
+function vscp_convertFahrenheitToKelvin(value) {
     var fTempVal = "string" == typeof value ? parseFloat(value) : value;
     var cTempVal = (fTempVal - 32) * (5 / 9) + 273.15;
     return cTempVal;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertFahrenheitToCelsius
+// vscp_convertFahrenheitToCelsius
 //
 
-function vscpws_convertFahrenheitToCelsius(value) {
+function vscp_convertFahrenheitToCelsius(value) {
     var fTempVal = "string" == typeof value ? parseFloat(value) : value;
     var cTempVal = (fTempVal - 32) * (5 / 9);
     return cTempVal;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertCelsiusToFahrenheit
+// vscp_convertCelsiusToFahrenheit
 //
 
-function vscpws_convertCelsiusToFahrenheit(value) {
+function vscp_convertCelsiusToFahrenheit(value) {
     var cTempVal = "string" == typeof value ? parseFloat(value) : value;
     var fTempVal = (cTempVal * (9 / 5)) + 32;
     return fTempVal;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertKelvinToCelsius
+// vscp_convertKelvinToCelsius
 //
 
-function vscpws_convertKelvinToCelsius(value) {
+function vscp_convertKelvinToCelsius(value) {
     var kTempVal = "string" == typeof value ? parseFloat(value) : value;
     var cTempVal = kTempVal - 273.15;
     return cTempVal;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertCelsiusToKelvin
+// vscp_convertCelsiusToKelvin
 //
 
-function vscpws_convertCelsiusToKelvin(value) {
+function vscp_convertCelsiusToKelvin(value) {
     var kTempVal = "string" == typeof value ? parseFloat(value) : value;
     var cTempVal = kTempVal + 273.15;
     return cTempVal;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertKelvinToFahrenheit
+// vscp_convertKelvinToFahrenheit
 //
 
-function vscpws_convertKelvinToFahrenheit(value) {
+function vscp_convertKelvinToFahrenheit(value) {
     var kTempVal = "string" == typeof value ? parseFloat(value) : value;
     var cTempVal = kTempVal + 273.15;
-    return vscpws_convertCelsiusToFahrenheit(cTempVal);
+    return vscp_convertCelsiusToFahrenheit(cTempVal);
 }
 
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertMeterToFeet
+// vscp_convertMeterToFeet
 //
 
-function vscpws_convertMeterToFeet(value) {
+function vscp_convertMeterToFeet(value) {
     var fTempVal = "string" == typeof value ? parseFloat(value) : value;
     return fTempVal* 3.2808399;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertFeetToMeter
+// vscp_convertFeetToMeter
 //
 
-function vscpws_convertFeetToMeter(value) {
+function vscp_convertFeetToMeter(value) {
     var fTempVal = "string" == typeof value ? parseFloat(value) : value;
     return fTempVal* 0.3048;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertMeterToInch
+// vscp_convertMeterToInch
 //
 
-function vscpws_convertMeterToInch(value) {
+function vscp_convertMeterToInch(value) {
     var fTempVal = "string" == typeof value ? parseFloat(value) : value;
     return fTempVal* 3.2808399 * 12;
 }
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_convertInchToMeter
+// vscp_convertInchToMeter
 //
 
-function vscpws_convertInchToMeter(value) {
+function vscp_convertInchToMeter(value) {
     var fTempVal = "string" == typeof value ? parseFloat(value) : value;
     return fTempVal* 0.3048/12;
 }
 
 
 /////////////////////////////////////////////////////////////////////////////
-// vscpws_units
+// vscp_units
 //
 
-var vscpws_units = [];
+var vscp_units = [];
 // Generic
-vscpws_units[0] = [];
+vscp_units[0] = [];
 // Count
-vscpws_units[1] = [];
+vscp_units[1] = [];
 // Length/Distance
-vscpws_units[2] = new Array("Meter");
+vscp_units[2] = new Array("Meter");
 // Mass
-vscpws_units[3] = new Array("Kilogram");
+vscp_units[3] = new Array("Kilogram");
 // Time
-vscpws_units[4] = new Array("Millisecond","Seconds");
+vscp_units[4] = new Array("Millisecond","Seconds");
 // Electrical Current
-vscpws_units[5] = new Array("Ampere");
+vscp_units[5] = new Array("Ampere");
 // Temperature
-vscpws_units[6] = new Array("Kelvin","Celsius","Fahrenheit");
+vscp_units[6] = new Array("Kelvin","Celsius","Fahrenheit");
 // Amount of substance
-vscpws_units[7] = new Array("Mole");
+vscp_units[7] = new Array("Mole");
 // Luminous Intensity (Intensity of light)
-vscpws_units[8] = new Array("Candela");
+vscp_units[8] = new Array("Candela");
 // Frequency
-vscpws_units[9] = new Array("Hertz");
+vscp_units[9] = new Array("Hertz");
 // Radioactivity and other random events
-vscpws_units[10] = new Array("Becquerel");
+vscp_units[10] = new Array("Becquerel");
 // Force
-vscpws_units[11] = new Array("Newton");
+vscp_units[11] = new Array("Newton");
 // Pressure
-vscpws_units[12] = new Array("Pascal","Bar","Psi");
+vscp_units[12] = new Array("Pascal","Bar","Psi");
 // Energy
-vscpws_units[13] = new Array("Joule");
+vscp_units[13] = new Array("Joule");
 // Power
-vscpws_units[14] = new Array("Watt");
+vscp_units[14] = new Array("Watt");
 // Electrical Charge
-vscpws_units[15] = new Array("Coulomb");
+vscp_units[15] = new Array("Coulomb");
 // Electrical Potential (Voltage)
-vscpws_units[16] = new Array("Volt");
+vscp_units[16] = new Array("Volt");
 // Electrical Capacitance
-vscpws_units[17] = new Array("Farad");
+vscp_units[17] = new Array("Farad");
 // Electrical Resistance
-vscpws_units[18] = new Array("Ohm");
+vscp_units[18] = new Array("Ohm");
 // Electrical Conductance
-vscpws_units[19] = new Array("Siemens");
+vscp_units[19] = new Array("Siemens");
 // Magnetic Field Strength
-vscpws_units[20] = new Array("Ampere meters");
+vscp_units[20] = new Array("Ampere meters");
 // Magnetic Flux
-vscpws_units[21] = new Array("Weber");
+vscp_units[21] = new Array("Weber");
 // Magnetic Flux Density
-vscpws_units[22] = new Array("Tesla");
+vscp_units[22] = new Array("Tesla");
 // Inductance
-vscpws_units[23] = new Array("Henry");
+vscp_units[23] = new Array("Henry");
 // Luminous Flux
-vscpws_units[24] = new Array("Lumen");
+vscp_units[24] = new Array("Lumen");
 // Illuminance
-vscpws_units[25] = new Array("Lux");
+vscp_units[25] = new Array("Lux");
 // Radiation dose
-vscpws_units[26] = new Array("Gray","Sievert");
+vscp_units[26] = new Array("Gray","Sievert");
 // Catalytic activity
-vscpws_units[27] = new Array("Katal");
+vscp_units[27] = new Array("Katal");
 // Volume
-vscpws_units[28] = new Array("Cubic meter","Liter");
+vscp_units[28] = new Array("Cubic meter","Liter");
 // Sound intensity
-vscpws_units[29] = new Array("Bel","Neper","dB");
+vscp_units[29] = new Array("Bel","Neper","dB");
 // Angle
-vscpws_units[30] = new Array("Rad","Degree","Arcminute","Arcseconds");
+vscp_units[30] = new Array("Rad","Degree","Arcminute","Arcseconds");
 // Position
-vscpws_units[31] = new Array("Longitude","Latitude");
+vscp_units[31] = new Array("Longitude","Latitude");
 // Speed
-vscpws_units[32] = new Array("Meters per second");
+vscp_units[32] = new Array("Meters per second");
 // Acceleration
-vscpws_units[33] = new Array("Meters per second/second");
+vscp_units[33] = new Array("Meters per second/second");
 // Tension
-vscpws_units[34] = new Array("N/m");
+vscp_units[34] = new Array("N/m");
 // Damp/moist (Hygrometer reading)
-vscpws_units[35] = new Array("%");
+vscp_units[35] = new Array("%");
 // Flow
-vscpws_units[36] = new Array("Cubic meters/second","Liter/Second");
+vscp_units[36] = new Array("Cubic meters/second","Liter/Second");
 // Thermal resistance
-vscpws_units[37] = new Array("K/W");
+vscp_units[37] = new Array("K/W");
 //  Refractive power
-vscpws_units[38] = new Array("Dioptre");
+vscp_units[38] = new Array("Dioptre");
 // Dynamic viscosity
-vscpws_units[39] = new Array("Poiseuille");
+vscp_units[39] = new Array("Poiseuille");
 // Sound impedance
-vscpws_units[40] = new Array("Rayal");
+vscp_units[40] = new Array("Rayal");
 // Sound resistance
-vscpws_units[41] = new Array("Acoustic ohm");
+vscp_units[41] = new Array("Acoustic ohm");
 // Electric elastance
-vscpws_units[42] = new Array("Darag");
+vscp_units[42] = new Array("Darag");
 // Luminous energy
-vscpws_units[43] = new Array("Talbot");
+vscp_units[43] = new Array("Talbot");
 // Luminance
-vscpws_units[44] = new Array("Nit");
+vscp_units[44] = new Array("Nit");
 // Chemical concentration
-vscpws_units[45] = new Array("Molal");
+vscp_units[45] = new Array("Molal");
 // Reserved
-vscpws_units[46] = new Array("Reserved");
+vscp_units[46] = new Array("Reserved");
 // Dose equivalent
-vscpws_units[47] = new Array("Sievert");
+vscp_units[47] = new Array("Sievert");
 // Reserved
-vscpws_units[48] = new Array("Reserved");
+vscp_units[48] = new Array("Reserved");
 // Dew Point
-vscpws_units[49] = new Array("Levin","Celsius","Fahrenheit");
+vscp_units[49] = new Array("Levin","Celsius","Fahrenheit");
 // Relative Level
-vscpws_units[50] = new Array("Relative");
+vscp_units[50] = new Array("Relative");
 // Altitude
-vscpws_units[51] = new Array("Meter","Feet","Inches");
+vscp_units[51] = new Array("Meter","Feet","Inches");
 // Area
-vscpws_units[52] = new Array("Square meter");
+vscp_units[52] = new Array("Square meter");
 // Radiant intensity
-vscpws_units[53] = new Array("Watt per steradian");
+vscp_units[53] = new Array("Watt per steradian");
 // Radiance
-vscpws_units[54] = new Array("Att per steradian per square metre");
+vscp_units[54] = new Array("Att per steradian per square metre");
 // Irradiance, Exitance, Radiosity
-vscpws_units[55] = new Array("Watt per square metre");
+vscp_units[55] = new Array("Watt per square metre");
 // Spectral radiance
-vscpws_units[56] = new Array("Watt per steradian per square metre per nm");
+vscp_units[56] = new Array("Watt per steradian per square metre per nm");
 // Spectral irradiance
-vscpws_units[57] = new Array("Watt per square metre per nm");
+vscp_units[57] = new Array("Watt per square metre per nm");
 
 /////////////////////////////////////////////////////////////////////////////
 // loadScript
@@ -1739,7 +1740,7 @@ vscpws_units[57] = new Array("Watt per square metre per nm");
 // loadScript("my_lovely_script.js", myPrettyCode);
 //
 
-function vscpws_loadScript(url, callback)
+function vscp_loadScript(url, callback)
 {
 // adding the script tag to the head as suggested before
 var head = document.getElementsByTagName('head')[0];
@@ -1836,10 +1837,10 @@ var getElementsByClassName = function (className, tag, elm){
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_obSub
+// vscp_obSub
 //
 
-function vscpws_obSub(ob) {
+function vscp_obSub(ob) {
     var r = [];
     var i = 0;
     for (var z in ob) {
@@ -1851,11 +1852,11 @@ function vscpws_obSub(ob) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_getVarName
+// vscp_getVarName
 //
 
-function vscpws_getVarName(variable) {
-    return vscpws_obSub(window).map(function(a) {
+function vscp_getVarName(variable) {
+    return vscp_obSub(window).map(function(a) {
         if (window[a] === variable) {
             return a;
         }
@@ -1863,10 +1864,10 @@ function vscpws_getVarName(variable) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_global_mouseover
+// vscp_global_mouseover
 //
 
-function vscpws_global_mouseover(obj) {
+function vscp_global_mouseover(obj) {
     //obj.onOver();
     //alert(obj.toString());
     //alert(obj);
@@ -1882,7 +1883,7 @@ function vscpws_global_mouseover(obj) {
 
 
 //*****************************************************************************
-//                             vscpws_backgroundCanvas
+//                             vscp_backgroundCanvas
 //*****************************************************************************
 
 
@@ -1892,10 +1893,10 @@ function vscpws_global_mouseover(obj) {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_backgroundCanvas
+// vscp_backgroundCanvas
 //
 
-function vscpws_backgroundCanvas(instanceName,  // Name of canvas
+function vscp_backgroundCanvas(instanceName,  // Name of canvas
                                     imgfile,    // Path to image file.
                                     x,          // Position
                                     y,          // Position
@@ -1928,9 +1929,9 @@ function vscpws_backgroundCanvas(instanceName,  // Name of canvas
 
 }
 
-vscpws_backgroundCanvas.prototype.onLoad = function() {
+vscp_backgroundCanvas.prototype.onLoad = function() {
     this.bLoaded = true;
-    vscpws_log('Load1');
+    vscp_log('Load1');
     this.ctx.drawImage(this.image_background, 0, 0);
 };
 
@@ -1939,7 +1940,7 @@ vscpws_backgroundCanvas.prototype.onLoad = function() {
 
 
 //*****************************************************************************
-//                             vscpws_stateButton
+//                             vscp_stateButton
 //*****************************************************************************
 
 
@@ -1957,10 +1958,10 @@ vscpws_backgroundCanvas.prototype.onLoad = function() {
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_stateButton
+// vscp_stateButton
 //
 
-function vscpws_stateButton( username,        // Username for websocket serever
+function vscp_stateButton( username,        // Username for websocket serever
                                passwordhash,  // Password hash for websocket server
                                url,           // url to VSCP websocket i/f
                                canvasName,    // Where it should be placed
@@ -1991,7 +1992,7 @@ function vscpws_stateButton( username,        // Username for websocket serever
     this.bConnected = false;
 
     // Set the instance name for the control
-    instanceName = "vscpws_" + canvasName;
+    instanceName = "vscp_" + canvasName;
 
     // move this to global scope
     eval(instanceName + " = this;");
@@ -2844,7 +2845,7 @@ function vscpws_stateButton( username,        // Username for websocket serever
 // setOnTransmitEvent
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setOnTransmitEvent = function(vscpclass,
+vscp_stateButton.prototype.setOnTransmitEvent = function(vscpclass,
                                                                 vscptype,
                                                                 data,
                                                                 guid )
@@ -2868,7 +2869,7 @@ vscpws_stateButton.prototype.setOnTransmitEvent = function(vscpclass,
 // setOnTransmitZone
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setOnTransmitZone = function(index,zone,subzone)
+vscp_stateButton.prototype.setOnTransmitZone = function(index,zone,subzone)
 {
     this.transmit_data_on[0] = typeof index !== 'undefined' ? index : 0;
     this.transmit_data_on[1] = typeof zone !== 'undefined' ? zone : 0;
@@ -2879,7 +2880,7 @@ vscpws_stateButton.prototype.setOnTransmitZone = function(index,zone,subzone)
 // setOffTransmitEvent
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setOffTransmitEvent = function(vscpclass,
+vscp_stateButton.prototype.setOffTransmitEvent = function(vscpclass,
                                                                 vscptype,
                                                                 data,
                                                                 guid)
@@ -2902,7 +2903,7 @@ vscpws_stateButton.prototype.setOffTransmitEvent = function(vscpclass,
 // setOffTransmitZone
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setOffTransmitZone = function(index,zone,subzone)
+vscp_stateButton.prototype.setOffTransmitZone = function(index,zone,subzone)
 {
     this.transmit_data_off[0] = typeof index !== 'undefined' ? index : 0;
     this.transmit_data_off[1] = typeof zone !== 'undefined' ? zone : 0;
@@ -2913,7 +2914,7 @@ vscpws_stateButton.prototype.setOffTransmitZone = function(index,zone,subzone)
 // setTransmitBothZone
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setTransmitBothZone = function(index,zone,subzone)
+vscp_stateButton.prototype.setTransmitBothZone = function(index,zone,subzone)
 {
     this.setOffTransmitZone(index,zone,subzone);
     this.setOnTransmitZone(index,zone,subzone);
@@ -2923,7 +2924,7 @@ vscpws_stateButton.prototype.setTransmitBothZone = function(index,zone,subzone)
 // setOnReceiveEvent
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setOnReceiveEvent = function(vscpclass,
+vscp_stateButton.prototype.setOnReceiveEvent = function(vscpclass,
                                                                 vscptype,
                                                                 data,
                                                                 guid )
@@ -2948,7 +2949,7 @@ vscpws_stateButton.prototype.setOnReceiveEvent = function(vscpclass,
 // setOnReceiveZone
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setOnReceiveZone = function(index,zone,subzone)
+vscp_stateButton.prototype.setOnReceiveZone = function(index,zone,subzone)
 {
     this.receive_data_on[0] = typeof index !== 'undefined' ? index : 0;
     this.receive_data_on[1] = typeof zone !== 'undefined' ? zone : 0;
@@ -2959,7 +2960,7 @@ vscpws_stateButton.prototype.setOnReceiveZone = function(index,zone,subzone)
 // setOffReceiveEvent
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setOffReceiveEvent = function(vscpclass,
+vscp_stateButton.prototype.setOffReceiveEvent = function(vscpclass,
                                                                 vscptype,
                                                                 data,
                                                                 guid )
@@ -2984,7 +2985,7 @@ vscpws_stateButton.prototype.setOffReceiveEvent = function(vscpclass,
 // setOffReceiveZone
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setOffReceiveZone = function(index,zone,subzone)
+vscp_stateButton.prototype.setOffReceiveZone = function(index,zone,subzone)
 {
     this.receive_data_off[0] = typeof index !== 'undefined' ? index : 0;
     this.receive_data_off[1] = typeof zone !== 'undefined' ? zone : 0;
@@ -2995,7 +2996,7 @@ vscpws_stateButton.prototype.setOffReceiveZone = function(index,zone,subzone)
 // setReceiveBothZone
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setReceiveBothZone = function(index,zone,subzone)
+vscp_stateButton.prototype.setReceiveBothZone = function(index,zone,subzone)
 {
     this.setOffReceiveZone(index,zone,subzone);
     this.setOnReceiveZone(index,zone,subzone);
@@ -3004,7 +3005,7 @@ vscpws_stateButton.prototype.setReceiveBothZone = function(index,zone,subzone)
 //-----------------------------------------------------------------------------
 // setFilter
 //-----------------------------------------------------------------------------
-vscpws_stateButton.prototype.setFilter = function()
+vscp_stateButton.prototype.setFilter = function()
 {
     var cmd;
 
@@ -3075,7 +3076,7 @@ vscpws_stateButton.prototype.setFilter = function()
         if (i<15) cmd += ":";   // No colon on last
     }
 
-    vscpws_log("Set filter = "+ cmd);
+    vscp_log("Set filter = "+ cmd);
 
     // Set filter/mask on server
     if (this.bConnected) this.socket_vscp.send(cmd);
@@ -3085,7 +3086,7 @@ vscpws_stateButton.prototype.setFilter = function()
 // setMonitorVariable
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setMonitorVariable = function(name,interval, bOnce)
+vscp_stateButton.prototype.setMonitorVariable = function(name,interval, bOnce)
 {
     if ( ( "" === name ) && ( typeof interval !== 'undefined' ) ) {
         clearInterval( this.variableTimer );
@@ -3106,9 +3107,9 @@ vscpws_stateButton.prototype.setMonitorVariable = function(name,interval, bOnce)
 // draw
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.draw = function()
+vscp_stateButton.prototype.draw = function()
 {
-    //vscpws_log("draw value=" + this.bState);
+    //vscp_log("draw value=" + this.bState);
 
     // Clear the last image, if it exists.
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -3139,7 +3140,7 @@ vscpws_stateButton.prototype.draw = function()
 // setValue
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.setValue = function(value, bUpdate)
+vscp_stateButton.prototype.setValue = function(value, bUpdate)
 {
     var cmd = "E;0,"; // Event + priority
     var i = 0;
@@ -3147,11 +3148,11 @@ vscpws_stateButton.prototype.setValue = function(value, bUpdate)
     // First set default parameter
     bUpdate = typeof bUpdate !== 'undefined' ? bUpdate : true;
 
-    //vscpws_log('setValue -' + this.instanceName);
+    //vscp_log('setValue -' + this.instanceName);
 
     if (value) {
 
-        vscpws_log("True");
+        vscp_log("True");
 
         // Send Turn On Event
         if (this.bConnected && (-1 != this.transmit_vscpclass_on ) ) {
@@ -3170,7 +3171,7 @@ vscpws_stateButton.prototype.setValue = function(value, bUpdate)
                     if ( i < this.transmit_data_on.length-1 ) cmd += ",";   // No comma for last
             }
 
-            vscpws_log(cmd);
+            vscp_log(cmd);
             this.socket_vscp.send(cmd);
 
             if ("" !== this.monitorVariableName) {
@@ -3183,7 +3184,7 @@ vscpws_stateButton.prototype.setValue = function(value, bUpdate)
     }
     else {
 
-        vscpws_log("False");
+        vscp_log("False");
 
         // Send Turn Off Event
         if (this.bConnected && (-1 != this.transmit_vscpclass_off)) {
@@ -3202,7 +3203,7 @@ vscpws_stateButton.prototype.setValue = function(value, bUpdate)
                     if (i<this.transmit_data_off.length-1) cmd += ",";   // No comma for last
             }
 
-            vscpws_log(cmd);
+            vscp_log(cmd);
             this.socket_vscp.send(cmd);
 
             if ("" !== this.monitorVariableName) {
@@ -3222,7 +3223,7 @@ vscpws_stateButton.prototype.setValue = function(value, bUpdate)
 // onImageLoad
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.onImageLoad = function(me)
+vscp_stateButton.prototype.onImageLoad = function(me)
 {
     this.draw();
 };
@@ -3231,25 +3232,25 @@ vscpws_stateButton.prototype.onImageLoad = function(me)
 // onMouseOver
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.onMouseOver = function()
+vscp_stateButton.prototype.onMouseOver = function()
 {
-   //vscpws_log("Over");
+   //vscp_log("Over");
 };
 
 //-----------------------------------------------------------------------------
 // onMouseOut
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.onMouseOut = function()
+vscp_stateButton.prototype.onMouseOut = function()
 {
-   //vscpws_log("Out");
+   //vscp_log("Out");
 };
 
 //-----------------------------------------------------------------------------
 // onMouseDown
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.onMouseDown = function()
+vscp_stateButton.prototype.onMouseDown = function()
 {
     // If interaction clicks are disabled don't do anything.
     if (this.bDisabled) return;
@@ -3265,7 +3266,7 @@ vscpws_stateButton.prototype.onMouseDown = function()
 // onMouseUp
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.onMouseUp = function()
+vscp_stateButton.prototype.onMouseUp = function()
 {
     // If interaction clicks are disabled don't do anything.
     if (this.bDisabled) return;
@@ -3287,9 +3288,9 @@ vscpws_stateButton.prototype.onMouseUp = function()
 // onVSCPOpen
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.onVSCPOpen = function()
+vscp_stateButton.prototype.onVSCPOpen = function()
 {
-    //vscpws_log('Open VSCP websocket');
+    //vscp_log('Open VSCP websocket');
     //this.bConnected = true;
 
     this.socket_vscp.send("C;" + "challenge");
@@ -3305,9 +3306,9 @@ vscpws_stateButton.prototype.onVSCPOpen = function()
 // onVSCPClose
 //-----------------------------------------------------------------------------
 
-vscpws_stateButton.prototype.onVSCPClose = function()
+vscp_stateButton.prototype.onVSCPClose = function()
 {
-    //vscpws_log('Close VSCP websocket');
+    //vscp_log('Close VSCP websocket');
     this.bConnected = false;
 
     // Draw the state
@@ -3319,16 +3320,16 @@ vscpws_stateButton.prototype.onVSCPClose = function()
 // onVSCPMessage
 //-----------------------------------------------------------------------------
 // handle VSCP websocket incoming message/event.
-vscpws_stateButton.prototype.onVSCPMessage = function(msg)
+vscp_stateButton.prototype.onVSCPMessage = function(msg)
 {
-    vscpws_log('onVSCPMessage -' + this.instanceName + " " + msg.data);
+    vscp_log('onVSCPMessage -' + this.instanceName + " " + msg.data);
 
     var msgitems = msg.data.split(';');
     var i = 0;
 
     if ("+" == msgitems[0]){        // check for positive reply
 
-        vscpws_log("Positive reply "+msg.data);
+        vscp_log("Positive reply "+msg.data);
 
         if ( "AUTH0" == msgitems[1] ) {
             var cmd = "C;AUTH;" + this.username + ";" + vscp_make_websocket_auth_hash( this.username, this.passwordhash, msgitems[2] );
@@ -3375,7 +3376,7 @@ vscpws_stateButton.prototype.onVSCPMessage = function(msg)
         }
     }
     else if ("-" == msgitems[0]){   // Check for negative reply
-        vscpws_log("Negative reply " + msg.data);
+        vscp_log("Negative reply " + msg.data);
     }
     else if ("E" == msgitems[0]){   // Check for event
 
@@ -3401,9 +3402,9 @@ vscpws_stateButton.prototype.onVSCPMessage = function(msg)
             vscpclass -= 512;
         }
 
-        //vscpws_log("CLASS = " + vscpclass + " TYPE = " + vscptype + "\n " + msg.data);
-        vscpws_log("CLASS = " + vscpclass + " Trigg on " + this.receive_vscpclass_on );
-        vscpws_log(" TYPE = " + vscptype + " Trigg on " + this.receive_vscptype_on );
+        //vscp_log("CLASS = " + vscpclass + " TYPE = " + vscptype + "\n " + msg.data);
+        vscp_log("CLASS = " + vscpclass + " Trigg on " + this.receive_vscpclass_on );
+        vscp_log(" TYPE = " + vscptype + " Trigg on " + this.receive_vscptype_on );
 
         // Nothing to do if vscpclass or vscptype is undefined
         if ((vscpclass === undefined) || (vscptype === undefined) ) return;
@@ -3430,7 +3431,7 @@ vscpws_stateButton.prototype.onVSCPMessage = function(msg)
             this.bState = true;
             this.draw();
 
-            vscpws_log("****** Turned ON ******");
+            vscp_log("****** Turned ON ******");
         }
 
         // Check if this is a possible OFF-event
@@ -3455,7 +3456,7 @@ vscpws_stateButton.prototype.onVSCPMessage = function(msg)
             this.bState = false;
             this.draw();
 
-            vscpws_log("****** Turned OFF ******");
+            vscp_log("****** Turned OFF ******");
         }
 
     }
@@ -3467,7 +3468,7 @@ vscpws_stateButton.prototype.onVSCPMessage = function(msg)
 // openConnection
 //-----------------------------------------------------------------------------
 // Open/close event traffic
-vscpws_stateButton.prototype.openConnection = function()
+vscp_stateButton.prototype.openConnection = function()
 {
     this.socket_vscp.send("C;" + "open");
 };
@@ -3475,7 +3476,7 @@ vscpws_stateButton.prototype.openConnection = function()
 //-----------------------------------------------------------------------------
 // closeConnection
 //-----------------------------------------------------------------------------
-vscpws_stateButton.prototype.closeConnection = function()
+vscp_stateButton.prototype.closeConnection = function()
 {
     this.socket_vscp.send("C;" + "close");
 };
@@ -3483,10 +3484,10 @@ vscpws_stateButton.prototype.closeConnection = function()
 //-----------------------------------------------------------------------------
 // time4VariableRead
 //-----------------------------------------------------------------------------
-vscpws_stateButton.prototype.time4VariableRead = function(m,s)
+vscp_stateButton.prototype.time4VariableRead = function(m,s)
 {
     var cmd;
-    vscpws_log("time4VariableRead");
+    vscp_log("time4VariableRead");
     cmd = "C;READVAR;" + m;
     s.send(cmd);
 };
@@ -3511,10 +3512,10 @@ vscpws_stateButton.prototype.time4VariableRead = function(m,s)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_simpleTextEvent
+// vscp_simpleTextEvent
 //
 
-function vscpws_simpleTextEvent( username,           // Username for websocket serever
+function vscp_simpleTextEvent( username,           // Username for websocket serever
                                     passwordhash,    // Password hash for websocket
                                     serverurl,       // url to VSCP websocket i/f
                                     id,              // Where it should be placed
@@ -3550,7 +3551,7 @@ function vscpws_simpleTextEvent( username,           // Username for websocket s
     this.bConnected = false;
 
     // Set the instance name for the control
-    instanceName = "vscpws_" + this.elementId;
+    instanceName = "vscp_" + this.elementId;
 
     // move this to global scope
     eval(instanceName + " = this;");
@@ -3585,7 +3586,7 @@ function vscpws_simpleTextEvent( username,           // Username for websocket s
 // setExtraParameters
 //-----------------------------------------------------------------------------
 
-vscpws_simpleTextEvent.prototype.setExtraParameters =
+vscp_simpleTextEvent.prototype.setExtraParameters =
                             function( index,     // Index if applicable
                                         zone,    // Zone if applicable
                                         subzone )// Sub zone if applicable
@@ -3599,12 +3600,12 @@ vscpws_simpleTextEvent.prototype.setExtraParameters =
 // onVSCPOpen
 //-----------------------------------------------------------------------------
 
-vscpws_simpleTextEvent.prototype.onVSCPOpen = function()
+vscp_simpleTextEvent.prototype.onVSCPOpen = function()
 {
     //document.getElementById(this.elementId).style.backgroundColor = "#40ff40";
     if (this.elementId) document.getElementById(this.elementId).textContent =
             " undefined ";
-    vscpws_log('Open VSCP websocket');
+    vscp_log('Open VSCP websocket');
     //this.bConnected = true;
 
     // Open the connection to the VSCP daemon
@@ -3620,12 +3621,12 @@ vscpws_simpleTextEvent.prototype.onVSCPOpen = function()
 // onVSCPClose
 //-----------------------------------------------------------------------------
 
-vscpws_simpleTextEvent.prototype.onVSCPClose = function()
+vscp_simpleTextEvent.prototype.onVSCPClose = function()
 {
     //document.getElementById(this.elementId).style.backgroundColor = "#ff4040";
     if (this.elementId) document.getElementById(this.elementId).textContent =
             " websocket connection CLOSED ";
-    vscpws_log('Close VSCP websocket');
+    vscp_log('Close VSCP websocket');
     this.bConnected = false;
 };
 
@@ -3633,7 +3634,7 @@ vscpws_simpleTextEvent.prototype.onVSCPClose = function()
 //-----------------------------------------------------------------------------
 // setFilter
 //-----------------------------------------------------------------------------
-vscpws_simpleTextEvent.prototype.setFilter = function()
+vscp_simpleTextEvent.prototype.setFilter = function()
 {
     var cmd;
 
@@ -3675,7 +3676,7 @@ vscpws_simpleTextEvent.prototype.setFilter = function()
         if (i<15) cmd += ":";   // No colon on last
     }
 
-    vscpws_log("Set filter = "+ cmd);
+    vscp_log("Set filter = "+ cmd);
 
     // Set filter/mask on server
     if (this.bConnected) this.socket_vscp.send(cmd);
@@ -3686,9 +3687,9 @@ vscpws_simpleTextEvent.prototype.setFilter = function()
 // onVSCPMessage
 //-----------------------------------------------------------------------------
 // handle VSCP websocket incoming message/event.
-vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
+vscp_simpleTextEvent.prototype.onVSCPMessage = function(msg)
 {
-    vscpws_log('onVSCPMessage -' + this.instanceName +
+    vscp_log('onVSCPMessage -' + this.instanceName +
                                     " " + msg.data);
 
     var msgitems = msg.data.split(';');
@@ -3698,7 +3699,7 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
 
     if ("+" == msgitems[0]){        // check for positive reply
 
-        vscpws_log("Positive reply "+msg.data);
+        vscp_log("Positive reply "+msg.data);
 
         if ( "AUTH0" == msgitems[1] ) {
             var cmd = "C;AUTH;" + this.username + ";" +
@@ -3725,7 +3726,7 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
         }
     }
     else if ("-" == msgitems[0]){   // Check for negative reply
-        vscpws_log("Negative reply " + msg.data);
+        vscp_log("Negative reply " + msg.data);
     }
     else if ("E" == msgitems[0]){   // Check for event
 
@@ -3750,11 +3751,11 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
         var vscpdata = [];
         for (i=0;i<vscpitems.length-6-offset;i++){
             vscpdata[i] = parseInt(vscpitems[offset+6+i]);
-            //vscpws_log("index="+i.toString()+
+            //vscp_log("index="+i.toString()+
             //                                " data="+vscpdata[i]);
         }
 
-        vscpws_log("CLASS = " + vscpclass +
+        vscp_log("CLASS = " + vscpclass +
                 " TYPE = " + vscptype + "\n " + msg.data);
 
         // Nothing to do if vscpclass or vscptype is undefined
@@ -3771,11 +3772,11 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
                 (VSCP_CLASS1_DATA == this.vscpclass) ) {
 
             if (( -1 != this.codingIndex) &&
-                    (vscpws_getSensorIndexFromDataCoding(vscpdata[0]) !=
+                    (vscp_getSensorIndexFromDataCoding(vscpdata[0]) !=
                                             this.codingIndex)) return;
 
             // This event is for us
-            value = vscpws_measurementClass10Decode( vscpdata );
+            value = vscp_measurementClass10Decode( vscpdata );
 
             strvalue = "";
             if ( null !== this.fncallback ) {
@@ -3783,45 +3784,45 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
                 strvalue =
                     this.fncallback.call( this,
                                     value,
-                                    vscpws_getDatacodingUnit( vscpdata[0] ),
+                                    vscp_getDatacodingUnit( vscpdata[0] ),
                                     vscpitems );
                 // null is returned we expect the callback routine to
                 // write the value for us.
                 if (null === strvalue ) return;
             }
             else {
-                strvalue = vscpws_toFixed(value,this.decimals);
+                strvalue = vscp_toFixed(value,this.decimals);
             }
 
             document.getElementById(this.elementId).textContent =
                 this.formatstr.format(strvalue,
-                vscpws_units[vscptype][vscpws_getDatacodingUnit(vscpdata[0])],
-                vscpws_getDatacodingUnit(vscpdata[0]),
-                vscpws_getSensorIndexFromDataCoding(vscpdata[0]));
+                vscp_units[vscptype][vscp_getDatacodingUnit(vscpdata[0])],
+                vscp_getDatacodingUnit(vscpdata[0]),
+                vscp_getSensorIndexFromDataCoding(vscpdata[0]));
 
         }
         // Floating point
         else if (VSCP_CLASS1_MEASUREMENT64 == this.vscpclass) {
 
-            value = vscpws_measurementClass60DecodeNumber(vscpdata);
+            value = vscp_measurementClass60DecodeNumber(vscpdata);
 
             if ( null !== this.fncallback ) {
                 strvalue =
                     this.fncallback.call( this,
                                         value,
-                                        vscpws_getDatacodingUnit( vscpdata[0] ),
+                                        vscp_getDatacodingUnit( vscpdata[0] ),
                                         vscpitems);
                 // null is returned we expect the callback routine to
                 // write the value for us.
                 if (null === strvalue ) return;
                 document.getElementById(this.elementId).textContent =
                         this.formatstr.format(strvalue,
-                            vscpws_units[vscptype][0],-1,-1);
+                            vscp_units[vscptype][0],-1,-1);
             }
             else {
                 document.getElementById(this.elementId).textContent =
                         this.formatstr.format(value.toString(),
-                            vscpws_units[vscptype][0],-1,-1);
+                            vscp_units[vscptype][0],-1,-1);
             }
         }
         // Measurement with zone
@@ -3839,7 +3840,7 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
                     (vscpdata[2] != this.subzone)) return;
             // Check sensor index
             if (( -1 != this.codingIndex) &&
-                    (vscpws_getSensorIndexFromDataCoding[vscpdata[3]] !=
+                    (vscp_getSensorIndexFromDataCoding[vscpdata[3]] !=
                                                 this.codingIndex)) return;
 
             // This is for us
@@ -3850,14 +3851,14 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
                 mimicdata[i-3] = vscpdata[i];
             }
 
-            value = vscpws_measurementClass10Decode( mimicdata );
+            value = vscp_measurementClass10Decode( mimicdata );
 
             strvalue = "";
             if ( null !== this.fncallback ) {
                 strvalue =
                     this.fncallback.call( this,
                                         value,
-                                        vscpws_getDatacodingUnit( vscpdata[0] ),
+                                        vscp_getDatacodingUnit( vscpdata[0] ),
                                         vscpitems);
                 // null is returned we expect the callback routine to
                 // write the value for us.
@@ -3869,9 +3870,9 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
 
             document.getElementById(this.elementId).textContent =
                 this.formatstr.format(strvalue,
-                vscpws_units[vscptype][vscpws_getDatacodingUnit(vscpdata[0])],
-                vscpws_getDatacodingUnit(vscpdata[0]),
-                vscpws_getSensorIndexFromDataCoding(vscpdata[0]));
+                vscp_units[vscptype][vscp_getDatacodingUnit(vscpdata[0])],
+                vscp_getDatacodingUnit(vscpdata[0]),
+                vscp_getSensorIndexFromDataCoding(vscpdata[0]));
 
         }
         // Other event
@@ -3882,7 +3883,7 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
                 strvalue =
                     this.fncallback.call( this,
                                         value,
-                                        vscpws_getDatacodingUnit( vscpdata[0] ),
+                                        vscp_getDatacodingUnit( vscpdata[0] ),
                                         vscpitems);
                 // null is returned we expect the callback routine to
                 // write the value for us.
@@ -3899,7 +3900,7 @@ vscpws_simpleTextEvent.prototype.onVSCPMessage = function(msg)
 // openConnection
 //-----------------------------------------------------------------------------
 // Open/close event traffic
-vscpws_simpleTextEvent.prototype.openConnection = function()
+vscp_simpleTextEvent.prototype.openConnection = function()
 {
     this.socket_vscp.send("C;" + "open");
 };
@@ -3907,7 +3908,7 @@ vscpws_simpleTextEvent.prototype.openConnection = function()
 //-----------------------------------------------------------------------------
 // closeConnection
 //-----------------------------------------------------------------------------
-vscpws_simpleTextEvent.prototype.closeConnection = function()
+vscp_simpleTextEvent.prototype.closeConnection = function()
 {
     this.socket_vscp.send("C;" + "close");
 };
@@ -3934,10 +3935,10 @@ vscpws_simpleTextEvent.prototype.closeConnection = function()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_thermometerCelsius
+// vscp_thermometerCelsius
 //
 
-function vscpws_thermometerCelsius( username,           // Username for websocket serever
+function vscp_thermometerCelsius( username,           // Username for websocket serever
                                         passwordhash,   // Password hash for websocket
                                         url,            // url to VSCP websocket i/f
                                         canvasName,     // Placeholder for widget
@@ -3973,7 +3974,7 @@ function vscpws_thermometerCelsius( username,           // Username for websocke
     this.bConnected = false;
 
     // Set the instance name for the control
-    instanceName = "vscpws_" + canvasName;
+    instanceName = "vscp_" + canvasName;
 
     // move this to global scope
     eval(instanceName + " = this;");
@@ -4040,7 +4041,7 @@ function vscpws_thermometerCelsius( username,           // Username for websocke
 // onImageLoad
 //-----------------------------------------------------------------------------
 
-vscpws_thermometerCelsius.prototype.onBgImageLoad = function(me)
+vscp_thermometerCelsius.prototype.onBgImageLoad = function(me)
 {
     this.draw();
 };
@@ -4049,9 +4050,9 @@ vscpws_thermometerCelsius.prototype.onBgImageLoad = function(me)
 // draw
 //-----------------------------------------------------------------------------
 
-vscpws_thermometerCelsius.prototype.draw = function()
+vscp_thermometerCelsius.prototype.draw = function()
 {
-    //vscpws_log("draw value=" + this.bState);
+    //vscp_log("draw value=" + this.bState);
 
     var t;
 
@@ -4154,7 +4155,7 @@ vscpws_thermometerCelsius.prototype.draw = function()
 // setExtraParameters
 //-----------------------------------------------------------------------------
 
-vscpws_thermometerCelsius.prototype.setExtraParameters =
+vscp_thermometerCelsius.prototype.setExtraParameters =
                             function( index,     // Index if applicable
                                         zone,    // Zone if applicable
                                         subzone )// Subzone if applicable
@@ -4168,11 +4169,11 @@ vscpws_thermometerCelsius.prototype.setExtraParameters =
 // onVSCPOpen
 //-----------------------------------------------------------------------------
 
-vscpws_thermometerCelsius.prototype.onVSCPOpen = function()
+vscp_thermometerCelsius.prototype.onVSCPOpen = function()
 {
     //document.getElementById(this.elementId).style.backgroundColor = "#40ff40";
     if (this.elementId) document.getElementById(this.elementId).textContent = " undefined ";
-    vscpws_log('Open VSCP websocket');
+    vscp_log('Open VSCP websocket');
     //this.bConnected = true;
 
     // Open the connection to the VSCP daemon
@@ -4190,12 +4191,12 @@ vscpws_thermometerCelsius.prototype.onVSCPOpen = function()
 // onVSCPClose
 //-----------------------------------------------------------------------------
 
-vscpws_thermometerCelsius.prototype.onVSCPClose = function()
+vscp_thermometerCelsius.prototype.onVSCPClose = function()
 {
     //document.getElementById(this.elementId).style.backgroundColor = "#ff4040";
     if (this.elementId) document.getElementById(this.elementId).textContent =
                 " websocket connection CLOSED ";
-    vscpws_log('Close VSCP websocket');
+    vscp_log('Close VSCP websocket');
     this.bConnected = false;
 };
 
@@ -4203,7 +4204,7 @@ vscpws_thermometerCelsius.prototype.onVSCPClose = function()
 //-----------------------------------------------------------------------------
 // setFilter
 //-----------------------------------------------------------------------------
-vscpws_thermometerCelsius.prototype.setFilter = function()
+vscp_thermometerCelsius.prototype.setFilter = function()
 {
     var cmd;
 
@@ -4245,7 +4246,7 @@ vscpws_thermometerCelsius.prototype.setFilter = function()
         if (i<15) cmd += ":";   // No colon on last
     }
 
-    vscpws_log("Set filter = "+ cmd);
+    vscp_log("Set filter = "+ cmd);
 
     // Set filter/mask on server
     if (this.bConnected) this.socket_vscp.send(cmd);
@@ -4255,7 +4256,7 @@ vscpws_thermometerCelsius.prototype.setFilter = function()
 // setMonitorVariable
 //-----------------------------------------------------------------------------
 
-vscpws_thermometerCelsius.prototype.setMonitorVariable = function(name,interval)
+vscp_thermometerCelsius.prototype.setMonitorVariable = function(name,interval)
 {
     // First set default parameter
     interval = typeof interval !== 'undefined' ? interval : 1000;
@@ -4272,16 +4273,16 @@ vscpws_thermometerCelsius.prototype.setMonitorVariable = function(name,interval)
 // onVSCPMessage
 //-----------------------------------------------------------------------------
 // handle VSCP socketcan incoming message/event.
-vscpws_thermometerCelsius.prototype.onVSCPMessage = function(msg)
+vscp_thermometerCelsius.prototype.onVSCPMessage = function(msg)
 {
-    vscpws_log('onVSCPMessage -' + this.instanceName + " " + msg.data);
+    vscp_log('onVSCPMessage -' + this.instanceName + " " + msg.data);
 
     var msgitems = msg.data.split(';');
     var i = 0;
 
     if ("+" == msgitems[0]){        // check for positive reply
 
-        vscpws_log("Positive reply "+msg.data);
+        vscp_log("Positive reply "+msg.data);
 
         if ( "AUTH0" == msgitems[1] ) {
             var cmd = "C;AUTH;" + this.username + ";" +
@@ -4312,13 +4313,13 @@ vscpws_thermometerCelsius.prototype.onVSCPMessage = function(msg)
             this.bConnected = false;
         }
         else if ("READVAR" == msgitems[1] && (2 == msgitems[2])){
-            this.value = vscpws_toFixed(msgitems[3],1);
+            this.value = vscp_toFixed(msgitems[3],1);
             this.temp = msgitems[3];
             this.draw();
         }
     }
     else if ("-" == msgitems[0]){   // Check for negative reply
-        vscpws_log("Negative reply " + msg.data);
+        vscp_log("Negative reply " + msg.data);
     }
     else if ("E" == msgitems[0]){   // Check for event
 
@@ -4343,10 +4344,10 @@ vscpws_thermometerCelsius.prototype.onVSCPMessage = function(msg)
         var vscpdata = [];
         for (i=0;i<vscpitems.length-6-offset;i++){
             vscpdata[i] = parseInt(vscpitems[offset+6+i]);
-            //vscpws_log("index="+i.toString()+" data="+vscpdata[i]);
+            //vscp_log("index="+i.toString()+" data="+vscpdata[i]);
         }
 
-        vscpws_log("CLASS = " + vscpclass + " TYPE = " +
+        vscp_log("CLASS = " + vscpclass + " TYPE = " +
                                             vscptype + "\n " + msg.data);
 
         // Nothing to do if vscpclass or vscptype is undefined
@@ -4359,21 +4360,21 @@ vscpws_thermometerCelsius.prototype.onVSCPMessage = function(msg)
                 (VSCP_CLASS1_DATA == this.vscpclass)) {
 
             if ((-1 != this.sensorIndex) &&
-                    (vscpws_getSensorIndexFromDataCoding(vscpdata[0]) !=
+                    (vscp_getSensorIndexFromDataCoding(vscpdata[0]) !=
                     this.sensorIndex))
                 return;
 
             // This event is for us
             this.value =
-                   vscpws_toFixed(vscpws_measurementClass10Decode(vscpdata), 1);
+                   vscp_toFixed(vscp_measurementClass10Decode(vscpdata), 1);
 
             // Should be a celsius value
-            switch(vscpws_getDatacoding(vscpdata[0])) {
+            switch(vscp_getDatacoding(vscpdata[0])) {
                 case 0:   // Kelvin
-                    this.value = vscpws_convertKelvinToCelsius(this.value);
+                    this.value = vscp_convertKelvinToCelsius(this.value);
                     break;
                 case 2:   // Fahrenheit
-                    this.value = vscpws_convertFahrenheitToCelsius(this.value);
+                    this.value = vscp_convertFahrenheitToCelsius(this.value);
                     break;
                 default:    // Do nothing (if already celsius)
                     break;
@@ -4387,8 +4388,8 @@ vscpws_thermometerCelsius.prototype.onVSCPMessage = function(msg)
         else if (VSCP_CLASS1_MEASUREMENT64 == this.vscpclass) {
 
             this.value =
-             vscpws_toFixed(vscpws_measurementClass60DecodeNumber(vscpdata), 1);
-            this.value = vscpws_convertKelvinToCelsius(this.value);
+             vscp_toFixed(vscp_measurementClass60DecodeNumber(vscpdata), 1);
+            this.value = vscp_convertKelvinToCelsius(this.value);
             this.temp = this.value;
             this.draw();
 
@@ -4411,7 +4412,7 @@ vscpws_thermometerCelsius.prototype.onVSCPMessage = function(msg)
                 return;
             // Check sensor index
             if ((-1 != this.sensorIndex) &&
-                    (vscpws_getSensorIndexFromDataCoding[vscpdata[3]] != this.sensorIndex))
+                    (vscp_getSensorIndexFromDataCoding[vscpdata[3]] != this.sensorIndex))
                 return;
 
             // This is for us
@@ -4422,15 +4423,15 @@ vscpws_thermometerCelsius.prototype.onVSCPMessage = function(msg)
                 mimicdata[i - 3] = vscpdata[i];
             }
 
-            this.value = vscpws_toFixed(vscpws_measurementClass10Decode(mimicdata), 1);
+            this.value = vscp_toFixed(vscp_measurementClass10Decode(mimicdata), 1);
 
             // Should be a celsius value
-            switch(vscpws_getDatacoding(vscpdata[3])) {
+            switch(vscp_getDatacoding(vscpdata[3])) {
                 case 0:   // Kelvin
-                    this.value = vscpws_convertKelvinToCelsius(this.value);
+                    this.value = vscp_convertKelvinToCelsius(this.value);
                     break;
                 case 2:   // Fahrenheit
-                    this.value = vscpws_convertFahrenheitToCelsius(this.value);
+                    this.value = vscp_convertFahrenheitToCelsius(this.value);
                     break;
                 default:    // Do nothing (if already celsius)
                     break;
@@ -4448,7 +4449,7 @@ vscpws_thermometerCelsius.prototype.onVSCPMessage = function(msg)
 // openConnection
 //-----------------------------------------------------------------------------
 // Open/close event traffic
-vscpws_thermometerCelsius.prototype.openConnection = function()
+vscp_thermometerCelsius.prototype.openConnection = function()
 {
     this.socket_vscp.send("C;" + "open");
 };
@@ -4456,7 +4457,7 @@ vscpws_thermometerCelsius.prototype.openConnection = function()
 //-----------------------------------------------------------------------------
 // closeConnection
 //-----------------------------------------------------------------------------
-vscpws_thermometerCelsius.prototype.closeConnection = function()
+vscp_thermometerCelsius.prototype.closeConnection = function()
 {
     this.socket_vscp.send("C;" + "close");
 };
@@ -4464,10 +4465,10 @@ vscpws_thermometerCelsius.prototype.closeConnection = function()
 //-----------------------------------------------------------------------------
 // time4VariableRead
 //-----------------------------------------------------------------------------
-vscpws_thermometerCelsius.prototype.time4VariableRead = function(m,s)
+vscp_thermometerCelsius.prototype.time4VariableRead = function(m,s)
 {
     var cmd;
-    vscpws_log("time4VariableRead");
+    vscp_log("time4VariableRead");
     cmd = "C;READVAR;" + m;
     s.send(cmd);
 };
@@ -4492,10 +4493,10 @@ vscpws_thermometerCelsius.prototype.time4VariableRead = function(m,s)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_spedometerCelsius
+// vscp_spedometerCelsius
 //
 
-function vscpws_speedometerCelius( username,        // Username for websocket serever
+function vscp_speedometerCelius( username,        // Username for websocket serever
                                     passwordhash,   // Password hash for websocket
                                     url,            // url to VSCP websocket i/f
                                     canvasName,     // Placeholder for widget
@@ -4532,7 +4533,7 @@ function vscpws_speedometerCelius( username,        // Username for websocket se
     this.bConnected = false;
 
     // Set the instance name for the control
-    instanceName = "vscpws_" + canvasName;
+    instanceName = "vscp_" + canvasName;
 
     // move this to global scope
     eval(instanceName + " = this;");
@@ -4591,7 +4592,7 @@ function vscpws_speedometerCelius( username,        // Username for websocket se
 // onImageLoad
 //-----------------------------------------------------------------------------
 
-vscpws_speedometerCelius.prototype.onBgImageLoad = function(me)
+vscp_speedometerCelius.prototype.onBgImageLoad = function(me)
 {
     this.draw();
 };
@@ -4600,9 +4601,9 @@ vscpws_speedometerCelius.prototype.onBgImageLoad = function(me)
 // draw
 //-----------------------------------------------------------------------------
 
-vscpws_speedometerCelius.prototype.draw = function()
+vscp_speedometerCelius.prototype.draw = function()
 {
-    //vscpws_log("draw value=" + this.bState);
+    //vscp_log("draw value=" + this.bState);
 
     // Clear the last image, if it exists.
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
@@ -4657,7 +4658,7 @@ vscpws_speedometerCelius.prototype.draw = function()
 // setExtraParameters
 //-----------------------------------------------------------------------------
 
-vscpws_speedometerCelius.prototype.setExtraParameters =
+vscp_speedometerCelius.prototype.setExtraParameters =
                             function( index,     // Index if applicable
                                         zone,    // Zone if applicable
                                         subzone )// Subzone if applicable
@@ -4671,7 +4672,7 @@ vscpws_speedometerCelius.prototype.setExtraParameters =
 // setDecimals
 //-----------------------------------------------------------------------------
 
-vscpws_speedometerCelius.prototype.setDecimals =
+vscp_speedometerCelius.prototype.setDecimals =
                             function( decimals )
 {
     this.ndecimals = decimals;
@@ -4681,11 +4682,11 @@ vscpws_speedometerCelius.prototype.setDecimals =
 // onVSCPOpen
 //-----------------------------------------------------------------------------
 
-vscpws_speedometerCelius.prototype.onVSCPOpen = function()
+vscp_speedometerCelius.prototype.onVSCPOpen = function()
 {
     //document.getElementById(this.elementId).style.backgroundColor = "#40ff40";
     if (this.elementId) document.getElementById(this.elementId).textContent = " undefined ";
-    vscpws_log('Open VSCP websocket');
+    vscp_log('Open VSCP websocket');
     //this.bConnected = true;
 
     // Open the connection to the VSCP daemon
@@ -4703,11 +4704,11 @@ vscpws_speedometerCelius.prototype.onVSCPOpen = function()
 // onVSCPClose
 //-----------------------------------------------------------------------------
 
-vscpws_speedometerCelius.prototype.onVSCPClose = function()
+vscp_speedometerCelius.prototype.onVSCPClose = function()
 {
     //document.getElementById(this.elementId).style.backgroundColor = "#ff4040";
     if (this.elementId) document.getElementById(this.elementId).textContent = " websocket connection CLOSED ";
-    vscpws_log('Close VSCP websocket');
+    vscp_log('Close VSCP websocket');
     this.bConnected = false;
 };
 
@@ -4715,7 +4716,7 @@ vscpws_speedometerCelius.prototype.onVSCPClose = function()
 //-----------------------------------------------------------------------------
 // setFilter
 //-----------------------------------------------------------------------------
-vscpws_speedometerCelius.prototype.setFilter = function()
+vscp_speedometerCelius.prototype.setFilter = function()
 {
     var cmd;
 
@@ -4757,7 +4758,7 @@ vscpws_speedometerCelius.prototype.setFilter = function()
         if (i<15) cmd += ":";   // No colon on last
     }
 
-    vscpws_log("Set filter = "+ cmd);
+    vscp_log("Set filter = "+ cmd);
 
     // Set filter/mask on server
     if (this.bConnected) this.socket_vscp.send(cmd);
@@ -4767,7 +4768,7 @@ vscpws_speedometerCelius.prototype.setFilter = function()
 // setMonitorVariable
 //-----------------------------------------------------------------------------
 
-vscpws_speedometerCelius.prototype.setMonitorVariable = function(name,interval)
+vscp_speedometerCelius.prototype.setMonitorVariable = function(name,interval)
 {
     // First set default parameter
     interval = typeof interval !== 'undefined' ? interval : 1000;
@@ -4784,16 +4785,16 @@ vscpws_speedometerCelius.prototype.setMonitorVariable = function(name,interval)
 // onVSCPMessage
 //-----------------------------------------------------------------------------
 // handle VSCP socketcan incoming message/event.
-vscpws_speedometerCelius.prototype.onVSCPMessage = function(msg)
+vscp_speedometerCelius.prototype.onVSCPMessage = function(msg)
 {
-    vscpws_log('onVSCPMessage -' + this.instanceName + " " + msg.data);
+    vscp_log('onVSCPMessage -' + this.instanceName + " " + msg.data);
 
     var msgitems = msg.data.split(';');
     var i = 0;
 
     if ("+" == msgitems[0]){        // check for positive reply
 
-        vscpws_log("Positive reply "+msg.data);
+        vscp_log("Positive reply "+msg.data);
 
         if ( "AUTH0" == msgitems[1] ) {
             var cmd = "C;AUTH;" + this.username + ";" +
@@ -4824,13 +4825,13 @@ vscpws_speedometerCelius.prototype.onVSCPMessage = function(msg)
             this.bConnected = false;
         }
         else if ("READVAR" == msgitems[1] && (2 == msgitems[2])){
-            this.value = vscpws_toFixed(msgitems[3],1);
+            this.value = vscp_toFixed(msgitems[3],1);
             this.temp = msgitems[3];
             this.draw();
         }
     }
     else if ("-" == msgitems[0]){   // Check for negative reply
-        vscpws_log("Negative reply " + msg.data);
+        vscp_log("Negative reply " + msg.data);
     }
     else if ("E" == msgitems[0]){   // Check for event
 
@@ -4857,7 +4858,7 @@ vscpws_speedometerCelius.prototype.onVSCPMessage = function(msg)
             vscpdata[i] = parseInt(vscpitems[offset+6+i]);
         }
 
-        vscpws_log("CLASS = " + vscpclass + " TYPE = " +
+        vscp_log("CLASS = " + vscpclass + " TYPE = " +
                                             vscptype + "\n " + msg.data);
 
         // Nothing to do if vscpclass or vscptype is undefined
@@ -4870,21 +4871,21 @@ vscpws_speedometerCelius.prototype.onVSCPMessage = function(msg)
                 (VSCP_CLASS1_DATA == this.vscpclass)) {
 
             if ((-1 != this.sensorIndex) &&
-                    (vscpws_getSensorIndexFromDataCoding(vscpdata[0]) !=
+                    (vscp_getSensorIndexFromDataCoding(vscpdata[0]) !=
                     this.sensorIndex))
                 return;
 
             // This event is for us
-            this.value = vscpws_toFixed(vscpws_measurementClass10Decode(vscpdata),
+            this.value = vscp_toFixed(vscp_measurementClass10Decode(vscpdata),
                                             this.ndecimals);
 
             // Should be a celsius value
-            switch(vscpws_getDatacoding(vscpdata[0])) {
+            switch(vscp_getDatacoding(vscpdata[0])) {
                 case 0:   // Kelvin
-                    this.value = vscpws_convertKelvinToCelsius(this.value);
+                    this.value = vscp_convertKelvinToCelsius(this.value);
                     break;
                 case 2:   // Fahrenheit
-                        this.value = vscpws_convertFahrenheitToCelsius(this.value);
+                        this.value = vscp_convertFahrenheitToCelsius(this.value);
                         break;
                 default:    // Do nothing (if already celsius)
                     break;
@@ -4897,8 +4898,8 @@ vscpws_speedometerCelius.prototype.onVSCPMessage = function(msg)
         // Floating point
         else if (VSCP_CLASS1_MEASUREMENT64 == this.vscpclass) {
 
-            this.value = vscpws_toFixed(vscpws_measurementClass60DecodeNumber(vscpdata), this.ndecimals);
-            this.value = vscpws_convertKelvinToCelsius(this.value);
+            this.value = vscp_toFixed(vscp_measurementClass60DecodeNumber(vscpdata), this.ndecimals);
+            this.value = vscp_convertKelvinToCelsius(this.value);
             this.temp = this.value;
             this.draw();
 
@@ -4921,7 +4922,7 @@ vscpws_speedometerCelius.prototype.onVSCPMessage = function(msg)
                 return;
             // Check sensor index
             if ((-1 != this.sensorIndex) &&
-                    (vscpws_getSensorIndexFromDataCoding[vscpdata[3]] != this.sensorIndex))
+                    (vscp_getSensorIndexFromDataCoding[vscpdata[3]] != this.sensorIndex))
                 return;
 
             // This is for us
@@ -4933,15 +4934,15 @@ vscpws_speedometerCelius.prototype.onVSCPMessage = function(msg)
                 mimicdata[1 + i - 3] = vscpdata[i];
             }
 
-            this.value = vscpws_toFixed(vscpws_measurementClass10Decode(mimicdata), this.ndecimals);
+            this.value = vscp_toFixed(vscp_measurementClass10Decode(mimicdata), this.ndecimals);
 
             // Should be a celsius value
-            switch(vscpws_getDatacoding(vscpdata[3])) {
+            switch(vscp_getDatacoding(vscpdata[3])) {
                 case 0:   // Kelvin
-                    this.value = vscpws_convertKelvinToCelsius(this.value);
+                    this.value = vscp_convertKelvinToCelsius(this.value);
                     break;
                 case 2:   // Fahrenheit
-                    this.value = vscpws_convertFahrenheitToCelsius(this.value);
+                    this.value = vscp_convertFahrenheitToCelsius(this.value);
                     break;
                 default:    // Do nothing (if already celsius)
                     break;
@@ -4959,7 +4960,7 @@ vscpws_speedometerCelius.prototype.onVSCPMessage = function(msg)
 // openConnection
 //-----------------------------------------------------------------------------
 // Open/close event traffic
-vscpws_speedometerCelius.prototype.openConnection = function()
+vscp_speedometerCelius.prototype.openConnection = function()
 {
     this.socket_vscp.send("C;" + "open");
 };
@@ -4967,7 +4968,7 @@ vscpws_speedometerCelius.prototype.openConnection = function()
 //-----------------------------------------------------------------------------
 // closeConnection
 //-----------------------------------------------------------------------------
-vscpws_speedometerCelius.prototype.closeConnection = function()
+vscp_speedometerCelius.prototype.closeConnection = function()
 {
     this.socket_vscp.send("C;" + "close");
 };
@@ -4975,10 +4976,10 @@ vscpws_speedometerCelius.prototype.closeConnection = function()
 //-----------------------------------------------------------------------------
 // time4VariableRead
 //-----------------------------------------------------------------------------
-vscpws_speedometerCelius.prototype.time4VariableRead = function(m,s)
+vscp_speedometerCelius.prototype.time4VariableRead = function(m,s)
 {
     var cmd;
-    vscpws_log("time4VariableRead");
+    vscp_log("time4VariableRead");
     cmd = "C;READVAR;" + m;
     s.send(cmd);
 };
@@ -5007,10 +5008,10 @@ vscpws_speedometerCelius.prototype.time4VariableRead = function(m,s)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_relocate
+// vscp_relocate
 //
 
-function vscpws_relocate( username,         // Username for websocket serever
+function vscp_relocate( username,         // Username for websocket serever
                             passwordhash,   // Password hash for websocket
                             url,            // url to relocate to
                             imageType,      // Image type
@@ -5086,10 +5087,10 @@ function vscpws_relocate( username,         // Username for websocket serever
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_Event
+// vscp_Event
 //
 
-function vscpws_Event( username,            // Username for websocket serever
+function vscp_Event( username,            // Username for websocket serever
                         passwordhash,       // Password hash for websocket
                         serverurl,          // url to VSCP websocket i/f
                         fncallbackresponse, // If set function to call when response arrives
@@ -5109,7 +5110,7 @@ function vscpws_Event( username,            // Username for websocket serever
     this.bConnected = false;
 
     // Set the instance name for the control
-    this.instanceName = "vscpws_" + "event";
+    this.instanceName = "vscp_" + "event";
 
     // Open the socket
     this.socket_vscp = new WebSocket( serverurl );
@@ -5138,7 +5139,7 @@ function vscpws_Event( username,            // Username for websocket serever
 // isOpen
 //-----------------------------------------------------------------------------
 
-vscpws_Event.prototype.isOpen = function()
+vscp_Event.prototype.isOpen = function()
 {
     return this.bConnected;
 };
@@ -5147,11 +5148,11 @@ vscpws_Event.prototype.isOpen = function()
 // onVSCPOpen
 //-----------------------------------------------------------------------------
 
-vscpws_Event.prototype.onVSCPOpen = function()
+vscp_Event.prototype.onVSCPOpen = function()
 {
     this.socket_vscp.send("C;" + "challenge");
 
-    vscpws_log('Open VSCP websocket');
+    vscp_log('Open VSCP websocket');
     this.bConnected = true;
 };
 
@@ -5159,9 +5160,9 @@ vscpws_Event.prototype.onVSCPOpen = function()
 // onVSCPClose
 //-----------------------------------------------------------------------------
 
-vscpws_Event.prototype.onVSCPClose = function()
+vscp_Event.prototype.onVSCPClose = function()
 {
-    vscpws_log('Close VSCP websocket');
+    vscp_log('Close VSCP websocket');
     this.bConnected = false;
 };
 
@@ -5169,7 +5170,7 @@ vscpws_Event.prototype.onVSCPClose = function()
 //-----------------------------------------------------------------------------
 // setFilter
 //-----------------------------------------------------------------------------
-vscpws_Event.prototype.setFilter = function( filter_class,
+vscp_Event.prototype.setFilter = function( filter_class,
                                                 filter_type,
                                                 filter_guid,
                                                 mask_class,
@@ -5233,7 +5234,7 @@ vscpws_Event.prototype.setFilter = function( filter_class,
         }
     }
 
-    vscpws_log("Set filter = "+ cmd );
+    vscp_log("Set filter = "+ cmd );
 
     // Set filter/mask on server
     if (this.bConnected) {
@@ -5246,9 +5247,9 @@ vscpws_Event.prototype.setFilter = function( filter_class,
 // onVSCPMessage
 //-----------------------------------------------------------------------------
 // handle VSCP websocket incoming message/event.
-vscpws_Event.prototype.onVSCPMessage = function(msg)
+vscp_Event.prototype.onVSCPMessage = function(msg)
 {
-    vscpws_log('onVSCPMessage -' + this.instanceName +
+    vscp_log('onVSCPMessage -' + this.instanceName +
                                     " " + msg.data);
 
     var msgitems = msg.data.split(';');
@@ -5256,7 +5257,7 @@ vscpws_Event.prototype.onVSCPMessage = function(msg)
 
     if ("+" == msgitems[0]){        // check for positive reply
 
-        vscpws_log("Positive reply " + msg.data);
+        vscp_log("Positive reply " + msg.data);
         if ( null !== this.fncallbackresponse ) {
             this.fncallbackresponse.call( this, true, msgitems );
         }
@@ -5286,7 +5287,7 @@ vscpws_Event.prototype.onVSCPMessage = function(msg)
         }
     }
     else if ("-" == msgitems[0]){   // Check for negative reply
-        vscpws_log("Negative reply " + msg.data);
+        vscp_log("Negative reply " + msg.data);
         if ( null !== this.fncallbackresponse ) {
             this.fncallbackresponse.call( this, false, msgitems );
         }
@@ -5314,11 +5315,11 @@ vscpws_Event.prototype.onVSCPMessage = function(msg)
         var vscpdata = [];
         for (i=0;i<vscpitems.length-6-offset;i++){
             vscpdata[i] = parseInt(vscpitems[offset+6+i]);
-            //vscpws_log("index="+i.toString()+
+            //vscp_log("index="+i.toString()+
             //                                " data="+vscpdata[i]);
         }
 
-        vscpws_log("CLASS = " + vscpclass +
+        vscp_log("CLASS = " + vscpclass +
                 " TYPE = " + vscptype + "\n " + msg.data);
 
         if ( null !== this.fncallbackevent ) {
@@ -5339,7 +5340,7 @@ vscpws_Event.prototype.onVSCPMessage = function(msg)
 // openConnection
 //-----------------------------------------------------------------------------
 // Open/close event traffic
-vscpws_Event.prototype.openConnection = function()
+vscp_Event.prototype.openConnection = function()
 {
     this.socket_vscp.send("C;" + "open");
 };
@@ -5347,7 +5348,7 @@ vscpws_Event.prototype.openConnection = function()
 //-----------------------------------------------------------------------------
 // closeConnection
 //-----------------------------------------------------------------------------
-vscpws_Event.prototype.closeConnection = function()
+vscp_Event.prototype.closeConnection = function()
 {
     this.socket_vscp.send("C;" + "close");
 };
@@ -5357,7 +5358,7 @@ vscpws_Event.prototype.closeConnection = function()
 // sendEvent
 //-----------------------------------------------------------------------------
 
-vscpws_Event.prototype.sendEvent = function( vscphead,
+vscp_Event.prototype.sendEvent = function( vscphead,
                                              vscpclass,
                                              vscptype,
                                              vscpobid,
@@ -5387,11 +5388,11 @@ vscpws_Event.prototype.sendEvent = function( vscphead,
         cmd += vscpdata;
     }
     else {
-        throw  "vscpws_Event : event data not a valid type.";
+        throw  "vscp_Event : event data not a valid type.";
     }
 
     // Send command
-    vscpws_log( cmd );
+    vscp_log( cmd );
     this.socket_vscp.send( cmd );
 };
 
@@ -5399,7 +5400,7 @@ vscpws_Event.prototype.sendEvent = function( vscphead,
 //-----------------------------------------------------------------------------
 // clrQueue
 //-----------------------------------------------------------------------------
-vscpws_Event.prototype.clrQueue = function()
+vscp_Event.prototype.clrQueue = function()
 {
     this.socket_vscp.send("C;" + "CLRQUEUE");
 };
@@ -5408,7 +5409,7 @@ vscpws_Event.prototype.clrQueue = function()
 
 
 //*****************************************************************************
-//                             vscpws_variable
+//                             vscp_variable
 //*****************************************************************************
 
 
@@ -5418,10 +5419,10 @@ vscpws_Event.prototype.clrQueue = function()
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_variable
+// vscp_variable
 //
 
-function vscpws_Variable( username,             // Username for websocket server
+function vscp_Variable( username,             // Username for websocket server
                             passwordhash,       // Password hash for websocket
                             serverurl,          // url to VSCP websocket i/f
                             variablename,       // The variable to monitor (must exist)
@@ -5448,7 +5449,7 @@ function vscpws_Variable( username,             // Username for websocket server
     this.value = "unassigned";
 
     // Set the instance name for the control
-    instanceName = "vscpws_variable_" + variablename;
+    instanceName = "vscp_variable_" + variablename;
 
     // move this to global scope
     eval(instanceName + " = this;");
@@ -5483,7 +5484,7 @@ function vscpws_Variable( username,             // Username for websocket server
 // isOpen
 //-----------------------------------------------------------------------------
 
-vscpws_Variable.prototype.isOpen = function()
+vscp_Variable.prototype.isOpen = function()
 {
     return this.bConnected;
 };
@@ -5492,11 +5493,11 @@ vscpws_Variable.prototype.isOpen = function()
 // onVSCPOpen
 //-----------------------------------------------------------------------------
 
-vscpws_Variable.prototype.onVSCPOpen = function()
+vscp_Variable.prototype.onVSCPOpen = function()
 {
     this.socket_vscp.send("C;" + "challenge");
 
-    vscpws_log('Open VSCP websocket');
+    vscp_log('Open VSCP websocket');
 
     // Start monitoring
     this.SetInterval( this.interval );
@@ -5506,9 +5507,9 @@ vscpws_Variable.prototype.onVSCPOpen = function()
 // onVSCPClose
 //-----------------------------------------------------------------------------
 
-vscpws_Variable.prototype.onVSCPClose = function()
+vscp_Variable.prototype.onVSCPClose = function()
 {
-    vscpws_log('Close VSCP websocket');
+    vscp_log('Close VSCP websocket');
     this.bConnected = false;
     this.SetInterval( 0 );
 };
@@ -5518,16 +5519,16 @@ vscpws_Variable.prototype.onVSCPClose = function()
 // onVSCPMessage
 //-----------------------------------------------------------------------------
 // handle VSCP websocket incoming message/event.
-vscpws_Variable.prototype.onVSCPMessage = function(msg)
+vscp_Variable.prototype.onVSCPMessage = function(msg)
 {
-    vscpws_log('onVSCPMessage - ' + this.instanceName +
+    vscp_log('onVSCPMessage - ' + this.instanceName +
                                     " " + msg.data);
 
     var msgitems = msg.data.split(';');
 
     if ("+" == msgitems[0]){        // check for positive reply
 
-        vscpws_log( "Positive reply " + msgitems );
+        vscp_log( "Positive reply " + msgitems );
 
         if ( "AUTH0" == msgitems[1] ) {
             var cmd = "C;AUTH;" + this.username + ";" +
@@ -5615,7 +5616,7 @@ vscpws_Variable.prototype.onVSCPMessage = function(msg)
 
     }
     else if ("-" == msgitems[0]){   // Check for negative reply
-        vscpws_log("vscpws_variable: Negative reply " + msg.data);
+        vscp_log("vscp_variable: Negative reply " + msg.data);
         if ( null !== this.fnCallback ) {
             this.fnCallback.call( this, false, msgitems[1], msgitems );
         }
@@ -5627,7 +5628,7 @@ vscpws_Variable.prototype.onVSCPMessage = function(msg)
 // openConnection
 //-----------------------------------------------------------------------------
 // Open/close event traffic
-vscpws_Variable.prototype.openConnection = function()
+vscp_Variable.prototype.openConnection = function()
 {
     this.socket_vscp.send("C;" + "open");
 };
@@ -5635,7 +5636,7 @@ vscpws_Variable.prototype.openConnection = function()
 //-----------------------------------------------------------------------------
 // closeConnection
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.closeConnection = function()
+vscp_Variable.prototype.closeConnection = function()
 {
     this.socket_vscp.send("C;" + "close");
 };
@@ -5644,7 +5645,7 @@ vscpws_Variable.prototype.closeConnection = function()
 // SetInterval
 //-----------------------------------------------------------------------------
 
-vscpws_Variable.prototype.SetInterval = function(interval)
+vscp_Variable.prototype.SetInterval = function(interval)
 {
     if ( 0 === interval  ) {
         clearInterval( this.variableTimer );
@@ -5665,20 +5666,20 @@ vscpws_Variable.prototype.SetInterval = function(interval)
 //-----------------------------------------------------------------------------
 // time4VariableRead
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.time4VariableRead = function(m,s)
+vscp_Variable.prototype.time4VariableRead = function(m,s)
 {
     var cmd;
 
     cmd = "C;READVAR;" + this.monitorVariableName;
     this.socket_vscp.send(cmd);
-    vscpws_log("time4VariableRead - " + cmd);
+    vscp_log("time4VariableRead - " + cmd);
 };
 
 
 //-----------------------------------------------------------------------------
 // writeVariable
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.writeVariable = function( name, value )
+vscp_Variable.prototype.writeVariable = function( name, value )
 {
     var cmd;
 
@@ -5686,7 +5687,7 @@ vscpws_Variable.prototype.writeVariable = function( name, value )
     cmd = "C;WRITEVAR;" + name + ";" + value;
     this.socket_vscp.send(cmd);
 
-    vscpws_log("writeVariable" + cmd);
+    vscp_log("writeVariable" + cmd);
 };
 
 
@@ -5694,7 +5695,7 @@ vscpws_Variable.prototype.writeVariable = function( name, value )
 //-----------------------------------------------------------------------------
 // createVariable
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.createVariable = function( name, type, value, persistence )
+vscp_Variable.prototype.createVariable = function( name, type, value, persistence )
 {
     var cmd;
 
@@ -5702,7 +5703,7 @@ vscpws_Variable.prototype.createVariable = function( name, type, value, persiste
     cmd = "C;CREATEVAR;" + name + ";" + type + ";" + localPersistence + ";" + value;
     this.socket_vscp.send(cmd);
 
-    vscpws_log("createVariable" + cmd);
+    vscp_log("createVariable" + cmd);
 };
 
 
@@ -5710,27 +5711,27 @@ vscpws_Variable.prototype.createVariable = function( name, type, value, persiste
 //-----------------------------------------------------------------------------
 // resetVariable
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.resetVariable = function(name)
+vscp_Variable.prototype.resetVariable = function(name)
 {
     var cmd;
 
     cmd = "C;RESETVAR;" + name;
     this.socket_vscp.send(cmd);
 
-    vscpws_log("resetVariable" + cmd);
+    vscp_log("resetVariable" + cmd);
 };
 
 //-----------------------------------------------------------------------------
 // removeVariable
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.removeVariable = function(name)
+vscp_Variable.prototype.removeVariable = function(name)
 {
     var cmd;
 
     cmd = "C;REMOVEVAR;" + name;
     this.socket_vscp.send(cmd);
 
-    vscpws_log("removeVariable" + cmd);
+    vscp_log("removeVariable" + cmd);
 };
 
 
@@ -5738,53 +5739,53 @@ vscpws_Variable.prototype.removeVariable = function(name)
 //-----------------------------------------------------------------------------
 // lengthVariable
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.lengthVariable = function(name)
+vscp_Variable.prototype.lengthVariable = function(name)
 {
     var cmd;
 
     cmd = "C;LENGTHVAR;" + name;
     this.socket_vscp.send(cmd);
 
-    vscpws_log("lengthVariable" + cmd);
+    vscp_log("lengthVariable" + cmd);
 };
 
 //-----------------------------------------------------------------------------
 // lastchangeVariable
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.lastchangeVariable = function(name)
+vscp_Variable.prototype.lastchangeVariable = function(name)
 {
     var cmd;
 
     cmd = "C;LASTCHANGEVAR;" + name;
     this.socket_vscp.send(cmd);
 
-    vscpws_log("lastchangeVariable" + cmd);
+    vscp_log("lastchangeVariable" + cmd);
 };
 
 //-----------------------------------------------------------------------------
 // listVariable
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.listVariable = function(name)
+vscp_Variable.prototype.listVariable = function(name)
 {
     var cmd;
 
     cmd = "C;LISTVAR;" + name;
     this.socket_vscp.send(cmd);
 
-    vscpws_log("listVariable" + cmd);
+    vscp_log("listVariable" + cmd);
 };
 
 //-----------------------------------------------------------------------------
 // saveVariable
 //-----------------------------------------------------------------------------
-vscpws_Variable.prototype.saveVariable = function(name)
+vscp_Variable.prototype.saveVariable = function(name)
 {
     var cmd;
 
     cmd = "C;SAVEVAR;" + name;
     this.socket_vscp.send(cmd);
 
-    vscpws_log("saveVariable" + cmd);
+    vscp_log("saveVariable" + cmd);
 };
 
 
@@ -5794,7 +5795,7 @@ vscpws_Variable.prototype.saveVariable = function(name)
 
 
 //*****************************************************************************
-//                             vscpws_Table
+//                             vscp_Table
 //*****************************************************************************
 
 
@@ -5804,10 +5805,10 @@ vscpws_Variable.prototype.saveVariable = function(name)
 
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscpws_Table
+// vscp_Table
 //
 
-function vscpws_Table( username,                // Username for websocket server
+function vscp_Table( username,                // Username for websocket server
                             passwordhash,       // Password hash for websocket
                             serverurl,          // url to VSCP websocket i/f
                             tablename,          // The table to monitor (must exist)
@@ -5835,7 +5836,7 @@ function vscpws_Table( username,                // Username for websocket server
     this.value = "unassigned";
 
     // Set the instance name for the control
-    //instanceName = "vscpws_table_" + tablename;
+    //instanceName = "vscp_table_" + tablename;
 
     // move this to global scope
     //eval(instanceName + " = this;");
@@ -5870,7 +5871,7 @@ function vscpws_Table( username,                // Username for websocket server
 // isOpen
 //-----------------------------------------------------------------------------
 
-vscpws_Table.prototype.isOpen = function()
+vscp_Table.prototype.isOpen = function()
 {
     return this.bConnected;
 };
@@ -5879,9 +5880,9 @@ vscpws_Table.prototype.isOpen = function()
 // onVSCPOpen
 //-----------------------------------------------------------------------------
 
-vscpws_Table.prototype.onVSCPOpen = function()
+vscp_Table.prototype.onVSCPOpen = function()
 {
-    vscpws_log('Open VSCP websocket');
+    vscp_log('Open VSCP websocket');
 
     this.socket_vscp.send("C;" + "challenge");
 
@@ -5893,9 +5894,9 @@ vscpws_Table.prototype.onVSCPOpen = function()
 // onVSCPClose
 //-----------------------------------------------------------------------------
 
-vscpws_Table.prototype.onVSCPClose = function()
+vscp_Table.prototype.onVSCPClose = function()
 {
-    vscpws_log('Close VSCP websocket');
+    vscp_log('Close VSCP websocket');
     this.bConnected = false;
     this.SetInterval( 0 );
 };
@@ -5905,16 +5906,16 @@ vscpws_Table.prototype.onVSCPClose = function()
 // onVSCPMessage
 //-----------------------------------------------------------------------------
 // handle VSCP websocket incoming message/event.
-vscpws_Table.prototype.onVSCPMessage = function(msg)
+vscp_Table.prototype.onVSCPMessage = function(msg)
 {
-    vscpws_log('onVSCPMessage - ' + this.instanceName +
+    vscp_log('onVSCPMessage - ' + this.instanceName +
                                     " " + msg.data);
 
     var msgitems = msg.data.split(';');
 
     if ("+" == msgitems[0]){        // check for positive reply
 
-        vscpws_log( "Positive reply " + msgitems );
+        vscp_log( "Positive reply " + msgitems );
 
         if ( "AUTH0" == msgitems[1] ) {
             var cmd = "C;AUTH;" + this.username + ";" +
@@ -5940,7 +5941,7 @@ vscpws_Table.prototype.onVSCPMessage = function(msg)
         }
         // Read a value for a variable
         else if ( "GT" == msgitems[1] ){
-            vscpws_log( msg.data );
+            vscp_log( msg.data );
             if ( null !== this.fnDataUpdate ) {
                 this.fnDataUpdate.call( this, msgitems );
             }
@@ -5948,7 +5949,7 @@ vscpws_Table.prototype.onVSCPMessage = function(msg)
 
     }
     else if ("-" == msgitems[0]){   // Check for negative reply
-        vscpws_log("vscpws_Table: Negative reply " + msg.data);
+        vscp_log("vscp_Table: Negative reply " + msg.data);
         if ( null !== this.fnDataUpdate ) {
             //this.fnCallback.call( this, false, msgitems[1], msgitems );
         }
@@ -5960,7 +5961,7 @@ vscpws_Table.prototype.onVSCPMessage = function(msg)
 // openConnection
 //-----------------------------------------------------------------------------
 // Open/close event traffic
-vscpws_Table.prototype.openConnection = function()
+vscp_Table.prototype.openConnection = function()
 {
     this.socket_vscp.send("C;" + "open");
 };
@@ -5968,7 +5969,7 @@ vscpws_Table.prototype.openConnection = function()
 //-----------------------------------------------------------------------------
 // closeConnection
 //-----------------------------------------------------------------------------
-vscpws_Table.prototype.closeConnection = function()
+vscp_Table.prototype.closeConnection = function()
 {
     this.socket_vscp.send("C;" + "close");
 };
@@ -5977,7 +5978,7 @@ vscpws_Table.prototype.closeConnection = function()
 // SetInterval
 //-----------------------------------------------------------------------------
 
-vscpws_Table.prototype.SetInterval = function(interval)
+vscp_Table.prototype.SetInterval = function(interval)
 {
     if ( 0 === interval  ) {
         clearInterval( this.variableTimer );
@@ -5998,13 +5999,13 @@ vscpws_Table.prototype.SetInterval = function(interval)
 //-----------------------------------------------------------------------------
 // time4VariableRead
 //-----------------------------------------------------------------------------
-vscpws_Table.prototype.time4TableUpdate = function(m,s)
+vscp_Table.prototype.time4TableUpdate = function(m,s)
 {
     var cmd;
 
     cmd = "C;GT;" + this.TableName + ";" + this.start + ";" + this.end;
     this.socket_vscp.send(cmd);
-    vscpws_log("time4TableUpdate - " + cmd);
+    vscp_log("time4TableUpdate - " + cmd);
 };
 
 
@@ -6012,7 +6013,7 @@ vscpws_Table.prototype.time4TableUpdate = function(m,s)
 // GetTableData
 //-----------------------------------------------------------------------------
 
-vscpws_Table.prototype.getTableData = function( start, end )
+vscp_Table.prototype.getTableData = function( start, end )
 {
     var cmd;
 
@@ -6020,5 +6021,5 @@ vscpws_Table.prototype.getTableData = function( start, end )
             start.toLocaleDateString() + " " + start.toLocaleTimeString() + ";" +
             end.toLocaleDateString() + " " + end.toLocaleTimeString();
     this.socket_vscp.send(cmd);
-    vscpws_log("GetTableData - " + cmd);
+    vscp_log("GetTableData - " + cmd);
 };
