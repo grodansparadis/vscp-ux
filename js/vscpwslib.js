@@ -1,6 +1,6 @@
 //
 // vscpwslib javascript websocket library
-// Copyright (C) 2012-2015 Ake Hedman, Grodans Paradis AB
+// Copyright (C) 2012-2016 Ake Hedman, Grodans Paradis AB
 // <akhe@grodansparadis.com>
 // Copyright (c) 2015 Andreas Merkle
 // <vscp@blue-andi.de>
@@ -43,8 +43,8 @@
 
 // Version information
 var vscpws_version_major = 0;
-var vscpws_version_minor = 0;
-var vscpws_version_subminor = 1;
+var vscpws_version_minor = 1;
+var vscpws_version_subminor = 0;
 
 // Uncomment to get debug messages
 var vscpws_debug = true;
@@ -1072,6 +1072,26 @@ var VSCP2_TYPE_VSCPD_TIMER_STOPPED = 28;
 var VSCP2_TYPE_VSCPD_TIMER_ELLAPSED = 29;
 
 
+// ----------------------------------------------------------------------------------
+
+
+// Since DOMStrings are 16-bit-encoded strings, in most browsers calling window.btoa 
+// on a Unicode string will cause a Character Out Of Range exception if a character 
+// exceeds the range of a 8-bit ASCII-encoded character.
+
+// Base64 unicode safe encode 
+function b64EncodeUnicode( str ) {
+    return btoa( encodeURIComponent( str ).replace( /%([0-9A-F]{2})/g, function( match, p1 ) {
+        return String.fromCharCode( '0x' + p1 );
+    }));
+}
+
+// Base64 unicode safe decode 
+function b64DecodeUnicode( str ) {
+    return decodeURIComponent( Array.prototype.map.call( atob( str ), function( c ) {
+        return '%' + ( '00' + c.charCodeAt( 0 ).toString( 16 ) ).slice( -2 );
+    }).join('') );
+}
 
 // How to use: https://gist.github.com/tbranyen/1049426
 // Inspired by http://bit.ly/juSAWl
@@ -1147,7 +1167,7 @@ function vscpws_encodeFloat(number) {
     i = -1;
     while (++i < len && !bin[i]);
 
-    if (bin[(lastBit = 22 + (i = (exp = 128 - i) >= -126 && exp <= 127 ? i + 1 : 128 - (exp = -127))) + 1]) {
+    if ( bin[(lastBit = 22 + (i = (exp = 128 - i) >= -126 && exp <= 127 ? i + 1 : 128 - (exp = -127))) + 1]) {
         if (!(rounded = bin[lastBit])) {
             j = lastBit + 2;
             while (!rounded && j < len) {
@@ -3039,7 +3059,7 @@ vscpws_stateButton.prototype.setFilter = function()
 
     // Send set filter command. Format is
     // â€œC;SETFILTER;filter-priority,filter-class,filter-type,
-    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDâ€?
+    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDï¿½ï¿½?
     cmd = "C;SETFILTER;0x00,";
     cmd += "0x"+filter_class.toString(16) + ",";
     cmd += "0x"+filter_type.toString(16) + ",";
@@ -3639,7 +3659,7 @@ vscpws_simpleTextEvent.prototype.setFilter = function()
 
     // Send setfilter command. Format is
     // â€œC;SETFILTER;filter-priority,filter-class,filter-type,
-    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDâ€?
+    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDï¿½ï¿½?
     cmd = "C;SETFILTER;0x00,";
     cmd += "0x"+filter_class.toString(16) + ",";
     cmd += "0x"+filter_type.toString(16) + ",";
@@ -4209,7 +4229,7 @@ vscpws_thermometerCelsius.prototype.setFilter = function()
 
     // Send setfilter command. Format is
     // â€œC;SETFILTER;filter-priority,filter-class,filter-type,
-    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDâ€?
+    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDï¿½ï¿½?
     cmd = "C;SETFILTER;0x00,";
     cmd += "0x"+filter_class.toString(16) + ",";
     cmd += "0x"+filter_type.toString(16) + ",";
@@ -4721,7 +4741,7 @@ vscpws_speedometerCelius.prototype.setFilter = function()
 
     // Send setfilter command. Format is
     // â€œC;SETFILTER;filter-priority,filter-class,filter-type,
-    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDâ€?
+    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDï¿½ï¿½?
     cmd = "C;SETFILTER;0x00,";
     cmd += "0x"+filter_class.toString(16) + ",";
     cmd += "0x"+filter_type.toString(16) + ",";
@@ -5193,7 +5213,7 @@ vscpws_Event.prototype.setFilter = function( filter_class,
 
     // Send setfilter command. Format is
     // â€œC;SETFILTER;filter-priority,filter-class,filter-type,
-    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDâ€?
+    //    filter-GUID;mask-priority,mask-class,mask-type,mask-GUIDï¿½ï¿½?
     cmd = "C;SETFILTER;0x00,";
     cmd += "0x" + filter_class.toString(16) + ",";
     cmd += "0x" + filter_type.toString(16) + ",";

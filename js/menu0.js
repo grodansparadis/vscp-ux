@@ -50,7 +50,7 @@ navBarMenu.content = [
         dropDown: [
             {
                 title: "Select server",
-                url: "testauth.html"
+                url: "javascript:setServerModal();"
             },
             
         ]

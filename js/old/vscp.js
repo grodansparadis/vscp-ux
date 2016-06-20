@@ -1259,6 +1259,25 @@ vscp.constants.varTypeNames = [
 
 /* ---------------------------------------------------------------------- */
 
+
+// Since DOMStrings are 16-bit-encoded strings, in most browsers calling window.btoa 
+// on a Unicode string will cause a Character Out Of Range exception if a character 
+// exceeds the range of a 8-bit ASCII-encoded character.
+
+// Base64 unicode safe encode 
+vscp.b64EncodeUnicode = function ( str ) {
+    return btoa( encodeURIComponent( str ).replace( /%([0-9A-F]{2})/g, function( match, p1 ) {
+        return String.fromCharCode( '0x' + p1 );
+    }));
+}
+
+// Base64 unicode safe decode 
+vscp.b64DecodeUnicode = function ( str ) {
+    return decodeURIComponent( Array.prototype.map.call( atob( str ), function( c ) {
+        return '%' + ( '00' + c.charCodeAt( 0 ).toString( 16 ) ).slice( -2 );
+    }).join('') );
+}
+
 /**
  * VSCP event.
  * @class
@@ -1462,7 +1481,10 @@ vscp.utility.getTime = function() {
         return str;
     };
 
-    return "" + paddingHead( now.getHours(), 2 ) + ":" + paddingHead( now.getMinutes(), 2 ) + ":" + paddingHead( now.getSeconds(), 2 ) + "." + paddingTail( now.getMilliseconds(), 3 );
+    return "" + paddingHead( now.getHours(), 2 ) + ":" + 
+                    paddingHead( now.getMinutes(), 2 ) + ":" + 
+                    paddingHead( now.getSeconds(), 2 ) + "." + 
+                    paddingTail( now.getMilliseconds(), 3 );
 };
 
 /**
@@ -1657,6 +1679,7 @@ vscp.Connection = function() {
      * @return {number} Index of command in the queue. If index is < 0, the command was not found.
      */
     var getPendingCommandIndex = function( command ) {
+
         var index = 0;
 
         for( index = 0; index < cmdQueue.length; ++index ) {
@@ -2066,7 +2089,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 this.signalSuccess( msgItems[ 1 ] );
             }
             else if ( "SETFILTER" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Filter successful set." );
+                console.info( vscp.utility.getTime() + " Filter successfully set." );
                 this.signalSuccess( msgItems[ 1 ] );
             }
             else if ( "READVAR" === msgItems[ 1 ] ) {
@@ -2081,7 +2104,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 );
             }
             else if ( "WRITEVAR" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Variable successful written." );
+                console.info( vscp.utility.getTime() + " Variable successfully written." );
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
@@ -2092,11 +2115,11 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 );
             }
             else if ( "CREATEVAR" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Variable successful created." );
+                console.info( vscp.utility.getTime() + " Variable successfully created." );
                 this.signalSuccess( msgItems[ 1 ] );
             }
             else if ( "RESETVAR" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Variable successful reset." );
+                console.info( vscp.utility.getTime() + " Variable successfully reset." );
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
@@ -2107,7 +2130,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 );
             }
             else if ( "REMOVEVAR" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Variable successful removed." );
+                console.info( vscp.utility.getTime() + " Variable successfully removed." );
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
@@ -2116,7 +2139,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 );
             }
             else if ( "LENGTHVAR" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Variable length successful read." );
+                console.info( vscp.utility.getTime() + " Variable length successfully read." );
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
@@ -2126,7 +2149,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 );
             }
             else if ( "LASTCHANGEVAR" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Variable last change successful read." );
+                console.info( vscp.utility.getTime() + " Variable last change successfully read." );
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
@@ -2136,7 +2159,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 );
             }
             else if ( "LISTVAR" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Variable successful listed." );
+                console.info( vscp.utility.getTime() + " Variable successfully listed." );
                 this.signalSuccess( msgItems[ 1 ] );
                 this.signalVariable({
                         id: parseInt( msgItems[ 2 ] ),                              // Consecutive number
@@ -2147,11 +2170,11 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 });
             }
             else if ( "SAVEVAR" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Variables successful saved." );
+                console.info( vscp.utility.getTime() + " Variables successfully saved." );
                 this.signalSuccess( msgItems[ 1 ] );
             }
             else if ( "GT" === msgItems[ 1 ] ) {
-                console.info( vscp.utility.getTime() + " Table successful read." );
+                console.info( vscp.utility.getTime() + " Table successfully read." );
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
