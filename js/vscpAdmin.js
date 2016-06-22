@@ -33,20 +33,35 @@
 // Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
 //
 
-// jshint bitwise: false 
-
 // Namespace for all functionality of the VSCP admin libraries.
+/*jshint bitwise: false */
+
+/* Create the root namespace and making sure we're not overwriting it */
 var vscp = vscp || {};
 
+/* ---------------------------------------------------------------------- */
+
+/**
+ * VSCP service supporting functions
+ * @namespace vscp.service
+ */
 vscp._createNS( "vscp.admin" );
+
+/** VSCP response timeout in ms
+ * @type {number}
+ * @const
+ */
+vscp.admin.timeout = 5000;
 
 // Admin interface Constants
 vscp.admin.config = {
 
-    copyright: "Copyright &copy; 2000-2016 Grodans Paradis AB (Paradise of the Frog)",
-    version: 0.0.1,
+    copyright: 'Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>',
+    version: "0.0.1",
     server: "http://127.0.0.1:8080",
-
+    user: "admin",
+    password: "secret", 
+    domain: "mydomain.com"
 };
 
 

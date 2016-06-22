@@ -95,17 +95,17 @@
         });
 
         // Connect to the VSCP daemon
-        function connect() {
+        function connect() 
+        {
             var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
 
                 url: settings.url,
-
                 userName: settings.user,
-
-                password: settings.passwordHash,
+                password: settings.password,
+                authdomain: settings.authdomain, 
 
                 onSuccess: function( conn ) {
                     deferred.resolve();                    
@@ -121,7 +121,8 @@
         }
         
         // Set a filter for CLASS1.Protocol
-        function setFilter() {
+        function setFilter() 
+        {
             var deferred = new $.Deferred();
             
             // Set filter for CLASS1.Protocol
@@ -145,7 +146,8 @@
         }
         
         // Start receiving VSCP events
-        function startReceivingEvents() {
+        function startReceivingEvents() 
+        {
             var deferred = new $.Deferred();
             
             // Start receiving VSCP events
@@ -165,7 +167,8 @@
         }
         
         // Initialize global node list
-        function initNodeList() {
+        function initNodeList() 
+        {
             var deferred = new $.Deferred();
             
             // Initialize node list
@@ -187,7 +190,8 @@
         }
         
         // Show the node list
-        function showNodeList() {
+        function showNodeList() 
+        {
             var index   = 0;
             var nodes   = nodeList.get();
             
@@ -200,7 +204,8 @@
         }
 
         // Discover nodes by who is there broadcast
-        function whoIsThere() {
+        function whoIsThere() 
+        {
             var index = 0;
             
             // Disable user interface
@@ -258,7 +263,8 @@
         }
         
         // Discover nodes by scanning for them
-        function scan() {
+        function scan() 
+        {
         
             // Disable user interface
             ui.disable();

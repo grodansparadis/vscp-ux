@@ -87,17 +87,17 @@
         });
 
         // Connect to the VSCP daemon
-        function connect() {
+        function connect() 
+        {
             var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
 
                 url: settings.url,
-
                 userName: settings.user,
-
-                password: settings.passwordHash,
+                password: settings.password,
+                authdomain: settings.authdomain, 
 
                 onSuccess: function( conn ) {
                     deferred.resolve();                    
@@ -113,7 +113,8 @@
         }
         
         // Set a filter for CLASS1.Protocol
-        function setFilter() {
+        function setFilter() 
+        {
             var deferred = new $.Deferred();
             
             // Set filter for CLASS1.Protocol
@@ -137,7 +138,8 @@
         }
         
         // Start receiving VSCP events
-        function startReceivingEvents() {
+        function startReceivingEvents() 
+        {
             var deferred = new $.Deferred();
             
             // Start receiving VSCP events
@@ -157,7 +159,8 @@
         }
         
         // Initialize global node list
-        function initNodeList() {
+        function initNodeList() 
+        {
             var deferred = new $.Deferred();
             
             // Initialize node list
@@ -179,7 +182,8 @@
         }
         
         // Show the node list
-        function showNodeList() {
+        function showNodeList() 
+        {
             var index   = 0;
             var nodes   = nodeList.get();
 
@@ -193,7 +197,8 @@
         }
 
         // User selected a node GUID, get provided recipes
-        function nodeSelected() {
+        function nodeSelected() 
+        {
             var guid = $( "#nodeList" ).val();
         
             if ( "-" === guid ) {
@@ -230,7 +235,8 @@
             });
         }
         
-        function convertToHex( value, length ) {
+        function convertToHex( value, length ) 
+        {
             var str = value.toString( 16 );
 
             while( length > str.length ) {
@@ -242,7 +248,8 @@
             return str;
         }
 
-        function readAlarmStatus() {
+        function readAlarmStatus() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readAlarmStatus({
@@ -264,7 +271,8 @@
             return deferred.promise();
         }
 
-        function readVscpVersion() {
+        function readVscpVersion() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readVscpVersion({
@@ -286,7 +294,8 @@
             return deferred.promise();
         }
 
-        function readNodeControlFlags() {
+        function readNodeControlFlags() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readNodeControlFlags({
@@ -308,7 +317,8 @@
             return deferred.promise();
         }
 
-        function readUserId() {
+        function readUserId() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readUserId({
@@ -330,7 +340,8 @@
             return deferred.promise();
         }
 
-        function readManufacturerDevId() {
+        function readManufacturerDevId() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readManufacturerDevId({
@@ -352,7 +363,8 @@
             return deferred.promise();
         }
 
-        function readManufacturerSubDevId() {
+        function readManufacturerSubDevId() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readManufacturerDevId({
@@ -374,7 +386,8 @@
             return deferred.promise();
         }
 
-        function readNicknameId() {
+        function readNicknameId() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readNicknameId({
@@ -396,7 +409,8 @@
             return deferred.promise();
         }
 
-        function readSelectedPage() {
+        function readSelectedPage() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readSelectedPage({
@@ -418,7 +432,8 @@
             return deferred.promise();
         }
 
-        function readFirmwareVersion() {
+        function readFirmwareVersion() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readFirmwareVersion({
@@ -440,7 +455,8 @@
             return deferred.promise();
         }
 
-        function readBootloaderAlgorithm() {
+        function readBootloaderAlgorithm() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readBootloaderAlgorithm({
@@ -462,7 +478,8 @@
             return deferred.promise();
         }
 
-        function readUsedPages() {
+        function readUsedPages() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readUsedPages({
@@ -484,7 +501,8 @@
             return deferred.promise();
         }
 
-        function readStdDevFamCode() {
+        function readStdDevFamCode() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readStdDevFamCode({
@@ -506,7 +524,8 @@
             return deferred.promise();
         }
 
-        function readStdDevType() {
+        function readStdDevType() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readStdDevType({
@@ -528,7 +547,8 @@
             return deferred.promise();
         }
 
-        function readGUID() {
+        function readGUID() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readGUID({
@@ -550,7 +570,8 @@
             return deferred.promise();
         }
 
-        function readMdfUrl() {
+        function readMdfUrl() 
+        {
             var deferred = new $.Deferred();
             
             vscp.register.readMdfUrl({

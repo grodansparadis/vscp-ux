@@ -102,17 +102,17 @@
         });
 
         // Connect to the VSCP daemon
-        function connect() {
+        function connect() 
+        {
             var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
 
                 url: settings.url,
-
                 userName: settings.user,
-
-                password: settings.passwordHash,
+                password: settings.password,
+                authdomain: settings.authdomain, 
 
                 onSuccess: function( conn ) {
                     deferred.resolve();                    
@@ -128,7 +128,8 @@
         }
         
         // Update the configuration, which is shown the user
-        function update( id ) {
+        function update( id ) 
+        {
         
             var head    = "";
             var body    = "";
@@ -186,7 +187,8 @@
         }
         
         // Read all variables from server
-        function readAllVariables() {
+        function readAllVariables() 
+        {
 
             // Disable user interface
             ui.disable();
@@ -229,7 +231,8 @@
         }
         
         // Write a variable value
-        function writeVariable( name, id ) {
+        function writeVariable( name, id ) 
+        {
 
             var index = 0;
         
@@ -278,7 +281,8 @@
         }
         
         // Read a variable value
-        function readVariable( name, id ) {
+        function readVariable( name, id ) 
+        {
 
             var index = 0;
                 
@@ -316,7 +320,8 @@
         }
         
         // Reset a variable
-        function resetVariable( name, id ) {
+        function resetVariable( name, id ) 
+        {
 
             var index = 0;
                 
@@ -354,7 +359,8 @@
         }
         
         // Remove a variable
-        function removeVariable( name ) {
+        function removeVariable( name ) 
+        {
 
             var index = 0;
                 
@@ -391,7 +397,8 @@
         }
         
         // Get variable length
-        function getVariableLength( name ) {
+        function getVariableLength( name ) 
+        {
 
             // Disable user interface
             ui.disable();
@@ -416,7 +423,8 @@
         }
         
         // Get variable last changed
-        function getVariableLastChanged( name ) {
+        function getVariableLastChanged( name ) 
+        {
 
             // Disable user interface
             ui.disable();
@@ -441,7 +449,8 @@
         }
         
         // Save persistent variables
-        function savePersistentVariables( name ) {
+        function savePersistentVariables( name ) 
+        {
 
             // Disable user interface
             ui.disable();

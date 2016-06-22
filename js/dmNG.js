@@ -38,7 +38,8 @@
 /**
  * This class implements the decision matrix NG.
  */
-function dmNG() {
+function dmNG() 
+{
     // Contains all rules
     this.rules = [];
 
@@ -88,7 +89,8 @@ function dmNG() {
  * @param {number} index    - Index (0..)
  * @param {dmNGRule} rule   - Decision matrix NG rule
  */
-dmNG.prototype.insertRule = function ( index, rule ) {
+dmNG.prototype.insertRule = function ( index, rule ) 
+{
     if ( rule instanceof dmNGRule ) {
         this.rules.splice( index, 0, rule );
     }
@@ -102,7 +104,8 @@ dmNG.prototype.insertRule = function ( index, rule ) {
  *
  * @param {number} index - Index (0..)
  */
-dmNG.prototype.deleteRule = function ( index ) {
+dmNG.prototype.deleteRule = function ( index ) 
+{
     this.rules.splice( index, 1 );
 };
 
@@ -111,7 +114,8 @@ dmNG.prototype.deleteRule = function ( index ) {
  *
  * @return {number} Rule set size in byte
  */
-dmNG.prototype.getSize = function() {
+dmNG.prototype.getSize = function() 
+{
     
     var size    = 1;
     var index   = 0;
@@ -129,7 +133,8 @@ dmNG.prototype.getSize = function() {
  *
  * @return {number[]} Configuration as array
  */
-dmNG.prototype.getConfig = function () {
+dmNG.prototype.getConfig = function () 
+{
     var config          = [];
     var ruleIndex       = 0;
     var conditionIndex  = 0;
@@ -191,7 +196,8 @@ dmNG.prototype.getConfig = function () {
  *
  * @param {number[]} config - Configuration
  */
-dmNG.prototype.setConfig = function ( config ) {
+dmNG.prototype.setConfig = function ( config ) 
+{
 
     var index           = 1;
     var numRules        = config[ 0 ];
@@ -302,7 +308,8 @@ dmNG.prototype.setConfig = function ( config ) {
  * This class implements a decision matrix NG rule.
  * @class
  */
-function dmNGRule() {
+function dmNGRule() 
+{
     this.actionId = 0;
     this.actionPar = 0;
     this.conditions = [];
@@ -314,7 +321,8 @@ function dmNGRule() {
  * @param {number} index                - Index (0..)
  * @param {dmNGRuleCondition} condition - Decision matrix NG rule condition
  */
-dmNGRule.prototype.insertCondition = function ( index, condition ) {
+dmNGRule.prototype.insertCondition = function ( index, condition ) 
+{
     if ( condition instanceof dmNGRuleCondition ) {
         this.conditions.splice( index, 0, condition );
     }
@@ -328,7 +336,8 @@ dmNGRule.prototype.insertCondition = function ( index, condition ) {
  *
  * @param {number} index - Index (0..)
  */
-dmNGRule.prototype.deleteCondition = function ( index ) {
+dmNGRule.prototype.deleteCondition = function ( index ) 
+{
     this.conditions.splice( index, 1 );
 };
 
@@ -337,7 +346,8 @@ dmNGRule.prototype.deleteCondition = function ( index ) {
  *
  * @return {number} Rule size in byte
  */
-dmNGRule.prototype.getSize = function() {
+dmNGRule.prototype.getSize = function() 
+{
     
     var size    = 2;
     var index   = 0;
@@ -364,7 +374,8 @@ dmNGRule.prototype.getSize = function() {
  * This class implements a decision matrix NG rule condition.
  * @class
  */
-function dmNGRuleCondition() {
+function dmNGRuleCondition() 
+{
     this.event = 0;
     this.value = 0;
     this.basicOperator = 0;

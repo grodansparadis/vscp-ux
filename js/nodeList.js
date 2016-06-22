@@ -56,7 +56,8 @@ var nodeList = (function() {
      * @param {function} options.onSuccess          - Callback which is called on successful operation
      * @param {function} [options.onError]          - Callback which is called on failed operation
      */
-    function init( options ) {
+    function init( options ) 
+    {
 
         if ( "undefined" === typeof options ) {
             return;
@@ -92,7 +93,8 @@ var nodeList = (function() {
      *
      * @return {string[]} Node list (GUID string array)
      */
-    function get() {
+    function get() 
+    {
         return container.data;
     }
     
@@ -102,7 +104,8 @@ var nodeList = (function() {
      * @param {object} options - Options
      * @param {string[]} guids - Array of GUID strings (one per node)
      */
-    function set( options ) {
+    function set( options ) 
+    {
     
         if ( "undefined" === typeof options ) {
             return;
@@ -121,7 +124,8 @@ var nodeList = (function() {
      * @param {object} options - Options
      * @param {string} guid - GUID string
      */
-    function append( options ) {
+    function append( options ) 
+    {
         
         if ( "undefined" === typeof options ) {
             return;
@@ -137,7 +141,8 @@ var nodeList = (function() {
     /**
      * Clears the node list.
      */
-    function clear() {
+    function clear() 
+    {
         
         container.data = [];
     }
@@ -149,7 +154,8 @@ var nodeList = (function() {
      * @param {function} options.onSuccess          - Callback which is called on successful operation
      * @param {function} [options.onError]          - Callback which is called on failed operation
      */
-    function write( options ) {
+    function write( options ) 
+    {
         
         if ( "undefined" === typeof options ) {
             return;

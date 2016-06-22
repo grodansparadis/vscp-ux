@@ -99,17 +99,17 @@
         });
 
         // Connect to the VSCP daemon
-        function connect() {
+        function connect() 
+        {
             var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
 
-                url: settings.url,
-
+                url: settings.url
                 userName: settings.user,
-
                 password: settings.passwordHash,
+                autdomain; settings.authdomain,
 
                 onSuccess: function( conn ) {
                     deferred.resolve();
@@ -125,7 +125,8 @@
         }
 
         // Set a filter for CLASS1.Protocol
-        function setFilter() {
+        function setFilter() 
+        {
             var deferred = new $.Deferred();
 
             // Set filter for CLASS1.Protocol
@@ -149,7 +150,8 @@
         }
 
         // Start receiving VSCP events
-        function startReceivingEvents() {
+        function startReceivingEvents() 
+        {
             var deferred = new $.Deferred();
 
             // Start receiving VSCP events
@@ -169,7 +171,8 @@
         }
 
         // Insert a rule
-        function insertRule( index ) {
+        function insertRule( index ) 
+        {
             console.log( "Insert rule at index " + index );
 
             dmNGInst.insertRule( index, new dmNGRule() );
@@ -181,7 +184,8 @@
         }
 
         // Delete a rule
-        function deleteRule( index ) {
+        function deleteRule( index ) 
+        {
             console.log( "Delete rule at index " + index );
 
             dmNGInst.deleteRule( index );
@@ -190,7 +194,8 @@
         }
 
         // Update conditions of a rule
-        function updateConditions( ruleIndex, conditionIndex ) {
+        function updateConditions( ruleIndex, conditionIndex ) 
+        {
             var value = dmNGInst.rules[ ruleIndex ].conditions[ conditionIndex ].logicOperator;
 
             // If there is no logic operator anymore, all following conditions will be removed.

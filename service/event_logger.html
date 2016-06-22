@@ -86,10 +86,9 @@
             vscpConn.connect({
 
                 url: settings.url,
-
                 userName: settings.user,
-
-                password: settings.passwordHash,
+                password: settings.password,
+                authdomain: settings.authdomain, 
 
                 onSuccess: function( conn ) {
                     deferred.resolve();                    
@@ -105,7 +104,8 @@
         }
         
         // Start receiving VSCP events
-        function startReceivingEvents() {
+        function startReceivingEvents() 
+        {
             var deferred = new $.Deferred();
             
             // Start receiving VSCP events
@@ -125,7 +125,8 @@
         }
                 
         // Catch all events and show them in the trace tab.
-        var eventListener = function( conn, evt ) {
+        var eventListener = function( conn, evt ) 
+        {
 
             var dateTime = new Date();
             var rowCount = $( "#eventTable > tbody > tr" ).length;
@@ -175,7 +176,8 @@
         };
         
         // Convert a number to hexdecimal with the given width.
-        function convertToHex( number, width ) {
+        function convertToHex( number, width ) 
+        {
             var hex = Number( number ).toString( 16 );
 
             while( hex.length < width ) {
@@ -189,7 +191,8 @@
         }
         
         // Show the even input filter in the filter tab.
-        function showFilter() {
+        function showFilter() 
+        {
         
             var row = "";
             
@@ -227,7 +230,8 @@
         }
         
         // Set a filter according to the values from the filter tab.
-        function setFilter() {
+        function setFilter() 
+        {
         
             var filterPriority  = $( "#filterPriority" ).val();
             var filterClass     = $( "#filterClass" ).val();

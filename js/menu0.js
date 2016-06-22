@@ -52,6 +52,14 @@ navBarMenu.content = [
                 title: "Select server",
                 url: "javascript:setServerModal();"
             },
+            {
+                title: "Connect",
+                url: "javascript:doConnect();"
+            },
+            {
+                title: "Disconnect",
+                url: "javascript:doDisconnect();"
+            },
             
         ]
     },

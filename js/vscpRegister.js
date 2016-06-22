@@ -107,7 +107,8 @@ vscp.register.constants = {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.read = function( options ) {
+vscp.register.read = function( options ) 
+{
 
     var page            = 0;
     var count           = 1;
@@ -292,7 +293,8 @@ vscp.register.read = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.write = function( options ) {
+vscp.register.write = function( options ) 
+{
 
     var page            = 0;
     var count           = 0;
@@ -500,7 +502,8 @@ vscp.register.write = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.writeBits = function( options ) {
+vscp.register.writeBits = function( options ) 
+{
 
     var page    = 0;
     var onError = null;
@@ -639,7 +642,8 @@ vscp.register.writeBits = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readAlarmStatus = function( options ) {
+vscp.register.readAlarmStatus = function( options ) 
+{
 
     var onError = null;
 
@@ -703,7 +707,8 @@ vscp.register.readAlarmStatus = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readVscpVersion = function( options ) {
+vscp.register.readVscpVersion = function( options ) 
+{
 
     var onError = null;
 
@@ -770,7 +775,8 @@ vscp.register.readVscpVersion = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readNodeControlFlags = function( options ) {
+vscp.register.readNodeControlFlags = function( options ) 
+{
 
     var onError = null;
 
@@ -834,7 +840,8 @@ vscp.register.readNodeControlFlags = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readUserId = function( options ) {
+vscp.register.readUserId = function( options ) 
+{
 
     var onError = null;
 
@@ -907,7 +914,8 @@ vscp.register.readUserId = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readManufacturerDevId = function( options ) {
+vscp.register.readManufacturerDevId = function( options ) 
+{
 
     var onError = null;
 
@@ -980,7 +988,8 @@ vscp.register.readManufacturerDevId = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readManufacturerSubDevId = function( options ) {
+vscp.register.readManufacturerSubDevId = function( options ) 
+{
 
     var onError = null;
 
@@ -1053,7 +1062,8 @@ vscp.register.readManufacturerSubDevId = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readNicknameId = function( options ) {
+vscp.register.readNicknameId = function( options ) 
+{
 
     var onError = null;
 
@@ -1117,7 +1127,8 @@ vscp.register.readNicknameId = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readSelectedPage = function( options ) {
+vscp.register.readSelectedPage = function( options ) 
+{
 
     var onError = null;
 
@@ -1190,7 +1201,8 @@ vscp.register.readSelectedPage = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readFirmwareVersion = function( options ) {
+vscp.register.readFirmwareVersion = function( options ) 
+{
 
     var onError = null;
 
@@ -1258,7 +1270,8 @@ vscp.register.readFirmwareVersion = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readBootloaderAlgorithm = function( options ) {
+vscp.register.readBootloaderAlgorithm = function( options ) 
+{
 
     var onError = null;
 
@@ -1322,7 +1335,8 @@ vscp.register.readBootloaderAlgorithm = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readUsedPages = function( options ) {
+vscp.register.readUsedPages = function( options ) 
+{
 
     var onError = null;
 
@@ -1386,7 +1400,8 @@ vscp.register.readUsedPages = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readStdDevFamCode = function( options ) {
+vscp.register.readStdDevFamCode = function( options ) 
+{
 
     var onError = null;
 
@@ -1458,7 +1473,8 @@ vscp.register.readStdDevFamCode = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readStdDevType = function( options ) {
+vscp.register.readStdDevType = function( options ) 
+{
 
     var onError = null;
 
@@ -1530,7 +1546,8 @@ vscp.register.readStdDevType = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readGUID = function( options ) {
+vscp.register.readGUID = function( options ) 
+{
 
     var onError = null;
 
@@ -1594,7 +1611,8 @@ vscp.register.readGUID = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readMdfUrl = function( options ) {
+vscp.register.readMdfUrl = function( options ) 
+{
 
     var onError = null;
 

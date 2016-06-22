@@ -60,7 +60,8 @@ vscp.service.timeout = 5000;
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.service.whoIsThere = function( options ) {
+vscp.service.whoIsThere = function( options ) 
+{
 
     var onError         = null;
     var eventData       = [];
@@ -302,7 +303,8 @@ vscp.service.whoIsThere = function( options ) {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.service.scan = function( options ) {
+vscp.service.scan = function( options ) 
+{
 
     var onError         = null;
     var eventListener   = null;
@@ -454,7 +456,8 @@ vscp.service.scan = function( options ) {
  * @param {vscp.Connection} options.connection  - VSCP connection
  * @param {string} options.name                 - Container name
  */
-vscp.service.Container = function( options ) {
+vscp.service.Container = function( options ) 
+{
 
     /** VSCP connection
      * @member {vscp.Connection}
@@ -493,7 +496,8 @@ vscp.service.Container = function( options ) {
  * @param {function} options.onSuccess  - Callback which is called on successful operation
  * @param {function} [options.onError]  - Callback which is called on failed operation
  */
-vscp.service.Container.prototype.create = function( options ) {
+vscp.service.Container.prototype.create = function( options ) 
+{
 
     var onError     = null;
     var index       = 0;
@@ -557,7 +561,8 @@ vscp.service.Container.prototype.create = function( options ) {
  * @param {function} options.onSuccess  - Callback which is called on successful operation
  * @param {function} [options.onError]  - Callback which is called on failed operation
  */
-vscp.service.Container.prototype.write = function( options ) {
+vscp.service.Container.prototype.write = function( options ) 
+{
 
     var onError     = null;
     var index       = 0;
@@ -616,7 +621,8 @@ vscp.service.Container.prototype.write = function( options ) {
  * @param {function} options.onSuccess  - Callback which is called on successful operation
  * @param {function} [options.onError]  - Callback which is called on failed operation
  */
-vscp.service.Container.prototype.read = function( options ) {
+vscp.service.Container.prototype.read = function( options ) 
+{
 
     var onError     = null;
     var elements    = null;

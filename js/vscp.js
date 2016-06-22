@@ -1611,6 +1611,16 @@ vscp.Connection = function() {
      */
     this.userName = "";
 
+    /** Password used for connection establishment
+     * @member {string}
+     */
+    this.password = "";
+
+    /** authdomain used for connection establishment
+     * @member {string}
+     */
+    this.authdomain = "";
+
     /** Password hash used for connection establishment
      * @member {string}
      */
@@ -2045,6 +2055,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 cmd = this.getPendingCommand( "CHALLENGE" );
 
                 if ( null !== cmd ) {
+
                     console.info( vscp.utility.getTime() + " Security challenge received." );
 
                     this._sendCommand({
@@ -2173,7 +2184,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 console.info( vscp.utility.getTime() + " Variables successfully saved." );
                 this.signalSuccess( msgItems[ 1 ] );
             }
-            else if ( "GT" === msgItems[ 1 ] ) {
+            else if ( ( "GT" === msgItems[ 1 ] ) || ( "GETTABLE" === msgItems[ 1 ] ) ) {
                 console.info( vscp.utility.getTime() + " Table successfully read." );
                 this.signalSuccess(
                     msgItems[ 1 ],
@@ -2455,7 +2466,14 @@ vscp.Connection.prototype.connect = function( options ) {
         return;
     }
 
-    this.passwordHash = options.password;
+    this.password = options.password;
+
+    if ( "string" !== typeof options.authdomain ) {
+        console.error( vscp.utility.getTime() + " Authdomain is missing." );
+        return;
+    }
+
+    this.authdomain = options.authdomain;
 
     if ( "function" !== typeof options.onMessage ) {
         this.onMessage = null;
@@ -2475,10 +2493,15 @@ vscp.Connection.prototype.connect = function( options ) {
         this.onConnError = options.onError;
     }
 
+    // Calculate password hash
+    this.passwordHash = vscp.utility.getWebSocketAuthHash( this.userName,
+                                                                this.authdomain,
+                                                                this.password );
+
     console.info( vscp.utility.getTime() + " Websocket connect to " + options.url + " (user name: " + this.userName + ", password hash: " + this.passwordHash + ")");
-
+    
     this.socket = new WebSocket( options.url );
-
+    
     if ( null === this.socket ) {
         console.error( vscp.utility.getTime() + " Couldn't open a websocket connection." );
 

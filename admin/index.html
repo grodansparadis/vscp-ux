@@ -14,10 +14,13 @@
     
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/3.3.6/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../js/bootstrap/3.3.6/css/bootstrap.min.css"> 
     <script type="text/javascript" src="../js/bootstrap/3.3.6/js/bootstrap.min.js"></script>
     
-
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
+    <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
+    
     <!-- Favorite icon -->
     <link rel="icon" href="favicon.ico">
 
@@ -27,6 +30,8 @@
     <script type="text/javascript" src="../js/md5.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP admin library -->
+    <script type="text/javascript" src="../js/vscpAdmin.js"></script>
 
     <!-- Menu styles -->
     <link rel="stylesheet" href="../js/menu0.css">
@@ -39,48 +44,126 @@
 
     <script type="text/javascript">
 
-        ( function() {
+        // VSCP websocket connection
+        var vscpConn = null;
 
-            // Wait until the whole website is loaded
-            $( document ).ready( function() {
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
                 
-                // Show navigation bar menu
-                navBarMenu.show( "menu", navBarMenu.content );
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
 
-                if ( typeof( Storage ) !== "undefined" ) {
-                    // Code for localStorage/sessionStorage.
-                    if ( null == localStorage.getItem("vscpserver") ) {
-                        document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> localhost:8080";
-                    }
-                    else {
-                        document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + localStorage.getItem("server");
-                    }
-                } 
-                else {
-                    // Sorry! No Web Storage support.
-                    document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> localhost:8080";
+            document.getElementById("admin-footer").innerHTML = vscp.admin.config.copyright;   
+
+            if ( typeof( Storage ) !== "undefined" ) 
+            {
+                // Server
+                if ( null != localStorage.getItem("vscp-url") ) {                    
+                    settings.url = localStorage.getItem("vscp-url");
                 }
-            });
 
-        })();
+                setConnectInfo( settings.url, false );
+
+                // User
+                if ( null != localStorage.getItem("vscp-user") ) {
+                    settings.user = localStorage.getItem("vscp-user");
+                }
+                // Password
+                if ( null != localStorage.getItem("vscp-password") ) {
+                    settings.password = localStorage.getItem("vscp-password");
+                }
+                // AuthDoamin
+                if ( null != localStorage.getItem("vscp-authdomain") ) {
+                    settings.authdomain = localStorage.getItem("vscp-authdomain");
+                }
+            } 
+            else {
+                // No Web Storage support.
+                setConnectInfo( settings.url, false );
+            }
+
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
+
+        });
+
+        function setConnectInfo( info, bConnected ) 
+        {
+            if ( bConnected ) {
+                document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + info + " - <b>Connected</b>.";
+            }
+            else {
+                document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + info + " - <b>Disonnected</b>.";
+            }
+        }
 
         // Show modal to select active server to use.
-        setServerModal = function() {
+        function setServerModal() 
+        {
+            $('#modal-url').val( localStorage.getItem( "vscp-url" ) );
             $('#setServer').modal();
         };
 
         // Get results from slect server modal
-        setServerResult = function() {
+        function setServerResult() 
+        {            
+            // Save server data
+            settings.url =  $('#modal-url').val();
+            settings.user =  $('#modal-user').val();
+            settings.password =  $('#modal-password').val();
+            settings.authdomain = $('#modal-authdomain').val();
 
-            document.getElementById("idSelectedServer").innerHTML =  "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + $('#modal-server').val();
-            
+            setConnectInfo( settings.url, false );
+
+            // Should we save persistent
             if ( $('#modal-brememberme').prop('checked') ) {
-                // Save server data
-                 localStorage.vscpserver =  $('#modal-server').val();
-                 localStorage.vscpserver_user =  $('#modal-username').val();
-                 localStorage.vscpserver_password =  $('#modal-password').val();
+                
+                 if ( typeof( Storage ) !== "undefined" ) {
+                    localStorage.setItem( "vscp-url", $('#modal-url').val() );
+                    localStorage.setItem( "vscp-user", $('#modal-user').val() );
+                    localStorage.setItem( "vscp-password", $('#modal-password').val() );
+                    localStorage.setItem( "vscp-authdomain", $('#modal-authdomain').val() );
+                 }
             }
 
+            doConnect();
+
+        };
+
+        // Connect to the VSCP daemon
+        function doConnect() 
+        {
+
+            var deferred = new $.Deferred();
+
+            // Connect to VSCP server
+            vscpConn.connect({
+
+                url: settings.url,
+                userName: settings.user,
+                password: settings.password,
+                authdomain: settings.authdomain,                                                                
+
+                onSuccess: function( conn ) {
+                    setConnectInfo( settings.url, true );
+                    deferred.resolve();                    
+                },
+
+                onError: function( conn ) {
+                    setConnectInfo( settings.url, false );
+                    BootstrapDialog.alert( "Connection lost. Please reload website." );
+                    deferred.reject();
+                }
+                
+            });
+            
+            deferred.promise();
+        };
+
+        // Disconnect from the VSCP daemon
+        function doDisconnect() {
+            vscpConn.disconnect();
+            setConnectInfo( settings.url, false );
         };
 
     </script>
@@ -90,7 +173,7 @@
    
     <div id="idSelectedServer">
         &nbsp;&nbsp;&nbsp;&nbsp;
-        <b>Server:</b> no server selected
+        <b>Server:</b> no server selected.
     </div>
 
     <!-- Menu -->
@@ -104,9 +187,13 @@
         </div>
     </nav>
 
+    <!--
     <p>Envelope icon: <span class="glyphicon glyphicon-print"></span></p>
+    -->
 
-    <!-- Modal to set active server -->
+    <!-- **********************************************************************************************************************-->
+    <!--                                           Modal to set active server                                                  -->
+    <!-- **********************************************************************************************************************-->
     <div id="setServer" class="modal fade" role="dialog">
         
         <div class="modal-dialog">
@@ -118,19 +205,23 @@
                     <h4 class="modal-title">Select VSCP server</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Server should be entered as http(s)://server-address:port</p>
+                    <p>Enter credentials for remote server</p>
                     <form role="form">
                         <div class="form-group">
-                            <label for="server"><span class="glyphicon glyphicon-user"></span> Server</label>
-                            <input type="text" class="form-control" id="modal-server" placeholder="Enter server address">
+                            <label for="server"><span class="glyphicon glyphicon-user"></span> Server (e.g. ws://127.0.0.1:8080, use wss:// for secure connection)</label>
+                            <input type="text" class="form-control" id="modal-url" placeholder="Enter server address">
                         </div>
                         <div class="form-group">
                             <label for="username"><span class="glyphicon glyphicon-user"></span> Username</label>
-                            <input type="text" class="form-control" id="modal-username" placeholder="Enter username">
+                            <input type="text" class="form-control" id="modal-user" placeholder="Enter username">
                         </div>
                         <div class="form-group">
                             <label for="password"><span class="glyphicon glyphicon-eye-open"></span> Password</label>
                             <input type="text" class="form-control" id="modal-password" placeholder="Enter password">
+                        </div>
+                        <div class="form-group">
+                            <label for="authdomain"><span class="glyphicon glyphicon-eye-open"></span> Domain</label>
+                            <input type="text" class="form-control" id="modal-authdomain" placeholder="Enter auth domain">
                         </div>
                         <div class="checkbox">
                             <label><input type="checkbox" id="modal-brememberme" value="true" checked>Remember me</label>
