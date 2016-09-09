@@ -1215,13 +1215,62 @@ vscp.constants.priorities = {
     PRIORITY_7_LOW: 7
 };
 
+case VSCP_DAEMON_VARIABLE_CODE_BLOB_BASE64:
+            return "BLOB-BASE64";
+
+        case VSCP_DAEMON_VARIABLE_CODE_DATE:
+            return "Date";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_TIME:
+            return "Time";    
+        
+        case VSCP_DAEMON_VARIABLE_CODE_MIME:
+            return "Mime";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_HTML:
+            return "Html";
+
+        case VSCP_DAEMON_VARIABLE_CODE_JAVASCRIPT:
+            return "Javascript";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_JSON:
+            return "Json";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_XML:
+            return "XML";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_SQL:
+            return "SQL";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_LUA:
+            return "LUA";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_LUA_RESULT:
+            return "LUARES";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_UX_TYPE1:
+            return "UX1";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_DM_ROW:
+            return "DMrow";   
+            
+        case VSCP_DAEMON_VARIABLE_CODE_DRIVER:
+            return "Driver";
+            
+        case VSCP_DAEMON_VARIABLE_CODE_USER:
+            return "User"; 
+            
+        case VSCP_DAEMON_VARIABLE_CODE_FILTER:
+            return "Filter"; 
+
+
 /** VSCP variable types
  * @enum {number}
  * @const
  */
 vscp.constants.varTypes = {
     UNASSIGNED: 0,          // Unassigned variable
-    STRING: 1,              // String value
+    STRING: 1,              // String value (Base64 encoded)
     BOOLEAN: 2,             // Boolean value (true, false, 0 or 1)
     INTEGER: 3,             // Integer value
     LONG: 4,                // Long value
@@ -1233,7 +1282,23 @@ vscp.constants.varTypes = {
     EVENT_CLASS: 10,        // Integer value for VSCP class
     EVENT_TYPE: 11,         // Integer value for VSCP type
     EVENT_TIMESTAMP: 12,    // Time when event was received in ms
-    DATE_TIME: 13           // Date + Time in ISO format 2008-11-07 20:10.00
+    DATE_TIME: 13,          // Date + Time in ISO format 2008-11-07T20:10.00
+    BLOB: 14,               //  Base64 encoded binary data.
+    DATE: 15,               //  ISO date 2008-11-07
+    TIME: 16,               //  ISO Time 20:10.00
+    MIME: 100,              //  Base64 mime types data base64(mimetype;data)
+    HTML: 101,              //  Base64 encoded HTML data.
+    JAVASCIPT: 102,         //  Base64 encoded Javascript data.
+    JSON: 103,              //  Base64 encoded JSON data.
+    XML: 104,               //  Base64 encoded XML data.
+    SQL: 105,               //  Base64 encoded SQL data.
+    LUA: 201,               //  Base64 encoded LUA data.
+    LUARES: 202,            //  Base64 encoded LUA result data.
+    UXTYPE1: 300,           //  Base64 encoded UX Type 1 data.
+    DMROW: 500,             //  Base64 encoded DM data row.
+    DRIVER: 501,            //  Base64 encoded Driver data row.
+    USER: 502,              //  Base64 encoded User data row.
+    FILTER: 503             //  Base64 encoded Filter data data.
 };
 
 /** VSCP variable type names
@@ -1241,20 +1306,36 @@ vscp.constants.varTypes = {
  * @const
  */
 vscp.constants.varTypeNames = [
-    "Unassigned",
-    "String",
-    "Boolean",
-    "Integer",
-    "Long",
-    "Double",
-    "Measurement",
-    "Event",
-    "GUID",
-    "Event data",
-    "Event class",
-    "Event type",
-    "Event timestamp",
-    "Date and Time"
+    ["Unassigned",0],
+    ["String",1],
+    ["Boolean",2].
+    ["Integer",3],
+    ["Long",4],
+    ["Double",5],
+    ["Measurement",6],
+    ["Event",7],
+    ["GUID",8],
+    ["Event data",9],
+    ["Event class",10],
+    ["Event type",11],
+    ["Event timestamp",12],
+    ["Date and Time",13],
+    ["Blob",14],
+    ["Date",15],
+    ["Time",16],
+    ["Mime",100],
+    ["HTML",101],
+    ["Javascript",102],
+    ["JSON",103],
+    ["XML",104],
+    ["SQL",105],
+    ["LUA",200],
+    ["LUA result",201],
+    ["UX Type 1",300],
+    ["DM-row",500],
+    ["Driver",501],
+    ["User",502],
+    ["Filter"503]
 ];
 
 /* ---------------------------------------------------------------------- */
@@ -1616,10 +1697,10 @@ vscp.Connection = function() {
      */
     this.password = "";
 
-    /** authdomain used for connection establishment
+    /** vscptoken used for connection establishment
      * @member {string}
      */
-    this.authdomain = "";
+    this.vscptoken = "";
 
     /** Password hash used for connection establishment
      * @member {string}
@@ -2468,12 +2549,12 @@ vscp.Connection.prototype.connect = function( options ) {
 
     this.password = options.password;
 
-    if ( "string" !== typeof options.authdomain ) {
-        console.error( vscp.utility.getTime() + " Authdomain is missing." );
+    if ( "string" !== typeof options.vscptoken ) {
+        console.error( vscp.utility.getTime() + " vscptoken is missing." );
         return;
     }
 
-    this.authdomain = options.authdomain;
+    this.vscptoken = options.vscptoken;
 
     if ( "function" !== typeof options.onMessage ) {
         this.onMessage = null;
@@ -2495,7 +2576,7 @@ vscp.Connection.prototype.connect = function( options ) {
 
     // Calculate password hash
     this.passwordHash = vscp.utility.getWebSocketAuthHash( this.userName,
-                                                                this.authdomain,
+                                                                this.vscptoken,
                                                                 this.password );
 
     console.info( vscp.utility.getTime() + " Websocket connect to " + options.url + " (user name: " + this.userName + ", password hash: " + this.passwordHash + ")");

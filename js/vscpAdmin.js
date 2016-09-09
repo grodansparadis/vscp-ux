@@ -61,7 +61,7 @@ vscp.admin.config = {
     server: "http://127.0.0.1:8080",
     user: "admin",
     password: "secret", 
-    domain: "mydomain.com"
+    token: "Stay Hungry. Stay Foolish."
 };
 
 

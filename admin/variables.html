@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>VSCP admin interface - Variable maintenance</title>
+
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="../js/jquery/2.2.1/jquery-2.2.1.min.js"></script>
+
+    
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../js/bootstrap/3.3.6/css/bootstrap.min.css"> 
+    <script type="text/javascript" src="../js/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
+    <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="../js/datatables/datatables.min.css"/>
+    <script type="text/javascript" src="../js/datatables/datatables.min.js"></script>
+    
+    <!-- Favorite icon -->
+    <link rel="icon" href="favicon.ico">
+
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="../js/settings.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket bases library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP admin library -->
+    <script type="text/javascript" src="../js/vscpAdmin.js"></script>
+
+    <!-- Menu styles -->
+    <link rel="stylesheet" href="../js/menu0.css">
+    
+    <!-- Boostrap navigation bar helper functions -->
+    <script type="text/javascript" src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script type="text/javascript" src="../js/menu0.js"></script>
+
+
+    <script type="text/javascript">
+
+    var dataset = [
+        ["ccVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+        ["ddVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+        ["eeVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+        ["ffVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+        ["ggVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+        ["hhVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+        ["iiVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"]
+    ];
+    /*var dataSet = [
+    [ "aaaaaVariable", "System Architect", "true", "false", "admin", "admin", 0 ],
+    [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750", 0 ],
+    [ "Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000", 0 ],
+    [ "Cedric Kelly", "Senior Javascript Developer", "Edinburgh", "6224", "2012/03/29", "$433,060", 0 ],
+    [ "Airi Satou", "Accountant", "Tokyo", "5407", "2008/11/28", "$162,700", 0 ],
+    [ "Brielle Williamson", "Integration Specialist", "New York", "4804", "2012/12/02", "$372,000", 0 ],
+    [ "Herrod Chandler", "Sales Assistant", "San Francisco", "9608", "2012/08/06", "$137,500", 0 ],
+    [ "Rhona Davidson", "Integration Specialist", "Tokyo", "6200", "2010/10/14", "$327,900", "This is a string that is vey long and we want to see what is happening when it is rendered." ],
+    [ "Colleen Hurst", "Javascript Developer", "San Francisco", "2360", "2009/09/15", "$205,500", 0 ],
+    [ "Sonya Frost", "Software Engineer", "Edinburgh", "1667", "2008/12/13", "$103,600", 0 ],
+    [ "Jena Gaines", "Office Manager", "London", "3814", "2008/12/19", "$90,560", 0 ],
+    [ "Quinn Flynn", "Support Lead", "Edinburgh", "9497", "2013/03/03", "$342,000", 0 ],
+    [ "Charde Marshall", "Regional Director", "San Francisco", "6741", "2008/10/16", "$470,600", 0 ],
+    [ "Haley Kennedy", "Senior Marketing Designer", "London", "3597", "2012/12/18", "$313,500", 0 ],
+    [ "Tatyana Fitzpatrick", "Regional Director", "London", "1965", "2010/03/17", "$385,750", 0 ],
+    [ "Michael Silva", "Marketing Designer", "London", "1581", "2012/11/27", "$198,500", 0 ],
+    [ "Paul Byrd", "Chief Financial Officer (CFO)", "New York", "3059", "2010/06/09", "$725,000", 0 ],
+    [ "Gloria Little", "Systems Administrator", "New York", "1721", "2009/04/10", "$237,500", 0 ],
+    [ "Bradley Greer", "Software Engineer", "London", "2558", "2012/10/13", "$132,000", 0 ],
+    [ "Dai Rios", "Personnel Lead", "Edinburgh", "2290", "2012/09/26", "$217,500", 0 ],
+    [ "Jenette Caldwell", "Development Lead", "New York", "1937", "2011/09/03", "$345,000", 0 ],
+    [ "Yuri Berry", "Chief Marketing Officer (CMO)", "New York", "6154", "2009/06/25", "$675,000", 0 ],
+    [ "Caesar Vance", "Pre-Sales Support", "New York", "8330", "2011/12/12", "$106,450", 0 ],
+    [ "Doris Wilder", "Sales Assistant", "Sidney", "3023", "2010/09/20", "$85,600", 0 ],
+    [ "Angelica Ramos", "Chief Executive Officer (CEO)", "London", "5797", "2009/10/09", "$1,200,000", 0 ],
+    [ "Gavin Joyce", "Developer", "Edinburgh", "8822", "2010/12/22", "$92,575", 0 ],
+    [ "Jennifer Chang", "Regional Director", "Singapore", "9239", "2010/11/14", "$357,650", 0 ],
+    [ "Brenden Wagner", "Software Engineer", "San Francisco", "1314", "2011/06/07", "$206,850", 0 ],
+    [ "Fiona Green", "Chief Operating Officer (COO)", "San Francisco", "2947", "2010/03/11", "$850,000", 0 ],
+    [ "Shou Itou", "Regional Marketing", "Tokyo", "8899", "2011/08/14", "$163,000", 0 ],
+    [ "Michelle House", "Integration Specialist", "Sidney", "2769", "2011/06/02", "$95,400", 0 ],
+    [ "Suki Burks", "Developer", "London", "6832", "2009/10/22", "$114,500", 0 ],
+    [ "Prescott Bartlett", "Technical Author", "London", "3606", "2011/05/07", "$145,000", 0 ],
+    [ "Gavin Cortez", "Team Leader", "San Francisco", "2860", "2008/10/26", "$235,500", 0 ],
+    [ "Martena Mccray", "Post-Sales support", "Edinburgh", "8240", "2011/03/09", "$324,050", 0 ],
+    [ "Unity Butler", "Marketing Designer", "San Francisco", "5384", "2009/12/09", "$85,675", 0 ]
+    ];*/
+
+        // VSCP websocket connection
+        var vscpConn = null;
+
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
+                
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
+
+            document.getElementById("admin-footer").innerHTML = vscp.admin.config.copyright;   
+
+            var table = $('#variableTable').DataTable( {
+                /*data: dataSet,*/
+                columns: [
+                    { title: "Name" },
+                    { title: "Type" },
+                    { title: "Persistent" },
+                    { title: "Stock" },
+                    { title: "Owner" },
+                    { title: "Permission" },
+                    { title: "value" },
+                    { title: "lastchange" },
+                    { title: "note" }
+                ]
+            });
+ 
+            $('#variableTable tbody').on( 'dblclick', 'tr', function () {
+                alert("double click");
+                if ( $(this).hasClass('selected') ) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            } );
+
+            $('#variableTable tbody').on( 'click', 'tr', function () {
+                if ( $(this).hasClass('selected') ) {
+                    $(this).removeClass('selected');
+                }
+                else {
+                    table.$('tr.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                }
+            } );
+ 
+            $('#button').click( function () {
+                table.row('.selected').remove().draw( false );
+             } );
+
+            if ( typeof( Storage ) !== "undefined" ) 
+            {
+                // Server
+                if ( null != localStorage.getItem("vscp-url") ) {                    
+                    settings.url = localStorage.getItem("vscp-url");
+                }
+
+                setConnectInfo( settings.url, false );
+
+                // User
+                if ( null != localStorage.getItem("vscp-user") ) {
+                    settings.user = localStorage.getItem("vscp-user");
+                }
+                // Password
+                if ( null != localStorage.getItem("vscp-password") ) {
+                    settings.password = localStorage.getItem("vscp-password");
+                }
+                // AuthDoamin
+                if ( null != localStorage.getItem("vscp-authdomain") ) {
+                    settings.authdomain = localStorage.getItem("vscp-authdomain");
+                }
+            } 
+            else {
+                // No Web Storage support.
+                setConnectInfo( settings.url, false );
+            }
+
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
+
+            table.row.add( [
+                    "aaaaaVariable", "Integer", "true", "false", "admin", "admin", 0, "test1","test2"
+            ] ).draw( false );
+
+            table.row.add( [
+                    "bbbbbVariable", "Integer", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"
+            ] ).draw( false );
+
+        });
+
+        function setConnectInfo( info, bConnected ) 
+        {
+            if ( bConnected ) {
+                document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + info + " - <b>Connected</b>.";
+            }
+            else {
+                document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + info + " - <b>Disonnected</b>.";
+            }
+        }
+
+        // Show modal to select active server to use.
+        function setServerModal() 
+        {
+            $('#modal-url').val( localStorage.getItem( "vscp-url" ) );
+            $('#setServer').modal();
+        };
+
+        // Get results from slect server modal
+        function setServerResult() 
+        {            
+            // Save server data
+            settings.url =  $('#modal-url').val();
+            settings.user =  $('#modal-user').val();
+            settings.password =  $('#modal-password').val();
+            settings.authdomain = $('#modal-authdomain').val();
+
+            setConnectInfo( settings.url, false );
+
+            // Should we save persistent
+            if ( $('#modal-brememberme').prop('checked') ) {
+                
+                 if ( typeof( Storage ) !== "undefined" ) {
+                    localStorage.setItem( "vscp-url", $('#modal-url').val() );
+                    localStorage.setItem( "vscp-user", $('#modal-user').val() );
+                    localStorage.setItem( "vscp-password", $('#modal-password').val() );
+                    localStorage.setItem( "vscp-authdomain", $('#modal-authdomain').val() );
+                 }
+            }
+
+            doConnect();
+
+        };
+
+        // Connect to the VSCP daemon
+        function doConnect() 
+        {
+
+            var deferred = new $.Deferred();
+
+            // Connect to VSCP server
+            vscpConn.connect({
+
+                url: settings.url,
+                userName: settings.user,
+                password: settings.password,
+                authdomain: settings.authdomain,                                                                
+
+                onSuccess: function( conn ) {
+                    setConnectInfo( settings.url, true );
+                    deferred.resolve();                    
+                },
+
+                onError: function( conn ) {
+                    setConnectInfo( settings.url, false );
+                    BootstrapDialog.alert( "Connection lost. Please reload website." );
+                    deferred.reject();
+                }
+                
+            });
+            
+            deferred.promise();
+        };
+
+        // Disconnect from the VSCP daemon
+        function doDisconnect() {
+            vscpConn.disconnect();
+            setConnectInfo( settings.url, false );
+        };
+
+
+    </script>
+
+</head>
+<body>
+   
+    <div id="idSelectedServer">
+        &nbsp;&nbsp;&nbsp;&nbsp;
+        <b>Server:</b> no server selected.
+    </div>
+
+    <!-- Menu -->
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+
+    <!--
+    <p>Envelope icon: <span class="glyphicon glyphicon-print"></span></p>
+    -->
+
+    <!-- **********************************************************************************************************************-->
+    <!--                                           Modal to set active server                                                  -->
+    <!-- **********************************************************************************************************************-->
+    <div id="setServer" class="modal fade" role="dialog">
+        
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Select VSCP server</h4>
+                </div>
+                <div class="modal-body">
+                    <p>Enter credentials for remote server</p>
+                    <form role="form">
+                        <div class="form-group">
+                            <label for="server"><span class="glyphicon glyphicon-user"></span> Server (e.g. ws://127.0.0.1:8080, use wss:// for secure connection)</label>
+                            <input type="text" class="form-control" id="modal-url" placeholder="Enter server address">
+                        </div>
+                        <div class="form-group">
+                            <label for="username"><span class="glyphicon glyphicon-user"></span> Username</label>
+                            <input type="text" class="form-control" id="modal-user" placeholder="Enter username">
+                        </div>
+                        <div class="form-group">
+                            <label for="password"><span class="glyphicon glyphicon-eye-open"></span> Password</label>
+                            <input type="text" class="form-control" id="modal-password" placeholder="Enter password">
+                        </div>
+                        <div class="form-group">
+                            <label for="authdomain"><span class="glyphicon glyphicon-eye-open"></span> Domain</label>
+                            <input type="text" class="form-control" id="modal-authdomain" placeholder="Enter auth domain">
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" id="modal-brememberme" value="true" checked>Remember me</label>
+                        </div>
+
+                        <!--
+                        <button type="submit" class="btn btn-default btn-success btn-block" data-dismiss><span class="glyphicon glyphicon-off"></span>Connect</button>
+                        -->
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">  
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="setServerResult()">Open</button>                  
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <div class="container-fluid">
+        <h1>VSCP variables</h1>
+        <div class="container-fluid">
+            <div class="row">
+            </div>
+            <div class="row">
+                <div class="col-sm-2"></div>
+                <div class="col-sm-8">
+                    <table id="variableTable"  class="table table-striped table-bordered table-hover" cellspacing="50" width="100%"></table>
+                </div>
+                <div class="col-sm-2"></div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+    <footer>
+        <div id="admin-footer">
+            Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+        </div>
+    </footer>
+    
+    
+    
+</body>
+</html>
