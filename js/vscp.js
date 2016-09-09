@@ -1022,7 +1022,7 @@ vscp.constants.types = {
     VSCP_TYPE_LOCAL_GENERAL: 0,
 
     ///////////////////////////////////////////////////////////////////////////////
-    //              Level II
+    //                              Level II
     ///////////////////////////////////////////////////////////////////////////////
 
     // Level II Protocol functionality Class=1024 (0x400)
@@ -1235,9 +1235,9 @@ vscp.constants.varTypes = {
     EVENT_TYPE: 11,         // Integer value for VSCP type
     EVENT_TIMESTAMP: 12,    // Time when event was received in ms
     DATE_TIME: 13,          // Date + Time in ISO format 2008-11-07T20:10.00
-    BLOB: 14,               //  Base64 encoded binary data.
-    DATE: 15,               //  ISO date 2008-11-07
-    TIME: 16,               //  ISO Time 20:10.00
+    DATE: 14,               //  ISO date 2008-11-07
+    TIME: 15,               //  ISO Time 20:10.00
+    BLOB: 16,               //  Base64 encoded binary data.    
     MIME: 100,              //  Base64 mime types data base64(mimetype;data)
     HTML: 101,              //  Base64 encoded HTML data.
     JAVASCIPT: 102,         //  Base64 encoded Javascript data.
@@ -1253,42 +1253,107 @@ vscp.constants.varTypes = {
     FILTER: 503             //  Base64 encoded Filter data data.
 };
 
-/** VSCP variable type names
- * @type {string[]}
- * @const
- */
-vscp.constants.varTypeNames = [
-    ["Unassigned",0],
-    ["String",1],
-    ["Boolean",2],
-    ["Integer",3],
-    ["Long",4],
-    ["Double",5],
-    ["Measurement",6],
-    ["Event",7],
-    ["GUID",8],
-    ["Event data",9],
-    ["Event class",10],
-    ["Event type",11],
-    ["Event timestamp",12],
-    ["Date and Time",13],
-    ["Blob",14],
-    ["Date",15],
-    ["Time",16],
-    ["Mime",100],
-    ["HTML",101],
-    ["Javascript",102],
-    ["JSON",103],
-    ["XML",104],
-    ["SQL",105],
-    ["LUA",200],
-    ["LUA result",201],
-    ["UX Type 1",300],
-    ["DM-row",500],
-    ["Driver",501],
-    ["User",502],
-    ["Filter",503]
-];
+///////////////////////////////////////////////////////////////////////////////
+// vscp.getVarTypeName
+//
+// Return variable type description/name from numerical code 
+//
+
+vscp.getVarTypeName = function ( n ) {
+    if ( vscp.varTypes.UNASSIGNED == n  ) {
+        return "unassigned";
+    }
+    else if ( vscp.varTypes.STRING == n  ) {
+        return "String";
+    }              
+    else if ( vscp.varTypes.BOOLEAN == n  ) {
+        return "Boolean";
+    }             
+    else if ( vscp.varTypes.INTEGER == n  ) {
+        return "Integer";
+    }             
+    else if ( vscp.varTypes.LONG == n  ) {
+        return "Long";
+    }               
+    else if ( vscp.varTypes.DOUBLE == n  ) {
+        return "Double";
+    }             
+    else if ( vscp.varTypes.MEASUREMENT == n  ) {
+        return "Measurement";
+    }         
+    else if ( vscp.varTypes.EVENT == n  ) {
+        return "Event";
+    }               
+    else if ( vscp.varTypes.GUID == n  ) {
+        return "GUID";
+    }                
+    else if ( vscp.varTypes.EVENT_DATA == n  ) {
+        return "Event data";
+    }          
+    else if ( vscp.varTypes.EVENT_CLASS == n  ) {
+        return "Event class";
+    }       
+    else if ( vscp.varTypes.EVENT_TYPE == n  ) {
+        return "Event type";
+    }         
+    else if ( vscp.varTypes.EVENT_TIMESTAMP == n  ) {
+        return "Event timestamp";
+    }    
+    else if ( vscp.varTypes.DATE_TIME == n  ) {
+        return "Date and Time";
+    }          
+    else if ( vscp.varTypes.DATE == n  ) {
+        return "Date";
+    }               
+    else if ( vscp.varTypes.TIME == n  ) {
+        return "Time";
+    }               
+    else if ( vscp.varTypes.BLOB == n  ) {
+        return "Blob";
+    }                
+    else if ( vscp.varTypes.MIME == n  ) {
+        return "Mime";
+    }              
+    else if ( vscp.varTypes.HTML == n  ) {
+        return "HTML";
+    }              
+    else if ( vscp.varTypes.JAVASCIPT == n  ) {
+        return "Javascript";
+    }         
+    else if ( vscp.varTypes.JSON == n  ) {
+        return "JSON";
+    }              
+    else if ( vscp.varTypes.XML == n  ) {
+        return "XML";
+    }              
+    else if ( vscp.varTypes.SQL == n  ) {
+        return "SQL";
+    }               
+    else if ( vscp.varTypes.LUA == n  ) {
+        return "LUA";
+    }              
+    else if ( vscp.varTypes.LUARES == n  ) {
+        return "LUA result";
+    }            
+    else if ( vscp.varTypes.UXTYPE1 == n  ) {
+        return "UX Type 1";
+    }          
+    else if ( vscp.varTypes.DMROW == n  ) {
+        return "DM-row";
+    }          
+    else if ( vscp.varTypes.DRIVER == n  ) {
+        return "Driver";
+    }            
+    else if ( vscp.varTypes.USER == n  ) {
+        return "User";
+    }              
+    else if ( vscp.varTypes.FILTER == n  ) {
+        return "Filter";
+    }
+    else {
+        return "Unknown variable type";
+    }
+}
 
 /* ---------------------------------------------------------------------- */
 
