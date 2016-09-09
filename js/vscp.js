@@ -1215,54 +1215,6 @@ vscp.constants.priorities = {
     PRIORITY_7_LOW: 7
 };
 
-case VSCP_DAEMON_VARIABLE_CODE_BLOB_BASE64:
-            return "BLOB-BASE64";
-
-        case VSCP_DAEMON_VARIABLE_CODE_DATE:
-            return "Date";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_TIME:
-            return "Time";    
-        
-        case VSCP_DAEMON_VARIABLE_CODE_MIME:
-            return "Mime";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_HTML:
-            return "Html";
-
-        case VSCP_DAEMON_VARIABLE_CODE_JAVASCRIPT:
-            return "Javascript";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_JSON:
-            return "Json";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_XML:
-            return "XML";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_SQL:
-            return "SQL";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_LUA:
-            return "LUA";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_LUA_RESULT:
-            return "LUARES";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_UX_TYPE1:
-            return "UX1";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_DM_ROW:
-            return "DMrow";   
-            
-        case VSCP_DAEMON_VARIABLE_CODE_DRIVER:
-            return "Driver";
-            
-        case VSCP_DAEMON_VARIABLE_CODE_USER:
-            return "User"; 
-            
-        case VSCP_DAEMON_VARIABLE_CODE_FILTER:
-            return "Filter"; 
-
 
 /** VSCP variable types
  * @enum {number}
@@ -1308,7 +1260,7 @@ vscp.constants.varTypes = {
 vscp.constants.varTypeNames = [
     ["Unassigned",0],
     ["String",1],
-    ["Boolean",2].
+    ["Boolean",2],
     ["Integer",3],
     ["Long",4],
     ["Double",5],
@@ -1335,7 +1287,7 @@ vscp.constants.varTypeNames = [
     ["DM-row",500],
     ["Driver",501],
     ["User",502],
-    ["Filter"503]
+    ["Filter",503]
 ];
 
 /* ---------------------------------------------------------------------- */
