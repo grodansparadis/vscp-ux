@@ -47,7 +47,7 @@
 
     <script type="text/javascript">
 
-    var dataset = [
+    var dataset;/* = [
         ["ccVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
         ["ddVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
         ["eeVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
@@ -55,7 +55,7 @@
         ["ggVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
         ["hhVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
         ["iiVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"]
-    ];
+    ];*/
     /*var dataSet = [
     [ "aaaaaVariable", "System Architect", "true", "false", "admin", "admin", 0 ],
     [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750", 0 ],
@@ -117,7 +117,13 @@
                     { title: "Permission" },
                     { title: "value" },
                     { title: "lastchange" },
-                    { title: "note" }
+                    { title: "note" },
+                    {
+                        data: null,
+                        //defaultContent: '<a href="#" class="remove">Delete</a>',
+                        defaultContent: '<a href="" class="editor_edit">Edit</a> / <a href="" class="editor_remove">Delete</a>',
+                        orderable: false
+                    },
                 ]
             });
  
@@ -164,8 +170,8 @@
                     settings.password = localStorage.getItem("vscp-password");
                 }
                 // AuthDoamin
-                if ( null != localStorage.getItem("vscp-authdomain") ) {
-                    settings.authdomain = localStorage.getItem("vscp-authdomain");
+                if ( null != localStorage.getItem("vscp-token") ) {
+                    settings.token = localStorage.getItem("vscp-token");
                 }
             } 
             else {
@@ -176,13 +182,12 @@
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
 
-            table.row.add( [
-                    "aaaaaVariable", "Integer", "true", "false", "admin", "admin", 0, "test1","test2"
-            ] ).draw( false );
+            for ( i=0; i<500; i++ ) {
+                table.row.add( [
+                        "" + i, "Integer", "true", "false", "admin", "admin", 0, "test1","test2"
+                ] ).draw( true );
+            }
 
-            table.row.add( [
-                    "bbbbbVariable", "Integer", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"
-            ] ).draw( false );
 
         });
 
@@ -241,7 +246,7 @@
                 url: settings.url,
                 userName: settings.user,
                 password: settings.password,
-                authdomain: settings.authdomain,                                                                
+                vscptoken: settings.vscptoken,                                                                
 
                 onSuccess: function( conn ) {
                     setConnectInfo( settings.url, true );
