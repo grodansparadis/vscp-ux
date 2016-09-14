@@ -1,0 +1,9 @@
+User librarys
+=============
+
+JQuery              3.1.0
+Bootstrap           3.3.7
+MarkItUp            1.1.4
+Bootstrap3-Dialog   1.34.6      http://nakupanda.github.io/bootstrap3-dialog/
+sidebars            2.0.2       http://plugins.adchsm.me/slidebars/
+datatables          1.10.12     
