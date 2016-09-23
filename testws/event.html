@@ -49,10 +49,9 @@
             vscpConn.connect({
 
                 url: settings.url,
-
                 userName: settings.user,
-
-                password: settings.passwordHash,
+                password: settings.password,
+                vscptoken: settings.vscptoken, 
 
                 onSuccess: function( conn ) {
 

@@ -49,10 +49,9 @@
                 vscpConn.connect({
 
                     url: settings.url,
-
                     userName: settings.user,
-
-                    password: settings.passwordHash,
+                    password: settings.password,
+                    vscptoken: settings.vscptoken, 
 
                     onSuccess: function( conn ) {
 
@@ -119,9 +118,12 @@
                 vscpConn.createVar({
 
                     name:           "demovariable",
-                    type:           vscp.constants.varTypes.BOOLEAN,
-                    value:          "true",
-                    persistency:    true,
+                    type:           vscp.constants.varTypes.BOOLEAN,    // Optional, defaults to 
+                    accessrights:   777,                                // Optional, defaults to 744
+                    value:          "true",                             // Optional. defaults to empty
+                    note:           "This is a simple variable.",       // Optional. default to empty
+                    persistency:    true,                               // defaults to false (non-persistent)
+
 
                     onSuccess: function( conn ) {
                         ui.enable();

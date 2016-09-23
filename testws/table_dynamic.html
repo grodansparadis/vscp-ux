@@ -134,8 +134,9 @@
         }
 
         var vscptableCtrl = new vscpws_Table(   settings.user,
-                                                settings.passwordHash,
+                                                settings.password,
                                                 settings.url,
+                                                vscptoken: settings.vscptoken,
                                                 "officetemp",
                                                 0,
                                                 dataUpdate );
