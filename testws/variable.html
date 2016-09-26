@@ -72,7 +72,7 @@
                     },
 
                     onError: function( conn ) {
-                        alert("Couldn't establish a connection.");
+                        alert("Couldn't establish a connection or connection lost.");
                     }
 
                 });
@@ -119,17 +119,19 @@
 
                     name:           "demovariable",
                     type:           vscp.constants.varTypes.BOOLEAN,    // Optional, defaults to 
-                    accessrights:   777,                                // Optional, defaults to 744
+                    accessrights:   0x777,                              // Optional, defaults to 744
                     value:          "true",                             // Optional. defaults to empty
                     note:           "This is a simple variable.",       // Optional. default to empty
-                    persistency:    true,                               // defaults to false (non-persistent)
+                    persistency:    false,                              // defaults to false (non-persistent)
 
 
                     onSuccess: function( conn ) {
+                        $("#mystatus").text("'demovariable' successfully created.");
                         ui.enable();
                     },
 
                     onError: function( conn ) {
+                        $("#mystatus").text("Failed to create 'demovariable'.");
                         ui.enable();
                     }
                 });
@@ -146,10 +148,12 @@
                     value:  "true",
 
                     onSuccess: function( conn ) {
+                        $("#mystatus").text("'demovariable' value successfully set to 'true'.");
                         ui.enable();
                     },
 
                     onError: function( conn ) {
+                        $("#mystatus").text("Failed to set 'demovariable' value to 'true'.");
                         ui.enable();
                     }
                 });
@@ -166,10 +170,12 @@
                     value:  "false",
 
                     onSuccess: function( conn ) {
+                        $("#mystatus").text("'demovariable' value successfully set to 'false'.");
                         ui.enable();
                     },
 
                     onError: function( conn ) {
+                        $("#mystatus").text("Failed to set 'demovariable' value to 'false'.");
                         ui.enable();
                     }
                 });
@@ -185,10 +191,12 @@
                     name: "demovariable",
 
                     onSuccess: function( conn ) {
+                        $("#mystatus").text("'demovariable' value successfully resetted (set to 'false').");
                         ui.enable();
                     },
 
                     onError: function( conn ) {
+                        $("#mystatus").text("Failed to reset 'demovariable'.");
                         ui.enable();
                     }
                 });
@@ -204,10 +212,12 @@
                     name: "demovariable",
 
                     onSuccess: function( conn ) {
+                        $("#mystatus").text("'demovariable' was successfully removed.");
                         ui.enable();
                     },
 
                     onError: function( conn ) {
+                        $("#mystatus").text("Failed to remove 'demovariable'.");
                         ui.enable();
                     }
                 });
@@ -223,11 +233,12 @@
                     name: "demovariable",
 
                     onSuccess: function( conn, options ) {
-                        alert("Variable length = " + options.length );
+                        $("#mystatus").text("Length for 'demovariable' is :" + options.length );
                         ui.enable();
                     },
 
                     onError: function( conn ) {
+                        $("#mystatus").text("Failed to get length for 'demovariable'.");
                         ui.enable();
                     }
                 });
@@ -243,11 +254,12 @@
                     name: "demovariable",
 
                     onSuccess: function( conn, options ) {
-                        alert( options.name + " was last changed " + options.lastChange + "." );                        
+                        $("#mystatus").text( options.name + " was last changed " + options.lastChange + "." );                        
                         ui.enable();
                     },
 
                     onError: function( conn ) {
+                        $("#mystatus").text("Failed to get last change time/date for 'demovariable'.");
                         ui.enable();
                     }
                 });
@@ -258,13 +270,25 @@
 
                 ui.disable();
                 
-                stripRows( "myResponseTable", 0 );
+                $("#myVariables tr").remove();
+                $( "#myVariables" ).append( "<tr><th><b>" + "Name" + 
+                                                        "</b></th><th>" + "Type" + 
+                                                        "</th><th>" + "UserID" + 
+                                                        "</th><th>" + "AccessRight" + 
+                                                        "</th><th>" + "Last change" + 
+                                                        "</th><th>" + "Persistent" + 
+                                                        "</th></tr>" ); 
 
                 vscpConn.listVar({
 
                     onVariable: function( conn, variable ) {
-                        //alert( variable.name + ", " +  variable.type + ", " + variable.value + ", " + variable.persistency );
-                        $( "#myVariables" ).append( "<tr><td><b>" + variable.name + "</b></td><td>" + variable.value + "</td><td>" + variable.persistency + "</td></tr>" );
+                        //alert( variable.name + ", " +  variable.type + ", " + variable.persistency );
+                        $( "#myVariables" ).append( "<tr><td><b>" + variable.name + 
+                                                        "</b></td><td>" + variable.type + 
+                                                        "</td><td>" + variable.userid + 
+                                                        "</td><td>" + variable.accessright.toString(16) + 
+                                                        "</td><td>" + variable.lastchange + 
+                                                        "</td><td>" + variable.persistency + "</td></tr>" );
                     },
 
                     onSuccess: function( conn ) {
@@ -305,11 +329,14 @@
                             vscpConn.readVar({
                                 name: "demovariable",
                                 onSuccess: function( conn, options ) {
-                                    if ( "true" === options.value ) {
+                                    $("#mystatus").text( "value = " + options.value );
+                                    if ( "true" === options.value ) {                                        
                                         document.body.style.backgroundColor = "#00FF00";
+                                        //$("#mystatus").body.style.backgroundColor = "#00FF00";
                                     }
                                     else {
                                         document.body.style.backgroundColor = "#FF0000";
+                                        //$("#mystatus").body.style.backgroundColor = "#FF0000";
                                     }
                                 }
                             });
@@ -344,41 +371,33 @@
         </div>
     </nav>
     <div class="container-fluid">
-        <h1>VSCP variable handling</h1>
+        <h1>VSCP remote variables</h1>
         <p>
-            The VSCP Dameon have variables that can be defined/written/read/manipulated by external nodes.
-            For example can a temperature value be stores in a node and that way be persistent over time,
+            The VSCP Dameon have variables that can be defined/written/read/manipulated by external devices.
+            For example can a temperature value be stores in a node and in that way be persistent over time,
             Another possibility is that a variable holds the mean value for a temperature over time or a state of
-            something. Variables is a very powerful tool.
+            something. Remote variables are a very powerful tool.
         </p>
         <p>
-            The vscp websocket library makes handling variables from Javascript code very easy. You just tell which
+            The vscp websocket library makes handling variables from Javascript very easy. You just tell which
             variable you are interested in and then you will get info when this variable has changed.
         </p>
         <p>
-            In this demo we just monitor the boolean variable <b>demoVariable</b> and show information when
-            it's value is changed. Go to the administration interface of the vscp daemon
-            (URL is <u>http://localhost:8080/vscp/dmedit</u> default) and create the variable.
-        </p>
-        <br />
-        <p>
-            <img src="../images/create_variable_boolean.jpg" class="img-responsive" width="700">
+            In this demo we just monitor the boolean variable <b>demovariable</b> and show information when
+            it's value has changed. You can add a variable, either in code as we do here, or by adding it in the 
+            VSCP daemon administrative interface or adding it in the REST or the TCP/IP interfaces.
         </p>
         <p>
-            There is also another way to define it. You can add it to the <b>variable.xml</b> file and restart the VSCP daemon.
-            In that case add the lines
+            There is also another way to add it. You can add it to the <b>variable.xml</b> file and restart the 
+            VSCP daemon. Info on how to add variabes here is in the file that comes with the distribution.
         </p>
         <p>
-    <xmp>
-    <variable type="bool">
-        <name>DEMOVARIABLE</name>
-        <note>This is a demo variable for the variable.html demo.</note>
-        <value>true</value>
-    </variable>
-    </xmp>
+            There are also <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles#stock_variables">stock variables</a> 
+            defined which hold system and similar information. You can read all about variables 
+            <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles">here.</a>
         </p>
         <p>
-            You can also create the variable by clicking this button
+            You can also create the variable ("DEMOVARIABLE") by clicking this button
         </p>
         <div id="ui">
             <p>
@@ -397,20 +416,22 @@
             <input type="button" class="btn btn-warning" value="Remove variable" onclick="removeVariable()" disabled />
             <input type="button" class="btn btn-warning" value="Get variable length" onclick="lengthVariable()" disabled />
             <input type="button" class="btn btn-warning" value="Get date/time for last change" onclick="lastchangeVariable()" disabled />
+            </p>
+            <p>
             <input type="button" class="btn btn-warning" value="List all variables" onclick="listVariable()" disabled />
+            Optional <a href="http://marvin.cs.uidaho.edu/Handouts/regex.html">regular expression</a> to select variables:  <input id="myRegExp" type="text">
+            </p>
+            <p>
             <input type="button" class="btn btn-warning" value="Save variables" onclick="saveVariable()" disabled />
             </p>
             <p>
-            Now when you have the variable defined you can start to monitor the variables with this button
+            Now when you have the <i>"demovariable"</i> variable defined you can start to monitor the variables value by clicking this button.
             </p>
             <input id="btnMonitor" type="button" class="btn btn-warning" value="Start to monitor variable" onclick="monitorVariable(!bMonitorActive)" />
         </div>
         <br />
-        <p>
-            There are also <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles#stock_variables">stock variables</a> 
-            defined which hold system and similar information. You can read all about variables 
-            <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles">here.</a>
-        </p>
+        <pre><div id="mystatus"> </div></pre>    
+        <br />        
 
         <div>
             <h3>Variables</h3>

@@ -1752,7 +1752,7 @@ vscp.Connection = function() {
      */
     this.onEvent = [];
 
-    /** Callback called on any received variable (see LISTVAR command)
+    /** Callback called on any received variable (see LSTVAR command)
      * @member {function}
      */
     this.onVariable = null;
@@ -2219,10 +2219,11 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
+                        // name;type;bPersistent;userid;rights;lastchanged;value;note
                         name: msgItems[ 2 ],                                        // Variable name
                         type: msgItems[ 3 ],                                        // Variable type
-                        user: msgItems[ 4 ],                                        // Variable user
-                        access: msgItems[ 5 ],                                      // Variable access
+                        userid: msgItems[ 4 ],                                      // Variable user
+                        accessright: msgItems[ 5 ],                                 // Variable access
                         persistency: ( "false" === msgItems[ 6 ] ) ? false : true,  // Variable persistency
                         lastchange: msgItems[ 7 ],                                  // Variable lastchange
                         value: msgItems[ 8 ],                                       // Variable value
@@ -2265,7 +2266,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                     }
                 );
             }
-            else if ( "LCVAR" === msgItems[ 1 ] ) {
+            else if ( "LENVAR" === msgItems[ 1 ] ) {
                 console.info( vscp.utility.getTime() + " Variable length successfully read." );
                 this.signalSuccess(
                     msgItems[ 1 ],
@@ -2289,15 +2290,14 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 console.info( vscp.utility.getTime() + " Variable successfully listed." );
                 this.signalSuccess( msgItems[ 1 ] );
                 this.signalVariable({
+                        // +;LSTVAR;ordinal;name;type;userid;accessrights;persistance;last_change
                         id: parseInt( msgItems[ 2 ] ),                              // Consecutive number
                         name: msgItems[ 3 ],                                        // Variable name
                         type: msgItems[ 4 ],                                        // Variable type
-                        user: msgItems[ 5 ],                                        // Variable user
-                        access: msgItems[ 6 ],                                      // Variable access rights
-                        persistency: ( "false" === msgItems[ 7 ] ) ? false : true,  // Variable persistency
-                        date: msgItems[ 8 ],                                        // Variable date
-                        value: msgItems[ 9 ],                                       // Variable value
-                        note: msgItems[ 10 ]                                        // Variable note
+                        userid: parseInt( msgItems[ 5 ] ),                          // Variable user
+                        accessright: parseInt( msgItems[ 6 ] ),                     // Variable access rights               
+                        persistency: ( "false" === msgItems[ 7 ] ) ? false : true,  // Variable persistency         
+                        lastchange: msgItems[ 8 ],                                  // Variable date                        
                 });
             }
             else if ( ( "GT" === msgItems[ 1 ] ) || ( "GETTABLE" === msgItems[ 1 ] ) ) {
@@ -3321,10 +3321,15 @@ vscp.Connection.prototype.listVar = function ( options ) {
 
     var onSuccess   = null;
     var onError     = null;
+    var regex       = null;
 
     if ( "undefined" === typeof options ) {
         console.error( vscp.utility.getTime() + " Options are missing. " );
         return;
+    }
+
+    if ( "string" !== typeof options.regex ) {
+        regex = options.regex;
     }
 
     if ( "function" !== typeof options.onVariable ) {
@@ -3344,7 +3349,7 @@ vscp.Connection.prototype.listVar = function ( options ) {
 
     this._sendCommand({
         command: "LSTVAR",
-        data: "",
+        data: regex,
         onSuccess: onSuccess,
         onError: onError
     });
