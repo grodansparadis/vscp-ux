@@ -3330,6 +3330,7 @@ vscp.Connection.prototype.listVar = function ( options ) {
 
     if ( "string" !== typeof options.regex ) {
         regex = options.regex;
+        alert( options.regex );
     }
 
     if ( "function" !== typeof options.onVariable ) {
@@ -3349,7 +3350,7 @@ vscp.Connection.prototype.listVar = function ( options ) {
 
     this._sendCommand({
         command: "LSTVAR",
-        data: regex,
+        data: options.regex,
         onSuccess: onSuccess,
         onError: onError
     });

@@ -269,6 +269,9 @@
             var listVariable = function() {
 
                 ui.disable();
+
+                var localregex = $("#myRegExp").val();
+                
                 
                 $("#myVariables tr").remove();
                 $( "#myVariables" ).append( "<tr><th><b>" + "Name" + 
@@ -280,6 +283,8 @@
                                                         "</th></tr>" ); 
 
                 vscpConn.listVar({
+
+                    regex: $("#myRegExp").val(),
 
                     onVariable: function( conn, variable ) {
                         //alert( variable.name + ", " +  variable.type + ", " + variable.persistency );
