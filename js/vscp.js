@@ -1727,10 +1727,10 @@ vscp.Connection = function() {
      */
     this.password = "";
 
-    /** vscptoken used for connection establishment
+    /** authdomain used for connection establishment
      * @member {string}
      */
-    this.vscptoken = "";
+    this.authdomain = "";
 
     /** Password hash used for connection establishment
      * @member {string}
@@ -2574,12 +2574,12 @@ vscp.Connection.prototype.connect = function( options ) {
 
     this.password = options.password;
 
-    if ( "string" !== typeof options.vscptoken ) {
-        console.error( vscp.utility.getTime() + " vscptoken is missing." );
+    if ( "string" !== typeof options.authdomain ) {
+        console.error( vscp.utility.getTime() + " authdomain is missing." );
         return;
     }
 
-    this.vscptoken = options.vscptoken;
+    this.authdomain = options.authdomain;
 
     if ( "function" !== typeof options.onMessage ) {
         this.onMessage = null;
@@ -2601,7 +2601,7 @@ vscp.Connection.prototype.connect = function( options ) {
 
     // Calculate password hash
     this.passwordHash = vscp.utility.getWebSocketAuthHash( this.userName,
-                                                                this.vscptoken,
+                                                                this.authdomain,
                                                                 this.password );
 
     console.info( vscp.utility.getTime() + " Websocket connect to " + options.url + " (user name: " + this.userName + ", password hash: " + this.passwordHash + ")");

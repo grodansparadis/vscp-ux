@@ -37,12 +37,16 @@
 -->
 <html>
 <head>
+	<meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
     <meta charset="UTF-8">
     <title>VSCP REST interface demo</title>
 
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
+
+	<!-- Settings -->
+	<script type="text/javascript" src="../js/settings.js"></script>
 
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/3.1.1/jquery-3.1.1.min.js"></script>
@@ -63,7 +67,7 @@
     <script type="text/javascript">
 		
 		var VscpSessionKey = "";						// Session key
-		var VscpServer = "http://localhost:8080";		// Host
+		var VscpServer = "http://127.0.0.1:8080";		// Host
 		var VscpEventCount = 0;							// Events in inqueue
 		var txtSendEvent = "0,10,6,0,0,-,138,0,255";	// Event sent by send event 
 		// Filter/Mask to filter just to receive heart beats CLASS1.INFORMATION, Type=9 Node heartbeat
@@ -123,7 +127,7 @@
 		
 		var do_open = function() {
 			$.ajax({
-				url: VscpServer + '/vscp/rest?vscpuser=admin&vscpsecret=13ca88de01ce06e377f74e61c23f630b&format=jsonp&op=1',
+				url: VscpServer + "/vscp/rest?vscpuser=" + settings.user + "&vscpsecret=" + settings.password + "&format=jsonp&op=1",
 				type : "GET",
 				jsonpCallback: 'handler',
 				cache: true,
