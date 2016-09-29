@@ -567,7 +567,7 @@
 		
 		var do_createVariable = function() {
 						
-			var txtVariableName = window.prompt("Name of variable to create:","newvar");
+			var txtVariableName = window.prompt("Name of variable to create:","test");
 			if ( null == txtVariableName ) return;
 			var txtVariableValue = window.prompt("Value:","This is a new string");
 			if ( null == txtVariableValue ) return;
@@ -642,11 +642,15 @@
 						console.log("Message = " + response.message );
 						console.log("Description = " + response.description );
 						console.log("Info = " + response.info );
-						console.log("Variable name = " + response.varname );
-						console.log("Variable value = " + response.varvalue );
+						console.log("Variable name = " + response.varname );						
 						console.log("Variable type = " + response.vartype );
 						console.log("Variable type code = " + response.vartypecode );
 						console.log("Variable percistence = " + response.varpersistence );
+						console.log("Variable user = " + response.varuser );
+						console.log("Variable access-right = " + response.varaccessright );
+						console.log("Variable last-change = " + response.varlastchange );
+						console.log("Variable value = " + response.varvalue );
+						console.log("Variable note = " + response.varnote );
 					
 						if ( response.success ) {
 							$("#events").html( response.varname + " = " + response.varvalue + ", type = " +
