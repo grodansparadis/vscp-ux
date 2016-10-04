@@ -55,6 +55,13 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
     <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+	<!-- VSCP settings -->
+    <script type="text/javascript" src="../js/settings.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket base library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
 	
 	<!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
@@ -148,7 +155,7 @@
 					if (  response.success ) {
 						console.log("Session key assigned to global object " + typeof( response.success) );
 						VscpSessionKey = response.vscpsession;
-						$("#sessionkey").html("<b>Sessionkey</b>: " + response.vscpsession );
+						$("#sessionkey").html("<b>Sessionkey</b>: <font size='2' color='red'>" + response.vscpsession + "</font>");
 					}
 										
 				},
@@ -569,19 +576,51 @@
 						
 			var txtVariableName = window.prompt("Name of variable to create:","test");
 			if ( null == txtVariableName ) return;
-			var txtVariableValue = window.prompt("Value:","This is a new string");
-			if ( null == txtVariableValue ) return;
 			var txtVariableType = window.prompt("Type:","string");
 			if ( null == txtVariableType ) return;
+			var txtVariableValue = window.prompt("Value:","This is a new string");
+			if ( null == txtVariableValue ) return;
+			var txtVariableNote = window.prompt("Note:","A base64 encoded note about this variable.");
+			if ( null == txtVariableNote ) return;
+			var txtVariableAccessRight = window.prompt("Access-rights:","777");
+			if ( null == txtVariableAccessRight ) return;
 			var txtVariablePersistent = window.prompt("Persistent (true/false):","false");
 			if ( null == txtVariablePersistent ) return;
 			
+			// The value should be base64 encoded for 'string-types'
+			if ( ( txtVariableType.toUpperCase() == "STRING" ) ||
+					( txtVariableType == "1" ) ||
+					( txtVariableType.toUpperCase() == "BLOB" ) ||
+					( txtVariableType == "16" ) ||
+					( txtVariableType.toUpperCase() == "MIME" ) ||
+					( txtVariableType == "100" ) ||
+					( txtVariableType.toUpperCase() == "HTML" ) ||
+					( txtVariableType == "101" ) ||
+					( txtVariableType.toUpperCase() == "JAVASCRIPT" ) ||
+					( txtVariableType == "102" ) ||
+					( txtVariableType.toUpperCase() == "JSON" ) ||
+					( txtVariableType == "103" ) ||
+					( txtVariableType.toUpperCase() == "XML" ) ||
+					( txtVariableType == "104" ) ||
+					( txtVariableType.toUpperCase() == "SQL" ) ||
+					( txtVariableType == "105" ) ||
+					( txtVariableType.toUpperCase() == "LUA" ) ||
+					( txtVariableType == "201" ) ||
+					( txtVariableType.toUpperCase() == "LUARES" ) ||
+					( txtVariableType == "202" ) ||
+					( txtVariableType.toUpperCase() == "UXTYPE1" ) ||
+					( txtVariableType == "300" )  ) { 
+				txtVariableValue = vscp.b64EncodeUnicode( txtVariableValue );
+			} 
+
 			if ( VscpSessionKey.length > 0 ) {	
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=createvar&variable=' + txtVariableName +
 							'&value=' + txtVariableValue +
 							'&type=' + txtVariableType +
+							'&note=' + vscp.b64EncodeUnicode( txtVariableNote ) +
+							'&accessright=' + txtVariableAccessRight +
 							'&persistent=' + txtVariablePersistent,
 					type : "GET",
 					jsonpCallback: 'handler',
@@ -647,18 +686,23 @@
 						console.log("Variable type code = " + response.vartypecode );
 						console.log("Variable percistence = " + response.varpersistence );
 						console.log("Variable user = " + response.varuser );
-						console.log("Variable access-right = " + response.varaccessright );
+						console.log("Variable access-rights = " + response.varaccessright );
 						console.log("Variable last-change = " + response.varlastchange );
 						console.log("Variable value = " + response.varvalue );
 						console.log("Variable note = " + response.varnote );
 					
 						if ( response.success ) {
-							$("#events").html( response.varname + " = " + response.varvalue + ", type = " +
-									response.vartype + ", typecode = " + response.vartypecode + 
-									", peristence = " + response.varpersistence );
+							$("#log").html( response.varname + " = " + response.varvalue + 
+							"<br>Type = " + response.vartype + 
+							"<br>Typecode = " + response.vartypecode + 
+							"<br>Peristence = " + response.varpersistence +
+							"<br>User = " + response.varuser +
+							"<br>Access-rights = " + response.varaccessright.toString(16) +
+							"<br>Last-change = " + response.varlastchange +
+							"<br>Note = " + response.varnote );
 						}
 						else {
-							$("#events").html( "Unable to read variable" );
+							$("#log").html( "Unable to read variable" );
 						}
 					
 					},
@@ -680,7 +724,7 @@
 		var do_writeVariable = function() {
 			
 			var txtVariableName = window.prompt("Name of variable to write:","test");
-			var txtVariableValue = window.prompt("New value:","");
+			var txtVariableValue = window.prompt("New value (BASE64 encoded for string types):","");
 			
 			if ( VscpSessionKey.length > 0 ) {	
 				$.ajax({
@@ -846,7 +890,12 @@
 		<p id="host">Host: </p>
 		<p id="sessionkey">Sessionkey: </p>
 		<p id="nevents"> </p>
+		<font size="2" color="green">
 		<p id="events"> </p>
+		</font>
+		<font size="2" color="blue">
+		<p id="log"> </p>
+		</font>
 		<br /><br />
         <hr />
         Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
