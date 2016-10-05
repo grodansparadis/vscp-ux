@@ -118,6 +118,14 @@ navBarMenu.content = [
                 title: "Delete variable",
                 url: "javascript:do_deleteVariable();"
             },
+            {
+                title: "List variables",
+                url: "javascript:do_listVariables();"
+            },
+            {
+                title: "List variables with value/note",
+                url: "javascript:do_listVariablesValue();"
+            },
         ]
     },
 ];

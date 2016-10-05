@@ -94,30 +94,7 @@
 			
 			});
 		})();
-		
-		///////////////////////////////////////////////////////////////////////
-		// printEventData
-		//
-		
-		var printEventData = function( event ) {
-			var eventtxt = "<b>Event</b>: <b>Head</b>:" + 
-				event.head +
-				" <b>Timestamp</b>:" + event.timestamp +
-				" <b>Obid</b>:" + event.obid +
-				" <b>Class</b>:" + event.vscpclass +
-				" <b>Type</b>:" + event.vscptype +
-				" <b>SizeData</b>:" + event.sizedata + " <b>Data</b>: ";
-			if ( 0 != event.sizedata ) {
-				for ( var i=0; i<event.sizedata; i++ ) {
-					eventtxt += event.data[i] + " ";
-				}							
-			}
-			else {
-				eventtxt += "none";
-			} 
 			
-			return eventtxt;
-		}
 		
 		///////////////////////////////////////////////////////////////////////
 		// do_setServer
@@ -133,8 +110,10 @@
 		//
 		
 		var do_open = function() {
+
 			$.ajax({
-				url: VscpServer + "/vscp/rest?vscpuser=" + settings.user + "&vscpsecret=" + settings.password + "&format=jsonp&op=1",
+				url: VscpServer + "/vscp/rest?vscpuser=" + settings.user + "&vscpsecret=" + 
+									settings.password + "&format=jsonp&op=1",
 				type : "GET",
 				jsonpCallback: 'handler',
 				cache: true,
@@ -155,12 +134,15 @@
 					if (  response.success ) {
 						console.log("Session key assigned to global object " + typeof( response.success) );
 						VscpSessionKey = response.vscpsession;
-						$("#sessionkey").html("<b>Sessionkey</b>: <font size='2' color='red'>" + response.vscpsession + "</font>");
+						$("#sessionkey").html("<b>Sessionkey</b>: <font size='2' color='red'>" + 
+												response.vscpsession + "</font>");
 					}
 										
 				},
-				error: function( xhr, status, error ) {
-					console.log( error + " Status:" + status );
+				error: function( xhr, status, error ) {				
+					console.log( "Error:" + error + " Status:" + xhr.status );
+					$("#sessionkey").html("<font size='2' color='red'><b>Faild to connect</b>: " + 
+												error + " status:" + xhr.status + "</font>" );
 				}
 			});
 		};
@@ -172,6 +154,7 @@
 		var do_close = function() {
 			
 			if ( VscpSessionKey.length > 0 ) {	
+
 				$.ajax({
 				url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=2',
 				type : "GET",
@@ -213,7 +196,8 @@
 		
 		var do_status = function() {
 			
-			if ( VscpSessionKey.length > 0 ) {	
+			if ( VscpSessionKey.length > 0 ) {
+
 				$.ajax({
 				url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=status',
 				type : "GET",
@@ -247,6 +231,30 @@
 				alert("Interface is not open!");
 			}
 		};
+
+		///////////////////////////////////////////////////////////////////////
+		// printEventData
+		//
+		
+		var printEventData = function( event ) {
+			var eventtxt = "<b>Event</b>: <b>Head</b>:" + 
+				event.head +
+				" <b>Timestamp</b>:" + event.timestamp +
+				" <b>Obid</b>:" + event.obid +
+				" <b>Class</b>:" + event.vscpclass +
+				" <b>Type</b>:" + event.vscptype +
+				" <b>SizeData</b>:" + event.sizedata + " <b>Data</b>: ";
+			if ( 0 != event.sizedata ) {
+				for ( var i=0; i<event.sizedata; i++ ) {
+					eventtxt += event.data[i] + " ";
+				}							
+			}
+			else {
+				eventtxt += "none";
+			} 
+			
+			return eventtxt;
+		}
 		
 		///////////////////////////////////////////////////////////////////////
 		// do_readEventOne
@@ -255,6 +263,7 @@
 		var do_readEventOne = function() {
 			
 			if ( VscpSessionKey.length > 0 ) {	
+
 				$.ajax({
 				url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=readevent&count=1',
 				type : "GET",
@@ -298,6 +307,7 @@
 		var do_readEventAll = function() {
 			
 			if ( VscpSessionKey.length > 0 ) {	
+
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=readevent&count=10000',
 					type : "GET",
@@ -329,7 +339,7 @@
 							}
 							else {
 								$("#events").html( " " );
-								$("#nevents").html( "It looks like there are no events to read." );
+								$("#nevents").html( "It looks like there is no events to read." );
 							};
 						}					
 					
@@ -352,8 +362,10 @@
 		var do_sendEvent = function() {
 			
 			if ( VscpSessionKey.length > 0 ) {	
+
 				$.ajax({
-					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=sendevent&vscpevent=' + txtSendEvent,
+					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
+							'&format=jsonp&op=sendevent&vscpevent=' + txtSendEvent,
 					type : "GET",
 					jsonpCallback: 'handler',
 					cache: true,
@@ -393,6 +405,7 @@
 		var do_setFilter = function() {
 			
 			if ( VscpSessionKey.length > 0 ) {	
+
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=setfilter&vscpfilter=' + txtVscpFilter + 
@@ -435,7 +448,8 @@
 		
 		var do_clrFilter = function() {
 			
-			if ( VscpSessionKey.length > 0 ) {	
+			if ( VscpSessionKey.length > 0 ) {
+
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=setfilter&vscpfilter=' + 
@@ -481,6 +495,7 @@
 		var do_clrQueue = function() {
 			
 			if ( VscpSessionKey.length > 0 ) {	
+
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=clearqueue',
@@ -522,9 +537,12 @@
 		
 		var do_sendMeasurement = function() {
 			
-			var txtValue = window.prompt("Send CLASS2.MEASUREMENT_FLOAT. Type=6 (temperature) i degrees Celsius:","23.98");
+			if ( VscpSessionKey.length > 0 ) {
+
+				var txtValue = 
+					window.prompt("Send CLASS2.MEASUREMENT_FLOAT. Type=6 (temperature) i degrees Celsius:","23.98");
 			
-			if ( VscpSessionKey.length > 0 ) {	
+				
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=measurement&value=' + txtValue +
@@ -574,46 +592,48 @@
 		
 		var do_createVariable = function() {
 						
-			var txtVariableName = window.prompt("Name of variable to create:","test");
-			if ( null == txtVariableName ) return;
-			var txtVariableType = window.prompt("Type:","string");
-			if ( null == txtVariableType ) return;
-			var txtVariableValue = window.prompt("Value:","This is a new string");
-			if ( null == txtVariableValue ) return;
-			var txtVariableNote = window.prompt("Note:","A base64 encoded note about this variable.");
-			if ( null == txtVariableNote ) return;
-			var txtVariableAccessRight = window.prompt("Access-rights:","777");
-			if ( null == txtVariableAccessRight ) return;
-			var txtVariablePersistent = window.prompt("Persistent (true/false):","false");
-			if ( null == txtVariablePersistent ) return;
-			
-			// The value should be base64 encoded for 'string-types'
-			if ( ( txtVariableType.toUpperCase() == "STRING" ) ||
-					( txtVariableType == "1" ) ||
-					( txtVariableType.toUpperCase() == "BLOB" ) ||
-					( txtVariableType == "16" ) ||
-					( txtVariableType.toUpperCase() == "MIME" ) ||
-					( txtVariableType == "100" ) ||
-					( txtVariableType.toUpperCase() == "HTML" ) ||
-					( txtVariableType == "101" ) ||
-					( txtVariableType.toUpperCase() == "JAVASCRIPT" ) ||
-					( txtVariableType == "102" ) ||
-					( txtVariableType.toUpperCase() == "JSON" ) ||
-					( txtVariableType == "103" ) ||
-					( txtVariableType.toUpperCase() == "XML" ) ||
-					( txtVariableType == "104" ) ||
-					( txtVariableType.toUpperCase() == "SQL" ) ||
-					( txtVariableType == "105" ) ||
-					( txtVariableType.toUpperCase() == "LUA" ) ||
-					( txtVariableType == "201" ) ||
-					( txtVariableType.toUpperCase() == "LUARES" ) ||
-					( txtVariableType == "202" ) ||
-					( txtVariableType.toUpperCase() == "UXTYPE1" ) ||
-					( txtVariableType == "300" )  ) { 
-				txtVariableValue = vscp.b64EncodeUnicode( txtVariableValue );
-			} 
+			if ( VscpSessionKey.length > 0 ) {
 
-			if ( VscpSessionKey.length > 0 ) {	
+				var txtVariableName = window.prompt("Name of variable to create:","test");
+				if ( null == txtVariableName ) return;
+				var txtVariableType = window.prompt("Type:","string");
+				if ( null == txtVariableType ) return;
+				var txtVariableValue = window.prompt("Value:","This is a new string");
+				if ( null == txtVariableValue ) return;
+				var txtVariableNote = window.prompt("Note:","A base64 encoded note about this variable.");
+				if ( null == txtVariableNote ) return;
+				var txtVariableAccessRight = window.prompt("Access-rights:","777");
+				if ( null == txtVariableAccessRight ) return;
+				var txtVariablePersistent = window.prompt("Persistent (true/false):","false");
+				if ( null == txtVariablePersistent ) return;
+			
+				// The value should be base64 encoded for 'string-types'
+				if ( ( txtVariableType.toUpperCase() == "STRING" ) ||
+						( txtVariableType == "1" ) ||
+						( txtVariableType.toUpperCase() == "BLOB" ) ||
+						( txtVariableType == "16" ) ||
+						( txtVariableType.toUpperCase() == "MIME" ) ||
+						( txtVariableType == "100" ) ||
+						( txtVariableType.toUpperCase() == "HTML" ) ||
+						( txtVariableType == "101" ) ||
+						( txtVariableType.toUpperCase() == "JAVASCRIPT" ) ||
+						( txtVariableType == "102" ) ||
+						( txtVariableType.toUpperCase() == "JSON" ) ||
+						( txtVariableType == "103" ) ||
+						( txtVariableType.toUpperCase() == "XML" ) ||
+						( txtVariableType == "104" ) ||
+						( txtVariableType.toUpperCase() == "SQL" ) ||
+						( txtVariableType == "105" ) ||
+						( txtVariableType.toUpperCase() == "LUA" ) ||
+						( txtVariableType == "201" ) ||
+						( txtVariableType.toUpperCase() == "LUARES" ) ||
+						( txtVariableType == "202" ) ||
+						( txtVariableType.toUpperCase() == "UXTYPE1" ) ||
+						( txtVariableType == "300" )  ) { 
+					txtVariableValue = vscp.b64EncodeUnicode( txtVariableValue );
+				} 
+
+				
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=createvar&variable=' + txtVariableName +
@@ -660,9 +680,10 @@
 		
 		var do_readVariable = function() {
 			
+			if ( VscpSessionKey.length > 0 ) {
+
 			var txtVariableName = window.prompt("Name of variable to read:","test");
-			
-			if ( VscpSessionKey.length > 0 ) {	
+				
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=readvar&variable=' + txtVariableName,
@@ -723,14 +744,15 @@
 		
 		var do_writeVariable = function() {
 			
-			var txtVariableName = window.prompt("Name of variable to write:","test");
-			var txtVariableValue = window.prompt("New value (BASE64 encoded for string types):","");
-			
-			if ( VscpSessionKey.length > 0 ) {	
+			if ( VscpSessionKey.length > 0 ) {
+
+				var txtVariableName = window.prompt("Name of variable to write:","test");
+				var txtVariableValue = window.prompt("New value (BASE64 encoded for string types):","");
+				
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=writevar&variable=' + txtVariableName +
-							'&value=' + txtVariableValue,
+							'&value=' + encodeURIComponent( txtVariableValue ),
 					type : "GET",
 					jsonpCallback: 'handler',
 					cache: true,
@@ -771,10 +793,11 @@
 		
 		var do_deleteVariable = function() {
 						
-			var txtVariableName = window.prompt("Name of variable to delete:","test");
-			if ( null == txtVariableName ) return;
-			
-			if ( VscpSessionKey.length > 0 ) {	
+			if ( VscpSessionKey.length > 0 ) {
+
+				var txtVariableName = window.prompt("Name of variable to delete:","test");
+				if ( null == txtVariableName ) return;			
+				
 				$.ajax({
 					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
 							'&format=jsonp&op=deletevar&variable=' + txtVariableName,
@@ -809,7 +832,154 @@
 			}
 
 		};
+
+
 		
+		///////////////////////////////////////////////////////////////////////
+		// printEventData
+		//
+		
+		var printVariableData = function( variable, bLong ) {
+
+			var vartxt = "<b>Variable</b>: <b>Name</b>:" 	+ variable.varname +
+					" <b>Type</b>:" 							+ variable.vartype +
+					" <b>Typecode</b>:" 						+ variable.vartypecode +
+					" <b>Persistence</b>:" 						+ variable.varpersistence +
+					" <b>User</b>:" 							+ variable.varuser +
+					" <b>Access-rights</b>:" 					+ variable.varaccessright +
+					" <b>Last-change</b>:" 						+ variable.varlastchange;
+
+			if ( true === bLong ) {
+				vartxt += "<br><b>Value</b>:" + variable.varvalue;
+				vartxt += "<br><b>Note</b>:" + variable.varnote;
+				vartxt += "<br>-----------------------------------------------------------------------------";	
+			}
+
+			return vartxt;
+		}
+
+		
+
+		///////////////////////////////////////////////////////////////////////
+		// do_listVariables
+		//
+		
+		var do_listVariables = function() {
+						
+			if ( VscpSessionKey.length > 0 ) {	
+
+				$("#events").html( "" );
+
+				var txtRegEx = window.prompt("Regular expression (leave blank to select all):","");
+				if ( null == txtRegEx ) txtRegEx = "(.*)";
+
+				$.ajax({
+					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
+							'&format=jsonp&op=listvar&listlong=false&regex=' + encodeURIComponent( txtRegEx ),
+					type : "GET",
+					jsonpCallback: 'handler',
+					cache: true,
+					dataType: 'jsonp',
+					success: function(response) {
+						// response will be a javascript
+						// array of objects
+						console.log("-----------------------------------------------------------");
+						console.log("                     do_listVariables");
+						console.log("-----------------------------------------------------------");
+						console.log("Success = " + response.success );
+						console.log("Code = " + response.code );
+						console.log("Message = " + response.message );
+						console.log("Description = " + response.description );
+						console.log("Info = " + response.info );
+						console.log("Count = " + response.count );
+						console.log("Errors = " + response.errors );
+					
+						if ( response.success ) {
+							if ( response.count > 0 ) {
+								var eventtxt = "";
+								for (var i=0; i<response.count; i++ ) {
+									eventtxt += printVariableData( response.variable[i], false ) + "<br>";
+								}
+								$("#events").html( eventtxt );
+							}
+							else {
+								$("#events").html( " " );
+								$("#nevents").html( "It looks like there is no variables to read." );
+							};
+						}
+					
+					},
+					error: function( xhr, status, error ) {
+						console.log( "do_listVariables:" + error + " Status:" + status );
+					}
+				});
+			}
+			else {
+				alert("Interface is not open!");
+			}
+
+		};
+
+
+		///////////////////////////////////////////////////////////////////////
+		// do_listVariablesValue
+		//
+		
+		var do_listVariablesValue = function() {
+						
+			if ( VscpSessionKey.length > 0 ) {	
+
+				$("#events").html( "" );
+
+				var txtRegEx = window.prompt("Regular expression (leave blank to select all):","");
+				if ( null == txtRegEx ) txtRegEx = "(.*)";
+
+				$.ajax({
+					url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + 
+							'&format=jsonp&op=listvar&listlong=true&regex=' + encodeURIComponent( txtRegEx ),
+					type : "GET",
+					jsonpCallback: 'handler',
+					cache: true,
+					dataType: 'jsonp',
+					success: function(response) {
+						// response will be a javascript
+						// array of objects
+						console.log("-----------------------------------------------------------");
+						console.log("                     do_listVariables");
+						console.log("-----------------------------------------------------------");
+						console.log("Success = " + response.success );
+						console.log("Code = " + response.code );
+						console.log("Message = " + response.message );
+						console.log("Description = " + response.description );
+						console.log("Info = " + response.info );
+						console.log("Count = " + response.count );
+						console.log("Errors = " + response.errors );
+					
+						if ( response.success ) {
+							if ( response.count > 0 ) {
+								var eventtxt = "";
+								for (var i=0; i<response.count; i++ ) {
+									eventtxt += printVariableData( response.variable[i], true ) + "<br>";
+								}
+								$("#events").html( eventtxt );
+							}
+							else {
+								$("#events").html( " " );
+								$("#nevents").html( "It looks like there is no variables to read." );
+							};
+						}
+					
+					},
+					error: function( xhr, status, error ) {
+						console.log( "do_listVariables:" + error + " Status:" + status );
+					}
+				});
+			}
+			else {
+				alert("Interface is not open!");
+			}
+
+		};
 		
 		
 	/*	
@@ -845,7 +1015,8 @@
 	<nav class="navbar navbar-inverse">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+                <a class="navbar-brand" href="../index.html">
+					<img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
             <div id="menu">
             </div>
@@ -857,34 +1028,16 @@
 		
 		<p>
 			This demo demonstrates the VSCP daemon REST interface functionality. The VSCP daemon REST interface is documented
-			<a href="http://www.vscp.org/docs/vscpd/doku.php?id=vscp_daemon_vscp_daemon_rest_interface">here</a> and you can find the code for this example at 
-			<a href="https://github.com/grodansparadis/vscp-ux">GitHub.</a>
-		</p>
-		<!--
-		<a href="#" onclick="do_setServer();" >Set server</a> |
-		<a href="#" onclick="do_open();" >Open</a> | 
-		<a href="#" onclick="do_close();" >Close</a> | 
-		<a href="#" onclick="do_status();" >Status</a> | 
-		<a href="#" onclick="do_readEventOne();" >Read One Event</a> |
-		<a href="#" onclick="do_readEventAll();" >Read All Events</a> |
-		<a href="#" onclick="do_sendEvent();" >Send Event</a> |
-		<a href="#" onclick="do_setFilter();" >Set Filter</a> |
-		<a href="#" onclick="do_clrFilter();" >Clear Filter</a> |
-		<a href="#" onclick="do_clrQueue();" >Clear Queue</a> 
-		<br>
-		<a href="#" onclick="do_createVariable();" >Create variable</a> |
-		<a href="#" onclick="do_readVariable();" >Read variable</a> |
-		<a href="#" onclick="do_writeVariable();" >Write variable</a> |
-		<a href="#" onclick="do_deleteVariable();" >Delete variable</a> |
-		<a href="#" onclick="do_sendMeasurement();" >Send measurement</a> |
-		<a href="#" onclick="do_getTable();" >Get table</a>
-		-->
-		<p>
-			Open a session and possible define a server (set Server) before you start to work with the other available menu items.
+			<a href="http://www.vscp.org/docs/vscpd/doku.php?id=vscp_daemon_vscp_daemon_rest_interface">here</a> and you can 
+			find the code for this example at <a href="https://github.com/grodansparadis/vscp-ux">GitHub.</a>
 		</p>
 		<p>
-			Open the console log window of your browser to see status from this demo as it use log functionality for info about what is done under 
-			the hood.
+			Open a session and possible define a server (set Server) before you start to work with the other available menu 
+			items.
+		</p>
+		<p>
+			Open the console log window of your browser to see status from this demo as it use log functionality for info 
+			about what is done under the hood.
 		<p>
         <hr>
 		<p id="host">Host: </p>
