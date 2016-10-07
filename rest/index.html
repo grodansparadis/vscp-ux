@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
 	//
-	// VSCP javascript websocket library
+	// VSCP JavaScript websocket library
 	// Copyright (C) 2012-2016 Ake Hedman, Grodans Paradis AB
 	// <akhe@grodansparadis.com>
 	//
@@ -119,7 +119,7 @@
 				cache: true,
 				dataType: 'jsonp',
 				success: function(response) {
-					// response will be a javascript
+					// response will be a JavaScript
 					// array of objects
 					console.log("-----------------------------------------------------------");
 					console.log("                         do_open");
@@ -162,7 +162,7 @@
 				cache: true,
 				dataType: 'jsonp',
 				success: function(response) {
-					// response will be a javascript
+					// response will be a JavaScript
 					// array of objects
 					console.log("-----------------------------------------------------------");
 					console.log("                         do_close");
@@ -205,7 +205,7 @@
 				cache: true,
 				dataType: 'jsonp',
 				success: function(response) {
-					// response will be a javascript
+					// response will be a JavaScript
 					// array of objects
 					console.log("-----------------------------------------------------------");
 					console.log("                         do_status");
@@ -271,7 +271,7 @@
 				cache: true,
 				dataType: 'jsonp',
 				success: function(response) {
-					// response will be a javascript
+					// response will be a JavaScript
 					// array of objects
 					console.log("-----------------------------------------------------------");
 					console.log("                         do_readEventOne");
@@ -315,7 +315,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                         do_readEventAll");
@@ -371,7 +371,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                         do_sendEvent");
@@ -415,7 +415,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                         do_setFilter");
@@ -461,7 +461,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                         do_clrFilter");
@@ -504,7 +504,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                         do_clrQueue");
@@ -559,7 +559,7 @@
 					dataType: 'jsonp',
 					success: function(response) {
 						
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                     do_sendMeasurement");
@@ -647,7 +647,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                     do_createVariable");
@@ -692,7 +692,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                     do_readVariable");
@@ -758,7 +758,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                     do_writeVariable");
@@ -806,7 +806,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                     do_deleteVariable");
@@ -836,7 +836,7 @@
 
 		
 		///////////////////////////////////////////////////////////////////////
-		// printEventData
+		// printVariableData
 		//
 		
 		var printVariableData = function( variable, bLong ) {
@@ -881,7 +881,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                     do_listVariables");
@@ -942,7 +942,7 @@
 					cache: true,
 					dataType: 'jsonp',
 					success: function(response) {
-						// response will be a javascript
+						// response will be a JavaScript
 						// array of objects
 						console.log("-----------------------------------------------------------");
 						console.log("                     do_listVariables");
@@ -1029,11 +1029,11 @@
 		<p>
 			This demo demonstrates the VSCP daemon REST interface functionality. The VSCP daemon REST interface is documented
 			<a href="http://www.vscp.org/docs/vscpd/doku.php?id=vscp_daemon_vscp_daemon_rest_interface">here</a> and you can 
-			find the code for this example at <a href="https://github.com/grodansparadis/vscp-ux">GitHub.</a>
+			find the code for this example on <a href="https://github.com/grodansparadis/vscp-ux">GitHub.</a>
 		</p>
 		<p>
-			Open a session and possible define a server (set Server) before you start to work with the other available menu 
-			items.
+			Open a session (Open REST session) and possible define a server (set Server) before you start, to work with the other 
+			available menu items.
 		</p>
 		<p>
 			Open the console log window of your browser to see status from this demo as it use log functionality for info 
