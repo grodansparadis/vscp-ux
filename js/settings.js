@@ -4,7 +4,6 @@
 //
 
 var settings = {
-
     user: "admin",
     password: "secret",
     authdomain: "mydomain.com",

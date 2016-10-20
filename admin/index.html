@@ -31,7 +31,7 @@
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP admin library -->
-    <script type="text/javascript" src="../js/vscpAdmin.js"></script>
+    <script type="text/javascript" src="../js/vscpadmin.js"></script>
 
     <!-- Menu styles -->
     <link rel="stylesheet" href="../js/menu0.css">
@@ -41,6 +41,7 @@
     <!-- Navigation bar menu structure -->
     <script type="text/javascript" src="../js/menu0.js"></script>
 
+    <link rel="stylesheet" type="text/css" href="css/vscp-admin.css">
 
     <script type="text/javascript">
 
@@ -53,7 +54,8 @@
             // Show navigation bar menu
             navBarMenu.show( "menu", navBarMenu.content );
 
-            document.getElementById("admin-footer").innerHTML = vscp.admin.config.copyright;   
+            vscp.admin.setCopyright();
+            vscp.admin.setStatus( "Unconnected" );   
 
             if ( typeof( Storage ) !== "undefined" ) 
             {
@@ -252,8 +254,13 @@
     </div>
     
     <footer>
-        <div id="admin-footer">
-            Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+        <div>
+            <p id="status-footer">
+            test
+            </p>
+            <p id="copyright-footer">
+            xxxx
+            </p>
         </div>
     </footer>
     

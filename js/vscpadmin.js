@@ -55,16 +55,42 @@ vscp.admin.timeout = 5000;
 
 // Admin interface Constants
 vscp.admin.config = {
-
     copyright: 'Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>',
     version: "0.0.1",
-    server: "http://127.0.0.1:8080",
+    // Defaults
     user: "admin",
-    password: "secret", 
-    vscptoken: "Stay Hungry. Stay Foolish."
+    password: "secret",
+    authdomain: "mydomain.com",
+    passwordHash: "d50c3180375c27927c22e42a379c3f67", // Hash on "user:vscptoken:password"
+    //url: "ws://192.168.1.9:8080" // Non SSL (to be able to use from remote machine)
+    //url: "wss://192.168.1.9:8080" // SSL (to be able to use from remote machine)
+    //url: "ws://demo.vscp.org:8080" // Demoserver
+    url: "ws://127.0.0.1:8080" // Local server
 };
 
 
 /* ---------------------------------------------------------------------- */
 
+/////////////////////////////////////////////////////////////////////////////////////////////
+// vscp.admin.setCopyright
+//
+// Set copyright in footer
+//
 
+vscp.admin.setCopyright = function () {
+    document.getElementById("copyright-footer").innerHTML =
+        "VSCP administrative interface - Version: " +
+        vscp.admin.config.version +
+        " - " +
+        vscp.admin.config.copyright;
+};
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// vscp.admin.setStatus
+//
+// Set status text
+//
+
+vscp.admin.setStatus = function ( str ) {
+    document.getElementById("status-footer").innerHTML = str;
+};

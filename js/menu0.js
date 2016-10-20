@@ -53,12 +53,16 @@ navBarMenu.content = [
                 url: "javascript:setServerModal();"
             },
             {
-                title: "Connect",
+                title: "Connect to VSCP server",
                 url: "javascript:doConnect();"
             },
             {
-                title: "Disconnect",
+                title: "Disconnect from VSCP server",
                 url: "javascript:doDisconnect();"
+            },
+            {
+                title: "Session window",
+                url: "javascript:doSession();"
             },
             
         ]
@@ -69,23 +73,23 @@ navBarMenu.content = [
         dropDown: [
             {
                 title: "Variables",
-                url: "epoch_simple.html"
+                url: "Variables.html"
             },
             {
                 title: "Decision Matrix",
-                url: "epoch_simple.html"
+                url: "dm.html"
             },
             {
                 title: "MDF - Module Description Files",
-                url: "epoch_simple.html"
+                url: "mdf.html"
             },
             {
                 title: "Daemon Configuration",
-                url: "epoch_simple.html"
+                url: "configure.html"
             },
             {
                 title: "Server logs",
-                url: "epoch_simple.html"
+                url: "logs.html"
             },
         ]
     },
