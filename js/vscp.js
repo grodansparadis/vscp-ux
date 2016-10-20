@@ -2171,11 +2171,11 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
 
                     this._sendCommand({
                         command: "AUTH",
-                        data: this.userName + ";" + vscp.utility.getWebSocketAuthHash(
-                            this.userName,
-                            this.passwordHash,
-                            msgItems[ 2 ]
-                        ),
+                        data: this.userName + ";" + 
+                                vscp.utility.getWebSocketAuthHash( this.userName,
+                                                                        this.passwordHash,
+                                                                        msgItems[ 2 ]       // sid
+                                                                 ),
                         onSuccess: null,
                         onError: null
                     });
@@ -2604,7 +2604,7 @@ vscp.Connection.prototype.connect = function( options ) {
                                                                 this.authdomain,
                                                                 this.password );
 
-    console.info( vscp.utility.getTime() + " Websocket connect to " + options.url + " (user name: " + this.userName + ", password hash: " + this.passwordHash + ")");
+    console.info( vscp.utility.getTime() + " Websocket connect to " + options.url + " (user name: " + this.userName + ", password: " + this.passwordHash + ")");
     
     this.socket = new WebSocket( options.url );
     

@@ -47,8 +47,9 @@ body {
 footer {
   position: absolute;
   bottom: 0;
-  margin-left: 1%;
-  width: 99%;
+  margin-left: 10%;
+  margin-right: 10%;
+  width: 80%;
   /* Set the fixed height of the footer here */
   height: 30px;
   background-color: #000000;

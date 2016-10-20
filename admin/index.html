@@ -158,6 +158,72 @@
             vscp.admin.setStatus( settings.url, false );
         };
 
+        // Test the connection
+        function doTestConnect() {
+            // VSCP websocket connection
+            var vscpConn = null;
+
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
+
+                // Redirect console output
+                (function(){
+                    var original = window.console;
+
+                    function handle( method, args ){
+                        var message = Array.prototype.slice.apply(args).join(' ');
+                        $( "#output" ).append( "<br />" + args[ 0 ] );
+                        if ( original ) {
+                            original[method](message);
+                        }
+                    }
+
+                    window.console = {
+                        log: function(){
+                            handle( 'log', arguments );
+                        },
+                        info: function(){
+                            handle( 'info', arguments );
+                        },
+                        warn: function(){
+                            handle( 'warn', arguments );
+                        },
+                        error: function(){
+                            handle( 'error', arguments );
+                        },
+                        debug: function(){
+                            handle( 'debug', arguments );
+                        }
+                    };
+
+                })();
+
+                // Create a VSCP websocket
+                vscpConn = new vscp.Connection();
+
+                // Connect to VSCP server
+                vscpConn.connect({
+
+                    url: settings.url,
+                    userName: settings.user,
+                    password: settings.password,
+                    authdomain: settings.authdomain, 
+
+                    onSuccess: function( conn ) {
+                        $( "#output" ).append( "<br /><br />Connection establishment successful." );
+                    },
+
+                    onError: function( conn ) {
+                        $( "#output" ).append( "<br /><br />Connection establishment failed." );
+                    }
+
+                });
+            });
+        };
+
     </script>
 
 </head>
@@ -234,10 +300,18 @@
 
     <div class="container-fluid">
         <h1>VSCP administrative interface</h1>
-        <div id="copyright-info" />        
-
-        
+        <div id="copyright-info" />                
     </div>
+
+    <p>
+        <div id="output" style="border: thin solid black; padding: 25px;" />
+    </p>
+
+    <p>
+        <div>
+        <img src="../images/logo/vscp_new_v2.png" />
+        </div>
+    </p>
     
     <footer>
         <div>
