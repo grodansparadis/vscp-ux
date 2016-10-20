@@ -32,10 +32,31 @@
    Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
 */
 
+/* 
+  Sticky footer styles
+  https://www.codementor.io/tips/4292721368/twitter-bootstrap-3-sticky-footer
+*/
+html {
+  position: relative;
+  min-height: 100%;
+}
+body {
+  /* Margin bottom by footer height */
+  margin-bottom: 30px;
+}
+footer {
+  position: absolute;
+  bottom: 0;
+  margin-left: 1%;
+  width: 99%;
+  /* Set the fixed height of the footer here */
+  height: 30px;
+  background-color: #000000;
+}
 
 #status-footer {
     text-align: center;
-    color: red;
+    color: goldenrod;
 }
 
 #copyright-footer {

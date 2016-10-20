@@ -1,74 +1,94 @@
 /*
-    http://work.smarchal.com/twbscolor/css/e74c3cc0392becf0f1ffbbbc0
+    http://work.smarchal.com/twbscolor/css/294bb22c74c5ecf0f1f4e30d0
 */
 
-.navbar-custom {
-  background-color: #3770bb;
-  border-color: #3e407c;
+.navbar-default {
+  background-color: #294bb2;
+  border-color: #2c74c5;
 }
-.navbar-custom .navbar-brand {
-  color: #f9f2f4;
+.navbar-default .navbar-brand {
+  color: #ecf0f1;
 }
-.navbar-custom .navbar-brand:hover,
-.navbar-custom .navbar-brand:focus {
-  color: #f6d557;
+.navbar-default .navbar-brand:hover,
+.navbar-default .navbar-brand:focus {
+  color: #f4e30d;
 }
-.navbar-custom .navbar-text {
-  color: #f9f2f4;
+.navbar-default .navbar-text {
+  color: #ecf0f1;
 }
-.navbar-custom .navbar-nav > li > a {
-  color: #f9f2f4;
+.navbar-default .navbar-nav > li > a {
+  color: #ecf0f1;
 }
-.navbar-custom .navbar-nav > li > a:hover,
-.navbar-custom .navbar-nav > li > a:focus {
-  color: #f6d557;
+.navbar-default .navbar-nav > li > a:hover,
+.navbar-default .navbar-nav > li > a:focus {
+  color: #f4e30d;
 }
-.navbar-custom .navbar-nav > .active > a,
-.navbar-custom .navbar-nav > .active > a:hover,
-.navbar-custom .navbar-nav > .active > a:focus {
-  color: #f6d557;
-  background-color: #3e407c;
+.navbar-default .navbar-nav > li > .dropdown-menu {
+  background-color: #294bb2;
 }
-.navbar-custom .navbar-nav > .open > a,
-.navbar-custom .navbar-nav > .open > a:hover,
-.navbar-custom .navbar-nav > .open > a:focus {
-  color: #f6d557;
-  background-color: #3e407c;
+.navbar-default .navbar-nav > li > .dropdown-menu > li > a {
+  color: #ecf0f1;
 }
-.navbar-custom .navbar-toggle {
-  border-color: #3e407c;
+.navbar-default .navbar-nav > li > .dropdown-menu > li > a:hover,
+.navbar-default .navbar-nav > li > .dropdown-menu > li > a:focus {
+  color: #f4e30d;
+  background-color: #2c74c5;
 }
-.navbar-custom .navbar-toggle:hover,
-.navbar-custom .navbar-toggle:focus {
-  background-color: #3e407c;
+.navbar-default .navbar-nav > li > .dropdown-menu > li > .divider {
+  background-color: #2c74c5;
 }
-.navbar-custom .navbar-toggle .icon-bar {
-  background-color: #f9f2f4;
+.navbar-default .navbar-nav .open .dropdown-menu > .active > a,
+.navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
+.navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+  color: #f4e30d;
+  background-color: #2c74c5;
 }
-.navbar-custom .navbar-collapse,
-.navbar-custom .navbar-form {
-  border-color: #f9f2f4;
+.navbar-default .navbar-nav > .active > a,
+.navbar-default .navbar-nav > .active > a:hover,
+.navbar-default .navbar-nav > .active > a:focus {
+  color: #f4e30d;
+  background-color: #2c74c5;
 }
-.navbar-custom .navbar-link {
-  color: #f9f2f4;
+.navbar-default .navbar-nav > .open > a,
+.navbar-default .navbar-nav > .open > a:hover,
+.navbar-default .navbar-nav > .open > a:focus {
+  color: #f4e30d;
+  background-color: #2c74c5;
 }
-.navbar-custom .navbar-link:hover {
-  color: #f6d557;
+.navbar-default .navbar-toggle {
+  border-color: #2c74c5;
+}
+.navbar-default .navbar-toggle:hover,
+.navbar-default .navbar-toggle:focus {
+  background-color: #2c74c5;
+}
+.navbar-default .navbar-toggle .icon-bar {
+  background-color: #ecf0f1;
+}
+.navbar-default .navbar-collapse,
+.navbar-default .navbar-form {
+  border-color: #ecf0f1;
+}
+.navbar-default .navbar-link {
+  color: #ecf0f1;
+}
+.navbar-default .navbar-link:hover {
+  color: #f4e30d;
 }
 
 @media (max-width: 767px) {
-  .navbar-custom .navbar-nav .open .dropdown-menu > li > a {
-    color: #3e407c;
+  .navbar-default .navbar-nav .open .dropdown-menu > li > a {
+    color: #ecf0f1;
   }
-  .navbar-custom .navbar-nav .open .dropdown-menu > li > a:hover,
-  .navbar-custom .navbar-nav .open .dropdown-menu > li > a:focus {
-    color: #f6d557;
+  .navbar-default .navbar-nav .open .dropdown-menu > li > a:hover,
+  .navbar-default .navbar-nav .open .dropdown-menu > li > a:focus {
+    color: #f4e30d;
   }
-  .navbar-custom .navbar-nav .open .dropdown-menu > .active > a,
-  .navbar-custom .navbar-nav .open .dropdown-menu > .active > a:hover,
-  .navbar-custom .navbar-nav .open .dropdown-menu > .active > a:focus {
-    color: #f6d557;
-    background-color: #3e407c;
+  .navbar-default .navbar-nav .open .dropdown-menu > .active > a,
+  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:hover,
+  .navbar-default .navbar-nav .open .dropdown-menu > .active > a:focus {
+    color: #f4e30d;
+    background-color: #2c74c5;
   }
 }
 
@@ -95,25 +115,5 @@
 }*/
 
 
-/* 
-  Sticky footer styles
-  https://www.codementor.io/tips/4292721368/twitter-bootstrap-3-sticky-footer
-*/
-html {
-  position: relative;
-  min-height: 100%;
-}
-body {
-  /* Margin bottom by footer height */
-  margin-bottom: 30px;
-}
-footer {
-  position: absolute;
-  bottom: 0;
-  margin-left: 1%;
-  width: 99%;
-  /* Set the fixed height of the footer here */
-  height: 30px;
-  background-color: #f5f5f5;
-}
+
 

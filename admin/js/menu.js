@@ -49,16 +49,12 @@ navBarMenu.content = [
         url: "#",
         dropDown: [
             {
-                title: "Select server",
+                title: "Select VSCP server...",
                 url: "javascript:setServerModal();"
             },
             {
-                title: "Connect to VSCP server",
-                url: "javascript:doConnect();"
-            },
-            {
-                title: "Disconnect from VSCP server",
-                url: "javascript:doDisconnect();"
+                title: "Test VSCP server...",
+                url: "javascript:doTestConnect();"
             },
             {
                 title: "Session window",

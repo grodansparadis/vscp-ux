@@ -14,8 +14,8 @@
     
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/3.3.6/css/bootstrap.min.css"> 
-    <script type="text/javascript" src="../js/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     
     <!-- Bootstrap dialogs -->
     <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
@@ -34,7 +34,7 @@
     <script type="text/javascript" src="../js/vscpadmin.js"></script>
 
     <!-- Menu styles -->
-    <link rel="stylesheet" href="css/menu.css">
+    <link rel="stylesheet" type="text/css" href="css/menu.css">
     
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navBar.js"></script>
@@ -55,7 +55,7 @@
             navBarMenu.show( "menu", navBarMenu.content );
 
             vscp.admin.setCopyright();
-            vscp.admin.setStatus( "Unconnected" );   
+            vscp.admin.setStatus( "<b>Server:</b> no server selected.", false );   
 
             if ( typeof( Storage ) !== "undefined" ) 
             {
@@ -64,7 +64,7 @@
                     settings.url = localStorage.getItem("vscp-url");
                 }
 
-                setConnectInfo( settings.url, false );
+                vscp.admin.setStatus( settings.url, false );
 
                 // User
                 if ( null != localStorage.getItem("vscp-user") ) {
@@ -81,23 +81,13 @@
             } 
             else {
                 // No Web Storage support.
-                setConnectInfo( settings.url, false );
+                vscp.admin.setStatus( settings.url, false );
             }
 
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
 
         });
-
-        function setConnectInfo( info, bConnected ) 
-        {
-            if ( bConnected ) {
-                document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + info + " - <b>Connected</b>.";
-            }
-            else {
-                document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + info + " - <b>Disonnected</b>.";
-            }
-        }
 
         // Show modal to select active server to use.
         function setServerModal() 
@@ -115,7 +105,7 @@
             settings.password =  $('#modal-password').val();
             settings.authdomain = $('#modal-authdomain').val();
 
-            setConnectInfo( settings.url, false );
+            vscp.admin.setStatus( settings.url, false );
 
             // Should we save persistent
             if ( $('#modal-brememberme').prop('checked') ) {
@@ -147,12 +137,12 @@
                 authdomain: settings.authdomain,                                                                
 
                 onSuccess: function( conn ) {
-                    setConnectInfo( settings.url, true );
+                    vscp.admin.setStatus( settings.url, true );
                     deferred.resolve();                    
                 },
 
                 onError: function( conn ) {
-                    setConnectInfo( settings.url, false );
+                    vscp.admin.setStatus( settings.url, false );
                     BootstrapDialog.alert( "Connection lost. Please reload website." );
                     deferred.reject();
                 }
@@ -165,7 +155,7 @@
         // Disconnect from the VSCP daemon
         function doDisconnect() {
             vscpConn.disconnect();
-            setConnectInfo( settings.url, false );
+            vscp.admin.setStatus( settings.url, false );
         };
 
     </script>
@@ -173,16 +163,12 @@
 </head>
 <body>
    
-    <div id="idSelectedServer">
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <b>Server:</b> no server selected.
-    </div>
-
     <!-- Menu -->
-    <nav class="navbar navbar-inverse">
+    <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+                <a class="navbar-brand" href="index.html">
+                <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="120" alt="vscp logo" /></a>
             </div>
             <div id="menu">
             </div>
@@ -247,20 +233,17 @@
 
 
     <div class="container-fluid">
-        <h1>VSCP control interface</h1>
-        
+        <h1>VSCP administrative interface</h1>
+        <div id="copyright-info" />        
 
         
     </div>
     
     <footer>
         <div>
-            <p id="status-footer">
+            <div id="status-footer">
             test
-            </p>
-            <p id="copyright-footer">
-            xxxx
-            </p>
+            </div>
         </div>
     </footer>
     

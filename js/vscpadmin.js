@@ -78,8 +78,8 @@ vscp.admin.config = {
 //
 
 vscp.admin.setCopyright = function () {
-    document.getElementById("copyright-footer").innerHTML =
-        "VSCP administrative interface - Version: " +
+    document.getElementById("copyright-info").innerHTML =
+        "Version: " +
         vscp.admin.config.version +
         " - " +
         vscp.admin.config.copyright;
@@ -91,6 +91,11 @@ vscp.admin.setCopyright = function () {
 // Set status text
 //
 
-vscp.admin.setStatus = function ( str ) {
-    document.getElementById("status-footer").innerHTML = str;
+vscp.admin.setStatus = function ( info, bConnected ) {
+    if ( bConnected ) {
+        document.getElementById("status-footer").innerHTML = "<b>Server:</b> " + info + " - <b>Connected</b>.";
+    }
+    else {
+        document.getElementById("status-footer").innerHTML = "<b>Server:</b> " + info + " - <b>Disonnected</b>.";
+    }
 };
