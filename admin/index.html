@@ -74,7 +74,7 @@
                 if ( null != localStorage.getItem("vscp-password") ) {
                     settings.password = localStorage.getItem("vscp-password");
                 }
-                // AuthDoamin
+                // AuthDomain
                 if ( null != localStorage.getItem("vscp-authdomain") ) {
                     settings.authdomain = localStorage.getItem("vscp-authdomain");
                 }
@@ -160,6 +160,7 @@
 
         // Test the connection
         function doTestConnect() {
+
             // VSCP websocket connection
             var vscpConn = null;
 
@@ -168,38 +169,6 @@
 
                 // Show navigation bar menu
                 navBarMenu.show( "menu", navBarMenu.content );
-
-                // Redirect console output
-                (function(){
-                    var original = window.console;
-
-                    function handle( method, args ){
-                        var message = Array.prototype.slice.apply(args).join(' ');
-                        $( "#output" ).append( "<br />" + args[ 0 ] );
-                        if ( original ) {
-                            original[method](message);
-                        }
-                    }
-
-                    window.console = {
-                        log: function(){
-                            handle( 'log', arguments );
-                        },
-                        info: function(){
-                            handle( 'info', arguments );
-                        },
-                        warn: function(){
-                            handle( 'warn', arguments );
-                        },
-                        error: function(){
-                            handle( 'error', arguments );
-                        },
-                        debug: function(){
-                            handle( 'debug', arguments );
-                        }
-                    };
-
-                })();
 
                 // Create a VSCP websocket
                 vscpConn = new vscp.Connection();
@@ -213,11 +182,13 @@
                     authdomain: settings.authdomain, 
 
                     onSuccess: function( conn ) {
-                        $( "#output" ).append( "<br /><br />Connection establishment successful." );
+                        //$( "#output" ).append( "<br /><br />Connection establishment successful." );
+                        vscp.admin.setStatus( settings.url + " - Connection establishment successful.");
                     },
 
                     onError: function( conn ) {
-                        $( "#output" ).append( "<br /><br />Connection establishment failed." );
+                        //$( "#output" ).append( "<br /><br />Connection establishment failed." );
+                        vscp.admin.setStatus( settings.url + " - Connection establishment failed.");
                     }
 
                 });
@@ -241,9 +212,9 @@
         </div>
     </nav>
 
-    <!--
+<!--
     <p>Envelope icon: <span class="glyphicon glyphicon-print"></span></p>
-    -->
+-->
 
     <!-- **********************************************************************************************************************-->
     <!--                                           Modal to set active server                                                  -->
@@ -298,27 +269,23 @@
     </div>
 
 
-    <div class="container-fluid">
+    <div class="container-fluid" >
         <h1>VSCP administrative interface</h1>
-        <div id="copyright-info" />                
+        <p>
+        <div id="copyright-info" />
+        </p>
     </div>
 
-    <p>
-        <div id="output" style="border: thin solid black; padding: 25px;" />
-    </p>
-
-    <p>
-        <div>
-        <img src="../images/logo/vscp_new_v2.png" />
-        </div>
-    </p>
+    <div>
+            <img class="logo" src="../images/logo/vscp_new_v2.png" width="400" />
+    </div>
     
+    <!--
+    <div id="output" style="border: thin solid black; padding: 25px;"/> 
+    -->               
+
     <footer>
-        <div>
-            <div id="status-footer">
-            test
-            </div>
-        </div>
+        <div id="status-footer"/>
     </footer>
     
     

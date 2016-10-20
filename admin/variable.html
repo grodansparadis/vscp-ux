@@ -9,7 +9,7 @@
     <meta http-equiv="Expires" content="-1" />
 
     <!-- JQuery -->
-    <script type="text/javascript" src="../js/jquery/3.1.0/jquery-3.1.0.min.js"></script>
+    <script type="text/javascript" src="../js/jquery/2.2.1/jquery-2.2.1.min.js"></script>
 
     
     <!-- Bootstrap -->
@@ -20,12 +20,13 @@
     <!-- Bootstrap dialogs -->
     <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
     <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
-
-    <link rel="stylesheet" type="text/css" href="../js/datatables/datatables.min.css"/>
-    <script type="text/javascript" src="../js/datatables/datatables.min.js"></script>
     
     <!-- Favorite icon -->
     <link rel="icon" href="favicon.ico">
+
+    <!-- Data tables -->
+    <link rel="stylesheet" href="../js/datatables/datatables.min.css">
+    <script type="text/javascript" src="../js/datatables/datatables.min.js"></script>
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
@@ -34,34 +35,38 @@
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP admin library -->
-    <script type="text/javascript" src="../js/vscpAdmin.js"></script>
+    <script type="text/javascript" src="../js/vscpadmin.js"></script>
 
     <!-- Menu styles -->
-    <link rel="stylesheet" href="../js/menu0.css">
+    <link rel="stylesheet" type="text/css" href="css/menu.css">
     
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
-    <script type="text/javascript" src="../js/menu0.js"></script>
+    <script type="text/javascript" src="js/menu.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/vscp-admin.css">
 
 
     <script type="text/javascript">
 
-    var dataset;/* = [
-        ["ccVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-        ["ddVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-        ["eeVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-        ["ffVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-        ["ggVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-        ["hhVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-        ["iiVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"]
-    ];*/
-    /*var dataSet = [
-    [ "aaaaaVariable", "System Architect", "true", "false", "admin", "admin", 0 ],
-    [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750", 0 ],
-    [ "Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000", 0 ],
-    [ "Cedric Kelly", "Senior Javascript Developer", "Edinburgh", "6224", "2012/03/29", "$433,060", 0 ],
-    [ "Airi Satou", "Accountant", "Tokyo", "5407", "2008/11/28", "$162,700", 0 ],
+        var table = null;
+
+        var dataset;/* = [
+            ["ccVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+            ["ddVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+            ["eeVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+            ["ffVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+            ["ggVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+            ["hhVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
+            ["iiVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"]
+        ];*/
+        /*var dataSet = [
+            [ "aaaaaVariable", "System Architect", "true", "false", "admin", "admin", 0 ],
+            [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750", 0 ],
+            [ "Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000", 0 ],
+            [ "Cedric Kelly", "Senior Javascript Developer", "Edinburgh", "6224", "2012/03/29", "$433,060", 0 ],
+            [ "Airi Satou", "Accountant", "Tokyo", "5407", "2008/11/28", "$162,700", 0 ],
     [ "Brielle Williamson", "Integration Specialist", "New York", "4804", "2012/12/02", "$372,000", 0 ],
     [ "Herrod Chandler", "Sales Assistant", "San Francisco", "9608", "2012/08/06", "$137,500", 0 ],
     [ "Rhona Davidson", "Integration Specialist", "Tokyo", "6200", "2010/10/14", "$327,900", "This is a string that is vey long and we want to see what is happening when it is rendered." ],
@@ -104,9 +109,37 @@
             // Show navigation bar menu
             navBarMenu.show( "menu", navBarMenu.content );
 
-            document.getElementById("admin-footer").innerHTML = vscp.admin.config.copyright;   
+            //vscp.admin.setCopyright();
+            vscp.admin.setStatus( "<b>Server:</b> no server selected.", false );   
 
-            var table = $('#variableTable').DataTable( {
+            if ( typeof( Storage ) !== "undefined" ) 
+            {
+                // Server
+                if ( null != localStorage.getItem("vscp-url") ) {                    
+                    settings.url = localStorage.getItem("vscp-url");
+                }
+
+                vscp.admin.setStatus( settings.url, false );
+
+                // User
+                if ( null != localStorage.getItem("vscp-user") ) {
+                    settings.user = localStorage.getItem("vscp-user");
+                }
+                // Password
+                if ( null != localStorage.getItem("vscp-password") ) {
+                    settings.password = localStorage.getItem("vscp-password");
+                }
+                // AuthDomain
+                if ( null != localStorage.getItem("vscp-authdomain") ) {
+                    settings.authdomain = localStorage.getItem("vscp-authdomain");
+                }
+            } 
+            else {
+                // No Web Storage support.
+                vscp.admin.setStatus( settings.url, false );
+            }   
+
+            table = $('#variableTable').DataTable( {
                 /*data: dataSet,*/
                 columns: [
                     { title: "Name" },
@@ -159,7 +192,7 @@
                     settings.url = localStorage.getItem("vscp-url");
                 }
 
-                setConnectInfo( settings.url, false );
+                vscp.admin.setStatus( settings.url, false );
 
                 // User
                 if ( null != localStorage.getItem("vscp-user") ) {
@@ -180,26 +213,47 @@
             }
 
             // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
+                vscpConn = new vscp.Connection();
 
-            for ( i=0; i<500; i++ ) {
+                // Connect to VSCP server
+                vscpConn.connect({
+
+                    url: settings.url,
+                    userName: settings.user,
+                    password: settings.password,
+                    authdomain: settings.authdomain, 
+
+                    onSuccess: function( conn ) {
+
+                        // Start receiving VSCP events
+                        vscpConn.start({
+
+                            onSuccess: function( conn ) {
+                                // Enable the user interface
+                                ui.enable();
+                            },
+
+                            onError: function( conn ) {
+                                alert("Couldn't start receiving events.");
+                            }
+
+                        });
+
+                    },
+
+                    onError: function( conn ) {
+                        alert("Couldn't establish a connection or connection lost.");
+                    }
+
+                });
+
+            for ( i=0; i<100; i++ ) {
                 table.row.add( [
                         "" + i, "Integer", "true", "false", "admin", "admin", 0, "test1","test2"
                 ] ).draw( true );
             }
 
-
         });
-
-        function setConnectInfo( info, bConnected ) 
-        {
-            if ( bConnected ) {
-                document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + info + " - <b>Connected</b>.";
-            }
-            else {
-                document.getElementById("idSelectedServer").innerHTML = "&nbsp;&nbsp;&nbsp;&nbsp;<b>Server:</b> " + info + " - <b>Disonnected</b>.";
-            }
-        }
 
         // Show modal to select active server to use.
         function setServerModal() 
@@ -217,7 +271,7 @@
             settings.password =  $('#modal-password').val();
             settings.authdomain = $('#modal-authdomain').val();
 
-            setConnectInfo( settings.url, false );
+            vscp.admin.setStatus( settings.url, false );
 
             // Should we save persistent
             if ( $('#modal-brememberme').prop('checked') ) {
@@ -270,22 +324,75 @@
             setConnectInfo( settings.url, false );
         };
 
+        // User interface data
+        var ui = {
+
+            enable: function() {
+                $( "#ui :input" ).attr( "disabled", false );
+            },
+
+            disable: function() {
+                $( "#ui :input" ).attr( "disabled", true );
+            }
+        };
+
+        function fetchVariables() {
+
+                ui.disable();
+
+                var localregex = $("#myRegExp").val();
+              
+                // Clear table
+                table.clear().draw();
+
+                /*
+                $("#myVariables tr").remove();
+                $( "#myVariables" ).append( "<tr><th><b>" + "Name" + 
+                                                        "</b></th><th>" + "Type" + 
+                                                        "</th><th>" + "UserID" + 
+                                                        "</th><th>" + "AccessRight" + 
+                                                        "</th><th>" + "Last change" + 
+                                                        "</th><th>" + "Persistent" + 
+                                                        "</th></tr>" ); 
+                */
+
+                vscpConn.listVar({
+
+                    regex: $("#myRegExp").val(),
+
+                    onVariable: function( conn, variable ) {
+                        alert( variable.name + ", " +  variable.type + ", " + variable.persistency );
+                        /*$( "#myVariables" ).append( "<tr><td><b>" + variable.name + 
+                                                        "</b></td><td>" + variable.type + 
+                                                        "</td><td>" + variable.userid + 
+                                                        "</td><td>" + variable.accessright.toString(16) + 
+                                                        "</td><td>" + variable.lastchange + 
+                                                        "</td><td>" + variable.persistency + "</td></tr>" );
+                        */                                    
+                    },
+
+                    onSuccess: function( conn ) {
+                        ui.enable();
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                    }
+                });
+
+            };
 
     </script>
 
 </head>
 <body>
    
-    <div id="idSelectedServer">
-        &nbsp;&nbsp;&nbsp;&nbsp;
-        <b>Server:</b> no server selected.
-    </div>
-
     <!-- Menu -->
-    <nav class="navbar navbar-inverse">
+    <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+                <a class="navbar-brand" href="index.html">
+                <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="120" alt="vscp logo" /></a>
             </div>
             <div id="menu">
             </div>
@@ -350,12 +457,21 @@
 
 
     <div class="container-fluid">
-        <h1>VSCP variables</h1>
-        <div class="container-fluid">
+        <h1>VSCP remote variables</h1>
+
+        <div class="container-fluid">            
             <div class="row">
+                
             </div>
             <div class="row">
-                <div class="col-sm-2"></div>
+                
+                <div class="col-sm-2">
+                    <br>
+                    Regexp: <input id="myRegExp" type="text">
+                    <br><br>
+                    <button type="button" class="btn btn-primary" onclick="fetchVariables()">Fetch variables</button>
+                </div>
+                
                 <div class="col-sm-8">
                     <table id="variableTable"  class="table table-striped table-bordered table-hover" cellspacing="50" width="100%"></table>
                 </div>
@@ -366,10 +482,10 @@
         
     </div>
     
+    <!-- <div id="copyright-info" /> -->
+
     <footer>
-        <div id="admin-footer">
-            Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-        </div>
+        <div id="status-footer"/>
     </footer>
     
     

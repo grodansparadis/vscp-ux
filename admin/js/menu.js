@@ -69,7 +69,7 @@ navBarMenu.content = [
         dropDown: [
             {
                 title: "Variables",
-                url: "Variables.html"
+                url: "variable.html"
             },
             {
                 title: "Decision Matrix",

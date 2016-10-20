@@ -56,16 +56,7 @@ vscp.admin.timeout = 5000;
 // Admin interface Constants
 vscp.admin.config = {
     copyright: 'Copyright &copy; 2000-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>',
-    version: "0.0.1",
-    // Defaults
-    user: "admin",
-    password: "secret",
-    authdomain: "mydomain.com",
-    passwordHash: "d50c3180375c27927c22e42a379c3f67", // Hash on "user:vscptoken:password"
-    //url: "ws://192.168.1.9:8080" // Non SSL (to be able to use from remote machine)
-    //url: "wss://192.168.1.9:8080" // SSL (to be able to use from remote machine)
-    //url: "ws://demo.vscp.org:8080" // Demoserver
-    url: "ws://127.0.0.1:8080" // Local server
+    version: "0.0.2",
 };
 
 
@@ -74,7 +65,7 @@ vscp.admin.config = {
 /////////////////////////////////////////////////////////////////////////////////////////////
 // vscp.admin.setCopyright
 //
-// Set copyright in footer
+// Set copyright
 //
 
 vscp.admin.setCopyright = function () {
