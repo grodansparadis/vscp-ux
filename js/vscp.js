@@ -1260,94 +1260,94 @@ vscp.constants.varTypes = {
 //
 
 vscp.getVarTypeName = function ( n ) {
-    if ( vscp.varTypes.UNASSIGNED == n  ) {
+    if ( vscp.constants.varTypes.UNASSIGNED == n  ) {
         return "unassigned";
     }
-    else if ( vscp.varTypes.STRING == n  ) {
+    else if ( vscp.constants.varTypes.STRING == n  ) {
         return "String";
     }              
-    else if ( vscp.varTypes.BOOLEAN == n  ) {
+    else if ( vscp.constants.varTypes.BOOLEAN == n  ) {
         return "Boolean";
     }             
-    else if ( vscp.varTypes.INTEGER == n  ) {
+    else if ( vscp.constants.varTypes.INTEGER == n  ) {
         return "Integer";
     }             
-    else if ( vscp.varTypes.LONG == n  ) {
+    else if ( vscp.constants.varTypes.LONG == n  ) {
         return "Long";
     }               
-    else if ( vscp.varTypes.DOUBLE == n  ) {
+    else if ( vscp.constants.varTypes.DOUBLE == n  ) {
         return "Double";
     }             
-    else if ( vscp.varTypes.MEASUREMENT == n  ) {
+    else if ( vscp.constants.varTypes.MEASUREMENT == n  ) {
         return "Measurement";
     }         
-    else if ( vscp.varTypes.EVENT == n  ) {
+    else if ( vscp.constants.varTypes.EVENT == n  ) {
         return "Event";
     }               
-    else if ( vscp.varTypes.GUID == n  ) {
+    else if ( vscp.constants.varTypes.GUID == n  ) {
         return "GUID";
     }                
-    else if ( vscp.varTypes.EVENT_DATA == n  ) {
+    else if ( vscp.constants.varTypes.EVENT_DATA == n  ) {
         return "Event data";
     }          
-    else if ( vscp.varTypes.EVENT_CLASS == n  ) {
+    else if ( vscp.constants.varTypes.EVENT_CLASS == n  ) {
         return "Event class";
     }       
-    else if ( vscp.varTypes.EVENT_TYPE == n  ) {
+    else if ( vscp.constants.varTypes.EVENT_TYPE == n  ) {
         return "Event type";
     }         
-    else if ( vscp.varTypes.EVENT_TIMESTAMP == n  ) {
+    else if ( vscp.constants.varTypes.EVENT_TIMESTAMP == n  ) {
         return "Event timestamp";
     }    
-    else if ( vscp.varTypes.DATE_TIME == n  ) {
+    else if ( vscp.constants.varTypes.DATE_TIME == n  ) {
         return "Date and Time";
     }          
-    else if ( vscp.varTypes.DATE == n  ) {
+    else if ( vscp.constants.varTypes.DATE == n  ) {
         return "Date";
     }               
-    else if ( vscp.varTypes.TIME == n  ) {
+    else if ( vscp.constants.varTypes.TIME == n  ) {
         return "Time";
     }               
-    else if ( vscp.varTypes.BLOB == n  ) {
+    else if ( vscp.constants.varTypes.BLOB == n  ) {
         return "Blob";
     }                
-    else if ( vscp.varTypes.MIME == n  ) {
+    else if ( vscp.constants.varTypes.MIME == n  ) {
         return "Mime";
     }              
-    else if ( vscp.varTypes.HTML == n  ) {
+    else if ( vscp.constants.varTypes.HTML == n  ) {
         return "HTML";
     }              
-    else if ( vscp.varTypes.JAVASCIPT == n  ) {
+    else if ( vscp.constants.varTypes.JAVASCIPT == n  ) {
         return "Javascript";
     }         
-    else if ( vscp.varTypes.JSON == n  ) {
+    else if ( vscp.constants.varTypes.JSON == n  ) {
         return "JSON";
     }              
-    else if ( vscp.varTypes.XML == n  ) {
+    else if ( vscp.constants.varTypes.XML == n  ) {
         return "XML";
     }              
-    else if ( vscp.varTypes.SQL == n  ) {
+    else if ( vscp.constants.varTypes.SQL == n  ) {
         return "SQL";
     }               
-    else if ( vscp.varTypes.LUA == n  ) {
+    else if ( vscp.constants.varTypes.LUA == n  ) {
         return "LUA";
     }              
-    else if ( vscp.varTypes.LUARES == n  ) {
+    else if ( vscp.constants.varTypes.LUARES == n  ) {
         return "LUA result";
     }            
-    else if ( vscp.varTypes.UXTYPE1 == n  ) {
+    else if ( vscp.constants.varTypes.UXTYPE1 == n  ) {
         return "UX Type 1";
     }          
-    else if ( vscp.varTypes.DMROW == n  ) {
+    else if ( vscp.constants.varTypes.DMROW == n  ) {
         return "DM-row";
     }          
-    else if ( vscp.varTypes.DRIVER == n  ) {
+    else if ( vscp.constants.varTypes.DRIVER == n  ) {
         return "Driver";
     }            
-    else if ( vscp.varTypes.USER == n  ) {
+    else if ( vscp.constants.varTypes.USER == n  ) {
         return "User";
     }              
-    else if ( vscp.varTypes.FILTER == n  ) {
+    else if ( vscp.constants.varTypes.FILTER == n  ) {
         return "Filter";
     }
     else {
