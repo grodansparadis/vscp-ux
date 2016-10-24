@@ -1355,6 +1355,8 @@ vscp.getVarTypeName = function ( n ) {
     }
 }
 
+
+
 /* ---------------------------------------------------------------------- */
 
 
@@ -1374,6 +1376,52 @@ vscp.b64DecodeUnicode = function ( str ) {
     return decodeURIComponent( Array.prototype.map.call( atob( str ), function( c ) {
         return '%' + ( '00' + c.charCodeAt( 0 ).toString( 16 ) ).slice( -2 );
     }).join('') );
+}
+
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp.isBase64Type
+//
+// Return true if a type is a type that is stored BASE64 ecoded
+//
+
+vscp.isBase64Type = function ( type ) {
+    switch ( Number( type ) ) {
+        case vscp.constants.varTypes.STRING:
+        case vscp.constants.varTypes.BLOB:  
+        case vscp.constants.varTypes.MIME: 
+        case vscp.constants.varTypes.HTML: 
+        case vscp.constants.varTypes.JAVASCIPT: 
+        case vscp.constants.varTypes.JSON: 
+        case vscp.constants.varTypes.XML: 
+        case vscp.constants.varTypes.SQL: 
+        case vscp.constants.varTypes.LUA: 
+        case vscp.constants.varTypes.LUARES: 
+        case vscp.constants.varTypes.UXTYPE1: 
+        case vscp.constants.varTypes.DMROW: 
+        case vscp.constants.varTypes.DRIVER: 
+        case vscp.constants.varTypes.USER: 
+        case vscp.constants.varTypes.FILTER:
+            return true;
+    }
+
+    return false;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp.decodeValue
+//
+// Return decoded value if it is BASE64 ecoded else return
+// original value.
+//
+
+vscp.decodeValue = function ( type, value ) {
+    if ( vscp.isBase64Type( type ) ) {
+        return vscp.b64DecodeUnicode( value );
+    }
+    else {
+        return value;
+    }
 }
 
 /**

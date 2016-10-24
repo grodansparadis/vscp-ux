@@ -25,6 +25,9 @@
     <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
     <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
     
+    <!-- Bootstrap waitingfor dialog -->
+    <script type="text/javascript" src="../js/waitingfor.js"></script>
+
     <!-- Favorite icon -->
     <link rel="icon" href="favicon.ico">
 
@@ -49,58 +52,9 @@
 
     <link rel="stylesheet" type="text/css" href="css/vscp-admin.css">
 
-
     <script type="text/javascript">
 
         var table = null;
-
-        var dataset;/* = [
-            ["ccVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-            ["ddVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-            ["eeVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-            ["ffVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-            ["ggVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-            ["hhVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"],
-            ["iiVariable", "String", "true", "false", "admin", "admin", "This is a very very long value with many many many characters", "test1","test2"]
-        ];*/
-        /*var dataSet = [
-            [ "aaaaaVariable", "System Architect", "true", "false", "admin", "admin", 0 ],
-            [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750", 0 ],
-            [ "Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000", 0 ],
-            [ "Cedric Kelly", "Senior Javascript Developer", "Edinburgh", "6224", "2012/03/29", "$433,060", 0 ],
-            [ "Airi Satou", "Accountant", "Tokyo", "5407", "2008/11/28", "$162,700", 0 ],
-    [ "Brielle Williamson", "Integration Specialist", "New York", "4804", "2012/12/02", "$372,000", 0 ],
-    [ "Herrod Chandler", "Sales Assistant", "San Francisco", "9608", "2012/08/06", "$137,500", 0 ],
-    [ "Rhona Davidson", "Integration Specialist", "Tokyo", "6200", "2010/10/14", "$327,900", "This is a string that is vey long and we want to see what is happening when it is rendered." ],
-    [ "Colleen Hurst", "Javascript Developer", "San Francisco", "2360", "2009/09/15", "$205,500", 0 ],
-    [ "Sonya Frost", "Software Engineer", "Edinburgh", "1667", "2008/12/13", "$103,600", 0 ],
-    [ "Jena Gaines", "Office Manager", "London", "3814", "2008/12/19", "$90,560", 0 ],
-    [ "Quinn Flynn", "Support Lead", "Edinburgh", "9497", "2013/03/03", "$342,000", 0 ],
-    [ "Charde Marshall", "Regional Director", "San Francisco", "6741", "2008/10/16", "$470,600", 0 ],
-    [ "Haley Kennedy", "Senior Marketing Designer", "London", "3597", "2012/12/18", "$313,500", 0 ],
-    [ "Tatyana Fitzpatrick", "Regional Director", "London", "1965", "2010/03/17", "$385,750", 0 ],
-    [ "Michael Silva", "Marketing Designer", "London", "1581", "2012/11/27", "$198,500", 0 ],
-    [ "Paul Byrd", "Chief Financial Officer (CFO)", "New York", "3059", "2010/06/09", "$725,000", 0 ],
-    [ "Gloria Little", "Systems Administrator", "New York", "1721", "2009/04/10", "$237,500", 0 ],
-    [ "Bradley Greer", "Software Engineer", "London", "2558", "2012/10/13", "$132,000", 0 ],
-    [ "Dai Rios", "Personnel Lead", "Edinburgh", "2290", "2012/09/26", "$217,500", 0 ],
-    [ "Jenette Caldwell", "Development Lead", "New York", "1937", "2011/09/03", "$345,000", 0 ],
-    [ "Yuri Berry", "Chief Marketing Officer (CMO)", "New York", "6154", "2009/06/25", "$675,000", 0 ],
-    [ "Caesar Vance", "Pre-Sales Support", "New York", "8330", "2011/12/12", "$106,450", 0 ],
-    [ "Doris Wilder", "Sales Assistant", "Sidney", "3023", "2010/09/20", "$85,600", 0 ],
-    [ "Angelica Ramos", "Chief Executive Officer (CEO)", "London", "5797", "2009/10/09", "$1,200,000", 0 ],
-    [ "Gavin Joyce", "Developer", "Edinburgh", "8822", "2010/12/22", "$92,575", 0 ],
-    [ "Jennifer Chang", "Regional Director", "Singapore", "9239", "2010/11/14", "$357,650", 0 ],
-    [ "Brenden Wagner", "Software Engineer", "San Francisco", "1314", "2011/06/07", "$206,850", 0 ],
-    [ "Fiona Green", "Chief Operating Officer (COO)", "San Francisco", "2947", "2010/03/11", "$850,000", 0 ],
-    [ "Shou Itou", "Regional Marketing", "Tokyo", "8899", "2011/08/14", "$163,000", 0 ],
-    [ "Michelle House", "Integration Specialist", "Sidney", "2769", "2011/06/02", "$95,400", 0 ],
-    [ "Suki Burks", "Developer", "London", "6832", "2009/10/22", "$114,500", 0 ],
-    [ "Prescott Bartlett", "Technical Author", "London", "3606", "2011/05/07", "$145,000", 0 ],
-    [ "Gavin Cortez", "Team Leader", "San Francisco", "2860", "2008/10/26", "$235,500", 0 ],
-    [ "Martena Mccray", "Post-Sales support", "Edinburgh", "8240", "2011/03/09", "$324,050", 0 ],
-    [ "Unity Butler", "Marketing Designer", "San Francisco", "5384", "2009/12/09", "$85,675", 0 ]
-    ];*/
 
         // VSCP websocket connection
         var vscpConn = null;
@@ -117,8 +71,7 @@
             //vscp.admin.setCopyright();
             vscp.admin.setStatus( "<b>Server:</b> no server selected.", false );   
 
-            if ( typeof( Storage ) !== "undefined" ) 
-            {
+            if ( typeof( Storage ) !== "undefined" ) {
                 // Server
                 if ( null != localStorage.getItem("vscp-url") ) {                    
                     settings.url = localStorage.getItem("vscp-url");
@@ -145,7 +98,7 @@
             }   
 
             table = $('#variableTable').DataTable( {
-                /*data: dataSet,*/
+ 
                 columns: [
                     { title: "Name" },
                     { title: "Type" },
@@ -165,8 +118,9 @@
  
             // Double click row
             $('#variableTable tbody').on( 'dblclick', 'tr', function () {
+ 
                 var data = table.row( this ).data();
-                data[ 1 ] = "------";
+ 
                 //console.log("Double click");
                 //self.Editor.edit( this );
                 if ( $(this).hasClass('selected') ) {
@@ -177,15 +131,15 @@
                     $(this).addClass('selected');
                 }
 
-                editDialog();
+                editDialog( data );
                 
             });
 
             // Click row
             $('#variableTable tbody').on( 'click', 'tr', function () {
                 var data = table.row( this ).data();
-                console.log( 'You clicked on '+data[0]+'\'s row' );
-                //console.log("Single click");
+                console.log( 'You clicked on '+ data[0] + '\'s row' );
+                
                 if ( $(this).hasClass('selected') ) {
                     $(this).removeClass('selected');
                 }
@@ -193,7 +147,26 @@
                     table.$('tr.selected').removeClass('selected');
                     $(this).addClass('selected');
                 }
-                document.getElementById("idVariableValue").innerHTML = 'You clicked on '+data[0]+'\'s row';
+
+                document.getElementById("idVariableValue").innerHTML = 'You clicked on ' + data[0] + '\'s row';
+
+                vscpConn.readVar({
+
+                    name: data[0],
+
+                    onSuccess: function( conn, msg ) {
+                        ui.enable();
+                        document.getElementById("idVariableValue").innerHTML = vscp.decodeValue( msg.type, msg.value );
+                        document.getElementById("idVariableNote").innerHTML = vscp.b64DecodeUnicode( msg.note ); 
+                    },
+
+                    onError: function( conn ) {
+                        ui.enable();
+                        document.getElementById("idVariableValue").innerHTML = "Failed to fetch value";
+                        document.getElementById("idVariableNote").innerHTML = "";
+                    }
+                });
+
             });
  
             $('#button').click( function () {
@@ -201,6 +174,7 @@
              });             
 
             if ( typeof( Storage ) !== "undefined" ) {
+
                 // Server
                 if ( null != localStorage.getItem("vscp-url") ) {                    
                     settings.url = localStorage.getItem("vscp-url");
@@ -276,11 +250,11 @@
         // showProgressDialog
         //
 
-        function showProgressDialog() 
+        /*function showProgressDialog() 
         {
             //$('#modal-url').val( localStorage.getItem( "vscp-url" ) );
-            $('#dlgProgress').modal();
-        };
+            //$('#dlgProgress').modal();
+        };*/
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // editDialog
@@ -288,9 +262,16 @@
         // Show modal to select active server to use.
         //
 
-        function editDialog() 
+        function editDialog( data ) 
         {
             //$('#modal-url').val( localStorage.getItem( "vscp-url" ) );
+            $('#dlgedit_varname').val( data[ 0 ] );
+            $('#dlgedit_vartype').val( data[ 1 ] );
+            $('#modal-brememberme').val( "false" );
+            $('#dlgedit_varpersistance').checked = false;
+            //document.getElementById("dlgedit_varname").innerHTML = "<b>Variable name:</b> "  + data[ 0 ];
+            document.getElementById("dlgedit_vartype").innerHTML = "<b>Variable type:</b> "  + data[ 1 ];
+            document.getElementById("dlgedit_varpersistance").innerHTML = "<b>Persistent:</b> "  + data[ 2 ];
             $('#dlgEditVariable').modal();
         };
 
@@ -393,8 +374,8 @@
 
         function fetchVariables() {
 
-                showProgressDialog();
-                
+                waitingDialog.show('Fetching variables...');
+
                 ui.disable();
 
                 var localregex = $("#myRegExp").val();
@@ -409,13 +390,14 @@
                     onVariable: function( conn, variable ) {
                         
                         table.row.add( [
-                                "<b>"+variable.name.toLowerCase()+"</b>", 
+                                variable.name.toLowerCase(), 
                                 vscp.getVarTypeName( variable.type ), 
                                 variable.persistency ? "true" : "false", 
                                 variable.userid, 
                                 variable.accessright.toString(16), 
                                 variable.lastchange
-                            ] ).draw( true );                                   
+                            ] ).draw( true );  
+                         //waitingDialog.progress( 90 );                                    
                     },
 
                     onSuccess: function( conn ) {
@@ -426,6 +408,8 @@
                         ui.enable();
                     }
                 });
+
+                waitingDialog.hide();
 
             };
 
@@ -447,7 +431,7 @@
     </nav>
 
     <!-- **********************************************************************************************************************-->
-    <!--                                           Progress dialog                                                      -->
+    <!--                                              Progress dialog                                                          -->
     <!-- **********************************************************************************************************************-->
     <div class="modal fade" id="dlgProgress" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -467,7 +451,7 @@
     </div>
 
     <!-- **********************************************************************************************************************-->
-    <!--                                           Modal to edit variable                                                      -->
+    <!--                                            Modal to edit variable                                                     -->
     <!-- **********************************************************************************************************************-->
     <div id="dlgEditVariable" class="modal fade" role="dialog">
         
@@ -477,18 +461,21 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Select VSCP server</h4>
+                    <h4 class="modal-title">Edit VSCP remote variable</h4>
                 </div>
                 <div class="modal-body">
-                    <p>Enter credentials for remote server</p>
+                    <p id="">Variablepersistence</p>
                     <form role="form">
                         <div class="form-group">
-                            <label for="server"><span class="glyphicon glyphicon-user"></span> Server (e.g. ws://127.0.0.1:8080, use wss:// for secure connection)</label>
-                            <input type="text" class="form-control" id="modal-url" placeholder="Enter server address">
+                            <label for="server"><span class="glyphicon glyphicon-user"></span> Variable name</label>
+                            <input type="text" class="form-control" id="dlgedit_varname" readonly >
                         </div>
                         <div class="form-group">
-                            <label for="username"><span class="glyphicon glyphicon-user"></span> Username</label>
-                            <input type="text" class="form-control" id="modal-user" placeholder="Enter username">
+                            <label for="username"><span class="glyphicon glyphicon-user"></span> Variable type</label>
+                            <input type="text" class="form-control" id="dlgedit_vartype" readonly >
+                        </div>
+                        <div class="checkbox">
+                            <label><input type="checkbox" id="dlgedit_varpersistance" readonly value="true" checked >Variable persistency</label>
                         </div>
                         <div class="form-group">
                             <label for="password"><span class="glyphicon glyphicon-eye-open"></span> Password</label>
@@ -526,16 +513,30 @@
             <div class="row">
                 
             </div>
-            <div class="row">
-                
+            <div class="row">                
                 <div class="col-sm-2">
-                    <div class="form-group">
-                    <label for="ex1">Regexp</label>
-                    <input class="form-control" id="myRegExp" type="text">
+                    
+                    <div class="input-group">
+                        <label for="basic-url">Select variables</label>
                     </div>
-                    <button type="button" class="btn btn-primary col-sm-8 glyphicon glyphicon-repeat" onclick="fetchVariables()">Fetch variables</button>
-                    <br><br>
-                    <button type="button" class="btn btn-success col-sm-8 glyphicon glyphicon-plus" onclick="editDialog()">Add variable</button>
+
+                    <div class="input-group"> 
+                        <span class="input-group-addon" id="basic-addon1">:</span>
+                        <input id="myRegExp" type="text" class="form-control" placeholder="regexp" aria-describedby="basic-addon1" >           
+                    </div>
+                    <p>
+                    <div class="input-group col-sm-8">
+                        <button type="button" class="btn btn-primary col-sm-12" onclick="fetchVariables();">
+                            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch variables
+                        </button>
+                    </div>
+                    </p>
+                    <div class="input-group col-sm-8">
+                        <button type="button" class="btn btn-success col-sm-12" onclick="editDialog();">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add variables
+                        </button>
+                    </div>
+
                 </div>
                 
                 <div class="col-sm-9">
@@ -545,14 +546,20 @@
             </div>
 
             <div class="row">
-                <div class="col-sm-2"></div>
-                <div id="idVariableValue" class="col-sm-9"></div>
+                <div class="col-sm-2"></div>                
+                <div class="col-sm-9">
+                    <b>Value:</b>
+                    <pre id="idVariableValue"> </pre>
+                </div>         
                 <div class="col-sm-1"></div>
             </div> 
 
             <div class="row">
-                <div class="col-sm-2"></div>
-                <div id="idVariableNote" class="col-sm-9"></div>
+                <div class="col-sm-2"></div>                
+                <div class="col-sm-9">
+                    <b>Note:</b>
+                    <pre id="idVariableNote"> </pre>
+                </div>         
                 <div class="col-sm-1"></div>
             </div>   
             
