@@ -2340,7 +2340,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 this.signalVariable({
                         // +;LSTVAR;ordinal;name;type;userid;accessrights;persistance;last_change
                         idx: parseInt( msgItems[ 2 ] ),                             // Ordinal
-                        count: msgItems[ 3 ],                                       // Total # variables
+                        count: parseInt( msgItems[ 3 ] ),                           // Total # variables
                         name: msgItems[ 4 ],                                        // Variable name
                         type: msgItems[ 5 ],                                        // Variable type
                         userid: parseInt( msgItems[ 6 ] ),                          // Variable user
