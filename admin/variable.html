@@ -9,31 +9,29 @@
     <meta http-equiv="Expires" content="-1" />
 
     <!-- JQuery -->
-    <script type="text/javascript" src="../js/jquery/3.1.1/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery/2.2.1/jquery-2.2.1.min.js"></script>
 
     <!-- Tether -->
     <script type="text/javascript" src="../js/tether/1.3.3/js/tether.min.js"></script>
     
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/bootstrap-4.0.0-alpha.5-dist/css/bootstrap.min.css"> 
-    <script type="text/javascript" src="../js/bootstrap/bootstrap-4.0.0-alpha.5-dist/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
+    <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
+
+    <!-- Bootstrap waitingfor dialog -->
+    <script type="text/javascript" src="../js/waitingfor.js"></script>
 
     <!-- Data tables -->
     <link rel="stylesheet" href="../js/datatables/datatables.min.css">
     <script type="text/javascript" src="../js/datatables/datatables.min.js"></script>
     
-    <!-- Bootstrap dialogs -->
-    <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
-    <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
-    
-    <!-- Bootstrap waitingfor dialog -->
-    <script type="text/javascript" src="../js/waitingfor.js"></script>
-
     <!-- Favorite icon -->
     <link rel="icon" href="favicon.ico">
-
-    
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
@@ -103,7 +101,7 @@
                 select: 'single',
                 dom: 'Bfrtip',
                 buttons: [
-                    'copy', 'excel', 'pdf'
+                    'colvis','copy', 'csv','excel', 'pdf','print'
                 ],
                 columns: [
                     { title: "Name" },
@@ -127,8 +125,6 @@
             $('#variableTable tbody').on( 'dblclick', 'tr', function () {
  
                 var data = table.row( this ).data();
- 
-                //console.log("Double click");
                 //self.Editor.edit( this );
                 if ( $(this).hasClass('selected') ) {
                     $(this).removeClass('selected');
@@ -146,7 +142,6 @@
             $('#variableTable tbody').on( 'click', 'tr', function () {
                 
                 var data = table.row( this ).data();
-                console.log( 'You clicked on '+ data[0] + '\'s row' );
                 
                 if ( $(this).hasClass('selected') ) {
                     $(this).removeClass('selected');
@@ -156,7 +151,7 @@
                     $(this).addClass('selected');
                 }
 
-                document.getElementById("idVariableValue").innerHTML = 'You clicked on ' + data[0] + '\'s row';
+                //document.getElementById("idVariableValue").innerHTML = 'You clicked on ' + data[0] + '\'s row';
 
                 vscpConn.readVar({
 
@@ -225,12 +220,15 @@
                     vscpConn.start({
 
                         onSuccess: function( conn ) {
+                            // Load variables
+                            fetchVariables();
                             // Enable the user interface
                             ui.enable();
                         },
 
                         onError: function( conn ) {
                             alert("Couldn't start receiving events.");
+                            ui.enable();
                         }
 
                     });
@@ -250,6 +248,8 @@
                 ] ).draw( true );
             }
             */
+
+            
 
         });
 
@@ -275,43 +275,22 @@
             //$('#modal-url').val( localStorage.getItem( "vscp-url" ) );
             $('#dlgedit_varname').val( data[ 0 ] );
             $('#dlgedit_vartype').val( data[ 1 ] );
+            $('#dlgedit_varpersistent').val( data[ 2 ] );
+            $('#dlgedit_varowner').val( data[ 3 ] );
+            $('#dlgedit_varpermission').val( data[ 4 ] );
+            $('#dlgedit_varvalue').val( $("#idVariableValue").html() );
+            $('#dlgedit_varnote').val( $("#idVariableNote").html() );
+            /*
             $('#modal-brememberme').val( "false" );
             $('#dlgedit_varpersistance').checked = false;
+            */
             //document.getElementById("dlgedit_varname").innerHTML = "<b>Variable name:</b> "  + data[ 0 ];
-            document.getElementById("dlgedit_vartype").innerHTML = "<b>Variable type:</b> "  + data[ 1 ];
-            document.getElementById("dlgedit_varpersistance").innerHTML = "<b>Persistent:</b> "  + data[ 2 ];
+            //document.getElementById("dlgedit_vartype").innerHTML = "<b>Variable type:</b> "  + data[ 1 ];
+            //document.getElementById("dlgedit_varpersistance").innerHTML = "<b>Persistent:</b> "  + data[ 2 ];
             $('#dlgEditVariable').modal();
         };
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // setServerResult
-        //
-        // Get results from slect server modal
-
-        function setServerResult() 
-        {            
-            // Save server data
-            settings.url =  $('#modal-url').val();
-            settings.user =  $('#modal-user').val();
-            settings.password =  $('#modal-password').val();
-            settings.authdomain = $('#modal-authdomain').val();
-
-            vscp.admin.setStatus( settings.url, false );
-
-            // Should we save persistent
-            if ( $('#modal-brememberme').prop('checked') ) {
-                
-                 if ( typeof( Storage ) !== "undefined" ) {
-                    localStorage.setItem( "vscp-url", $('#modal-url').val() );
-                    localStorage.setItem( "vscp-user", $('#modal-user').val() );
-                    localStorage.setItem( "vscp-password", $('#modal-password').val() );
-                    localStorage.setItem( "vscp-authdomain", $('#modal-authdomain').val() );
-                 }
-            }
-
-            doConnect();
-
-        };
+        
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // doConnect
@@ -348,16 +327,6 @@
             deferred.promise();
         };
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // doDisconnect
-        //
-        // Disconnect from the VSCP daemon
-        //
-
-        function doDisconnect() {
-            vscpConn.disconnect();
-            setConnectInfo( settings.url, false );
-        };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // ui enable/disable
@@ -426,17 +395,7 @@
 </head>
 <body>
    
-    <!-- Menu -->
-    <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="index.html">
-                <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="120" alt="vscp logo" /></a>
-            </div>
-            <div id="menu">
-            </div>
-        </div>
-    </nav>
+    
 
     <!-- **********************************************************************************************************************-->
     <!--                                              Progress dialog                                                          -->
@@ -472,39 +431,73 @@
                     <h4 class="modal-title">Edit VSCP remote variable</h4>
                 </div>
                 <div class="modal-body">
-                    <p id="">Variablepersistence</p>
+   
                     <form role="form">
                         <div class="form-group">
-                            <label for="server"><span class="glyphicon glyphicon-user"></span> Variable name</label>
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> name</label>
                             <input type="text" class="form-control" id="dlgedit_varname" readonly >
                         </div>
                         <div class="form-group">
-                            <label for="username"><span class="glyphicon glyphicon-user"></span> Variable type</label>
+                            <label for="type"><span class="glyphicon glyphicon-asterisk"></span> type</label>
                             <input type="text" class="form-control" id="dlgedit_vartype" readonly >
                         </div>
+                        <div class="form-group">
+                            <label for="persistent"><span class="glyphicon glyphicon-asterisk"></span> persistence</label>
+                            <input type="text" class="form-control" id="dlgedit_varpersistent" readonly >
+                        </div>
+                        <!--
                         <div class="checkbox">
-                            <label><input type="checkbox" id="dlgedit_varpersistance" readonly value="true" checked >Variable persistency</label>
+                            <label><input type="checkbox" id="dlgedit_varpersistance" readonly value="true" checked >Persistent</label>
+                        </div>
+                        -->
+                        <div class="form-group">
+                            <label for="owner"><span class="glyphicon glyphicon-asterisk"></span> owner</label>
+                            
+                            <!--
+                            <input type="text" class="form-control" id="dlgedit_varowner" placeholder="Enter owner">
+                            -->
+                            
+                            <div class="input-group">                                
+                                <input type="text" class="form-control" aria-label="..." id="dlgedit_varowner">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-success dropdown-toggle" 
+                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                aria-expanded="false">user <span class="caret"></span></button>
+                                    <ul class="dropdown-menu dropdown-menu-right">
+                                        <li><a href="#">Action</a></li>
+                                        <li><a href="#">Another action</a></li>
+                                        <li><a href="#">Something else here</a></li>
+                                        <li role="separator" class="divider"></li>
+                                        <li><a href="#">Separated link</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="permission"><span class="glyphicon glyphicon-asterisk"></span> permission</label>
+                            <input type="text" class="form-control" id="dlgedit_varpermission" placeholder="Enter permissions">
                         </div>
                         <div class="form-group">
-                            <label for="password"><span class="glyphicon glyphicon-eye-open"></span> Password</label>
-                            <input type="text" class="form-control" id="modal-password" placeholder="Enter password">
+                            <label for="value"><span class="glyphicon glyphicon-asterisk"></span> value</label>
+                            <input type="text" class="form-control" id="dlgedit_varvalue" placeholder="Enter value">
                         </div>
                         <div class="form-group">
-                            <label for="authdomain"><span class="glyphicon glyphicon-eye-open"></span> Domain</label>
-                            <input type="text" class="form-control" id="modal-authdomain" placeholder="Enter auth domain">
+                            <label for="note"><span class="glyphicon glyphicon-asterisk"></span> note</label>
+                            <input type="text" class="form-control" id="dlgedit_varnote" placeholder="Enter note">
                         </div>
+                        <!--
                         <div class="checkbox">
                             <label><input type="checkbox" id="modal-brememberme" value="true" checked>Remember me</label>
                         </div>
-
-                        <!--
+                        
                         <button type="submit" class="btn btn-default btn-success btn-block" data-dismiss><span class="glyphicon glyphicon-off"></span>Connect</button>
                         -->
                         
                     </form>
                 </div>
                 <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="setServerResult()">Open</button>                  
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="_setServerResult()">Open</button>                  
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Close</button>
                 </div>
             </div>
@@ -513,7 +506,23 @@
 
     </div>
 
+    <!-- **********************************************************************************************************************-->
+    <!--                                                      Menu                                                             -->
+    <!-- **********************************************************************************************************************-->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html">
+                <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="120" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
 
+    <!-- **********************************************************************************************************************-->
+    <!--                                                    Table-area                                                        -->
+    <!-- **********************************************************************************************************************-->
     <div class="container-fluid">
         <h1>VSCP remote variables</h1>
 

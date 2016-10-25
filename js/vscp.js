@@ -2339,13 +2339,14 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 this.signalSuccess( msgItems[ 1 ] );
                 this.signalVariable({
                         // +;LSTVAR;ordinal;name;type;userid;accessrights;persistance;last_change
-                        id: parseInt( msgItems[ 2 ] ),                              // Consecutive number
-                        name: msgItems[ 3 ],                                        // Variable name
-                        type: msgItems[ 4 ],                                        // Variable type
-                        userid: parseInt( msgItems[ 5 ] ),                          // Variable user
-                        accessright: parseInt( msgItems[ 6 ] ),                     // Variable access rights               
-                        persistency: ( "false" === msgItems[ 7 ] ) ? false : true,  // Variable persistency         
-                        lastchange: msgItems[ 8 ],                                  // Variable date                        
+                        idx: parseInt( msgItems[ 2 ] ),                             // Ordinal
+                        count: msgItems[ 3 ],                                       // Total # variables
+                        name: msgItems[ 4 ],                                        // Variable name
+                        type: msgItems[ 5 ],                                        // Variable type
+                        userid: parseInt( msgItems[ 6 ] ),                          // Variable user
+                        accessright: parseInt( msgItems[ 7 ] ),                     // Variable access rights               
+                        persistency: ( "false" === msgItems[ 8 ] ) ? false : true,  // Variable persistency         
+                        lastchange: msgItems[ 9 ],                                  // Variable date                        
                 });
             }
             else if ( ( "GT" === msgItems[ 1 ] ) || ( "GETTABLE" === msgItems[ 1 ] ) ) {
