@@ -56,11 +56,17 @@ navBarMenu.content = [
                 title: "Test VSCP server...",
                 url: "javascript:doTestConnect();"
             },
+   
+        ]
+    },
+    {
+        title: "Session",
+        url: "#",
+        dropDown: [
             {
                 title: "Session window",
                 url: "javascript:doSession();"
             },
-            
         ]
     },
     {
@@ -82,6 +88,38 @@ navBarMenu.content = [
             {
                 title: "Daemon Configuration",
                 url: "configure.html"
+            },
+            {
+                title: "Users",
+                url: "users.html"
+            },
+            {
+                title: "Location",
+                url: "users.html"
+            },
+            {
+                title: "Drivers",
+                url: "users.html"
+            },
+            {
+                title: "Zones",
+                url: "users.html"
+            },
+            {
+                title: "GUIDS",
+                url: "users.html"
+            },
+            {
+                title: "Drivers",
+                url: "users.html"
+            },
+            {
+                title: "MDF cache",
+                url: "users.html"
+            },
+            {
+                title: "acl",
+                url: "acl.html"
             },
             {
                 title: "Server logs",
@@ -108,6 +146,68 @@ navBarMenu.content = [
             {
                 title: "Update device firmware",
                 url: "google_table.html"
+            }
+        ]
+    },
+    {
+        title: "Decision matrix",
+        url: "#",
+        dropDown: [
+            {
+                title: "DM",
+                url: "dm.html"
+            }
+        ]
+    },
+    {
+        title: "MDF",
+        url: "#",
+        dropDown: [
+            {
+                title: "Get MDF",
+                url: "mdf.html"
+            },
+            {
+                title: "Build MDF",
+                url: "mdf.html"
+            },
+            {
+                title: "Test MDF wizad",
+                url: "mdf.html"
+            },
+            {
+                title: "Test MDF embedded UI",
+                url: "mdf.html"
+            },
+        ]
+    },
+    {
+        title: "Discovery",
+        url: "#",
+        dropDown: [
+            {
+                title: "xxxx",
+                url: "simpleui.html"
+            }
+        ]
+    },
+    {
+        title: "Simple UI",
+        url: "#",
+        dropDown: [
+            {
+                title: "UI worker",
+                url: "simpleui.html"
+            }
+        ]
+    },
+    {
+        title: "User tables",
+        url: "#",
+        dropDown: [
+            {
+                title: "Tables",
+                url: "tables.html"
             }
         ]
     },

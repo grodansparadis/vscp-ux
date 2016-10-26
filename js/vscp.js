@@ -1355,6 +1355,108 @@ vscp.getVarTypeName = function ( n ) {
     }
 }
 
+///////////////////////////////////////////////////////////////////////////////
+// vscp.getEditorModeFromType
+//
+// Return ace editor formation mode string  from numerical vriable type code 
+//
+
+vscp.getVarTypeName = function ( n ) {
+    if ( vscp.constants.varTypes.UNASSIGNED == n  ) {
+        return "text";
+    }
+    else if ( vscp.constants.varTypes.STRING == n  ) {
+        return "text";
+    }              
+    else if ( vscp.constants.varTypes.BOOLEAN == n  ) {
+        return "text";
+    }             
+    else if ( vscp.constants.varTypes.INTEGER == n  ) {
+        return "text";
+    }             
+    else if ( vscp.constants.varTypes.LONG == n  ) {
+        return "text";
+    }               
+    else if ( vscp.constants.varTypes.DOUBLE == n  ) {
+        return "text";
+    }             
+    else if ( vscp.constants.varTypes.MEASUREMENT == n  ) {
+        return "c_cpp";
+    }         
+    else if ( vscp.constants.varTypes.EVENT == n  ) {
+        return "c_cpp";
+    }               
+    else if ( vscp.constants.varTypes.GUID == n  ) {
+        return "asciidoc";
+    }                
+    else if ( vscp.constants.varTypes.EVENT_DATA == n  ) {
+        return "c_cpp";
+    }          
+    else if ( vscp.constants.varTypes.EVENT_CLASS == n  ) {
+        return "c_cpp";
+    }       
+    else if ( vscp.constants.varTypes.EVENT_TYPE == n  ) {
+        return "c_cpp";
+    }         
+    else if ( vscp.constants.varTypes.EVENT_TIMESTAMP == n  ) {
+        return "c_cpp";
+    }    
+    else if ( vscp.constants.varTypes.DATE_TIME == n  ) {
+        return "text";
+    }          
+    else if ( vscp.constants.varTypes.DATE == n  ) {
+        return "c_cpp";
+    }               
+    else if ( vscp.constants.varTypes.TIME == n  ) {
+        return "c_cpp";
+    }               
+    else if ( vscp.constants.varTypes.BLOB == n  ) {
+        return "c_cpp";
+    }                
+    else if ( vscp.constants.varTypes.MIME == n  ) {
+        return "c_cpp";
+    }              
+    else if ( vscp.constants.varTypes.HTML == n  ) {
+        return "html";
+    }              
+    else if ( vscp.constants.varTypes.JAVASCIPT == n  ) {
+        return "javascript";
+    }         
+    else if ( vscp.constants.varTypes.JSON == n  ) {
+        return "json";
+    }              
+    else if ( vscp.constants.varTypes.XML == n  ) {
+        return "xml";
+    }              
+    else if ( vscp.constants.varTypes.SQL == n  ) {
+        return "sql";
+    }               
+    else if ( vscp.constants.varTypes.LUA == n  ) {
+        return "lua";
+    }              
+    else if ( vscp.constants.varTypes.LUARES == n  ) {
+        return "lua";
+    }            
+    else if ( vscp.constants.varTypes.UXTYPE1 == n  ) {
+        return "xml";
+    }          
+    else if ( vscp.constants.varTypes.DMROW == n  ) {
+        return "c_cpp";
+    }          
+    else if ( vscp.constants.varTypes.DRIVER == n  ) {
+        return "c_cpp";
+    }            
+    else if ( vscp.constants.varTypes.USER == n  ) {
+        return "c_cpp";
+    }              
+    else if ( vscp.constants.varTypes.FILTER == n  ) {
+        return "c_cpp";
+    }
+    else {
+        return "text";
+    }
+}
+
 
 
 /* ---------------------------------------------------------------------- */
