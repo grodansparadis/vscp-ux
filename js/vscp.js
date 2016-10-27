@@ -1361,7 +1361,7 @@ vscp.getVarTypeName = function ( n ) {
 // Return ace editor formation mode string  from numerical vriable type code 
 //
 
-vscp.getVarTypeName = function ( n ) {
+vscp.getEditorModeFromType = function ( n ) {
     if ( vscp.constants.varTypes.UNASSIGNED == n  ) {
         return "text";
     }

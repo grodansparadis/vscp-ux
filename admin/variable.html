@@ -215,6 +215,7 @@
  
             // Double click row
             $('#variableTable tbody').on( 'dblclick', 'tr', function () {
+                $(this).addClass('selected');
                 var data = table.row( this ).data();
                 editDialog( data );                
             });
@@ -222,6 +223,8 @@
             // Click row
             $('#variableTable tbody').on( 'click', 'tr', function () {
                 
+                $(this).addClass('selected');
+
                 var data = table.row( this ).data();
 
                 vscpConn.readVar({
@@ -230,13 +233,11 @@
 
                     onSuccess: function( conn, msg ) {
                         ui.enable();
-                        //$('#editorValue').height( "300px");
+                        
                         editorValue.setValue( vscp.decodeValue( msg.type, msg.value ) );
                         editorValue.clearSelection();
                         editorNote.setValue( vscp.b64DecodeUnicode( msg.note ) );
                         editorNote.clearSelection();
-                        //document.getElementById("idVariableValue").innerHTML = vscp.decodeValue( msg.type, msg.value );
-                        //document.getElementById("idVariableNote").innerHTML = vscp.b64DecodeUnicode( msg.note ); 
                     },
 
                     onError: function( conn ) {
@@ -525,10 +526,10 @@
                                                 aria-expanded="false">users <span class="caret"></span></button>
                                     <ul class="dropdown-menu dropdown-menu-right">
                                         <li><a href="javascript:$('#dlgedit_varowner').val('admin');">Admin</a></li>
-                                        <li><a href="#">Curt</a></li>
-                                        <li><a href="#">Driver</a></li>
+                                        <li><a href="javascript:$('#dlgedit_varowner').val('Curt');">Curt</a></li>
+                                        <li><a href="javascript:$('#dlgedit_varowner').val('Andrea');">Andrea</a></li>
                                         <li role="separator" class="divider"></li>
-                                        <li><a href="#">Mr Magoo</a></li>
+                                        <li><a href="javascript:$('#dlgedit_varowner').val('Mr Magoo');">Mr Magoo</a></li>
                                     </ul>
                                 </div>
                             </div>
@@ -538,10 +539,14 @@
                             <label for="permission"><span class="glyphicon glyphicon-asterisk"></span> permission</label>
                             <input type="text" class="form-control" id="dlgedit_varpermission" placeholder="Enter permissions">
                         </div>
+
+                        <!--
+
                         <div class="form-group">
                             <label for="value"><span class="glyphicon glyphicon-asterisk"></span> value</label>
                             <input type="text" class="form-control" id="dlgedit_varvalue" placeholder="Enter value">
                         </div>
+
                         <div class="form-group">
                             <label for="note"><span class="glyphicon glyphicon-asterisk"></span> note</label>
                             <input type="text" class="form-control" id="dlgedit_varnote" placeholder="Enter note">
@@ -550,7 +555,7 @@
                         <div class="checkbox">
                             <label><input type="checkbox" id="modal-brememberme" value="true" checked>Remember me</label>
                         </div>
-                        <!--
+                        
                         <button type="submit" class="btn btn-default btn-success btn-block" data-dismiss><span class="glyphicon glyphicon-off"></span>Connect</button>
                         -->
                         
@@ -652,13 +657,13 @@
                 </div>
                 
                 <div class="col-sm-9">
-                    <table id="variableTable"  class="table table-striped select table-bordered table-hover display nowrap" cellspacing="50" width="100%"></table>
+                    <table id="variableTable"  class="table table-striped table-bordered table-hover display nowrap" cellspacing="50" width="100%"></table>
                 </div>
                 <div class="col-sm-1"></div>
             </div>
 
             <div class="row">
-                <div class="col-sm-2"><b>ctrl+'S'</b> - Save variable<br><b>ctrl+'R'</b> - Read variable<br><b>ctrl+'+'</b> - Increase size<br><b>ctrl+'-'</b> - Decreas size<br></div>                
+                <div class="col-sm-2"><b>Shortcut keys</b><br><b>ctrl+'S'</b> - Save variable<br><b>ctrl+'R'</b> - Read variable<br><b>ctrl+'+'</b> - Increase size<br><b>ctrl+'-'</b> - Decreas size<br></div>                
                 <div class="col-sm-9">
                     <b>Value:</b>
                     <div id="editorValue">function foo(items) { var x = "This is a vale"; return x; }</div>
