@@ -2153,7 +2153,7 @@ vscp.Connection = function() {
      */
     this.signalConnError = function() {
         if ( ( "function" === typeof this.onConnError ) &&
-             ( null !== this.onConnError ) ) {
+             ( null !== this.onConnError ) ) {    
             this.onConnError( this );
         }
     };

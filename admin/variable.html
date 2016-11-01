@@ -277,7 +277,7 @@
             } 
             else {
                 // No Web Storage support.
-                setConnectInfo( settings.url, false );
+                //setConnectInfo( settings.url, false );
             }
 
             // Create a VSCP websocket
@@ -297,6 +297,7 @@
                     vscpConn.start({
 
                         onSuccess: function( conn ) {
+                            vscp.admin.setStatus( settings.url, true );
                             // Load variables
                             fetchVariables();
                             // Enable the user interface
@@ -304,9 +305,15 @@
                         },
 
                         onError: function( conn ) {
-                            alert("Couldn't start receiving events.");
+                            vscp.admin.setStatus( settings.url, false );
+                            alert("Unable to connect to server.");
                             ui.enable();
-                        }
+                        },
+
+                        onConnError: function( conn ) {
+                            vscp.admin.setStatus( settings.url, false );
+                            ui.enable();
+                        },
 
                     });
 
@@ -327,16 +334,6 @@
             editDialog( data[0] );
         }
         
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // showProgressDialog
-        //
-
-        /*function showProgressDialog() 
-        {
-            //$('#modal-url').val( localStorage.getItem( "vscp-url" ) );
-            //$('#dlgProgress').modal();
-        };*/
-
         ///////////////////////////////////////////////////////////////////////////////////////////
         // editDialog
         //
@@ -365,45 +362,7 @@
 
         
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // doConnect
-        //
-        // Connect to the VSCP daemon
-        //
-
-        function doConnect() 
-        {
-            waitingDialog.show('Connecting...');
-            waitingDialog.progress( 0 );
-
-            var deferred = new $.Deferred();
-
-            // Connect to VSCP server
-            vscpConn.connect({
-
-                url: settings.url,
-                userName: settings.user,
-                password: settings.password,
-                vscptoken: settings.vscptoken,                                                                
-
-                onSuccess: function( conn ) {
-                    setConnectInfo( settings.url, true );
-                    waitingDialog.hide();
-                    deferred.resolve();                    
-                },
-
-                onError: function( conn ) {
-                    setConnectInfo( settings.url, false );
-                    waitingDialog.hide();
-                    BootstrapDialog.alert( "Connection lost. Please reload website." );
-                    deferred.reject();
-                }
-                
-            });
-            
-            deferred.promise();
-        };
-
+        
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // ui enable/disable
@@ -533,6 +492,7 @@
                                     </ul>
                                 </div>
                             </div>
+
                         </div>
                         
                         <div class="form-group">
@@ -640,7 +600,7 @@
 
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="editDialog();">
+                        <button type="button" class="btn btn-success col-sm-12" onclick="hideTable()">
                             <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate variable
                         </button>
                     </div>
@@ -648,7 +608,7 @@
 
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="editDialog();">
+                        <button type="button" class="btn btn-success col-sm-12" onclick="showTable();">
                             <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Import variables
                         </button>
                     </div>
