@@ -56,6 +56,7 @@
 
     <script type="text/javascript">
 
+        var curSelectedVariable;    // Current slected variable
         var table = null;
 
         // VSCP websocket connection
@@ -91,7 +92,21 @@
                     name: 'Save',
                     bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                     exec: function( editorValue ) {
-                        alert("Now save this shit");
+                        ui.disable();
+                        vscpConn.writeVar({
+
+                            name:   curSelectedVariable[0],
+                            value:  editorValue.getSession().getValue(),
+
+                            onSuccess: function( conn ) {
+                                ui.enable();
+                            },
+
+                            onError: function( conn ) {
+                                alert("Failed to save variable!");
+                                ui.enable();
+                            }
+                        });
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
                 }
@@ -130,12 +145,13 @@
                 }
             );
 
-            //editorValue.setTheme("ace/theme/solarized_light");
-            editorValue.setTheme("ace/theme/iplastic");
-            //editorValue.setTheme("ace/theme/solarized_light"); 
+            //editorValue.setTheme("ace/theme/iplastic");
+            editorValue.setTheme("ace/theme/solarized_light");
             editorValue.getSession().setMode("ace/mode/javascript");
-            //editorValue.setReadOnly(true);  // false to make it editable
+            editorValue.setReadOnly(false);  // false to make it editable
             editorValue.setShowPrintMargin(false);
+            editorValue.getSession().setNewLineMode("unix");
+            editorValue.setFontSize(16);
 
             $('#editorValue').height( "100px");
             $('#editorValue-section').height( "100px");
@@ -146,12 +162,61 @@
 
             // Note editor
             var editorNote = ace.edit("editorNote");
-            //editorValue.setTheme("ace/theme/solarized_light");
-            editorNote.setTheme("ace/theme/iplastic");
-            //editorValue.setTheme("ace/theme/solarized_light"); 
+
+            editorNote.commands.addCommand(
+                {
+                    name: 'Save',
+                    bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
+                    exec: function( editorNote ) {
+                        ui.disable();
+                        vscpConn.writeVar({
+
+                            name:   curSelectedVariable[0],
+                            value:  editorNote.getSession().getValue(),
+
+                            onSuccess: function( conn ) {
+                                ui.enable();
+                            },
+
+                            onError: function( conn ) {
+                                alert("Failed to save variable!");
+                                ui.enable();
+                            }
+                        });
+                    },
+                    readOnly: true // false if this command should not apply in readOnly mode
+                }
+            );
+
+            editorNote.commands.addCommand(
+                {
+                    name: 'Increase size',
+                    bindKey: {win: 'Ctrl-+',  mac: 'Command-+'},
+                    exec: function( editorNote ) {
+                        $('#editorNote').height( "500px");
+                    },
+                    readOnly: true // false if this command should not apply in readOnly mode
+                }
+            );
+
+            editorValue.commands.addCommand(
+                {
+                    name: 'Decrease size',
+                    bindKey: {win: 'Ctrl--',  mac: 'Command-.'},
+                    exec: function( editorNote ) {
+                        $('#editorNote').height( "100px");
+                    },
+                    readOnly: true // false if this command should not apply in readOnly mode
+                }
+            );
+
+            //editorNote.setTheme("ace/theme/iplastic");
+            editorNote.setTheme("ace/theme/solarized_light"); 
             editorNote.getSession().setMode("ace/mode/html");
-            editorNote.setReadOnly(true);  // false to make it editable
+            editorNote.setReadOnly(false);  // false to make it editable
             editorNote.setShowPrintMargin(false);
+            editorNote.setFontSize(16);
+            editorNote.getSession().setNewLineMode("unix");
 
             $('#editorNote').height( "100px");
             $('#editorNote-section').height( "100px");
@@ -192,6 +257,9 @@
             table = $('#variableTable').DataTable( {
                 select: 'single',
                 dom: 'Bfrtip',
+                "oTableTools": {
+                    "sRowSelect": "single"
+                },
                 buttons: [
                     'colvis','copy', 'csv','excel', 'pdf','print'
                 ],
@@ -220,30 +288,31 @@
                 editDialog( data );                
             });
 
-            // Click row
+            // Single click row
             $('#variableTable tbody').on( 'click', 'tr', function () {
                 
-                $(this).addClass('selected');
-
                 var data = table.row( this ).data();
+                curSelectedVariable = data;
 
                 vscpConn.readVar({
 
                     name: data[ 0 ],
 
                     onSuccess: function( conn, msg ) {
-                        ui.enable();
-                        
                         editorValue.setValue( vscp.decodeValue( msg.type, msg.value ) );
                         editorValue.clearSelection();
+                        editorValue.getSession().setMode("ace/mode/" + vscp.getEditorModeFromType( msg.type ));
+
                         editorNote.setValue( vscp.b64DecodeUnicode( msg.note ) );
                         editorNote.clearSelection();
+                        
+                        ui.enable();
                     },
 
                     onError: function( conn ) {
+                        editorValue.setValue( "Failed to fetch value" );
+                        editorValue.setValue( "Failed to fetch note" );
                         ui.enable();
-                        document.getElementById("idVariableValue").innerHTML = "Failed to fetch value";
-                        document.getElementById("idVariableNote").innerHTML = "";
                     }
                 });
 
@@ -655,7 +724,7 @@
                 <div class="col-sm-2"><b>Shortcut keys</b><br><b>ctrl+'S'</b> - Save variable<br><b>ctrl+'R'</b> - Read variable<br><b>ctrl+'+'</b> - Increase size<br><b>ctrl+'-'</b> - Decreas size<br></div>                
                 <div class="col-sm-9">
                     <b>Value:</b>
-                    <div id="editorValue">function foo(items) { var x = "This is a vale"; return x; }</div>
+                    <div id="editorValue"></div>
                 </div>         
                 <div class="col-sm-1"></div>
             </div>
@@ -664,7 +733,7 @@
                 <div class="col-sm-2"></div>                
                 <div class="col-sm-9">
                     <b>Note:</b>
-                    <div id="editorNote">This is note</div>
+                    <div id="editorNote"></div>
                 </div>         
                 <div class="col-sm-1"></div>
             </div>     
