@@ -298,8 +298,13 @@
 
                         onSuccess: function( conn ) {
                             vscp.admin.setStatus( settings.url, true );
+
+                            // Fetch users
+                            fetchUsers();
+                            
                             // Load variables
                             fetchVariables();
+                            
                             // Enable the user interface
                             ui.enable();
                         },
@@ -360,10 +365,6 @@
             $('#dlgEditVariable').modal();
         };
 
-        
-
-        
-
         ///////////////////////////////////////////////////////////////////////////////////////////
         // ui enable/disable
         //
@@ -387,26 +388,26 @@
 
         function fetchVariables() {
 
-                waitingDialog.show('Fetching variables...');
-                waitingDialog.progress( 0 );
+            waitingDialog.show('Fetching variables...');
+            waitingDialog.progress( 0 );
 
-                ui.disable();
+            ui.disable();
 
-                var localregex = $("#myRegExp").val();
+            var localregex = $("#myRegExp").val();
 
-                // Clear table
-                table.clear().draw();                
+            // Clear table
+            table.clear().draw();                
 
-                vscpConn.listVar({
+            vscpConn.listVar({
 
-                    regex: $("#myRegExp").val(),
+                regex: $("#myRegExp").val(),
 
-                    onVariable: function( conn, variable ) {
+                onVariable: function( conn, variable ) {
 
-                        waitingDialog.progress( variable.idx, variable.count );
-                        console.log(" Progress" + variable.idx + " " + variable.count );
+                    waitingDialog.progress( variable.idx, variable.count );
+                    console.log(" Progress" + variable.idx + " " + variable.count );
                         
-                        table.row.add( [
+                    table.row.add( [
                                 variable.name.toLowerCase(), 
                                 vscp.getVarTypeName( variable.type ), 
                                 variable.persistency ? "true" : "false", 
@@ -415,22 +416,50 @@
                                 variable.lastchange
                             ] ).draw( true );  
 
-                           
+                },
 
-                    },
+                onSuccess: function( conn ) {
+                    ui.enable();
+                    waitingDialog.hide();
+                },
 
-                    onSuccess: function( conn ) {
-                        ui.enable();
-                        waitingDialog.hide();
-                    },
+                onError: function( conn ) {
+                    ui.enable();
+                    waitingDialog.hide();
+                }
 
-                    onError: function( conn ) {
-                        ui.enable();
-                        waitingDialog.hide();
-                    }
-                });
+            });
 
-            };
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // fetchUsers
+        //
+
+        function fetchUsers() {
+
+            ui.disable();
+
+            // Clear table
+            table.clear().draw();                
+
+            vscpConn.readVar({
+
+                name: "vscp.user",
+
+                onSuccess: function( conn, options ) {
+                    ui.enable();
+                    console.log( "value = " + vscp.b64DecodeUnicode( options.value ) + 
+                                    " note = " + vscp.b64DecodeUnicode( options.note ) );
+                },
+
+                onError: function( conn ) {
+                    ui.enable();
+                }
+                
+            });
+
+        };
 
     </script>
 

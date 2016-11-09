@@ -2755,12 +2755,15 @@ vscp.Connection.prototype.connect = function( options ) {
                                                                 this.authdomain,
                                                                 this.password );
 
-    console.info( vscp.utility.getTime() + " Websocket connect to " + options.url + " (user name: " + this.userName + ", password: " + this.passwordHash + ")");
+    console.info( vscp.utility.getTime() + 
+        " Websocket connect to " + options.url + 
+        " (user name: " + this.userName + ", password: " + this.passwordHash + ")");
     
     this.socket = new WebSocket( options.url );
     
     if ( null === this.socket ) {
-        console.error( vscp.utility.getTime() + " Couldn't open a websocket connection." );
+        console.error( vscp.utility.getTime() + 
+            " Couldn't open a websocket connection." );
 
         this.signalConnError();
 
