@@ -96,6 +96,7 @@
                         vscpConn.writeVar({
 
                             name:   curSelectedVariable[0],
+                            type:   curSelectedVariable[1],
                             value:  editorValue.getSession().getValue(),
 
                             onSuccess: function( conn ) {
@@ -168,11 +169,17 @@
                     name: 'Save',
                     bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                     exec: function( editorNote ) {
-                        ui.disable();
-                        vscpConn.writeVar({
 
-                            name:   curSelectedVariable[0],
-                            value:  editorNote.getSession().getValue(),
+                        ui.disable();
+
+                        vscpConn.createVar({
+
+                            name:           curSelectedVariable[0],
+                            value:          editorValue.getSession().getValue(),
+                            note:           editorNote.getSession().getValue(),
+                            type:           vscp.getVarType( curSelectedVariable[1] ), 
+                            accessrights:   curSelectedVariable[4],
+                            persistency:    curSelectedVariable[2],
 
                             onSuccess: function( conn ) {
                                 ui.enable();
@@ -299,11 +306,11 @@
                     name: data[ 0 ],
 
                     onSuccess: function( conn, msg ) {
-                        editorValue.setValue( vscp.decodeValue( msg.type, msg.value ) );
+                        editorValue.setValue( msg.value );
                         editorValue.clearSelection();
                         editorValue.getSession().setMode("ace/mode/" + vscp.getEditorModeFromType( msg.type ));
 
-                        editorNote.setValue( vscp.b64DecodeUnicode( msg.note ) );
+                        editorNote.setValue( msg.note );
                         editorNote.clearSelection();
                         
                         ui.enable();

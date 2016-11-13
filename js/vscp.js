@@ -1356,6 +1356,105 @@ vscp.getVarTypeName = function ( n ) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
+// vscp.getVarTypeName
+//
+// Return variable type from textual representation 
+//
+
+vscp.getVarType = function ( str ) {
+    if ( "unassigned" === str.toLowerCase() ) {
+        return vscp.constants.varTypes.UNASSIGNED;
+    }
+    else if ( "string" === str.toLowerCase() ) {
+        return vscp.constants.varTypes.STRING;
+    }
+    else if ( "boolean" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.BOOLEAN;
+    }             
+    else if ( "integer" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.INTEGER ;
+    }             
+    else if ( "long" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.LONG;
+    }               
+    else if ( "double" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.DOUBLE;
+    }             
+    else if ( "measurement" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.MEASUREMENT;
+    }         
+    else if ( "event" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.EVENT;
+    }               
+    else if ( "guid" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.GUID;
+    }                
+    else if ( "event data" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.EVENT_DATA;
+    }          
+    else if ( "event class" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.EVENT_CLASS;
+    }       
+    else if ( "event type" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.EVENT_TYPE;
+    }         
+    else if ( "event timestamp" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.EVENT_TIMESTAMP;
+    }    
+    else if ( "date and time" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.DATE_TIME;
+    }          
+    else if ( "date" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.DATE;
+    }               
+    else if ( "time" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.TIME;
+    }               
+    else if ( "blob" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.BLOB;
+    }                
+    else if ( "mime" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.MIME;
+    }              
+    else if ( "html" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.HTML;
+    }              
+    else if ( "javascript" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.JAVASCIPT;
+    }         
+    else if ( "json" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.JSON;
+    }              
+    else if ( "xml" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.XML;
+    }              
+    else if ( "sql" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.SQL;
+    }               
+    else if ( "lua" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.LUA;
+    }              
+    else if ( "lua result" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.LUARES;
+    }            
+    else if ( "ux Type 1" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.UXTYPE1;
+    }          
+    else if ( "dm-row" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.DMROW;
+    }          
+    else if ( "driver" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.DRIVER;
+    }            
+    else if ( "user" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.USER;
+    }              
+    else if ( "filter" == str.toLowerCase()  ) {
+        return vscp.constants.varTypes.FILTER;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
 // vscp.getEditorModeFromType
 //
 // Return ace editor formation mode string  from numerical vriable type code 
@@ -1513,13 +1612,29 @@ vscp.isBase64Type = function ( type ) {
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.decodeValue
 //
-// Return decoded value if it is BASE64 ecoded else return
-// original value.
+// Return decoded value if type is BASE64 encoded type 
+// else return original value.
 //
 
 vscp.decodeValue = function ( type, value ) {
     if ( vscp.isBase64Type( type ) ) {
         return vscp.b64DecodeUnicode( value );
+    }
+    else {
+        return value;
+    }
+}
+
+///////////////////////////////////////////////////////////////////////////////
+// vscp.encodeValue
+//
+// Return encoded value if type is type that should be BASE64 encoded 
+// else return original value.
+//
+
+vscp.encodeValue = function ( type, value ) {
+    if ( vscp.isBase64Type( type ) ) {
+        return vscp.b64EncodeUnicode( value );
     }
     else {
         return value;
@@ -2369,15 +2484,15 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
-                        // name;type;bPersistent;userid;rights;lastchanged;value;note
+                        // name;type;userid;accessright,bPersistent;userid;rights;lastchanged;value;note
                         name: msgItems[ 2 ],                                        // Variable name
-                        type: msgItems[ 3 ],                                        // Variable type
-                        userid: msgItems[ 4 ],                                      // Variable user
-                        accessright: msgItems[ 5 ],                                 // Variable access
+                        type: parseInt( msgItems[ 3 ] ),                            // Variable type
+                        userid: parseInt( msgItems[ 4 ] ),                          // Variable user
+                        accessright: parseInt( msgItems[ 5 ] ),                     // Variable access
                         persistency: ( "false" === msgItems[ 6 ] ) ? false : true,  // Variable persistency
                         lastchange: msgItems[ 7 ],                                  // Variable lastchange
-                        value: msgItems[ 8 ],                                       // Variable value
-                        note: msgItems[ 9 ]                                         // Variable note
+                        value: vscp.decodeValue( parseInt( msgItems[ 3 ] ), msgItems[ 8 ] ), // Variable value
+                        note: vscp.b64DecodeUnicode( msgItems[ 9 ] )                // Variable note
                     }
                 );
             }
@@ -2386,9 +2501,9 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
-                        name: msgItems[ 2 ],    // Variable name
-                        type: msgItems[ 3 ],    // Variable type
-                        value: msgItems[ 4 ]    // Variable value
+                        name: msgItems[ 2 ],                // Variable name
+                        type: parseInt( msgItems[ 3 ] ),    // Variable type
+                        value: msgItems[ 4 ]                // Variable value
                     }
                 );
             }
@@ -3290,6 +3405,11 @@ vscp.Connection.prototype.writeVar = function ( options ) {
         return;
     }
 
+    if ( "string" !== typeof options.type ) {
+        console.error( vscp.utility.getTime() + " Variable type is missing. " );
+        return;
+    }
+
     if ( "function" === typeof options.onSuccess ) {
         onSuccess = options.onSuccess;
     }
@@ -3300,7 +3420,7 @@ vscp.Connection.prototype.writeVar = function ( options ) {
 
     this._sendCommand({
         command: "WVAR",
-        data: options.name + ";" + options.value,
+        data: options.name + ";" + encodeValue( options.type, options.value ),
         onSuccess: onSuccess,
         onError: onError
     });
