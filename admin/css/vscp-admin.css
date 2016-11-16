@@ -70,3 +70,8 @@ img.logo {
     text-align: center;
     color: green;
 }
+
+.ace-editor {
+    width: 100%;
+    height: 100%;
+}

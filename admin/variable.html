@@ -84,6 +84,35 @@
                 }
             }) */
 
+            var dlgeditorValue = ace.edit("dlgeditorValue");
+
+            //dlgeditorValue.setTheme("ace/theme/iplastic");
+            dlgeditorValue.setTheme("ace/theme/solarized_light");
+            dlgeditorValue.getSession().setMode("ace/mode/javascript");
+            dlgeditorValue.setReadOnly(false);  // false to make it editable
+            dlgeditorValue.setShowPrintMargin(false);
+            dlgeditorValue.getSession().setNewLineMode("unix");
+            dlgeditorValue.setFontSize(16);
+            dlgeditorValue.setAutoScrollEditorIntoView(true);
+
+            $('#dlgeditorValue').height( "150px");
+            $('#dlgeditorValue-section').height( "100px");
+
+            // Dialog note editor
+            var dlgeditorNote = ace.edit("dlgeditorNote");
+
+            //dlgeditorNote.setTheme("ace/theme/iplastic");
+            dlgeditorNote.setTheme("ace/theme/solarized_light");
+            dlgeditorNote.getSession().setMode("ace/mode/javascript");
+            dlgeditorNote.setReadOnly(false);  // false to make it editable
+            dlgeditorNote.setShowPrintMargin(false);
+            dlgeditorNote.getSession().setNewLineMode("unix");
+            dlgeditorNote.setFontSize(16);
+            dlgeditorNote.setAutoScrollEditorIntoView(true);
+
+            $('#dlgeditorNote').height( "150px");
+            $('#dlgeditorNote-section').height( "100px");
+
             // Value editor
             var editorValue = ace.edit("editorValue");
 
@@ -92,11 +121,12 @@
                     name: 'Save',
                     bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
                     exec: function( editorValue ) {
+
                         ui.disable();
                         vscpConn.writeVar({
 
                             name:   curSelectedVariable[0],
-                            type:   curSelectedVariable[1],
+                            type:   curSelectedVariable[6],
                             value:  editorValue.getSession().getValue(),
 
                             onSuccess: function( conn ) {
@@ -107,6 +137,7 @@
                                 alert("Failed to save variable!");
                                 ui.enable();
                             }
+
                         });
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
@@ -118,7 +149,36 @@
                     name: 'Read again',
                     bindKey: {win: 'Ctrl-R',  mac: 'Command-R'},
                     exec: function( editorValue ) {
-                        alert("Read again!");
+
+                        var table = $('#variableTable').DataTable();
+                        var rows = table.rows( '.selected' ).data()
+                        var data = rows[0]; // .Split(',');
+
+                        vscpConn.readVar( {
+
+                            name: data[ 0 ],
+                            type: data[ 6 ],
+
+                            onSuccess: function( conn, msg ) {
+                                editorValue.setValue( msg.value );
+                                editorValue.clearSelection();
+                                editorValue.selection.moveTo(0, 0);
+                                editorValue.getSession().setMode("ace/mode/" + 
+                                vscp.getEditorModeFromType( msg.type ));
+
+                                editorNote.setValue( msg.note );
+                                editorNote.clearSelection();
+                                editorNote.selection.moveTo(0, 0);
+                        
+                                ui.enable();
+                            },
+
+                            onError: function( conn ) {
+                                editorValue.setValue( "Failed to fetch value" );
+                                editorValue.setValue( "Failed to fetch note" );
+                                ui.enable();
+                            }
+                        });
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
                 }
@@ -126,10 +186,11 @@
 
             editorValue.commands.addCommand(
                 {
-                    name: 'Increase size',
-                    bindKey: {win: 'Ctrl-+',  mac: 'Command-+'},
+                    name: 'Increase size for editor window',
+                    bindKey: {win: 'Ctrl-.',  mac: 'Command-.'},
                     exec: function( editorValue ) {
                         $('#editorValue').height( "500px");
+                        $('#editorValue').resize(true);
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
                 }
@@ -137,10 +198,12 @@
 
             editorValue.commands.addCommand(
                 {
-                    name: 'Decrease size',
-                    bindKey: {win: 'Ctrl--',  mac: 'Command-.'},
+                    name: 'Decrease size for editor window',
+                    bindKey: {win: 'Ctrl-,',  mac: 'Command-,'},
                     exec: function( editorValue ) {
                         $('#editorValue').height( "100px");
+                        $('#editorValue-section').height( "100px");
+                        $('#editorValue').resize(true);
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
                 }
@@ -153,13 +216,14 @@
             editorValue.setShowPrintMargin(false);
             editorValue.getSession().setNewLineMode("unix");
             editorValue.setFontSize(16);
+            editorValue.setAutoScrollEditorIntoView(true);
 
             $('#editorValue').height( "100px");
             $('#editorValue-section').height( "100px");
 
             // This call is required for the editor to fix all of
             // its inner structure for adapting to a change in size
-            editorValue.resize();
+            editorValue.resize(true);
 
             // Note editor
             var editorNote = ace.edit("editorNote");
@@ -177,7 +241,7 @@
                             name:           curSelectedVariable[0],
                             value:          editorValue.getSession().getValue(),
                             note:           editorNote.getSession().getValue(),
-                            type:           vscp.getVarType( curSelectedVariable[1] ), 
+                            type:           curSelectedVariable[6], 
                             accessrights:   curSelectedVariable[4],
                             persistency:    curSelectedVariable[2],
 
@@ -189,6 +253,7 @@
                                 alert("Failed to save variable!");
                                 ui.enable();
                             }
+
                         });
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
@@ -197,21 +262,23 @@
 
             editorNote.commands.addCommand(
                 {
-                    name: 'Increase size',
-                    bindKey: {win: 'Ctrl-+',  mac: 'Command-+'},
+                    name: 'Increase size for note window',
+                    bindKey: {win: 'Ctrl-.',  mac: 'Command-.'},
                     exec: function( editorNote ) {
                         $('#editorNote').height( "500px");
+                        $('#editorNote').resize(true);
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
                 }
             );
 
-            editorValue.commands.addCommand(
+            editorNote.commands.addCommand(
                 {
-                    name: 'Decrease size',
-                    bindKey: {win: 'Ctrl--',  mac: 'Command-.'},
+                    name: 'Decrease size for note window',
+                    bindKey: {win: 'Ctrl-,',  mac: 'Command-,'},
                     exec: function( editorNote ) {
                         $('#editorNote').height( "100px");
+                        $('#editorNote').resize(true);
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
                 }
@@ -224,13 +291,14 @@
             editorNote.setShowPrintMargin(false);
             editorNote.setFontSize(16);
             editorNote.getSession().setNewLineMode("unix");
+            editorNote.setAutoScrollEditorIntoView(true);
 
             $('#editorNote').height( "100px");
             $('#editorNote-section').height( "100px");
 
             // This call is required for the editor to fix all of
             // its inner structure for adapting to a change in size
-            editorNote.resize();
+            editorNote.resize(true);
 
             //vscp.admin.setCopyright();
             vscp.admin.setStatus( "<b>Server:</b> no server selected.", false );
@@ -277,6 +345,8 @@
                     { title: "Owner" },
                     { title: "Permission" },
                     { title: "lastchange" },
+                    { title: "TypeId", visible: false, searchable: false  },
+                    { title: "OwnerId", visible: false, searchable: false },
                     {
                         data: null,
                         width : "5%",
@@ -304,14 +374,18 @@
                 vscpConn.readVar({
 
                     name: data[ 0 ],
+                    type: data[ 6 ],
 
                     onSuccess: function( conn, msg ) {
                         editorValue.setValue( msg.value );
                         editorValue.clearSelection();
-                        editorValue.getSession().setMode("ace/mode/" + vscp.getEditorModeFromType( msg.type ));
+                        editorValue.selection.moveTo(0, 0);
+                        editorValue.getSession().setMode("ace/mode/" + 
+                        vscp.getEditorModeFromType( msg.type ));
 
                         editorNote.setValue( msg.note );
                         editorNote.clearSelection();
+                        editorNote.selection.moveTo(0, 0);
                         
                         ui.enable();
                     },
@@ -489,7 +563,9 @@
                                 variable.persistency ? "true" : "false", 
                                 variable.userid, 
                                 variable.accessright.toString(16), 
-                                variable.lastchange
+                                variable.lastchange,
+                                variable.type,
+                                variable.userid
                             ] ).draw( true );  
 
                 },
@@ -570,6 +646,8 @@
                             <label for="persistent"><span class="glyphicon glyphicon-asterisk"></span> persistence</label>
                             <input type="text" class="form-control" id="dlgedit_varpersistent" readonly >
                         </div>
+                        
+                         
                         <!--
                         <div class="checkbox">
                             <label><input type="checkbox" id="dlgedit_varpersistance" readonly value="true" checked >Persistent</label>
@@ -603,6 +681,30 @@
                         <div class="form-group">
                             <label for="permission"><span class="glyphicon glyphicon-asterisk"></span> permission</label>
                             <input type="text" class="form-control" id="dlgedit_varpermission" placeholder="Enter permissions">
+                        </div>
+
+                        <div class="form-group">
+                            <div class="col-sm-12">              
+                                <b>Value:</b>
+                                <div class="ace-holder">
+                                    <div class="ace-editor">
+                                        <div id="dlgeditorValue"></div>
+                                    </div>
+                                </div>     
+                            </div>
+                        </div>
+
+                        <br>
+
+                        <div class="form-group">
+                            <div class="col-sm-12">              
+                                <b>Note:</b>
+                                <div class="ace-holder">
+                                    <div class="ace-editor">
+                                        <div id="dlgeditorNote"></div>
+                                    </div>
+                                </div>     
+                            </div>
                         </div>
 
                         <!--
@@ -728,19 +830,27 @@
             </div>
 
             <div class="row">
-                <div class="col-sm-2"><b>Shortcut keys</b><br><b>ctrl+'S'</b> - Save variable<br><b>ctrl+'R'</b> - Read variable<br><b>ctrl+'+'</b> - Increase size<br><b>ctrl+'-'</b> - Decreas size<br></div>                
+                <div class="col-sm-2"><b>Shortcut keys</b><br><b>ctrl+'S'</b> - Save variable<br><b>ctrl+'R'</b> - Read variable<br><b>ctrl+'.'</b> - Increase size<br><b>ctrl+','</b> - Decreas size<br></div>                
                 <div class="col-sm-9">
                     <b>Value:</b>
-                    <div id="editorValue"></div>
+                    <div class="ace-holder">
+                        <div class="ace-editor">
+                            <div id="editorValue"></div>
+                        </div>
+                    </div>     
                 </div>         
                 <div class="col-sm-1"></div>
             </div>
-
+            <br>
             <div class="row">
                 <div class="col-sm-2"></div>                
                 <div class="col-sm-9">
                     <b>Note:</b>
-                    <div id="editorNote"></div>
+                    <div class="ace-holder">
+                        <div class="ace-editor">
+                            <div id="editorNote"></div>
+                        </div>
+                    </div>        
                 </div>         
                 <div class="col-sm-1"></div>
             </div>     

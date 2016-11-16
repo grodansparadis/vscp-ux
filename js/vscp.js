@@ -1361,7 +1361,7 @@ vscp.getVarTypeName = function ( n ) {
 // Return variable type from textual representation 
 //
 
-vscp.getVarType = function ( str ) {
+vscp.getVarTypeNumerical = function ( str ) {
     if ( "unassigned" === str.toLowerCase() ) {
         return vscp.constants.varTypes.UNASSIGNED;
     }
@@ -1610,13 +1610,13 @@ vscp.isBase64Type = function ( type ) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp.decodeValue
+// vscp.decodeValueIfBase64
 //
 // Return decoded value if type is BASE64 encoded type 
 // else return original value.
 //
 
-vscp.decodeValue = function ( type, value ) {
+vscp.decodeValueIfBase64 = function ( type, value ) {
     if ( vscp.isBase64Type( type ) ) {
         return vscp.b64DecodeUnicode( value );
     }
@@ -1626,13 +1626,13 @@ vscp.decodeValue = function ( type, value ) {
 }
 
 ///////////////////////////////////////////////////////////////////////////////
-// vscp.encodeValue
+// vscp.encodeValueIfBase64
 //
 // Return encoded value if type is type that should be BASE64 encoded 
 // else return original value.
 //
 
-vscp.encodeValue = function ( type, value ) {
+vscp.encodeValueIfBase64 = function ( type, value ) {
     if ( vscp.isBase64Type( type ) ) {
         return vscp.b64EncodeUnicode( value );
     }
@@ -2480,7 +2480,11 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                 this.signalSuccess( msgItems[ 1 ] );
             }
             else if ( "RVAR" === msgItems[ 1 ] ) { 
-                console.info( vscp.utility.getTime() + " Variable " + msgItems[ 2 ] + " (" + msgItems[ 4 ] + ") successful read." );
+                console.info( vscp.utility.getTime() + 
+                                    " Variable " + 
+                                    msgItems[ 2 ] + 
+                                    " (" + msgItems[ 4 ] + 
+                                    ") successful read." );
                 this.signalSuccess(
                     msgItems[ 1 ],
                     {
@@ -2491,7 +2495,7 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                         accessright: parseInt( msgItems[ 5 ] ),                     // Variable access
                         persistency: ( "false" === msgItems[ 6 ] ) ? false : true,  // Variable persistency
                         lastchange: msgItems[ 7 ],                                  // Variable lastchange
-                        value: vscp.decodeValue( parseInt( msgItems[ 3 ] ), msgItems[ 8 ] ), // Variable value
+                        value: vscp.decodeValueIfBase64( parseInt( msgItems[ 3 ] ), msgItems[ 8 ] ), // Variable value
                         note: vscp.b64DecodeUnicode( msgItems[ 9 ] )                // Variable note
                     }
                 );
@@ -3294,17 +3298,18 @@ vscp.Connection.prototype.createVar = function ( options ) {
         return;
     }
 
-    if ( "number" !== typeof options.type ) {
+    if ( "string" !== typeof options.type ) {
         console.error( vscp.utility.getTime() + " Variable type is missing. " );
         return;
     }
 
-    if ( "number" === typeof options.accessrights ) {
+    if ( "string" === typeof options.accessrights ) {
         accessrights = options.accessrights;
     }
 
-    if ( "boolean" === typeof options.persistency ) {
-        if ( false === options.persistency ) {
+    if ( "string" === typeof options.persistency ) {
+        
+        if ( 'false' === options.persistency.toLowerCase() ) {
             persistency = 0;
         }
         else {
@@ -3331,7 +3336,12 @@ vscp.Connection.prototype.createVar = function ( options ) {
 
     this._sendCommand({
         command: "CVAR",
-        data: options.name + ";" + options.type + ";" + accessrights + ";" + persistency + ";" + vscp.b64EncodeUnicode( options.value ) + ";" + vscp.b64EncodeUnicode( note ),
+        data: options.name + ";" + 
+                options.type + ";" + 
+                accessrights + ";" + 
+                persistency + ";" + 
+                vscp.encodeValueIfBase64( options.type, options.value ) + ";" + 
+                vscp.b64EncodeUnicode( options.note ),
         onSuccess: onSuccess,
         onError: onError
     });
@@ -3420,7 +3430,7 @@ vscp.Connection.prototype.writeVar = function ( options ) {
 
     this._sendCommand({
         command: "WVAR",
-        data: options.name + ";" + encodeValue( options.type, options.value ),
+        data: options.name + ";" + vscp.encodeValueIfBase64( options.type, options.value ),
         onSuccess: onSuccess,
         onError: onError
     });
@@ -3604,7 +3614,6 @@ vscp.Connection.prototype.listVar = function ( options ) {
 
     if ( "string" !== typeof options.regex ) {
         regex = options.regex;
-        alert( options.regex );
     }
 
     if ( "function" !== typeof options.onVariable ) {
