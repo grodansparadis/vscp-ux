@@ -56,11 +56,47 @@
 
     <script type="text/javascript">
 
-        var curSelectedVariable;    // Current slected variable
-        var table = null;
+        var curSelectedVariable;    // Current selected variable
+        var users;                  // Array with system defined users (fetchUsers) 
+        var table = null;   
 
         // VSCP websocket connection
         var vscpConn = null;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // fetchUsers
+        //
+
+        function fetchUsers() {
+
+            ui.disable();
+
+            // Clear table
+            table.clear().draw();                
+
+            vscpConn.readVar({
+
+                name: "vscp.user.names",
+
+                onSuccess: function( conn, options ) {
+
+                    users = options.value.split(',');
+                    users.forEach( function(u) {
+                        $("#dlguserdd").append("<li><a href=\"javascript:$('#dlgedit_varowner').val('"
+                                                    + u + "');\">" + u + "</a></li>");
+                    });    
+
+                    ui.enable();            
+                                    
+                },
+
+                onError: function( conn ) {
+                    ui.enable();
+                }
+                
+            });
+
+        };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // load ready
@@ -73,7 +109,7 @@
 
             // add command to all new editor instaces
             /*
-            require("ace/commands/default_commands").commands.push({
+            ace.require("ace/commands/default_commands").commands.push({
                 name: "Toggle Fullscreen",
                 bindKey: "F11",
                 exec: function( editor ) {
@@ -82,36 +118,7 @@
                     editor.setAutoScrollEditorIntoView( !fullScreen )
                     editor.resize()
                 }
-            }) */
-
-            var dlgeditorValue = ace.edit("dlgeditorValue");
-
-            //dlgeditorValue.setTheme("ace/theme/iplastic");
-            dlgeditorValue.setTheme("ace/theme/solarized_light");
-            dlgeditorValue.getSession().setMode("ace/mode/javascript");
-            dlgeditorValue.setReadOnly(false);  // false to make it editable
-            dlgeditorValue.setShowPrintMargin(false);
-            dlgeditorValue.getSession().setNewLineMode("unix");
-            dlgeditorValue.setFontSize(16);
-            dlgeditorValue.setAutoScrollEditorIntoView(true);
-
-            $('#dlgeditorValue').height( "150px");
-            $('#dlgeditorValue-section').height( "100px");
-
-            // Dialog note editor
-            var dlgeditorNote = ace.edit("dlgeditorNote");
-
-            //dlgeditorNote.setTheme("ace/theme/iplastic");
-            dlgeditorNote.setTheme("ace/theme/solarized_light");
-            dlgeditorNote.getSession().setMode("ace/mode/javascript");
-            dlgeditorNote.setReadOnly(false);  // false to make it editable
-            dlgeditorNote.setShowPrintMargin(false);
-            dlgeditorNote.getSession().setNewLineMode("unix");
-            dlgeditorNote.setFontSize(16);
-            dlgeditorNote.setAutoScrollEditorIntoView(true);
-
-            $('#dlgeditorNote').height( "150px");
-            $('#dlgeditorNote-section').height( "100px");
+            });*/ 
 
             // Value editor
             var editorValue = ace.edit("editorValue");
@@ -165,6 +172,7 @@
                                 editorValue.selection.moveTo(0, 0);
                                 editorValue.getSession().setMode("ace/mode/" + 
                                 vscp.getEditorModeFromType( msg.type ));
+                                editorValue.$blockScrolling = Infinity;
 
                                 editorNote.setValue( msg.note );
                                 editorNote.clearSelection();
@@ -212,6 +220,7 @@
             //editorValue.setTheme("ace/theme/iplastic");
             editorValue.setTheme("ace/theme/solarized_light");
             editorValue.getSession().setMode("ace/mode/javascript");
+            editorValue.$blockScrolling = Infinity;
             editorValue.setReadOnly(false);  // false to make it editable
             editorValue.setShowPrintMargin(false);
             editorValue.getSession().setNewLineMode("unix");
@@ -287,6 +296,7 @@
             //editorNote.setTheme("ace/theme/iplastic");
             editorNote.setTheme("ace/theme/solarized_light"); 
             editorNote.getSession().setMode("ace/mode/html");
+            editorNote.$blockScrolling = Infinity;
             editorNote.setReadOnly(false);  // false to make it editable
             editorNote.setShowPrintMargin(false);
             editorNote.setFontSize(16);
@@ -350,7 +360,6 @@
                     {
                         data: null,
                         width : "5%",
-                        //defaultContent: '<a href="#" class="remove">Delete</a> <a href="#" class="edit">Edit</a>',
                         defaultContent: '<a href="javascript:void(0)" class="editor_edit" onclick="showEditDialog();"><span class="glyphicon glyphicon-edit"/></a> <a href="javascript:void(0)" class="editor_remove" onclick="editDialog();" ><span class="glyphicon glyphicon-remove"/></a>',
                         orderable: false
                     },                
@@ -482,39 +491,6 @@
 
         });
 
-        function showEditDialog() 
-        {
-            var table = $('#variableTable').DataTable();
-            var data = table.rows( '.selected' ).data();
-            editDialog( data[0] );
-        }
-        
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // editDialog
-        //
-        // Show modal to select active server to use.
-        //
-
-        function editDialog( data ) 
-        {
-            // Not allowed to ed
-            /*if ( data[ 0 ].startsWith("vscp.")  ) {
-                return;
-            }*/
-            $('#dlgedit_varname').val( data[ 0 ] );
-            $('#dlgedit_vartype').val( data[ 1 ] );
-            $('#dlgedit_varpersistent').val( data[ 2 ] );
-            $('#dlgedit_varowner').val( data[ 3 ] );
-            $('#dlgedit_varpermission').val( data[ 4 ] );
-            $('#dlgedit_varvalue').val( $("#idVariableValue").html() );
-            $('#dlgedit_varnote').val( $("#idVariableNote").html() );
-            /*
-            $('#modal-brememberme').val( "false" );
-            $('#dlgedit_varpersistance').checked = false;
-            */
-            $('#dlgEditVariable').modal();
-        };
-
         ///////////////////////////////////////////////////////////////////////////////////////////
         // ui enable/disable
         //
@@ -522,7 +498,6 @@
         //
 
         var ui = {
-
             enable: function() {
                 $( "#ui :input" ).attr( "disabled", false );
             },
@@ -585,30 +560,102 @@
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // fetchUsers
+        // showEditDialog
+        //
+        // Show the edit dialog
         //
 
-        function fetchUsers() {
+        function showEditDialog() 
+        {
+            var table = $('#variableTable').DataTable();
+            var data = table.rows('.selected').data();
+            editDialog( data[0] );
+        }
+        
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // editDialog
+        //
+        // Show modal to select active server to use.
+        //
 
-            ui.disable();
+        function editDialog( data ) 
+        {
+            // Not allowed to ed
+            /*if ( data[ 0 ].startsWith("vscp.")  ) {
+                return;
+            }*/
+            $('#dlgedit_name').val( data[ 0 ] );
+            $('#dlgedit_type').val( data[ 1 ] );
+            $('#dlgedit_persistent').val( data[ 2 ] );
+            $('#dlgedit_owner').val( data[ 3 ] );
+            $('#dlgedit_permission').val( data[ 4 ] );
 
-            // Clear table
-            table.clear().draw();                
+            var evmain = ace.edit("editorValue");
+            var enmain = ace.edit("editorNote");
 
-            vscpConn.readVar({
+            /*evdlg.focus();
+            evdlg.getSession().setMode("ace/mode/" + 
+                        vscp.getEditorModeFromType( data[ 5 ] ));
+            evdlg.setValue( evmain.getValue() );
+            evdlg.clearSelection();
+            evdlg.selection.moveTo(0, 0);            
+            evdlg.$blockScrolling = Infinity;
+            
+            endlg.focus();
+            endlg.getSession().setMode("ace/mode/text");
+            endlg.setValue( enmain.getSession().getValue() );
+            endlg.clearSelection();
+            endlg.selection.moveTo(0, 0);            
+            endlg.$blockScrolling = Infinity;*/
+            
 
-                name: "vscp.user",
+            $('#dlgedit_value').val( evmain.getValue() );
+            $('#dlgedit_note').val( enmain.getValue() );
+            /*
+            $('#modal-brememberme').val( "false" );
+            $('#dlgedit_varpersistance').checked = false;
+            */
+            $('#dlgEditVariable').modal();
 
-                onSuccess: function( conn, options ) {
+        };
+
+        
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // saveEditResult
+        //
+        // Save results from edit dialog
+        //
+
+        var saveEditResult = function() {
+
+            var evmain = ace.edit("editorValue");
+            var enmain = ace.edit("editorNote");
+
+            evmain.setValue( $('#dlgedit_value').val() );
+            evmain.clearSelection();
+
+            enmain.setValue( $('#dlgedit_note').val() );
+            enmain.clearSelection();
+
+            vscpConn.createVar({
+
+                name:           curSelectedVariable[0],
+                value:          $('#dlgedit_value').val(),
+                note:           $('#dlgedit_note').val(),
+                type:           curSelectedVariable[6], 
+                accessrights:   curSelectedVariable[4],
+                persistency:    curSelectedVariable[2],
+
+                onSuccess: function( conn ) {
                     ui.enable();
-                    console.log( "value = " + vscp.b64DecodeUnicode( options.value ) + 
-                                    " note = " + vscp.b64DecodeUnicode( options.note ) );
                 },
 
                 onError: function( conn ) {
+                    alert("Failed to save variable!");
                     ui.enable();
                 }
-                
+
             });
 
         };
@@ -636,18 +683,17 @@
                     <form role="form">
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> name</label>
-                            <input type="text" class="form-control" id="dlgedit_varname" readonly >
+                            <input type="text" class="form-control" id="dlgedit_name" readonly >
                         </div>
                         <div class="form-group">
                             <label for="type"><span class="glyphicon glyphicon-asterisk"></span> type</label>
-                            <input type="text" class="form-control" id="dlgedit_vartype" readonly >
+                            <input type="text" class="form-control" id="dlgedit_type" readonly >
                         </div>
                         <div class="form-group">
                             <label for="persistent"><span class="glyphicon glyphicon-asterisk"></span> persistence</label>
-                            <input type="text" class="form-control" id="dlgedit_varpersistent" readonly >
+                            <input type="text" class="form-control" id="dlgedit_persistent" readonly >
                         </div>
                         
-                         
                         <!--
                         <div class="checkbox">
                             <label><input type="checkbox" id="dlgedit_varpersistance" readonly value="true" checked >Persistent</label>
@@ -661,17 +707,19 @@
                             -->
                             
                             <div class="input-group">                                
-                                <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_varowner">
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_owner">
                                 <div class="input-group-btn">
                                     <button type="button" class="btn btn-success dropdown-toggle" 
                                                 data-toggle="dropdown" aria-haspopup="true" 
                                                 aria-expanded="false">users <span class="caret"></span></button>
-                                    <ul class="dropdown-menu dropdown-menu-right">
+                                    <ul id="dlguserdd" class="dropdown-menu dropdown-menu-right">
+                                        <!--
                                         <li><a href="javascript:$('#dlgedit_varowner').val('admin');">Admin</a></li>
                                         <li><a href="javascript:$('#dlgedit_varowner').val('Curt');">Curt</a></li>
                                         <li><a href="javascript:$('#dlgedit_varowner').val('Andrea');">Andrea</a></li>
                                         <li role="separator" class="divider"></li>
                                         <li><a href="javascript:$('#dlgedit_varowner').val('Mr Magoo');">Mr Magoo</a></li>
+                                        -->
                                     </ul>
                                 </div>
                             </div>
@@ -680,45 +728,20 @@
                         
                         <div class="form-group">
                             <label for="permission"><span class="glyphicon glyphicon-asterisk"></span> permission</label>
-                            <input type="text" class="form-control" id="dlgedit_varpermission" placeholder="Enter permissions">
+                            <input type="text" class="form-control" id="dlgedit_permission" placeholder="Enter permissions">
                         </div>
-
-                        <div class="form-group">
-                            <div class="col-sm-12">              
-                                <b>Value:</b>
-                                <div class="ace-holder">
-                                    <div class="ace-editor">
-                                        <div id="dlgeditorValue"></div>
-                                    </div>
-                                </div>     
-                            </div>
-                        </div>
-
-                        <br>
-
-                        <div class="form-group">
-                            <div class="col-sm-12">              
-                                <b>Note:</b>
-                                <div class="ace-holder">
-                                    <div class="ace-editor">
-                                        <div id="dlgeditorNote"></div>
-                                    </div>
-                                </div>     
-                            </div>
-                        </div>
-
-                        <!--
 
                         <div class="form-group">
                             <label for="value"><span class="glyphicon glyphicon-asterisk"></span> value</label>
-                            <input type="text" class="form-control" id="dlgedit_varvalue" placeholder="Enter value">
+                            <textarea class="form-control" rows="6" id="dlgedit_value" placeholder="Enter value"></textarea>
                         </div>
 
                         <div class="form-group">
                             <label for="note"><span class="glyphicon glyphicon-asterisk"></span> note</label>
-                            <input type="text" class="form-control" id="dlgedit_varnote" placeholder="Enter note">
+                            <textarea class="form-control" rows="6" id="dlgedit_note" placeholder="Enter value"></textarea>
                         </div>
                         
+                        <!--
                         <div class="checkbox">
                             <label><input type="checkbox" id="modal-brememberme" value="true" checked>Remember me</label>
                         </div>
@@ -729,8 +752,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="_setServerResult()">Save</button>                  
-                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveEditResult()">Save</button>                  
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
 
