@@ -118,10 +118,14 @@
                     editor.setAutoScrollEditorIntoView( !fullScreen )
                     editor.resize()
                 }
-            });*/ 
+            }); */
 
             // Value editor
             var editorValue = ace.edit("editorValue");
+
+            //editorValue.on('change', function( e ) {
+            //    alert('change');
+            //});
 
             editorValue.commands.addCommand(
                 {
@@ -197,8 +201,12 @@
                     name: 'Increase size for editor window',
                     bindKey: {win: 'Ctrl-.',  mac: 'Command-.'},
                     exec: function( editorValue ) {
+                        //$('#divval').height( "500px");
                         $('#editorValue').height( "500px");
+                        $('#editorValue').trigger('resize');
+                        //$('#editorValue-section').height( "500px");
                         $('#editorValue').resize(true);
+                        resizeAce();
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
                 }
@@ -209,8 +217,10 @@
                     name: 'Decrease size for editor window',
                     bindKey: {win: 'Ctrl-,',  mac: 'Command-,'},
                     exec: function( editorValue ) {
+                        //('#divval').height( "100px");
                         $('#editorValue').height( "100px");
-                        $('#editorValue-section').height( "100px");
+                        $('#editorValue').trigger('resize');
+                        //$('#editorValue-section').height( "100px");
                         $('#editorValue').resize(true);
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
@@ -358,59 +368,114 @@
                     { title: "TypeId", visible: false, searchable: false  },
                     { title: "OwnerId", visible: false, searchable: false },
                     {
+                        "targets": -1,
                         data: null,
                         width : "5%",
-                        defaultContent: '<a href="javascript:void(0)" class="editor_edit" onclick="showEditDialog();"><span class="glyphicon glyphicon-edit"/></a> <a href="javascript:void(0)" class="editor_remove" onclick="editDialog();" ><span class="glyphicon glyphicon-remove"/></a>',
+                        defaultContent: '<span id="rowedit" class="glyphicon glyphicon-edit"> </span> <span id="rowdelete" class="glyphicon glyphicon-remove"> </span>',
                         orderable: false
                     },                
                 ],
                 
             });
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // select row
+            //
+
+            table.on( 'select', function ( e, dt, type, indexes ) {
+
+                if ( type === 'row' ) {
+
+                    var row = table.rows( indexes ).data(); //.pluck( 'id' );
+                    var data = row[0]; //.split(',');
+
+                    curSelectedVariable = data;
+
+                    vscpConn.readVar({
+
+                        name: data[ 0 ],    // name
+                        type: data[ 6 ],    // id for type
+
+                        onSuccess: function( conn, msg ) {
+                            editorValue.setValue( msg.value );
+                            editorValue.clearSelection();
+                            editorValue.selection.moveTo(0, 0);
+                            editorValue.getSession().setMode("ace/mode/" + 
+                                                                vscp.getEditorModeFromType( msg.type ));
+
+                            editorNote.setValue( msg.note );
+                            editorNote.clearSelection();
+                            editorNote.selection.moveTo(0, 0);
+                        
+                            ui.enable();
+                        },
+
+                        onError: function( conn ) {
+                            editorValue.setValue( "Failed to fetch value" );
+                            editorNote.setValue( "Failed to fetch note" );
+                            ui.enable();
+                        }
+                    });
+                }
+                
+            });
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // deselect row
+            //
+
+            table.on( 'deselect', function ( e, dt, type, indexes ) {
+
+                if ( type === 'row' ) {
+                    editorValue.setValue( "" );
+                    editorNote.setValue( "" );
+                }
+            
+            });
  
+            ///////////////////////////////////////////////////////////////////////////////////////////////
             // Double click row
+            //
+            
             $('#variableTable tbody').on( 'dblclick', 'tr', function () {
                 $(this).addClass('selected');
                 var data = table.row( this ).data();
                 editDialog( data );                
             });
 
+            ///////////////////////////////////////////////////////////////////////////////////////////////
             // Single click row
+            //
+            
             $('#variableTable tbody').on( 'click', 'tr', function () {
-                
-                var data = table.row( this ).data();
-                curSelectedVariable = data;
-
-                vscpConn.readVar({
-
-                    name: data[ 0 ],
-                    type: data[ 6 ],
-
-                    onSuccess: function( conn, msg ) {
-                        editorValue.setValue( msg.value );
-                        editorValue.clearSelection();
-                        editorValue.selection.moveTo(0, 0);
-                        editorValue.getSession().setMode("ace/mode/" + 
-                        vscp.getEditorModeFromType( msg.type ));
-
-                        editorNote.setValue( msg.note );
-                        editorNote.clearSelection();
-                        editorNote.selection.moveTo(0, 0);
-                        
-                        ui.enable();
-                    },
-
-                    onError: function( conn ) {
-                        editorValue.setValue( "Failed to fetch value" );
-                        editorValue.setValue( "Failed to fetch note" );
-                        ui.enable();
-                    }
-                });
 
             });
- 
-            /*$('#button').click( function () {
-                table.row('.selected').remove().draw( false );
-             });      */       
+
+            
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // rowedit click
+            //
+
+            $('#variableTable tbody').on( 'click', '#rowedit', function () {
+                var data = table.row( $(this).parents('tr') ).data();
+                //$(this).addClass('selected');
+                //table.row('.selected').remove().draw( false );
+                alert( 'Edit ' + data[0]  );
+            });
+
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // rowdelete click
+            //
+
+            $('#variableTable tbody').on( 'click', '#rowdelete', function () {
+                var data = table.row( $(this).parents('tr') ).data();
+                //$(this).addClass('selected');
+                alert( 'Delete ' + data[0]  );
+            });
+        
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // Credential handling
+            //
 
             if ( typeof( Storage ) !== "undefined" ) {
 
@@ -489,7 +554,7 @@
 
             });       
 
-        });
+        }); // onLoad
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // ui enable/disable
@@ -580,10 +645,16 @@
 
         function editDialog( data ) 
         {
-            // Not allowed to ed
-            /*if ( data[ 0 ].startsWith("vscp.")  ) {
-                return;
-            }*/
+            // Can not change stock variables
+            if ( data[ 0 ].startsWith("vscp.")  ) {
+                $('#dlgedit_permission').prop('readonly', true);
+                $('#dlgedit_note').prop('readonly', true);
+            }
+            else {
+                $('#dlgedit_permission').prop('readonly', false);
+                $('#dlgedit_note').prop('readonly', false);
+            }
+
             $('#dlgedit_name').val( data[ 0 ] );
             $('#dlgedit_type').val( data[ 1 ] );
             $('#dlgedit_persistent').val( data[ 2 ] );
@@ -857,7 +928,7 @@
                 <div class="col-sm-9">
                     <b>Value:</b>
                     <div class="ace-holder">
-                        <div class="ace-editor">
+                        <div id="divval" class="ace-editor">
                             <div id="editorValue"></div>
                         </div>
                     </div>     
