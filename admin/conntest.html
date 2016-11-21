@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>VSCP admin interface - Variable maintenance</title>
+
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="../js/jquery/3.1.1/jquery-3.1.1.min.js"></script>
+
+    <!-- Tether -->
+    <script type="text/javascript" src="../js/tether/1.3.3/js/tether.min.js"></script>
+    
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
+    <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
+
+    <!-- Bootstrap waitingfor dialog -->
+    <script type="text/javascript" src="../js/waitingfor.js"></script>
+
+    <!-- Data tables -->
+    <link rel="stylesheet" href="../js/datatables/datatables.min.css">
+    <script type="text/javascript" src="../js/datatables/datatables.min.js"></script>
+
+    <script src="../js/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+    <!-- Favorite icon -->
+    <link rel="icon" href="favicon.ico">
+
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="../js/settings.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket bases library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP admin library -->
+    <script type="text/javascript" src="../js/vscpadmin.js"></script>
+
+    <!-- Menu styles -->
+    <link rel="stylesheet" type="text/css" href="css/menu.css">
+    
+    <!-- Boostrap navigation bar helper functions -->
+    <script type="text/javascript" src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script type="text/javascript" src="js/menu.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/vscp-admin.css">
+
+    <script type="text/javascript">
+
+        var curSelectedVariable;    // Current selected variable
+        var users;                  // Array with system defined users (fetchUsers) 
+        var table = null;   
+
+        // VSCP websocket connection
+        var vscpConn = null;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // load ready
+        //
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
+        
+            for ( i=0; i<200; i++ ) {
+
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
+
+            // Connect to VSCP server
+            vscpConn.connect({
+
+                url: "ws://127.0.0.1:8080",
+                userName: "admin",
+                password: "secret",
+                authdomain: "mydomain.com", 
+
+                onSuccess: function( conn ) {
+
+                    console.log("connected OK");
+
+                    // Start receiving VSCP events
+                    vscpConn.disconnect({
+
+                        onSuccess: function( conn ) {
+                            console.log("Disconnect OK");
+                        },
+
+                        onError: function( conn ) {
+                            console.log("Disconnect error");
+                        },
+
+                    });
+
+                },
+
+                onError: function( conn ) {
+                    console.log("Connect error");
+                }
+
+            });
+
+            }       
+
+        }); // onLoad
+
+    </script>    
