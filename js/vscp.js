@@ -1253,6 +1253,40 @@ vscp.constants.varTypes = {
     FILTER: 503             //  Base64 encoded Filter data data.
 };
 
+// Use to fill dtop down booxes and simular
+vscp.constants.arrTypeNames = [
+    "Unassigned",          // Unassigned variable
+    "String",              // String value (Base64 encoded)
+    "Boolean",             // Boolean value (true, false, 0 or 1)
+    "Integer",             // Integer value
+    "Long",                // Long value
+    "Double",              // Double value
+    "Measurement",         // String representation of the measurement.
+    "Event",               // VSCP event head, class, type, obId, timestamp, GUID, data 1, data 2, data ...
+    "GUID",                // Standard GUID string format: FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF
+    "Event Data",          // Comma separated list with decimal values. 1,2,3,4,5,6,7,8, ...
+    "Event Class",         // Integer value for VSCP class
+    "Event Type",          // Integer value for VSCP type
+    "Event Timestamp",     // Time when event was received in ms
+    "Data/Time",           // Date + Time in ISO format 2008-11-07T20:10.00
+    "Date",                //  ISO date 2008-11-07
+    "Time",                //  ISO Time 20:10.00
+    "Blob",                //  Base64 encoded binary data.    
+    "Mime",                //  Base64 mime types data base64(mimetype;data)
+    "HTML",                //  Base64 encoded HTML data.
+    "JavaScript",          //  Base64 encoded Javascript data.
+    "JSON",                //  Base64 encoded JSON data.
+    "XML",                 //  Base64 encoded XML data.
+    "SQL",                 //  Base64 encoded SQL data.
+    "LUA",                 //  Base64 encoded LUA data.
+    "LUARES",              //  Base64 encoded LUA result data.
+    "UXType1",             //  Base64 encoded UX Type 1 data.
+    "DMRow",               //  Base64 encoded DM data row.
+    "Driver",              //  Base64 encoded Driver data row.
+    "User",                //  Base64 encoded User data row.
+    "Filter"
+];
+
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.getVarTypeName
 //
