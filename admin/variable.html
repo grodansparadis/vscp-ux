@@ -59,6 +59,7 @@
         var curSelectedVariable;    // Current selected variable
         var users;                  // Array with system defined users (fetchUsers) 
         var table = null;  
+        var gindexes;               // Curret selected row(s)
         var editorValue;            // ace editor for value
         var editorNote;             // ace editor for notes 
 
@@ -84,8 +85,12 @@
 
                     users = options.value.split(',');
                     users.forEach( function(u) {
+                        // Add to edit user drop down
                         $("#dlgedit_userdd").append("<li><a href=\"javascript:$('#dlgedit_owner').val('"
                                                     + u + "');\">" + u + "</a></li>");
+                        // Add to add user drop down                            
+                        $("#dlgadd_userdd").append("<li><a href=\"javascript:$('#dlgadd_owner').val('"
+                                                    + u + "');\">" + u + "</a></li>");                                                    
                     });    
 
                     ui.enable();            
@@ -108,8 +113,12 @@
 
             // Fill types into dropdown
             vscp.constants.arrTypeNames.forEach( function(u) {
+                // Add to edit type drop down
                 $("#dlgedit_typedd").append("<li><a href=\"javascript:$('#dlgedit_type').val('"
                                                     + u + "');\">" + u + "</a></li>");
+                // Add to add type drop down
+                $("#dlgadd_typedd").append("<li><a href=\"javascript:$('#dlgadd_type').val('"
+                                                    + u + "');\">" + u + "</a></li>");                                                    
             });
                 
             // Show navigation bar menu
@@ -132,9 +141,9 @@
             // Value editor
             editorValue = ace.edit("editorValue");
 
-            //editorValue.on('change', function( e ) {
-            //    alert('change');
-            //});
+            editorValue.on('change', function( e ) {
+                //alert('change');
+            });
 
             editorValue.commands.addCommand(
                 {
@@ -393,11 +402,12 @@
             //
 
             table.on( 'select', function ( e, dt, type, indexes ) {
-
+                
                 if ( type === 'row' ) {
 
+                    gindexes = indexes;
                     var row = table.rows( indexes ).data(); //.pluck( 'id' );
-                    var data = row[0]; //.split(',');
+                    var data = row[0]; 
 
                     curSelectedVariable = data;
 
@@ -435,12 +445,10 @@
             //
 
             table.on( 'deselect', function ( e, dt, type, indexes ) {
-
                 if ( type === 'row' ) {
                     editorValue.setValue( "" );
                     editorNote.setValue( "" );
                 }
-            
             });
  
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -448,9 +456,35 @@
             //
             
             $('#variableTable tbody').on( 'dblclick', 'tr', function () {
-                var data = table.row( this ).data();
-                editDialog( data );   
-                $(this).addClass('selected');             
+
+                vscpConn.readVar({
+
+                        name: curSelectedVariable[ 0 ],    // name
+                        type: curSelectedVariable[ 6 ],    // id for type
+
+                        onSuccess: function( conn, msg ) {
+                            editorValue.setValue( msg.value );
+                            editorValue.clearSelection();
+                            editorValue.selection.moveTo(0, 0);
+                            editorValue.getSession().setMode("ace/mode/" + 
+                                                                vscp.getEditorModeFromType( msg.type ));
+
+                            editorNote.setValue( msg.note );
+                            editorNote.clearSelection();
+                            editorNote.selection.moveTo(0, 0);
+                        
+                            ui.enable();
+
+                            editVariable();
+                        },
+
+                        onError: function( conn ) {
+                            editorValue.setValue( "Failed to fetch value" );
+                            editorNote.setValue( "Failed to fetch note" );
+                            ui.enable();
+                        }
+                });
+                            
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -458,7 +492,7 @@
             //
             
             /*$('#variableTable tbody').on( 'click', 'tr', function () {
-
+                console.log("Single click");
             });*/
 
             
@@ -542,6 +576,7 @@
                             
                             // Enable the user interface
                             ui.enable();
+
                         },
 
                         onError: function( conn ) {
@@ -628,9 +663,6 @@
                 regex: $("#myRegExp").val(),
 
                 onVariable: function( conn, variable ) {
-
-                    //waitingDialog.progress( variable.idx, variable.count );
-                    //console.log(" Progress" + variable.idx + " " + variable.count );
                         
                     table.row.add( [
                                 variable.name.toLowerCase(), 
@@ -641,13 +673,18 @@
                                 variable.lastchange,
                                 variable.type,
                                 variable.userid
-                            ] ).draw( true );  
+                            ] ).draw( false );  
 
                 },
 
                 onSuccess: function( conn ) {
-                    ui.enable();
+
+                    ui.enable();                    
                     waitingDialog.hide();
+
+                    // Select first row
+                    table.row( 0 ).select();
+
                 },
 
                 onError: function( conn ) {
@@ -670,6 +707,7 @@
 
             if ( undefined == data[0] ) {
                 BootstrapDialog.alert({
+                    title: 'WARNING',
                     type: BootstrapDialog.TYPE_WARNING,
                     message: 'A row must be selected for a variable to be deleted'
                 });
@@ -680,63 +718,81 @@
 
             if ( name.startsWith("vscp.")  ) {
                 BootstrapDialog.alert({
+                    title: 'WARNING',
                     type: BootstrapDialog.TYPE_WARNING,
                     message: 'A stock variable can not be deleted'
                 });
                 return;
             }
 
-            editorValue.setValue("");
-            editorNote.setValue("");
 
-            ui.disable();
-            vscpConn.removeVar({
+            BootstrapDialog.confirm( { 
+                title: 'WARNING',
+                message: 'Are you sure that the variable \'' + name + '\' should be deleted?', 
+                type: BootstrapDialog.TYPE_DANGER, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+                callback: function( result ) {
+                    if ( result ) {
+                        editorValue.setValue("");
+                        editorNote.setValue("");
 
-                name:   name,
+                        ui.disable();
+                        vscpConn.removeVar({
 
-                onSuccess: function( conn ) {
-                    table.row('.selected').remove().draw( false );
-                    ui.enable();
-                },
+                            name:   name,
 
-                onError: function( conn ) {
-                    BootstrapDialog.alert({
-                        type: BootstrapDialog.TYPE_WARNING,
-                        message: 'Failed to delete variable!'
-                    });
-                    ui.enable();
+                            onSuccess: function( conn ) {
+                                table.row('.selected').remove().draw( false );
+                                ui.enable();
+                            },
+
+                            onError: function( conn ) {
+                                BootstrapDialog.alert({
+                                    title: 'ERROR',
+                                    type: BootstrapDialog.TYPE_WARNING,
+                                    message: 'Failed to delete variable!'
+                                });
+                                ui.enable();
+                            }
+
+                        });
+                    }
                 }
-
             });
+
+
+            
 
         };
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // addVariable
-        //
-
-        function addVariable() 
-        {
-
-        }
+        
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // showEditDialog
+        // editVariable
         //
         // Show the edit dialog
         //
 
-        function showEditDialog() 
+        function editVariable() 
         {
             var table = $('#variableTable').DataTable();
             var data = table.rows('.selected').data();
+
+            if ( undefined == data[0] ) {
+                BootstrapDialog.alert({
+                    title: 'WARNING',
+                    type: BootstrapDialog.TYPE_WARNING,
+                    message: 'A row must be selected for a variable to be edited'
+                });
+                return;
+            }
+
             editDialog( data[0] );
         }
         
         ///////////////////////////////////////////////////////////////////////////////////////////
         // editDialog
         //
-        // Show modal to select active server to use.
+        // Show modal to edit variable
         //
 
         function editDialog( data ) 
@@ -765,8 +821,6 @@
  
             $('#dlgEditVariable').modal();
         };
-
-        
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // saveEditResult
@@ -800,7 +854,8 @@
 
                 onError: function( conn ) {
                     BootstrapDialog.alert({
-                        type: BootstrapDialog.TYPE_WARNING,
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
                         message: 'Failed to save variable!'
                     });
                     ui.enable();
@@ -810,14 +865,121 @@
 
         };
 
+        //////////////////////////////////////////////////////////////////////////////////////////
+        // addVariable
+        //
+
+        function addVariable() 
+        {
+            //var table = $('#variableTable').DataTable();
+            //var data = table.rows('.selected').data();
+
+            addDialog();
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // addDialog
+        //
+        // Show modal for adding data
+        //
+
+        function addDialog() 
+        {
+            $('#dlgadd_owner').val( settings.user );
+            $('#dlgadd_permission').val( '744' );
+            $('#dlgadd_type').val( 'String' );
+
+            var evmain = ace.edit("editorValue");
+            var enmain = ace.edit("editorNote");
+
+            $('#dlgadd_value').val( "" );
+            $('#dlgadd_note').val( "" );
+ 
+            $('#dlgAddVariable').modal();
+
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // saveAddResult
+        //
+        // Save results from edit dialog
+        //
+
+        var saveAddResult = function() {
+
+            // Not allowed to add varables with stock variable reserved names
+            if ( $('#dlgadd_name').val().startsWith("vscp.")  ) {
+                BootstrapDialog.alert({
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Can\'t add varables that have names that start with \'vscp.\'. Reserved for stock variables.'
+                    });
+            }
+
+            vscpConn.createVar({
+
+                name:           $('#dlgadd_name').val(),
+                value:          $('#dlgadd_value').val(),
+                note:           $('#dlgadd_note').val(),
+                type:           vscp.getVarTypeNumerical( $('#dlgadd_type').val() ).toString(), 
+                user:           $('#dlgadd_user').val(),
+                accessrights:   parseInt( $('#dlgadd_permission').val(), 16).toString(),
+                persistency:    $('#dlgadd_persistent').is(":checked") ? "true" : "false",
+
+                onSuccess: function( conn ) {
+                    
+                    // Read back the variable
+                    vscpConn.readVar({
+
+                        name: $('#dlgadd_name').val(),                                          // name
+                        type: vscp.getVarTypeNumerical( $('#dlgadd_type').val() ).toString(),   // id for type
+
+                        onSuccess: function( conn, msg ) {
+
+                            table.row.add( [
+                                msg.name.toLowerCase(), 
+                                vscp.getVarTypeName( msg.type ), 
+                                msg.persistency ? "true" : "false", 
+                                users[ msg.userid ], 
+                                msg.accessright.toString(16), 
+                                msg.lastchange,
+                                msg.type,
+                                msg.userid
+                            ] ).draw( false );  
+                        
+                            ui.enable();
+
+                        },
+
+                        onError: function( conn ) {
+                            ui.enable();
+                        }
+                    });
+
+                },
+
+                onError: function( conn ) {
+                    BootstrapDialog.alert({
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Failed to save variable!'
+                    });
+                    ui.enable();
+                }
+
+            });
+
+        };
+
+
     </script>
 
 </head>
 <body>
 
-    <!-- **********************************************************************************************************************-->
-    <!--                                            Modal to edit variable                                                     -->
-    <!-- **********************************************************************************************************************-->
+    <!-- **************************************************************************************-->
+    <!--                              Modal to edit variable                                   -->
+    <!-- **************************************************************************************-->
     <div id="dlgEditVariable" class="modal fade" role="dialog">
         
         <div class="modal-dialog">
@@ -838,12 +1000,7 @@
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> name</label>
                             <input type="text" class="form-control" id="dlgedit_name" readonly >
                         </div>
-                        <!--
-                        <div class="form-group">
-                            <label for="type"><span class="glyphicon glyphicon-asterisk"></span> type</label>
-                            <input type="text" class="form-control" id="dlgedit_type" readonly >
-                        </div>
-                        -->
+
                         <div class="form-group">
                             <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>                    
                             <div class="input-group">                                
@@ -853,13 +1010,6 @@
                                                 data-toggle="dropdown" aria-haspopup="true" 
                                                 aria-expanded="false">types <span class="caret"></span></button>
                                     <ul id="dlgedit_typedd" class="dropdown-menu dropdown-menu-right">
-                                        <!--
-                                        <li><a href="javascript:$('#dlgedit_typedd').val('admin');">Admin</a></li>
-                                        <li><a href="javascript:$('#dlgedit_typedd').val('Curt');">Curt</a></li>
-                                        <li><a href="javascript:$('#dlgedit_typedd').val('Andrea');">Andrea</a></li>
-                                        <li role="separator" class="divider"></li>
-                                        <li><a href="javascript:$('#dlgedit_typedd').val('Mr Magoo');">Mr Magoo</a></li>
-                                        -->
                                     </ul>
                                 </div>
                             </div>
@@ -871,11 +1021,6 @@
                             <input type="text" class="form-control" id="dlgedit_persistent" readonly >
                         </div>
                         
-                        <!--
-                        <div class="checkbox">
-                            <label><input type="checkbox" id="dlgedit_varpersistance" readonly value="true" checked >Persistent</label>
-                        </div>
-                        -->
                         <div class="form-group">
                             <label for="owner"><span class="glyphicon glyphicon-asterisk"></span> owner</label>                    
                             <div class="input-group">                                
@@ -885,13 +1030,6 @@
                                                 data-toggle="dropdown" aria-haspopup="true" 
                                                 aria-expanded="false">users <span class="caret"></span></button>
                                     <ul id="dlgedit_userdd" class="dropdown-menu dropdown-menu-right">
-                                        <!--
-                                        <li><a href="javascript:$('#dlgedit_varowner').val('admin');">Admin</a></li>
-                                        <li><a href="javascript:$('#dlgedit_varowner').val('Curt');">Curt</a></li>
-                                        <li><a href="javascript:$('#dlgedit_varowner').val('Andrea');">Andrea</a></li>
-                                        <li role="separator" class="divider"></li>
-                                        <li><a href="javascript:$('#dlgedit_varowner').val('Mr Magoo');">Mr Magoo</a></li>
-                                        -->
                                     </ul>
                                 </div>
                             </div>
@@ -912,14 +1050,6 @@
                             <textarea class="form-control" rows="6" id="dlgedit_note" placeholder="Enter value"></textarea>
                         </div>
                         
-                        <!--
-                        <div class="checkbox">
-                            <label><input type="checkbox" id="modal-brememberme" value="true" checked>Remember me</label>
-                        </div>
-                        
-                        <button type="submit" class="btn btn-default btn-success btn-block" data-dismiss><span class="glyphicon glyphicon-off"></span>Connect</button>
-                        -->
-                        
                     </form>
                 </div>
                 <div class="modal-footer">  
@@ -931,6 +1061,105 @@
         </div>
 
     </div>
+
+
+    <!-- **************************************************************************************-->
+    <!--                              Modal to add variable                                   -->
+    <!-- **************************************************************************************-->
+    <div id="dlgAddVariable" class="modal fade" role="dialog">
+        
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Add VSCP remote variable</h4>
+                </div>
+
+                <div class="modal-body">
+   
+                    <form role="form">
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> name</label>
+                            <input type="text" class="form-control" id="dlgadd_name"  >
+                            <span class="help-block">Enter name for variable. Must be unique.</span>
+                        </div>
+                        <!--
+                        <div class="form-group">
+                            <label for="type"><span class="glyphicon glyphicon-asterisk"></span> type</label>
+                            <input type="text" class="form-control" id="dlgedit_type" readonly >
+                        </div>
+                        -->
+                        <div class="form-group">
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>                    
+                            <div class="input-group">                                
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgadd_type">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-success dropdown-toggle" 
+                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                aria-expanded="false">types <span class="caret"></span></button>
+                                    <ul id="dlgadd_typedd" class="dropdown-menu dropdown-menu-right">
+                                    </ul>
+                                </div>
+                            </div>
+                            <span class="help-block">Set variable type.</span>
+                        </div>    
+
+                        <div class="form-group">    
+                            <div class="checkbox">
+                                <label><input type="checkbox" id="dlgadd_persistent" value="true" checked ><b>Persistent</b></label>
+                                <span class="help-block">Persistent variables are saved in a database, non persistent variables are saved in memory.</span>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="owner"><span class="glyphicon glyphicon-asterisk"></span> owner</label>                    
+                            <div class="input-group">                                
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgadd_owner">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-success dropdown-toggle" 
+                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                aria-expanded="false">users <span class="caret"></span></button>
+                                    <ul id="dlgadd_userdd" class="dropdown-menu dropdown-menu-right">
+                                    </ul>
+                                </div>
+                            </div>
+                            <span class="help-block">Set the owner of this variable.<a href="http://www.vscp.org">test</a></span>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="permission"><span class="glyphicon glyphicon-asterisk"></span> permission</label>
+                            <input type="text" class="form-control" id="dlgadd_permission" placeholder="Enter permissions">
+                            <span class="help-block">Set permissions for the variable. Permissions are given as tre hex numbers one each for user/group and others. Each of the digits is three bits for read, write and execute.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="value"><span class="glyphicon glyphicon-asterisk"></span> value</label>
+                            <textarea class="form-control" rows="6" id="dlgadd_value" placeholder="Enter value"></textarea>
+                            <span class="help-block">Enter the value for the variable. May be easier to edit in the mainscreen enitor</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="note"><span class="glyphicon glyphicon-asterisk"></span> note</label>
+                            <textarea class="form-control" rows="6" id="dlgadd_note" placeholder="Enter note"></textarea>
+                            <span class="help-block">Enter an optional description for the variable. Presented as HTML. May be easier to edit in the mainscreen enitor</span>
+                        </div>
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">  
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveAddResult()">Add</button>                  
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
 
     <!-- **********************************************************************************************************************-->
     <!--                                                      Menu                                                             -->
@@ -965,7 +1194,7 @@
 
                     <div class="input-group"> 
                         <span class="input-group-addon" id="basic-addon1">:</span>
-                        <input id="myRegExp" type="text" class="form-control" placeholder="regexp" aria-describedby="basic-addon1" >           
+                        <input id="myRegExp" type="text" class="form-control" placeholder="regexp" aria-describedby="basic-addon1" >         
                     </div>
                     <p>
                     <div class="input-group col-sm-8">
@@ -977,7 +1206,7 @@
 
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="showEditDialog();">
+                        <button type="button" class="btn btn-success col-sm-12" onclick="editVariable();">
                             <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit variable
                         </button>
                     </div>
@@ -985,7 +1214,7 @@
                     
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="editDialog();">
+                        <button type="button" class="btn btn-success col-sm-12" onclick="addVariable();">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add variable
                         </button>
                     </div>

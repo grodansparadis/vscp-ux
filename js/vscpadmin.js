@@ -90,3 +90,24 @@ vscp.admin.setStatus = function ( info, bConnected ) {
         document.getElementById("status-footer").innerHTML = "<b>Server:</b> " + info + " - <b>Disonnected</b>.";
     }
 };
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+// vscp.admin.storageAvailable
+//
+// Check if local storage is available.
+//
+// type - localStorage or sessionStorage
+//
+
+vscp.admin.storageAvailable = function (type) {
+	try {
+		var storage = window[type],
+			x = '__storage_test__';
+		storage.setItem(x, x);
+		storage.removeItem(x);
+		return true;
+	}
+	catch(e) {
+		return false;
+	}
+}
