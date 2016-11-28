@@ -43,6 +43,8 @@
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP admin library -->
     <script type="text/javascript" src="../js/vscpadmin.js"></script>
+    <!-- VSCP user library -->
+    <script type="text/javascript" src="../js/vscpuser.js"></script>
 
     <!-- Menu styles -->
     <link rel="stylesheet" type="text/css" href="css/menu.css">
@@ -57,7 +59,8 @@
     <script type="text/javascript">
 
         var curSelectedVariable;    // Current selected variable
-        var users;                  // Array with system defined users (fetchUsers) 
+        //var gusers;                 // Array with system defined users (fetchUsers)
+        //var guserinfo = new Array;  // Array with full userinfo 
         var table = null;  
         var gindexes;               // Curret selected row(s)
         var editorValue;            // ace editor for value
@@ -65,45 +68,6 @@
 
         // VSCP websocket connection
         var vscpConn = null;
-
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // fetchUsers
-        //
-
-        function fetchUsers() {
-
-            ui.disable();
-
-            // Clear table
-            table.clear().draw();                
-
-            vscpConn.readVar({
-
-                name: "vscp.user.names",
-
-                onSuccess: function( conn, options ) {
-
-                    users = options.value.split(',');
-                    users.forEach( function(u) {
-                        // Add to edit user drop down
-                        $("#dlgedit_userdd").append("<li><a href=\"javascript:$('#dlgedit_owner').val('"
-                                                    + u + "');\">" + u + "</a></li>");
-                        // Add to add user drop down                            
-                        $("#dlgadd_userdd").append("<li><a href=\"javascript:$('#dlgadd_owner').val('"
-                                                    + u + "');\">" + u + "</a></li>");                                                    
-                    });    
-
-                    ui.enable();            
-                                    
-                },
-
-                onError: function( conn ) {
-                    ui.enable();
-                }
-                
-            });
-
-        };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // load ready
@@ -405,6 +369,7 @@
                 
                 if ( type === 'row' ) {
 
+                    console.log('select');
                     gindexes = indexes;
                     var row = table.rows( indexes ).data(); //.pluck( 'id' );
                     var data = row[0]; 
@@ -446,6 +411,7 @@
 
             table.on( 'deselect', function ( e, dt, type, indexes ) {
                 if ( type === 'row' ) {
+                    console.log('deselect');
                     editorValue.setValue( "" );
                     editorNote.setValue( "" );
                 }
@@ -457,12 +423,16 @@
             
             $('#variableTable tbody').on( 'dblclick', 'tr', function () {
 
+                //$(this).parents('tr') .addClass('selected');
+                console.log('dbl-click');
+
                 vscpConn.readVar({
 
                         name: curSelectedVariable[ 0 ],    // name
                         type: curSelectedVariable[ 6 ],    // id for type
 
                         onSuccess: function( conn, msg ) {
+
                             editorValue.setValue( msg.value );
                             editorValue.clearSelection();
                             editorValue.selection.moveTo(0, 0);
@@ -491,9 +461,9 @@
             // Single click row
             //
             
-            /*$('#variableTable tbody').on( 'click', 'tr', function () {
+            $('#variableTable tbody').on( 'click', 'tr', function () {
                 console.log("Single click");
-            });*/
+            });
 
             
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -569,7 +539,7 @@
                             vscp.admin.setStatus( settings.url, true );
 
                             // Fetch users
-                            fetchUsers();
+                            vscp.fetchUsers();
                             
                             // Load variables
                             fetchVariables();
@@ -615,9 +585,12 @@
                 },
 
                 onError: function( conn ) {
-                    BootstrapDialog.alert({
+                    /*BootstrapDialog.alert({
                         message: 'Could not establish a connection or connection lost.'
-                    });
+                    });*/
+                    setTimeout(function () {
+                        location.reload()
+                    }, 2000);
                 }
 
             });       
@@ -668,7 +641,8 @@
                                 variable.name.toLowerCase(), 
                                 vscp.getVarTypeName( variable.type ), 
                                 variable.persistency ? "true" : "false", 
-                                users[ variable.userid ], 
+                                //vscp.users[ variable.userid ],
+                                vscp.getUserFromId( variable.userid ), 
                                 variable.accessright.toString(16), 
                                 variable.lastchange,
                                 variable.type,
@@ -865,17 +839,66 @@
 
         };
 
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // duplicateVariable
+        //
+        // Duplicate seledted variable
+        //
+
+        function duplicateVariable() 
+        {
+            var table = $('#variableTable').DataTable();
+            //var data = $('#variableTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
+            var row = table.rows('.selected').data();            
+
+            if ( undefined == row[0] ) {
+                BootstrapDialog.alert({
+                    title: 'WARNING',
+                    type: BootstrapDialog.TYPE_WARNING,
+                    message: 'A row must be selected for a variable to be deleted'
+                });
+                return;
+            }
+
+            var data = row[0];
+            
+            $('#dlgadd_name').val( data[0] + "_new" );                        
+            $('#dlgadd_type').val( data[1] );
+            if ( data[2] == "true" ) {
+                $('#dlgadd_persistent').prop('checked', true );
+            }
+            else {
+                $('#dlgadd_persistent').prop('checked', false );
+            }
+            $('#dlgadd_owner').val( data[3] );
+            $('#dlgadd_permission').val( data[4] );
+
+            var evmain = ace.edit("editorValue");
+            var enmain = ace.edit("editorNote");
+
+            $('#dlgadd_value').val( evmain.getValue() );
+            $('#dlgadd_note').val( enmain.getValue() );
+ 
+            $('#dlgAddVariable').modal();
+
+        };
+
         //////////////////////////////////////////////////////////////////////////////////////////
         // addVariable
         //
 
         function addVariable() 
         {
-            //var table = $('#variableTable').DataTable();
+            var table = $('#variableTable').DataTable();
+
             //var data = table.rows('.selected').data();
+            var data = $('#variableTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
+            
 
             addDialog();
         }
+
+        
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // addDialog
@@ -898,6 +921,25 @@
             $('#dlgAddVariable').modal();
 
         };
+
+        
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // isVariableInTable
+        //
+
+        function isVariableInTable( name ) {
+            
+            for ( i=0; i<table.rows().count(); i++ ) {
+                
+                if ( name.toLowerCase() == $('#variableTable').dataTable({bRetrieve: true}).fnGetData(i)[0]  ) {
+                    return i;
+                }
+            }
+
+            // Not found
+            return -1;
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // saveAddResult
@@ -936,16 +978,24 @@
 
                         onSuccess: function( conn, msg ) {
 
-                            table.row.add( [
-                                msg.name.toLowerCase(), 
-                                vscp.getVarTypeName( msg.type ), 
-                                msg.persistency ? "true" : "false", 
-                                users[ msg.userid ], 
-                                msg.accessright.toString(16), 
-                                msg.lastchange,
-                                msg.type,
-                                msg.userid
-                            ] ).draw( false );  
+                            var row_exist;
+                            if ( ( row_exist = isVariableInTable( msg.name ) ) < 0 ) {
+                                // Add new row to table
+                                table.row.add( [
+                                    msg.name.toLowerCase(), 
+                                    vscp.getVarTypeName( msg.type ), 
+                                    msg.persistency ? "true" : "false", 
+                                    users[ msg.userid ], 
+                                    msg.accessright.toString(16), 
+                                    msg.lastchange,
+                                    msg.type,
+                                    msg.userid
+                                ] ).draw( false );  
+                            }
+                            else {
+                                // Update row data
+
+                            }
                         
                             ui.enable();
 
@@ -1230,7 +1280,7 @@
 
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="hideTable()">
+                        <button type="button" class="btn btn-success col-sm-12" onclick="duplicateVariable()">
                             <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate variable
                         </button>
                     </div>
