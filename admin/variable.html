@@ -520,6 +520,8 @@
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
 
+            ui.disable();
+
             // Connect to VSCP server
             vscpConn.connect({
 
@@ -538,15 +540,7 @@
                             // Show conect status
                             vscp.admin.setStatus( settings.url, true );
 
-                            // Fetch users
-                            vscp.fetchUsers();
-                            
-                            // Load variables
-                            fetchVariables();
-                            
-                            // Enable the user interface
-                            ui.enable();
-
+                            fetchUsers();                       
                         },
 
                         onError: function( conn ) {
@@ -556,7 +550,8 @@
 
                             // Warn user
                             BootstrapDialog.alert({
-                                type: BootstrapDialog.TYPE_WARNING,
+                                title: 'ERROR',
+                                type: BootstrapDialog.TYPE_DANGER,
                                 message: 'Unable to connect to server.'
                             });
 
@@ -612,6 +607,42 @@
                 $( "#ui :input" ).attr( "disabled", true );
             }
         };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // fetchVariables
+        //
+
+        function fetchUsers() {
+            
+            // Fetch users
+            vscp.fetchUsers( 
+                function() {
+
+                    // Enable the user interface
+                    ui.enable();
+
+                    alert( vscp.userinfo.length );
+
+                    // Load variables
+                    fetchVariables();
+
+                    
+                                    
+                },
+                function() {
+                                    
+                    // Enable the user interface
+                    ui.enable();
+                                    
+                    // Warn user
+                    BootstrapDialog.alert({
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Unable to  get users.'
+                    });
+                }
+            );     
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // fetchVariables

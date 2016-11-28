@@ -42,6 +42,7 @@
  */
 var vscp = vscp || {};
 
+vscp.nusers = 0;
 vscp.users = new Array;
 vscp.userinfo = new Array;
 
@@ -49,19 +50,33 @@ vscp.userinfo = new Array;
 // fetchUsers
 //
 
-vscp.fetchUsers = function () {
+vscp.fetchUsers = function ( onSuccessEx, onErrorEx ) {
 
-    ui.disable();
+    var _onSuccess = null;
+    var _onError = null;
+
+    if ( "function" === typeof onSuccessEx ) {
+        _onSuccess = onSuccessEx;
+    }
+
+    if ( "function" !== typeof onErrorEx ) {
+        _onError = null;
+    }
+    else {
+        _onError = onErrorEx;
+    }
 
     vscpConn.readVar({
     
-        name: "vscp.user.names",
+        name: "vscp.user.count",
 
         onSuccess: function( conn, options ) {
 
-            var usridx = 0;
-            vscp.users = options.value.split(',');
-            vscp.users.forEach( function(u) {
+            //alert( options.value );
+            //vscp.users = options.value.split(',');
+            //vscp.users.forEach( function(u) {
+            vscp.nusers = options.value;    
+            for ( i=0; i<options.value; i++ ) {    
 
                 // Add to edit user drop down
                 //$("#dlgedit_userdd").append("<li><a href=\"javascript:$('#dlgedit_owner').val('"
@@ -71,7 +86,8 @@ vscp.fetchUsers = function () {
                 //                                    + u + "');\">" + u + "</a></li>");  
                 vscpConn.readVar({
 
-                    name: "vscp.user." + usridx.toString(),
+                    name: "vscp.user." + i.toString(),
+                    idx: i,
 
                     onSuccess: function( conn, options ) {  
 
@@ -80,27 +96,51 @@ vscp.fetchUsers = function () {
                         //vscp.guserinfo.push( items );
                         vscp.userinfo.push( items );
 
-                        console.log( items ); 
-                    }, 
+                        var dd =  options.name.split("."); 
+
+                        // Signal success when last user is read
+                        if ( (vscp.nusers-1) == dd[2] ) {
+                            _onSuccess && _onSuccess();
+                        }
+
+                    },
 
                     onError: function( conn ) {
-                                
-                    }                                                                           
+                        _onError && _onError();
+                    }
                 }); 
 
-                usridx++;
+            }; // forEach   
 
-            }); // forEach   
-
-            ui.enable();            
+            
                                     
         },
 
         onError: function( conn ) {
-            ui.enable();
+            _onError && _onError();
         }
                 
     });
+
+    /**
+     * Signal success of the current asynchronous operation.
+     */
+    this.signalSuccessEx = function( onSuccess ) {
+
+        if ( ( "function" === typeof onSuccess ) && ( null !== onSuccess ) ) {
+            onSuccess( this );
+        }
+    };
+
+    /**
+     * Signal error of the current asynchronous operation.
+     */
+    this.signalErrorEx = function( onError ) {
+
+        if ( ( "function" === typeof onError ) && ( null !== onError ) ) {
+            onError( this );
+        }
+    };
 
 };
 
