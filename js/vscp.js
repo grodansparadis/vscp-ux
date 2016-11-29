@@ -2016,6 +2016,11 @@ vscp.Connection = function() {
      */
     this.socket = null;
 
+    /** url used for connection establishment
+     * @member {string}
+     */
+    this.url = "";
+
     /** User name used for connection establishment
      * @member {string}
      */
@@ -2407,6 +2412,7 @@ vscp.Connection = function() {
 
     return this;
 };
+
 
 /**
  * This function is called by the websocket in case the connection is established.
@@ -2864,6 +2870,8 @@ vscp.Connection.prototype.connect = function( options ) {
         return;
     }
 
+    this.url = options.url;
+
     if ( "string" !== typeof options.userName ) {
         console.error( vscp.utility.getTime() + " User name is missing." );
         return;
@@ -3315,12 +3323,12 @@ vscp.Connection.prototype.setFilter = function ( options ) {
  */
 vscp.Connection.prototype.createVar = function ( options ) {
 
-    var onSuccess   = null;
-    var onError     = null;
-    var type        = vscp.constants.varTypes.STRING;   // default type is string
-    var accessrights = 744;                             // default access rights 
-    var persistency = 0;                                // Not persistent
-    var note        = "";
+    var onSuccess       = null;
+    var onError         = null;
+    var type            = vscp.constants.varTypes.STRING;   // default type is string
+    var accessrights    = 744;                              // default access rights 
+    var persistency     = 0;                                // Not persistent
+    var note            = "";                               // No note
 
     if ( "undefined" === typeof options ) {
         console.error( vscp.utility.getTime() + " Options are missing. " );

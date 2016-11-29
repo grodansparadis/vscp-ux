@@ -42,15 +42,21 @@
  */
 var vscp = vscp || {};
 
-vscp.nusers = 0;
-vscp.users = new Array;
-vscp.userinfo = new Array;
+/* ---------------------------------------------------------------------- */
+
+/** VSCP user functionality
+ * @namespace vscp.user
+ */
+vscp._createNS( "vscp.user" );
+
+vscp.user.count = 0;                // Number of users
+vscp.user.userinfo = new Array;     // User array
 
 ///////////////////////////////////////////////////////////////////////////////////////////
 // fetchUsers
 //
 
-vscp.fetchUsers = function ( onSuccessEx, onErrorEx ) {
+vscp.user.fetchUsers = function ( onSuccessEx, onErrorEx ) {
 
     var _onSuccess = null;
     var _onError = null;
@@ -72,34 +78,23 @@ vscp.fetchUsers = function ( onSuccessEx, onErrorEx ) {
 
         onSuccess: function( conn, options ) {
 
-            //alert( options.value );
-            //vscp.users = options.value.split(',');
-            //vscp.users.forEach( function(u) {
-            vscp.nusers = options.value;    
+            vscp.user.count = options.value;    
             for ( i=0; i<options.value; i++ ) {    
-
-                // Add to edit user drop down
-                //$("#dlgedit_userdd").append("<li><a href=\"javascript:$('#dlgedit_owner').val('"
-                //                                    + u + "');\">" + u + "</a></li>");
-                // Add to add user drop down                            
-                //$("#dlgadd_userdd").append("<li><a href=\"javascript:$('#dlgadd_owner').val('"
-                //                                    + u + "');\">" + u + "</a></li>");  
+ 
                 vscpConn.readVar({
 
                     name: "vscp.user." + i.toString(),
-                    idx: i,
 
                     onSuccess: function( conn, options ) {  
 
                         // Add to array
                         var items = options.value.split(";");
-                        //vscp.guserinfo.push( items );
-                        vscp.userinfo.push( items );
+                        vscp.user.userinfo.push( items );
 
                         var dd =  options.name.split("."); 
 
                         // Signal success when last user is read
-                        if ( (vscp.nusers-1) == dd[2] ) {
+                        if ( (vscp.user.count-1) == dd[2] ) {
                             _onSuccess && _onSuccess();
                         }
 
@@ -110,7 +105,7 @@ vscp.fetchUsers = function ( onSuccessEx, onErrorEx ) {
                     }
                 }); 
 
-            }; // forEach   
+            }; // for  
 
             
                                     
@@ -148,13 +143,37 @@ vscp.fetchUsers = function ( onSuccessEx, onErrorEx ) {
 // getUserFromId
 //
 
-vscp.getUserFromId = function( id ) {
-    for ( i=0;i<vscp.userinfo.length; i++ ) {     
-        console.log( parseInt( vscp.userinfo[i][0] ), id );
-        if ( id == parseInt( vscp.userinfo[i][0] ) ) {
-            return vscp.userinfo[i][1];
+vscp.user.getUserFromId = function( id ) {
+    for ( i=0;i<vscp.user.userinfo.length; i++ ) {     
+        console.log( parseInt( vscp.user.userinfo[i][0] ), id );
+        if ( id == parseInt( vscp.user.userinfo[i][0] ) ) {
+            return vscp.user.userinfo[i][1];
         }
     }
 
     return "Unknown";
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// getIdFromUser
+//
+
+vscp.user.getIdFromUser = function( user ) {
+    for ( i=0;i<vscp.user.userinfo.length; i++ ) {  
+        if ( user == vscp.user.userinfo[i][1] ) {
+            return vscp.user.userinfo[i][0];
+        }
+    }
+};
+
+///////////////////////////////////////////////////////////////////////////////////////////
+// fillUserDropdown
+//
+
+vscp.user.fillUserDropdown = function( idDropdown, idText ) {
+    vscp.user.userinfo.forEach( function(u) {
+        // Add to drop down
+        $(idDropdown).append("<li><a href=\"javascript:$('" + idText + "').val('" + u[1] + 
+                        "');\">" + u[1] + "</a></li>");
+    });
 };
