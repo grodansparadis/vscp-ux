@@ -2037,19 +2037,24 @@ vscp.Connection = function() {
     this.userFullname = "";
 
     /** User rights from authentication AUTH1
-     * @member {number}
+     * @member {array}
      */
     this.userRights = new Array;
 
     /** User allowed remotes from authentication AUTH1
-     * @member {number}
+     * @member {array}
      */
     this.userRemotes = new Array;
 
     /** User allowed events from authentication AUTH1
-     * @member {number}
+     * @member {array}
      */
     this.userEvents = new Array;
+
+    /** User note from authentication AUTH1
+     * @member {string}
+     */
+    this.userNote = "";
 
     /** Password used for connection establishment
      * @member {string}
@@ -2524,11 +2529,12 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
                     }
                     
                     // Save authenticated user info
-                    this.userId = msgItems[2];
+                    this.userId = parseInt( msgItems[2] );
                     this.userFullname = msgItems[3];
                     this.userRights = msgItems[4].split("/");
                     this.userRemotes = msgItems[5];
                     this.userEvents = msgItems[6];
+                    this.userNote = msgItems[7];
 
                 }
             }

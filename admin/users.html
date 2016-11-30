@@ -107,6 +107,7 @@
 
             table = $('#userTable').DataTable( {
                 select: 'single',
+                "order": [[ 1, 'asc' ], [ 2, 'asc' ]],
                 dom: 'Bfrtip',
                 "oTableTools": {
                     "sRowSelect": "single"
@@ -116,7 +117,7 @@
                 ],
                 columns: [
                     { title: "Ordinal", visible: false, searchable: false  },
-                    { title: "User id" },
+                    { title: "User id", sort: true },
                     { title: "Username" },
                     { title: "Password", visible: false, searchable: false  },
                     { title: "Full Name" },                    
@@ -138,13 +139,27 @@
                 
                 if ( type === 'row' ) {
 
-                    console.log('select');
                     gindexes = indexes;
                     var row = table.rows( indexes ).data(); 
                     var data = row[0]; 
 
                     curSelectedVariable = data;
-
+                    
+                    var user_html_content = "<h4>User data</h4>" +
+                                "<table class='table table-striped table-hover table-condensed'>" +
+                                "<tr><td> <b>Ordinal: </b></td><td>" + data[0] + "</td><tr>" +
+                                "<tr><td> <b>User id: </b></td><td>" + data[1] + "</td><tr>" +
+                                "<tr class='success'><td> <b>User name: </b></td><td>" + data[2] + "</td><tr>" +
+                                "<tr><td> <b>Password: </b></td><td>" + data[3] + "</td><tr>" +
+                                "<tr><td> <b>Full name: </b></td><td>" + data[4] + "</td><tr>" +
+                                "<tr><td> <b>Filter: </b></td><td>" + data[5] + "</td><tr>" +
+                                "<tr><td> <b>Mask: </b></td><td>" + data[6] + "</td><tr>" +
+                                "<tr><td> <b>Rights: </b></td><td>" + data[7] + "</td><tr>" +
+                                "<tr><td> <b>Allowed Remotes: </b></td><td>" + data[8] + "</td><tr>" +
+                                "<tr><td> <b>Allowed Events: </b></td><td>" + data[9] + "</td><tr>" +
+                                "<tr><td> <b>Note: </b></td><td>" + data[10] + "</td><tr>" +
+                                "</table>";
+                    $('#userdata').html( user_html_content );
                 }
                 
             });
@@ -156,7 +171,7 @@
             table.on( 'deselect', function ( e, dt, type, indexes ) 
             {
                 if ( type === 'row' ) {
-  
+                    $('#userdata').html("");
                 }
             });
  
@@ -223,10 +238,21 @@
 
                         onSuccess: function( conn ) {
 
-                            // Show conect status
-                            vscp.admin.setStatus( vscpConn.url, true );
+                            if ( 0 == vscpConn.userId ) {
+                                // Show conect status
+                                vscp.admin.setStatus( vscpConn.url, true );
 
-                            fetchUsers();                       
+                                fetchUsers(); 
+                            }
+                            else {
+                                // Warn user
+                                BootstrapDialog.alert({
+                                    title: 'ERROR',
+                                    type: BootstrapDialog.TYPE_DANGER,
+                                    message: 'You must be logged in as the admin user to handle user information.'
+                                });
+                            }
+
                         },
 
                         onError: function( conn ) {
@@ -366,13 +392,14 @@
                 return;
             }
 
-            var name =  data[0][0];
+            var userid =  data[0][1];
+            var name =  data[0][2];
 
-            if ( name.startsWith("vscp.")  ) {
+            if ( parseInt( userid ) <= 0 ) {
                 BootstrapDialog.alert({
                     title: 'WARNING',
                     type: BootstrapDialog.TYPE_WARNING,
-                    message: 'A stock variable can not be deleted'
+                    message: "Can\'t remove internal users" 
                 });
                 return;
             }
@@ -380,8 +407,8 @@
 
             BootstrapDialog.confirm( { 
                 title: 'WARNING',
-                message: 'Are you sure that the variable \'' + name + '\' should be deleted?', 
-                type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
+                message: 'Are you sure that the user \'' + name + '\' with userid = ' + userid + ' should be deleted?', 
+                type: BootstrapDialog.TYPE_WARNING,
                 callback: function( result ) {
                     if ( result ) {
                         editorValue.setValue("");
@@ -962,7 +989,7 @@
                     
                     <div class="input-group col-sm-8">
                         <button type="button" class="btn btn-primary col-sm-12" onclick="vscp.user.fetchUsers();">
-                            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch variables
+                            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch users
                         </button>
                     </div>
                     </p>
@@ -1007,11 +1034,17 @@
                 <div class="col-sm-1"></div>
             </div>
 
+            
             <div class="row">
-                <div class="col-sm-2"></div>                
-                <div class="col-sm-9"></div>         
+                <div class="col-sm-2"> </div>                
+                <div class="col-sm-9" >
+                    <p>
+                        <div id="userdata"/>
+                    </p> 
+                </div>         
                 <div class="col-sm-1"></div>
             </div>
+
             <br>
             <div class="row">
                 <div class="col-sm-2"></div>                
