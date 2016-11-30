@@ -52,6 +52,24 @@ vscp._createNS( "vscp.user" );
 vscp.user.count = 0;                // Number of users
 vscp.user.userinfo = new Array;     // User array
 
+/** VSCP user record ordinals
+ *       "userid;name;password;fullname;filter;mask;rights;remotes;events;note"
+ * @enum {number}
+ * @const
+ */
+vscp.user.records = {
+    ID: 0,
+    NAME: 1,
+    PASSWORD: 2,
+    FULLNAME: 3,
+    FILTER: 4,
+    MASK: 5,
+    RIGHTS: 6,
+    REMOTES: 7,
+    EVENTS: 8,
+    NOTE: 9
+};
+
 ///////////////////////////////////////////////////////////////////////////////////////////
 // fetchUsers
 //

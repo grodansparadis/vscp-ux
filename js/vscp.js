@@ -2026,6 +2026,31 @@ vscp.Connection = function() {
      */
     this.userName = "";
 
+    /** User id from authentication AUTH1
+     * @member {number}
+     */
+    this.userId = 0;
+
+    /** User full name from authentication AUTH1
+     * @member {string}
+     */
+    this.userFullname = "";
+
+    /** User rights from authentication AUTH1
+     * @member {number}
+     */
+    this.userRights = new Array;
+
+    /** User allowed remotes from authentication AUTH1
+     * @member {number}
+     */
+    this.userRemotes = new Array;
+
+    /** User allowed events from authentication AUTH1
+     * @member {number}
+     */
+    this.userEvents = new Array;
+
     /** Password used for connection establishment
      * @member {string}
      */
@@ -2495,8 +2520,16 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
 
                     if ( this.states.CONNECTED === this.state ) {
                         this.state = this.states.AUTHENTICATED;
-                        this.signalSuccess( "FUNCTION_CONNECT" );
+                        this.signalSuccess( "FUNCTION_CONNECT" );                        
                     }
+                    
+                    // Save authenticated user info
+                    this.userId = msgItems[2];
+                    this.userFullname = msgItems[3];
+                    this.userRights = msgItems[4].split("/");
+                    this.userRemotes = msgItems[5];
+                    this.userEvents = msgItems[6];
+
                 }
             }
             else if ( "OPEN" === msgItems[ 1 ] ) {

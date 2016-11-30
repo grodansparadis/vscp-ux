@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>VSCP admin interface - Variable maintenance</title>
+    <title>VSCP admin interface - User maintenance</title>
 
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
@@ -72,232 +72,9 @@
         //
         // Wait until the whole website is loaded
         $( document ).ready( function() {
-
-            // Fill types into dropdown
-            vscp.constants.arrTypeNames.forEach( function(u) {
-                // Add to edit type drop down
-                $("#dlgedit_typedd").append("<li><a href=\"javascript:$('#dlgedit_type').val('"
-                                                    + u + "');\">" + u + "</a></li>");
-                // Add to add type drop down
-                $("#dlgadd_typedd").append("<li><a href=\"javascript:$('#dlgadd_type').val('"
-                                                    + u + "');\">" + u + "</a></li>");                                                    
-            });
                 
             // Show navigation bar menu
             navBarMenu.show( "menu", navBarMenu.content );
-
-            // add command to all new editor instances
-            /*
-            ace.require("ace/commands/default_commands").commands.push({
-                name: "Toggle Fullscreen",
-                bindKey: "F11",
-                exec: function( editor ) {
-                    var fullScreen = dom.toggleCssClass( document.body, "fullScreen" )
-                    dom.setCssClass( editor.container, "fullScreen", fullScreen )
-                    editor.setAutoScrollEditorIntoView( !fullScreen )
-                    editor.resize()
-                }
-            }); */
-           
-
-            // Value editor
-            editorValue = ace.edit("editorValue");
-
-            editorValue.on('change', function( e ) {
-                //alert('change');
-            });
-
-            editorValue.commands.addCommand(
-                {
-                    name: 'Save',
-                    bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
-                    exec: function( editorValue ) {
-
-                        ui.disable();
-                        vscpConn.writeVar({
-
-                            name:   curSelectedVariable[0],
-                            type:   curSelectedVariable[6],
-                            value:  editorValue.getSession().getValue(),
-
-                            onSuccess: function( conn ) {
-                                ui.enable();
-                            },
-
-                            onError: function( conn ) {
-                                BootstrapDialog.alert({
-                                    type: BootstrapDialog.TYPE_WARNING,
-                                    message: 'Failed to save variable!'
-                                });                                
-                                ui.enable();
-                            }
-
-                        });
-                    },
-                    readOnly: true // false if this command should not apply in readOnly mode
-                }
-            );
-
-            editorValue.commands.addCommand(
-                {
-                    name: 'Read again',
-                    bindKey: {win: 'Ctrl-R',  mac: 'Command-R'},
-                    exec: function( editorValue ) {
-
-                        var table = $('#variableTable').DataTable();
-                        var rows = table.rows( '.selected' ).data()
-                        var data = rows[0]; // .Split(',');
-
-                        vscpConn.readVar( {
-
-                            name: data[ 0 ],
-                            type: data[ 6 ],
-
-                            onSuccess: function( conn, msg ) {
-                                editorValue.setValue( msg.value );
-                                editorValue.clearSelection();
-                                editorValue.selection.moveTo(0, 0);
-                                editorValue.getSession().setMode("ace/mode/" + 
-                                vscp.getEditorModeFromType( msg.type ));
-                                editorValue.$blockScrolling = Infinity;
-
-                                editorNote.setValue( msg.note );
-                                editorNote.clearSelection();
-                                editorNote.selection.moveTo(0, 0);
-                        
-                                ui.enable();
-                            },
-
-                            onError: function( conn ) {
-                                editorValue.setValue( "Failed to fetch value" );
-                                editorValue.setValue( "Failed to fetch note" );
-                                ui.enable();
-                            }
-                        });
-                    },
-                    readOnly: true // false if this command should not apply in readOnly mode
-                }
-            );
-
-            editorValue.commands.addCommand(
-                {
-                    name: 'Increase size for editor window',
-                    bindKey: {win: 'Ctrl-.',  mac: 'Command-.'},
-                    exec: function( editorValue ) {
-                        $('#editorValue').height( "500px");
-                        editorValue.resize(true);
-                    },
-                    readOnly: true // false if this command should not apply in readOnly mode
-                }
-            );
-
-            editorValue.commands.addCommand(
-                {
-                    name: 'Decrease size for editor window',
-                    bindKey: {win: 'Ctrl-,',  mac: 'Command-,'},
-                    exec: function( editorValue ) {
-                        $('#editorValue').height( "100px");                     
-                        editorValue.resize(true);
-                    },
-                    readOnly: true // false if this command should not apply in readOnly mode
-                }
-            );
-
-            //editorValue.setTheme("ace/theme/iplastic");
-            editorValue.setTheme("ace/theme/solarized_light");
-            editorValue.getSession().setMode("ace/mode/javascript");
-            editorValue.$blockScrolling = Infinity;
-            editorValue.setReadOnly(false);  // false to make it editable
-            editorValue.setShowPrintMargin(false);
-            editorValue.getSession().setNewLineMode("unix");
-            editorValue.setFontSize(16);
-            editorValue.setAutoScrollEditorIntoView(true);
-
-            $('#editorValue').height("100px");
-            //$('#editorValue-section').height( "100px");
-
-            // This call is required for the editor to fix all of
-            // its inner structure for adapting to a change in size
-            editorValue.resize(true);
-
-            // Note editor
-            editorNote = ace.edit("editorNote");
-
-            editorNote.commands.addCommand(
-                {
-                    name: 'Save',
-                    bindKey: {win: 'Ctrl-S',  mac: 'Command-S'},
-                    exec: function( editorNote ) {
-
-                        ui.disable();
-
-                        vscpConn.createVar({
-
-                            name:           curSelectedVariable[0],
-                            value:          editorValue.getSession().getValue(),
-                            note:           editorNote.getSession().getValue(),
-                            type:           curSelectedVariable[6], 
-                            accessrights:   curSelectedVariable[4],
-                            persistency:    curSelectedVariable[2],
-
-                            onSuccess: function( conn ) {
-                                ui.enable();
-                            },
-
-                            onError: function( conn ) {
-                                BootstrapDialog.alert({
-                                    type: BootstrapDialog.TYPE_WARNING,
-                                    message: 'Failed to save variable!'
-                                });
-                                ui.enable();
-                            }
-
-                        });
-                    },
-                    readOnly: true // false if this command should not apply in readOnly mode
-                }
-            );
-
-            editorNote.commands.addCommand(
-                {
-                    name: 'Increase size for note window',
-                    bindKey: {win: 'Ctrl-.',  mac: 'Command-.'},
-                    exec: function( editorNote ) {
-                        $('#editorNote').height( "500px");
-                        editorNote.resize(true);
-                    },
-                    readOnly: true // false if this command should not apply in readOnly mode
-                }
-            );
-
-            editorNote.commands.addCommand(
-                {
-                    name: 'Decrease size for note window',
-                    bindKey: {win: 'Ctrl-,',  mac: 'Command-,'},
-                    exec: function( editorNote ) {
-                        $('#editorNote').height( "100px");
-                        editorNote.resize(true);
-                    },
-                    readOnly: true // false if this command should not apply in readOnly mode
-                }
-            );
-
-            //editorNote.setTheme("ace/theme/iplastic");
-            editorNote.setTheme("ace/theme/solarized_light"); 
-            editorNote.getSession().setMode("ace/mode/html");
-            editorNote.$blockScrolling = Infinity;
-            editorNote.setReadOnly(false);  // false to make it editable
-            editorNote.setShowPrintMargin(false);
-            editorNote.setFontSize(16);
-            editorNote.getSession().setNewLineMode("unix");
-            editorNote.setAutoScrollEditorIntoView(true);
-
-            $('#editorNote').height( "100px");
-            $('#editorNote-section').height( "100px");
-
-            // This call is required for the editor to fix all of
-            // its inner structure for adapting to a change in size
-            editorNote.resize(true);
 
             //vscp.admin.setCopyright();
             vscp.admin.setStatus( "<b>Server:</b> no server selected.", false );
@@ -328,7 +105,7 @@
                 vscp.admin.setStatus( settings.url, false );
             }   
 
-            table = $('#variableTable').DataTable( {
+            table = $('#userTable').DataTable( {
                 select: 'single',
                 dom: 'Bfrtip',
                 "oTableTools": {
@@ -338,23 +115,17 @@
                     'colvis','copy', 'csv','excel', 'pdf','print'
                 ],
                 columns: [
-                    { title: "Name" },
-                    { title: "Type" },
-                    { title: "Persistent" },
-                    { title: "Owner" },
-                    { title: "Permission" },
-                    { title: "lastchange" },
-                    { title: "TypeId", visible: false, searchable: false  },
-                    { title: "OwnerId", visible: false, searchable: false },
-                    /*
-                    {
-                        "targets": -1,
-                        data: null,
-                        width : "5%",
-                        defaultContent: '<span id="rowedit" class="glyphicon glyphicon-edit"> </span> <span id="rowdelete" class="glyphicon glyphicon-remove"> </span>',
-                        orderable: false
-                    },
-                    */                
+                    { title: "Ordinal", visible: false, searchable: false  },
+                    { title: "User id" },
+                    { title: "Username" },
+                    { title: "Password", visible: false, searchable: false  },
+                    { title: "Full Name" },                    
+                    { title: "Filter", visible: false, searchable: false  },
+                    { title: "Mask", visible: false, searchable: false  },
+                    { title: "Rights", visible: false, searchable: false  },
+                    { title: "Allowed Remotes", visible: false, searchable: false  },
+                    { title: "Allowed Events", visible: false, searchable: false  },                    
+                    { title: "Note" },                
                 ],
                 
             });
@@ -369,36 +140,11 @@
 
                     console.log('select');
                     gindexes = indexes;
-                    var row = table.rows( indexes ).data(); //.pluck( 'id' );
+                    var row = table.rows( indexes ).data(); 
                     var data = row[0]; 
 
                     curSelectedVariable = data;
 
-                    vscpConn.readVar({
-
-                        name: data[ 0 ],    // name
-                        type: data[ 6 ],    // id for type
-
-                        onSuccess: function( conn, msg ) {
-                            editorValue.setValue( msg.value );
-                            editorValue.clearSelection();
-                            editorValue.selection.moveTo(0, 0);
-                            editorValue.getSession().setMode("ace/mode/" + 
-                                                                vscp.getEditorModeFromType( msg.type ));
-
-                            editorNote.setValue( msg.note );
-                            editorNote.clearSelection();
-                            editorNote.selection.moveTo(0, 0);
-                        
-                            ui.enable();
-                        },
-
-                        onError: function( conn ) {
-                            editorValue.setValue( "Failed to fetch value" );
-                            editorNote.setValue( "Failed to fetch note" );
-                            ui.enable();
-                        }
-                    });
                 }
                 
             });
@@ -407,11 +153,10 @@
             // deselect row
             //
 
-            table.on( 'deselect', function ( e, dt, type, indexes ) {
+            table.on( 'deselect', function ( e, dt, type, indexes ) 
+            {
                 if ( type === 'row' ) {
-                    console.log('deselect');
-                    editorValue.setValue( "" );
-                    editorNote.setValue( "" );
+  
                 }
             });
  
@@ -419,70 +164,13 @@
             // Double click row
             //
             
-            $('#variableTable tbody').on( 'dblclick', 'tr', function () {
-
-                //$(this).parents('tr') .addClass('selected');
-                //console.log('dbl-click');
-
-                vscpConn.readVar({
-
-                        name: curSelectedVariable[ 0 ],    // name
-                        type: curSelectedVariable[ 6 ],    // id for type
-
-                        onSuccess: function( conn, msg ) {
-
-                            editorValue.setValue( msg.value );
-                            editorValue.clearSelection();
-                            editorValue.selection.moveTo(0, 0);
-                            editorValue.getSession().setMode("ace/mode/" + 
-                                                                vscp.getEditorModeFromType( msg.type ));
-
-                            editorNote.setValue( msg.note );
-                            editorNote.clearSelection();
-                            editorNote.selection.moveTo(0, 0);
-                        
-                            ui.enable();
-
-                            editVariable();
-                        },
-
-                        onError: function( conn ) {
-                            editorValue.setValue( "Failed to fetch value" );
-                            editorNote.setValue( "Failed to fetch note" );
-                            ui.enable();
-                        }
-                });
+            $('#userTable tbody').on( 'dblclick', 'tr', function () 
+            {
+    
                             
             });
 
-            ///////////////////////////////////////////////////////////////////////////////////////////////
-            // Single click row
-            //
             
-            /*$('#variableTable tbody').on( 'click', 'tr', function () {
-                //console.log("Single click");
-            });*/
-
-            
-            ///////////////////////////////////////////////////////////////////////////////////////////////
-            // rowedit click
-            //
-
-            /*$('#variableTable tbody').on( 'click', '#rowedit', function () {
-                var data = table.row( $(this).parents('tr') ).data();
-                $(this).parents('tr') .addClass('selected');
-                showEditDialog();
-            });*/
-
-            ///////////////////////////////////////////////////////////////////////////////////////////////
-            // rowdelete click
-            //
-
-            /*$('#variableTable tbody').on( 'click', '#rowdelete', function () {
-                var data = table.row( $(this).parents('tr') ).data();
-                //$(this).addClass('selected');
-                alert( 'Delete ' + data[0]  );
-            });*/
         
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Credential handling
@@ -613,21 +301,36 @@
         function fetchUsers() {
             
             // Fetch users
-            vscp.user.fetchUsers( function() {
+            vscp.user.fetchUsers( 
+                // Success
+                function() {
+
+                    // Clear table
+                    table.clear().draw();
+
+                    var idx = 0;
+                    vscp.user.userinfo.forEach( function( u ) { 
+                        //alert( u );
+                        table.row.add( [
+                                    idx++,
+                                    u[vscp.user.records.ID],
+                                    u[vscp.user.records.NAME],
+                                    u[vscp.user.records.PASSWORD], 
+                                    u[vscp.user.records.FULLNAME],
+                                    u[vscp.user.records.FILTER],
+                                    u[vscp.user.records.MASK],
+                                    u[vscp.user.records.RIGHTS],
+                                    u[vscp.user.records.REMOTES],
+                                    u[vscp.user.records.EVENTS],                                     
+                                    u[vscp.user.records.NOTE] 
+                                ] ).draw( false ); 
+
+                    });    
 
                     // Enable the user interface
-                    ui.enable();
-
-                    // Fill drop downs with user data
-                    vscp.user.fillUserDropdown("#dlgedit_userdd", "#dlgedit_owner" );
-                    $('#dlgedit_userbtn').prop('disabled', true);   // Disable dropdown button
-                    vscp.user.fillUserDropdown("#dlgadd_userdd", "#dlgadd_owner");
-                    $('#dlgadd_userbtn').prop('disabled', true);   // Disable dropdown button
-
-                    // Load variables
-                    fetchVariables();
-                                    
+                    ui.enable();      
                 },
+                // Error
                 function() {
                                     
                     // Enable the user interface
@@ -643,76 +346,22 @@
             );     
         }
 
-        ///////////////////////////////////////////////////////////////////////////////////////////
-        // fetchVariables
-        //
-
-        function fetchVariables() {
-
-            editorValue.setValue("");
-            editorNote.setValue("");
-
-            waitingDialog.show('Fetching variables...', {dialogSize: 'xm', progressType: 'warning'});
-
-            ui.disable();
-
-            var localregex = $("#myRegExp").val();
-
-            // Clear table
-            table.clear().draw();                
-
-            vscpConn.listVar({
-
-                regex: $("#myRegExp").val(),
-
-                onVariable: function( conn, variable ) {
-                        
-                    table.row.add( [
-                                variable.name.toLowerCase(), 
-                                vscp.getVarTypeName( variable.type ), 
-                                variable.persistency ? "true" : "false", 
-                                vscp.user.getUserFromId( variable.userid ), 
-                                variable.accessright.toString(16), 
-                                variable.lastchange,
-                                variable.type,
-                                variable.userid
-                            ] ).draw( false );  
-
-                },
-
-                onSuccess: function( conn ) {
-
-                    ui.enable();                    
-                    waitingDialog.hide();
-
-                    // Select first row
-                    table.row( 0 ).select();
-
-                },
-
-                onError: function( conn ) {
-                    ui.enable();
-                    waitingDialog.hide();
-                }
-
-            });
-
-        };
+        
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // deleteVariable
+        // deleteUser
         //
 
-        function deleteVariable() 
+        function deleteUser() 
         {
-            var table = $('#variableTable').DataTable();
+            var table = $('#userTable').DataTable();
             var data = table.rows('.selected').data();
 
             if ( undefined == data[0] ) {
                 BootstrapDialog.alert({
                     title: 'WARNING',
                     type: BootstrapDialog.TYPE_WARNING,
-                    message: 'A row must be selected for a variable to be deleted'
+                    message: 'A row must be selected for a user to be deleted'
                 });
                 return;
             }
@@ -766,21 +415,21 @@
         
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // editVariable
+        // editUser
         //
         // Show the edit dialog
         //
 
-        function editVariable() 
+        function editUser() 
         {
-            var table = $('#variableTable').DataTable();
+            var table = $('#userTable').DataTable();
             var data = table.rows('.selected').data();
 
             if ( undefined == data[0] ) {
                 BootstrapDialog.alert({
                     title: 'WARNING',
                     type: BootstrapDialog.TYPE_WARNING,
-                    message: 'A row must be selected for a variable to be edited'
+                    message: 'A row must be selected for a user to be edited'
                 });
                 return;
             }
@@ -907,15 +556,15 @@
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // duplicateVariable
+        // duplicateUser
         //
-        // Duplicate selected variable
+        // Duplicate selected user
         //
 
         function duplicateVariable() 
         {
-            var table = $('#variableTable').DataTable();
-            //var data = $('#variableTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
+            var table = $('#userTable').DataTable();
+            //var data = $('#userTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
             var row = table.rows('.selected').data();            
 
             if ( undefined == row[0] ) {
@@ -951,15 +600,15 @@
         };
 
         //////////////////////////////////////////////////////////////////////////////////////////
-        // addVariable
+        // addUser
         //
 
-        function addVariable() 
+        function addUser() 
         {
-            var table = $('#variableTable').DataTable();
+            var table = $('#userTable').DataTable();
 
             //var data = table.rows('.selected').data();
-            var data = $('#variableTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
+            var data = $('#userTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
             
 
             addDialog();
@@ -992,14 +641,14 @@
         
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // isVariableInTable
+        // isUserInTable
         //
 
-        function isVariableInTable( name ) {
+        function isUserInTable( name ) {
             
             for ( i=0; i<table.rows().count(); i++ ) {
                 
-                if ( name.toLowerCase() == $('#variableTable').dataTable({bRetrieve: true}).fnGetData(i)[0]  ) {
+                if ( name.toLowerCase() == $('#userTable').dataTable({bRetrieve: true}).fnGetData(i)[0]  ) {
                     return i;
                 }
             }
@@ -1099,7 +748,7 @@
     <!-- **************************************************************************************-->
     <!--                              Modal to edit variable                                   -->
     <!-- **************************************************************************************-->
-    <div id="dlgEditVariable" class="modal fade" role="dialog">
+    <div id="dlgEditUser" class="modal fade" role="dialog">
         
         <div class="modal-dialog">
 
@@ -1193,7 +842,7 @@
     <!-- **************************************************************************************-->
     <!--                              Modal to add variable                                   -->
     <!-- **************************************************************************************-->
-    <div id="dlgAddVariable" class="modal fade" role="dialog">
+    <div id="dlgAddUser" class="modal fade" role="dialog">
         
         <div class="modal-dialog">
 
@@ -1302,7 +951,7 @@
     <!--                                                    Table-area                                                        -->
     <!-- **********************************************************************************************************************-->
     <div class="container-fluid">
-        <h1>VSCP remote variables</h1>
+        <h1>VSCP users</h1>
 
         <div class="container-fluid">            
             <div class="row">
@@ -1311,17 +960,8 @@
             <div class="row">                
                 <div class="col-sm-2">
                     
-                    <div class="input-group">
-                        <label for="basic-url">Select variables</label>
-                    </div>
-
-                    <div class="input-group"> 
-                        <span class="input-group-addon" id="basic-addon1">:</span>
-                        <input id="myRegExp" type="text" class="form-control" placeholder="regexp" aria-describedby="basic-addon1" >         
-                    </div>
-                    <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-primary col-sm-12" onclick="fetchVariables();">
+                        <button type="button" class="btn btn-primary col-sm-12" onclick="vscp.user.fetchUsers();">
                             <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch variables
                         </button>
                     </div>
@@ -1329,76 +969,53 @@
 
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="editVariable();">
-                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit variable
+                        <button type="button" class="btn btn-success col-sm-12" onclick="editUser();">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span> Edit user
                         </button>
                     </div>
                     </p>
                     
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="addVariable();">
-                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add variable
+                        <button type="button" class="btn btn-success col-sm-12" onclick="addUser();">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add user
                         </button>
                     </div>
                     </p>
 
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="deleteVariable();">
-                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete variable
+                        <button type="button" class="btn btn-success col-sm-12" onclick="deleteUser();">
+                            <span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete user
                         </button>
                     </div>
                     </p>
 
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="duplicateVariable()">
-                            <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate variable
+                        <button type="button" class="btn btn-success col-sm-12" onclick="duplicateUser()">
+                            <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate user
                         </button>
                     </div>
                     </p>
-
-                    <p>
-                    <!--  TODO    
-                    <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="showTable();">
-                            <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Import variables
-                        </button>
-                    </div>
-                    </p>
-                    -->        
+       
                 </div>
                 
                 <div class="col-sm-9">
-                    <table id="variableTable"  class="table table-striped table-bordered table-hover display nowrap" cellspacing="50" width="100%"></table>
+                    <table id="userTable"  class="table table-striped table-bordered table-hover display nowrap" cellspacing="50" width="100%"></table>
                 </div>
                 <div class="col-sm-1"></div>
             </div>
 
             <div class="row">
-                <div class="col-sm-2"><b>Shortcut keys</b><br><b>ctrl+'S'</b> - Save variable<br><b>ctrl+'R'</b> - Read variable<br><b>ctrl+'.'</b> - Increase size<br><b>ctrl+','</b> - Decreas size<br></div>                
-                <div class="col-sm-9">
-                    <b>Value:</b>
-                    <div class="ace-holder">
-                        <div id="divval" class="ace-editor">
-                            <div id="editorValue"></div>
-                        </div>
-                    </div>     
-                </div>         
+                <div class="col-sm-2"></div>                
+                <div class="col-sm-9"></div>         
                 <div class="col-sm-1"></div>
             </div>
             <br>
             <div class="row">
                 <div class="col-sm-2"></div>                
-                <div class="col-sm-9">
-                    <b>Note:</b>
-                    <div class="ace-holder">
-                        <div class="ace-editor">
-                            <div id="editorNote"></div>
-                        </div>
-                    </div>        
-                </div>         
+                <div class="col-sm-9"></div>         
                 <div class="col-sm-1"></div>
             </div>     
 
