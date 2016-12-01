@@ -49,7 +49,6 @@ var vscp = vscp || {};
  */
 vscp._createNS( "vscp.user" );
 
-vscp.user.count = 0;                // Number of users
 vscp.user.userinfo = new Array;     // User array
 
 /** VSCP user record ordinals
@@ -90,14 +89,17 @@ vscp.user.fetchUsers = function ( onSuccessEx, onErrorEx ) {
         _onError = onErrorEx;
     }
 
+    // Clear user info array
+    vscp.user.userinfo = [];
+
     vscpConn.readVar({
     
         name: "vscp.user.count",
 
         onSuccess: function( conn, options ) {
 
-            vscp.user.count = options.value;    
-            for ( i=0; i<options.value; i++ ) {    
+            var count = options.value;    
+            for ( i=0; i<count; i++ ) {    
  
                 vscpConn.readVar({
 
@@ -112,7 +114,7 @@ vscp.user.fetchUsers = function ( onSuccessEx, onErrorEx ) {
                         var dd =  options.name.split("."); 
 
                         // Signal success when last user is read
-                        if ( (vscp.user.count-1) == dd[2] ) {
+                        if ( (count-1) == dd[2] ) {
                             _onSuccess && _onSuccess();
                         }
 

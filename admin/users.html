@@ -326,13 +326,14 @@
 
         function fetchUsers() {
             
+            // Clear table
+            table.clear().draw();
+
             // Fetch users
             vscp.user.fetchUsers( 
+
                 // Success
                 function() {
-
-                    // Clear table
-                    table.clear().draw();
 
                     var idx = 0;
                     vscp.user.userinfo.forEach( function( u ) { 
@@ -348,7 +349,7 @@
                                     u[vscp.user.records.RIGHTS],
                                     u[vscp.user.records.REMOTES],
                                     u[vscp.user.records.EVENTS],                                     
-                                    u[vscp.user.records.NOTE] 
+                                    vscp.b64DecodeUnicode(u[vscp.user.records.NOTE]) 
                                 ] ).draw( false ); 
 
                     });    
@@ -473,28 +474,28 @@
         function editDialog( data ) 
         {
             // Can not change stock variables
-            if ( data[ 0 ].startsWith("vscp.")  ) {
-                $('#dlgedit_permission').prop('readonly', true);
-                $('#dlgedit_note').prop('readonly', true);
+            if ( parseInt( data[ 1 ] ) <= 0  ) {
+                BootstrapDialog.alert({
+                        title: 'WARNING',
+                        type: BootstrapDialog.TYPE_WARNING,
+                        message: 'Internal users can not be edited.'
+                });
+                return;
             }
-            else {
-                $('#dlgedit_permission').prop('readonly', false);
-                $('#dlgedit_note').prop('readonly', false);
-            }
+            
+            $('#dlgedit_ordinal').val( data[ 0 ] );
+            $('#dlgedit_username').val( data[ 2 ] );
+            $('#dlgedit_password').val( data[ 3 ] );
+            $('#dlgedit_password2').val( data[ 3 ] );
+            $('#dlgedit_fullname').val( data[ 4 ] );
+            $('#dlgedit_filter').val( data[ 5 ] );
+            $('#dlgedit_mask').val( data[ 6 ] );
+            $('#dlgedit_rights').val( data[ 7 ] );
+            $('#dlgedit_remotes').val( data[ 8 ] );
+            $('#dlgedit_events').val( data[ 9 ] );
+            $('#dlgedit_note').val( data[ 10 ] );
 
-            $('#dlgedit_name').val( data[ 0 ] );
-            $('#dlgedit_type').val( data[ 1 ] );
-            $('#dlgedit_persistent').val( data[ 2 ] );
-            $('#dlgedit_owner').val( data[ 3 ] );
-            $('#dlgedit_permission').val( data[ 4 ] );
-
-            var evmain = ace.edit("editorValue");
-            var enmain = ace.edit("editorNote");
-
-            $('#dlgedit_value').val( evmain.getValue() );
-            $('#dlgedit_note').val( enmain.getValue() );
- 
-            $('#dlgEditVariable').modal();
+            $('#dlgEditUser').modal();
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -505,16 +506,62 @@
 
         var saveEditResult = function() {
 
-            var evmain = ace.edit("editorValue");
-            var enmain = ace.edit("editorNote");
+            ui.disable();
 
-            evmain.setValue( $('#dlgedit_value').val() );
-            evmain.clearSelection();
+            var user = $('#dlgedit_username').val() + ";" +
+                        $('#dlgedit_password').val() + ";" +
+                        $('#dlgedit_fullname').val() + ";" +
+                        $('#dlgedit_filter').val() + ";" +
+                        $('#dlgedit_mask').val() + ";" +
+                        $('#dlgedit_rights').val() + ";" +
+                        $('#dlgedit_remotes').val() + ";" +
+                        $('#dlgedit_events').val() + ";" +
+                        vscp.b64EncodeUnicode( $('#dlgedit_note').val() );
 
-            enmain.setValue( $('#dlgedit_note').val() );
-            enmain.clearSelection();
+            alert( user );            
 
-            vscpConn.createVar({
+            vscpConn.writeVar({ 
+                name: "vscp.user." + $('#dlgedit_ordinal').val(),
+                value: user,
+                type: vscp.constants.varTypes.STRING.toString(),
+
+                onSuccess: function( conn ) {
+                    
+                    vscpConn.readVar({
+
+                        name: options.name,
+
+                        onSuccess: function( conn, options ) {  
+
+                            // Add to array
+                            var items = options.value.split(";"); 
+                            alert( items );
+
+                        },
+                        onError: function( conn ) {
+                            BootstrapDialog.alert({
+                                title: 'ERROR',
+                                type: BootstrapDialog.TYPE_DANGER,
+                                message: 'Failed to read back user data ' + options.name
+                            });
+                        }
+                    });
+
+                },
+
+                onError: function( conn ) {
+                    
+                    BootstrapDialog.alert({
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Failed to save variable!'
+                    });
+
+                    ui.enable();
+                }
+            });                 
+
+            /*vscpConn.createVar({
 
                 name:           curSelectedVariable[0],
                 value:          $('#dlgedit_value').val(),
@@ -578,7 +625,7 @@
                     ui.enable();
                 }
 
-            });
+            });*/
 
         };
 
@@ -784,73 +831,98 @@
                 
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Edit VSCP remote variable</h4>
+                    <h4 id="editdlg_header" class="modal-title">Edit VSCP user</h4>
                 </div>
 
                 <div class="modal-body">
    
                     <form role="form">
 
+                        <input type="hidden" class="form-control" id="dlgedit_ordinal"  >
+
                         <div class="form-group">
-                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> name</label>
-                            <input type="text" class="form-control" id="dlgedit_name" readonly >
-                            <span class="help-block">Name of variable. Can not be changed.</span>
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> Username</label>
+                            <input type="text" class="form-control" id="dlgedit_username"  >
+                            <span class="help-block">Username for user (must be unique).</span>
                         </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>                    
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> Password</label>
+                            <input type="password" class="form-control" id="dlgedit_password"  >
+                            <span class="help-block">Password for user.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> Repeat password</label>
+                            <input type="password" class="form-control" id="dlgedit_password2"  >
+                            <span class="help-block">Repeat password for user.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> Full name</label>
+                            <input type="text" class="form-control" id="dlgedit_fullname"  >
+                            <span class="help-block">Full name of user.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Filter</label>                    
                             <div class="input-group">                                
-                                <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_type">
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_filter">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle" 
-                                                data-toggle="dropdown" aria-haspopup="true" 
-                                                aria-expanded="false">types <span class="caret"></span></button>
-                                    <ul id="dlgedit_typedd" class="dropdown-menu dropdown-menu-right">
-                                    </ul>
+                                    <button type="button" class="btn btn-success btn-sm">Set filter</button>
                                 </div>
                             </div>
-                            <span class="help-block">Set variable type.</span>
+                            <span class="help-block">Set user filter.</span>
                         </div>
 
-
                         <div class="form-group">
-                            <label for="persistent"><span class="glyphicon glyphicon-asterisk"></span> persistence</label>
-                            <input type="text" class="form-control" id="dlgedit_persistent" readonly >
-                            <span class="help-block">Variable persistance. Can not be changed.</span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="owner"><span class="glyphicon glyphicon-asterisk"></span> owner</label>                    
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Mask</label>                    
                             <div class="input-group">                                
-                                <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_owner">
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_mask">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle" 
-                                                id="dlgedit_userbtn"
-                                                data-toggle="dropdown" aria-haspopup="true" 
-                                                aria-expanded="false">users <span class="caret"></span></button>
-                                    <ul id="dlgedit_userdd" class="dropdown-menu dropdown-menu-right">
-                                    </ul>
+                                    <button type="button" class="btn btn-success btn-sm">Set mask</button>
                                 </div>
                             </div>
-                            <span class="help-block">Owner of variable is logged in user. Can not be changed.</span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="permission"><span class="glyphicon glyphicon-asterisk"></span> permission</label>
-                            <input type="text" class="form-control" id="dlgedit_permission" placeholder="Enter permissions">
-                            <span class="help-block">Set permissions for the variable. Permissions are given as tre hex numbers one each for user/group and others. Each of the digits is three bits for read, write and execute.</span>
+                            <span class="help-block">Set user mask.</span>
                         </div>
 
                         <div class="form-group">
-                            <label for="value"><span class="glyphicon glyphicon-asterisk"></span> value</label>
-                            <textarea class="form-control" rows="6" id="dlgedit_value" placeholder="Enter value"></textarea>
-                            <span class="help-block">Enter the value for the variable. May be easier to edit in the mainscreen enitor</span>
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Rights</label>                    
+                            <div class="input-group">                                
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_rights">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-success btn-sm">Set rights</button>
+                                </div>
+                            </div>
+                            <span class="help-block">Set user rights.</span>
                         </div>
 
+                        <div class="form-group">
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Remotes</label>                    
+                            <div class="input-group">                                
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_remotes">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-success btn-sm">Set remotes</button>
+                                </div>
+                            </div>
+                            <span class="help-block">Set allowed remotes this user can log in from ("*" is all).</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Events</label>                    
+                            <div class="input-group">                                
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_events">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-success btn-sm">Set events</button>
+                                </div>
+                            </div>
+                            <span class="help-block">Set allowed events this used can send ("*" is all).</span>
+                        </div>
+                     
                         <div class="form-group">
                             <label for="note"><span class="glyphicon glyphicon-asterisk"></span> note</label>
                             <textarea class="form-control" rows="6" id="dlgedit_note" placeholder="Enter value"></textarea>
-                            <span class="help-block">Enter an optional description for the variable. Presented as HTML. May be easier to edit in the mainscreen enitor</span>
+                            <span class="help-block">Enter an optional description for the user. Presented as HTML.</span>
                         </div>
                         
                     </form>
@@ -988,7 +1060,7 @@
                 <div class="col-sm-2">
                     
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-primary col-sm-12" onclick="vscp.user.fetchUsers();">
+                        <button type="button" class="btn btn-primary col-sm-12" onclick="fetchUsers();">
                             <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch users
                         </button>
                     </div>
