@@ -181,8 +181,7 @@
             
             $('#userTable tbody').on( 'dblclick', 'tr', function () 
             {
-    
-                            
+                editUser();              
             });
 
             
@@ -518,9 +517,10 @@
                         $('#dlgedit_events').val() + ";" +
                         vscp.b64EncodeUnicode( $('#dlgedit_note').val() );
 
-            alert( user );            
+            //alert( user );            
 
             vscpConn.writeVar({ 
+
                 name: "vscp.user." + $('#dlgedit_ordinal').val(),
                 value: user,
                 type: vscp.constants.varTypes.STRING.toString(),
@@ -529,7 +529,7 @@
                     
                     vscpConn.readVar({
 
-                        name: options.name,
+                        name: "vscp.user." + $('#dlgedit_ordinal').val(),
 
                         onSuccess: function( conn, options ) {  
 
