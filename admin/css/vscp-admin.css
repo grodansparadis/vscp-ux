@@ -75,3 +75,9 @@ img.logo {
     width: 100%;
     height: 100%;
 }
+
+/* 
+  Fix for bootstrap modal multiopen issue
+  https://github.com/nakupanda/bootstrap3-dialog/issues/70
+*/
+.modal { overflow: auto !important; }

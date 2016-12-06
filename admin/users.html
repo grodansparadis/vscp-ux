@@ -497,10 +497,13 @@
             }
 
             $('#editdlg_header').html("Edit VSCP system user");
+
+            // Can not change username
+            $("#dlgedit_username").prop("readonly", true);
             
             $('#dlgedit_ordinal').val( data[ 0 ] );
             $('#dlgedit_username').val( data[ 2 ] );
-            $('#dlgedit_password').val( data[ 3 ] );
+            $('#dlgedit_password1').val( data[ 3 ] );
             $('#dlgedit_password2').val( data[ 3 ] );
             $('#dlgedit_fullname').val( data[ 4 ] );
             $('#dlgedit_filter').val( data[ 5 ] );
@@ -509,6 +512,8 @@
             $('#dlgedit_remotes').val( data[ 8 ] );
             $('#dlgedit_events').val( data[ 9 ] );
             $('#dlgedit_note').val( data[ 10 ] );
+
+            doPasswordOnKeyUp();
 
             $('#dlgEditUser').modal();
         };
@@ -519,7 +524,21 @@
         // Save results from edit dialog
         //
 
-        var saveEditResult = function() {
+        var saveEditResult = function() 
+        {
+
+            if ( $("#pw1grp").hasClass("has-error") ) {
+                
+                BootstrapDialog.alert({
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'The two password fields must have the same content.'
+                });;
+
+                return;
+            }
+
+            $('#dlgEditUser').modal("hide");
 
             ui.disable();
 
@@ -637,11 +656,14 @@
 
             var data = row[0];
             
-            $('#editdlg_header').html("Duplicate existing VSCP system user");            
+            $('#editdlg_header').html("Duplicate existing VSCP system user");  
+
+            // Can change username
+            $("#dlgedit_username").prop("readonly", false);          
             
             $('#dlgedit_ordinal').val("-1");
             $('#dlgedit_username').val(data[2]+"_new");
-            $('#dlgedit_password').val(data[3]);
+            $('#dlgedit_password1').val(data[3]);
             $('#dlgedit_password2').val(data[3]);
             $('#dlgedit_fullname').val(data[4]);
             $('#dlgedit_filter').val(data[5]);
@@ -661,11 +683,14 @@
 
         function addUser() 
         {
-            $('#editdlg_header').html("Add new VSCP system user");            
+            $('#editdlg_header').html("Add new VSCP system user");  
+
+            // Can change username
+            $("#dlgedit_username").prop("readonly", false);           
             
             $('#dlgedit_ordinal').val("-1");
             $('#dlgedit_username').val("");
-            $('#dlgedit_password').val("");
+            $('#dlgedit_password1').val("");
             $('#dlgedit_password2').val("");
             $('#dlgedit_fullname').val("");
             $('#dlgedit_filter').val("0,0,0,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00");
@@ -718,8 +743,19 @@
 
         var saveAddResult = function() {
 
+            if ( $("#pw1grp").hasClass("has-error") ) {
+                
+                BootstrapDialog.alert({
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'The two password fields must have the same content.'
+                });;
+
+                return;
+            }
+
             var user = $('#dlgedit_username').val() + ";" +
-                        $('#dlgedit_password').val() + ";" +
+                        $('#dlgedit_password1').val() + ";" +
                         $('#dlgedit_fullname').val() + ";" +
                         $('#dlgedit_filter').val() + ";" +
                         $('#dlgedit_mask').val() + ";" +
@@ -755,6 +791,166 @@
             });
         };
 
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // filterDialog
+        //
+        // Show modal for setting filter
+        //
+
+        function filterDialog( filter ) 
+        { 
+            items = filter.split(',');
+
+            $('#dlgfilter_vscppriority').val(items[0]);
+            $('#dlgfilter_vscpclass').val(items[1]);
+            $('#dlgfilter_vscptype').val(items[2]);
+            $('#dlgfilter_vscpguid').val(items[3]);
+
+            $('#dlgFilter').modal();
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // saveFilterResult
+        //
+
+        function saveFilterResult()
+        {
+            var filterguid = $('#dlgfilter_vscpguid').val();
+            filterguid = filterguid.trim();
+            if ( '-' == filterguid ) {
+                filterguid = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00";
+            }
+
+            var filter = $('#dlgfilter_vscppriority').val() + ',' +
+                            $('#dlgfilter_vscpclass').val() + ',' +
+                            $('#dlgfilter_vscptype').val() + ',' +
+                            filterguid;
+            $(dlgedit_filter).val( filter );
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // maskDialog
+        //
+        // Show modal for setting mask
+        //
+
+        function maskDialog( filter ) 
+        { 
+            items = filter.split(',');
+
+            $('#dlgmask_vscppriority').val(items[0]);
+            $('#dlgmask_vscpclass').val(items[1]);
+            $('#dlgmask_vscptype').val(items[2]);
+            $('#dlgmask_vscpguid').val(items[3]);
+
+            $('#dlgMask').modal();
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // saveMaskResult
+        //
+
+        function saveMaskResult()
+        {
+            var maskguid = $('#dlgmask_vscpguid').val();
+            maskguid = maskguid.trim();
+            if ( '-' == maskguid ) {
+                maskguid = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00";
+            }
+
+            var mask = $('#dlgmask_vscppriority').val() + ',' +
+                            $('#dlgmask_vscpclass').val() + ',' +
+                            $('#dlgmask_vscptype').val() + ',' +
+                            maskguid;
+            $(dlgedit_mask).val( mask );                            
+        };
+
+        function doPasswordOnKeyUp()
+        {
+            //$(dlgedit_password2).val( $(dlgedit_password1).val() );
+            if ( $('#dlgedit_password1').val() != $('#dlgedit_password2').val() ) {
+                $("#pw1grp").addClass("has-error has-feedback");
+                $("#pw2grp").addClass("has-error has-feedback");
+            } 
+            else {
+                $("#pw1grp").removeClass("has-error");
+                $("#pw2grp").removeClass("has-error");
+            }  
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // rightsDialog
+        //
+        // Show modal for setting of user rights
+        //
+
+        function rightsDialog( rights ) 
+        { 
+            items = rights.split('/');
+
+            $('#dlgRights').modal();
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // saveRightsResult
+        //
+
+        function saveRightsResult()
+        {
+            var byte = [0,0,0,0,0,0,0,0];
+
+            // Byte 0
+            $("input:checkbox[name=byte0]:checked").each( function() {
+                byte[0] += parseInt( $(this).val() );
+            });
+
+            // Byte 1
+            $("input:checkbox[name=byte1]:checked").each( function() {
+                byte[1] += parseInt( $(this).val() );
+            });
+
+            // Byte 2
+            $("input:checkbox[name=byte2]:checked").each( function() {
+                byte[2] += parseInt( $(this).val() );
+            });
+
+            // Byte 3
+            $("input:checkbox[name=byte3]:checked").each( function() {
+                byte[3] += parseInt( $(this).val() );
+            });
+
+            // Byte 4
+            $("input:checkbox[name=byte4]:checked").each( function() {
+                byte[4] += parseInt( $(this).val() );
+            });
+
+            // Byte 5
+            $("input:checkbox[name=byte5]:checked").each( function() {
+                byte[5] += parseInt( $(this).val() );
+            });
+
+            // Byte 6
+            $("input:checkbox[name=byte6]:checked").each( function() {
+                byte[6] += parseInt( $(this).val() );
+            });
+
+            // Byte 7
+            $("input:checkbox[name=byte7]:checked").each( function() {
+                byte[7] += parseInt( $(this).val() );
+            });
+
+            $('#dlgedit_rights').val(
+                byte[0].toString() + "/" +
+                byte[1].toString() + "/" + 
+                byte[2].toString() + "/" +
+                byte[3].toString() + "/" +
+                byte[4].toString() + "/" +
+                byte[5].toString() + "/" +
+                byte[6].toString() + "/" +
+                byte[7].toString()
+            )
+        }
+
     </script>
 
 </head>
@@ -781,21 +977,21 @@
 
                         <input type="hidden" class="form-control" id="dlgedit_ordinal"  >
 
-                        <div class="form-group">
+                        <div class="form-group" >
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> Username</label>
                             <input type="text" class="form-control" id="dlgedit_username"  >
                             <span class="help-block">Username for user (must be unique).</span>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="pw1grp">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> Password</label>
-                            <input type="password" class="form-control" id="dlgedit_password"  >
+                            <input type="password" class="form-control" id="dlgedit_password1" onkeyup="doPasswordOnKeyUp();"  >
                             <span class="help-block">Password for user.</span>
                         </div>
 
-                        <div class="form-group">
+                        <div class="form-group" id="pw2grp">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> Repeat password</label>
-                            <input type="password" class="form-control" id="dlgedit_password2"  >
+                            <input type="password" class="form-control" id="dlgedit_password2" onkeyup="doPasswordOnKeyUp();" >
                             <span class="help-block">Repeat password for user.</span>
                         </div>
 
@@ -810,7 +1006,7 @@
                             <div class="input-group">                                
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_filter">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success btn-sm">Set filter</button>
+                                    <button type="button" onclick="filterDialog( $('#dlgedit_filter').val() );" class="btn btn-success btn-sm">Set filter</button>
                                 </div>
                             </div>
                             <span class="help-block">Set user filter.</span>
@@ -821,7 +1017,7 @@
                             <div class="input-group">                                
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_mask">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success btn-sm">Set mask</button>
+                                    <button type="button" onclick="maskDialog( $('#dlgedit_mask').val() );" class="btn btn-success btn-sm">Set mask</button>
                                 </div>
                             </div>
                             <span class="help-block">Set user mask.</span>
@@ -832,7 +1028,7 @@
                             <div class="input-group">                                
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_rights">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success btn-sm">Set rights</button>
+                                    <button type="button" onclick="rightsDialog( $('#dlgedit_rights').val() );" class="btn btn-success btn-sm">Set rights</button>
                                 </div>
                             </div>
                             <span class="help-block">Set user rights.</span>
@@ -846,7 +1042,7 @@
                                     <button type="button" class="btn btn-success btn-sm">Set remotes</button>
                                 </div>
                             </div>
-                            <span class="help-block">Set allowed remotes this user can log in from ("*" is all).</span>
+                            <span class="help-block">Set remotes this user can log in from ("*" is all).</span>
                         </div>
 
                         <div class="form-group">
@@ -857,7 +1053,7 @@
                                     <button type="button" class="btn btn-success btn-sm">Set events</button>
                                 </div>
                             </div>
-                            <span class="help-block">Set allowed events this used can send ("*" is all).</span>
+                            <span class="help-block">Set events this user can send ("*" is all).</span>
                         </div>
                      
                         <div class="form-group">
@@ -869,13 +1065,299 @@
                     </form>
                 </div>
                 <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveEditResult()">Save</button>                  
+                    <button type="button" class="btn btn-success btn-lg" onclick="saveEditResult()">Save</button>                  
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
 
         </div>
 
+    </div>
+
+
+    <!-- **************************************************************************************-->
+    <!--                              Modal to edit filter                                   -->
+    <!-- **************************************************************************************-->
+    <div id="dlgFilter" class="modal fade" role="dialog">
+        
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="filterdlg_header" class="modal-title">Edit VSCP user filter</h4>
+                </div>
+
+                <div class="modal-body">
+   
+                    <form role="form">
+
+                        <div class="form-group">
+                            <label for="priority"><span class="glyphicon glyphicon-asterisk"></span> priority</label>                    
+                            <div class="input-group">                                
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgfilter_vscppriority">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-success dropdown-toggle" 
+                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                aria-expanded="false">priority <span class="caret"></span></button>
+                                    <ul id="dlgfilter_prioritydd" class="dropdown-menu dropdown-menu-right">
+                                        <li>Very Very High (0)</li>
+                                        <li>Very High (1)</li>
+                                        <li>High (2)</li>
+                                        <li>Above normal (3)</li>
+                                        <li>Normal (4)</li>
+                                        <li>Low (5)</li>
+                                        <li>Very Low (6)</li>
+                                        <li>Very very Low (7)</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <span class="help-block">If user should receive all events regardless of priority set this value
+                                to zero for a don't care. If user just should see events of a certain priority set to 0xFF and
+                                set the priority of interest in the corresponding filter. </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> VSCP Class</label>
+                            <input type="text" class="form-control" id="dlgfilter_vscpclass"  >
+                            <span class="help-block">If user should receive all events regardless of VSCP class set this value
+                                to zero for a don't care. If user shuld just see events of a certain VSC class set to 0xFFFF and
+                                set the VSCP class of interest in the corresponding filter.
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> VSCP Type</label>
+                            <input type="text" class="form-control" id="dlgfilter_vscptype"  >
+                            <span class="help-block">If user should receive all events regardless of VSCP type set this value
+                                to zero for a don't care. If user shuld just see events of a certain VSCP type set to 0xFFFF and
+                                set the VSCP type of interest in the corresponding filter.
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> GUID</label>
+                            <input type="text" class="form-control" id="dlgfilter_vscpguid"  >
+                            <span class="help-block">Set to all zeros if user should see events from all devices and interfaces. Set to
+                                'FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:00:00 if user should just see events from a specific interface.
+                                Then enter the interface GUID in the corresponding GUID filter. 
+                                You can enter a single '-' for a filter with all zeros.                           
+                            </span>
+                        </div>
+
+                        
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">  
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveFilterResult()">Save</button>                  
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    
+
+    <!-- **************************************************************************************-->
+    <!--                              Modal to edit mask                                   -->
+    <!-- **************************************************************************************-->
+    <div id="dlgMask" class="modal fade" role="dialog">
+        
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="filterdlg_header" class="modal-title">Edit VSCP user mask</h4>
+                </div>
+
+                <div class="modal-body">
+   
+                    <form role="form">
+
+                        <div class="form-group">
+                            <label for="priority"><span class="glyphicon glyphicon-asterisk"></span> priority</label>                    
+                            <div class="input-group">                                
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgmask_vscppriority">                                
+                            </div>
+                            <span class="help-block">Set priority (0 (high)-7 (low)).</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> VSCP Class</label>
+                            <input type="text" class="form-control" id="dlgmask_vscpclass"  >
+                            <span class="help-block">Normally you set a Level I or Level II VSCP class here that 
+                                 the user is allowed to receive. In that case set the corresponding mask to all ones,
+                                 or 0xffff. Data can be enetered as a deciaml integer or a hexadecimal integer (preced number with '0x'
+                                 in the öater case).
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> VSCP Type</label>
+                            <input type="text" class="form-control" id="dlgmask_vscptype"  >
+                            <span class="help-block">Normally you set a Level I or Level II VSCP type here that 
+                                 the user is allowed to receive. In that case set the correspnding mask to all ones,
+                                 or 0xffff. Data can be enetered as a deciaml integer or a hexadecimal integer (preced number with '0x'
+                                  in the later case).
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> GUID</label>
+                            <input type="text" class="form-control" id="dlgmask_vscpguid"  >
+                            <span class="help-block">Set the GUID filter here. If you enter a specific GUID and set all
+                                byte of the mask GUID to FF (all ones) events will only be received form that device. 
+                                The GUID should always be give as hex bytes without the preceding '0x'. You can enter a single '-'
+                                for a filter with all zeros.                           
+                            </span>
+                        </div>
+
+                        
+                        
+                    </form>
+                </div>
+                <div class="modal-footer">  
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveMaskResult()">Save</button>                  
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- **************************************************************************************-->
+    <!--                              Modal to edit rights                                     -->
+    <!-- **************************************************************************************-->
+    <div id="dlgRights" class="modal fade" role="dialog">
+        
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="filterdlg_header" class="modal-title">Edit VSCP user rights</h4>
+                </div>
+
+                <div class="modal-body">
+   
+                    <form role="form">
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte 0 (MSB)</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_7" class="form-control-xs" value="128"> Bit 7</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_6" class="form-control-xs" value="64"> Bit 6</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_5" class="form-control-xs" value="32"> Bit 5</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_4" class="form-control-xs" value="16"> Bit 4</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_3" class="form-control-xs" value="8"> Bit 3</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_2" class="form-control-xs" value="4"> Bit 2</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_1" class="form-control-xs" value="2"> Bit 1</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_1" class="form-control-xs" value="1"> Bit 0</label><br>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  1</label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_7" class="form-control-xs" value="128"> Bit 7</label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_6" class="form-control-xs" value="64"> Bit 6</label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_5" class="form-control-xs" value="32"> Bit 5</label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_4" class="form-control-xs" value="16"> Bit 4</label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_3" class="form-control-xs" value="8"> Bit 3</label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_2" class="form-control-xs" value="4"> Bit 2</label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_1" class="form-control-xs" value="2"> Bit 1</label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  2</label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_7" class="form-control-xs" value="128"> Bit 7</label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_6" class="form-control-xs" value="64"> Bit 6</label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_5" class="form-control-xs" value="32"> Bit 5</label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_4" class="form-control-xs" value="16"> Bit 4</label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_3" class="form-control-xs" value="8"> Bit 3</label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_2" class="form-control-xs" value="4"> Bit 2</label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_1" class="form-control-xs" value="2"> Bit 1</label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  3</label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_7" class="form-control-xs" value="128"> Bit 7</label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_6" class="form-control-xs" value="64"> Bit 6</label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_5" class="form-control-xs" value="32"> Bit 5</label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_4" class="form-control-xs" value="16"> Bit 4</label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_3" class="form-control-xs" value="8"> Bit 3</label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_2" class="form-control-xs" value="4"> Bit 2</label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_1" class="form-control-xs" value="2"> Bit 1</label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  4</label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_7" class="form-control-xs" value="128"> Bit 7</label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_6" class="form-control-xs" value="64"> Bit 6</label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_5" class="form-control-xs" value="32"> Bit 5</label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_4" class="form-control-xs" value="16"> Bit 4</label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_3" class="form-control-xs" value="8"> Bit 3</label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_2" class="form-control-xs" value="4"> Bit 2</label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_1" class="form-control-xs" value="2"> Bit 1</label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  5</label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_7" class="form-control-xs" value="128"> Bit 7</label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_6" class="form-control-xs" value="64"> Bit 6</label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_5" class="form-control-xs" value="32"> Bit 5</label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_4" class="form-control-xs" value="16"> Bit 4</label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_3" class="form-control-xs" value="8"> Bit 3</label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_2" class="form-control-xs" value="4"> Bit 2</label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_1" class="form-control-xs" value="2"> Bit 1</label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  6</label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_7" class="form-control-xs" value="128"> Bit 7</label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_6" class="form-control-xs" value="64"> Bit 6</label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_5" class="form-control-xs" value="32"> Bit 5</label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_4" class="form-control-xs" value="16"> Bit 4</label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_3" class="form-control-xs" value="8"> Bit 3</label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_2" class="form-control-xs" value="4"> Bit 2</label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_1" class="form-control-xs" value="2"> Bit 1</label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  7 (LSB)</label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_7" class="form-control-xs" value="128"> Bit 7</label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_6" class="form-control-xs" value="64"> Bit 6</label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_5" class="form-control-xs" value="32"> Bit 5</label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_4" class="form-control-xs" value="16"> Bit 4</label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_3" class="form-control-xs" value="8"> Bit 3</label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_2" class="form-control-xs" value="4"> Bit 2</label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_1" class="form-control-xs" value="2"> Bit 1</label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                        </div>
+ 
+                    </form>
+                </div>
+                <div class="modal-footer">  
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveRightsResult()">Save</button>                  
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
     </div>
 
 
