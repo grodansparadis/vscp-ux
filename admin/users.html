@@ -108,7 +108,9 @@
             table = $('#userTable').DataTable( {
                 select: 'single',
                 "order": [[ 1, 'asc' ], [ 2, 'asc' ]],
-                dom: 'Bfrtip',
+                "lengthChange": true,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                dom: 'l Bfrtip',
                 "oTableTools": {
                     "sRowSelect": "single"
                 },
@@ -145,24 +147,12 @@
 
                     curSelectedVariable = data;
                     
-                    var user_html_content = "<h4>User data</h4>" +
-                                "<table class='table table-striped table-hover table-condensed'>" +
-                                "<tr><td> <b>Ordinal: </b></td><td>" + data[0] + "</td><tr>" +
-                                "<tr><td> <b>User id: </b></td><td>" + data[1] + "</td><tr>" +
-                                "<tr class='success'><td> <b>User name: </b></td><td>" + data[2] + "</td><tr>" +
-                                "<tr><td> <b>Password: </b></td><td>" + data[3] + "</td><tr>" +
-                                "<tr><td> <b>Full name: </b></td><td>" + data[4] + "</td><tr>" +
-                                "<tr><td> <b>Filter: </b></td><td>" + data[5] + "</td><tr>" +
-                                "<tr><td> <b>Mask: </b></td><td>" + data[6] + "</td><tr>" +
-                                "<tr><td> <b>Rights: </b></td><td>" + data[7] + "</td><tr>" +
-                                "<tr><td> <b>Allowed Remotes: </b></td><td>" + data[8] + "</td><tr>" +
-                                "<tr><td> <b>Allowed Events: </b></td><td>" + data[9] + "</td><tr>" +
-                                "<tr><td> <b>Note: </b></td><td>" + data[10] + "</td><tr>" +
-                                "</table>";
-                    $('#userdata').html( user_html_content );
+                    showFullInfo( data );
                 }
                 
             });
+
+            
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // deselect row
@@ -291,12 +281,12 @@
                 },
 
                 onError: function( conn ) {
-                    /*BootstrapDialog.alert({
-                        message: 'Could not establish a connection or connection lost.'
-                    });*/
-                    setTimeout(function () {
+                    BootstrapDialog.alert({
+                        message: 'Could not establish a connection or connection lost. Reload page to try again.'
+                    });
+                    /*setTimeout(function () {
                         location.reload()
-                    }, 2000);
+                    }, 2000);*/
                 }
 
             });       
@@ -319,6 +309,29 @@
             }
         };
 
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // showFullInfo
+        //
+
+        function showFullInfo( data )
+        {
+            var user_html_content = "<h4>User data</h4>" +
+                                "<table class='table table-striped table-hover table-condensed'>" +
+                                "<tr><td> <b>Ordinal: </b></td><td>" + data[0] + "</td><tr>" +
+                                "<tr><td> <b>User id: </b></td><td>" + data[1] + "</td><tr>" +
+                                "<tr class='success'><td> <b>User name: </b></td><td>" + data[2] + "</td><tr>" +
+                                "<tr><td> <b>Password: </b></td><td>" + data[3] + "</td><tr>" +
+                                "<tr><td> <b>Full name: </b></td><td>" + data[4] + "</td><tr>" +
+                                "<tr><td> <b>Filter: </b></td><td>" + data[5] + "</td><tr>" +
+                                "<tr><td> <b>Mask: </b></td><td>" + data[6] + "</td><tr>" +
+                                "<tr><td> <b>Rights: </b></td><td>" + data[7] + "</td><tr>" +
+                                "<tr><td> <b>Allowed Remotes: </b></td><td>" + data[8] + "</td><tr>" +
+                                "<tr><td> <b>Allowed Events: </b></td><td>" + data[9] + "</td><tr>" +
+                                "<tr><td> <b>Note: </b></td><td>" + data[10] + "</td><tr>" +
+                                "</table>";
+            $('#userdata').html( user_html_content );
+        }
+
         ///////////////////////////////////////////////////////////////////////////////////////////
         // fetchVariables
         //
@@ -336,7 +349,7 @@
 
                     var idx = 0;
                     vscp.user.userinfo.forEach( function( u ) { 
-                        //alert( u );
+                        //alert( u[vscp.user.records.NOTE] );
                         table.row.add( [
                                     idx++,
                                     u[vscp.user.records.ID],
@@ -411,25 +424,27 @@
                 type: BootstrapDialog.TYPE_WARNING,
                 callback: function( result ) {
                     if ( result ) {
-                        editorValue.setValue("");
-                        editorNote.setValue("");
 
                         ui.disable();
-                        vscpConn.removeVar({
+                        vscpConn.writeVar({
 
-                            name:   name,
+                            name:   "vscp.user.delete",
+                            type:   vscp.constants.varTypes.STRING.toString(),
+                            value:  name, //vscp.b64EncodeUnicode( name ),
 
                             onSuccess: function( conn ) {
-                                table.row('.selected').remove().draw( false );
                                 ui.enable();
+                                // Fetch users
+                                fetchUsers();
+                                // Clear full info area
+                                $('#userdata').html("");
                             },
 
                             onError: function( conn ) {
                                 BootstrapDialog.alert({
-                                    title: 'ERROR',
                                     type: BootstrapDialog.TYPE_WARNING,
-                                    message: 'Failed to delete variable!'
-                                });
+                                    message: 'Failed to save variable!'
+                                });                                
                                 ui.enable();
                             }
 
@@ -437,9 +452,8 @@
                     }
                 }
             });
-        };
 
-        
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // editUser
@@ -481,6 +495,8 @@
                 });
                 return;
             }
+
+            $('#editdlg_header').html("Edit VSCP system user");
             
             $('#dlgedit_ordinal').val( data[ 0 ] );
             $('#dlgedit_username').val( data[ 2 ] );
@@ -507,6 +523,12 @@
 
             ui.disable();
 
+            // If this was a add operation
+            if ( $('#dlgedit_ordinal').val() == -1 ) {
+                saveAddResult();
+                return;
+            }
+
             var user = $('#dlgedit_username').val() + ";" +
                         $('#dlgedit_password').val() + ";" +
                         $('#dlgedit_fullname').val() + ";" +
@@ -515,9 +537,7 @@
                         $('#dlgedit_rights').val() + ";" +
                         $('#dlgedit_remotes').val() + ";" +
                         $('#dlgedit_events').val() + ";" +
-                        vscp.b64EncodeUnicode( $('#dlgedit_note').val() );
-
-            //alert( user );            
+                        vscp.b64EncodeUnicode( $('#dlgedit_note').val() );           
 
             vscpConn.writeVar({ 
 
@@ -535,7 +555,39 @@
 
                             // Add to array
                             var items = options.value.split(";"); 
-                            alert( items );
+                            var row_exist;
+                            if ( ( row_exist = isUserInTable( items[1] ) ) < 0 ) {
+                                
+                                BootstrapDialog.alert({
+                                    title: 'ERROR',
+                                    type: BootstrapDialog.TYPE_DANGER,
+                                    message: 'User ' + items[1] + ' not found in table. He/she should be there. Report this error!'
+                                });
+
+                            }
+                            else {
+                                
+                                // Replace data of row
+                                // userid;name;password;fullname;filter;mask;rights;remotes;events;note
+                                table.cell( row_exist, 1).data( items[0] );     // Userid
+                                table.cell( row_exist, 2).data( items[1] );     // Username
+                                table.cell( row_exist, 3).data( items[2] );     // Password 
+                                table.cell( row_exist, 4).data( items[3] );     // Full Name
+
+                                table.cell( row_exist, 5).data( items[4] );     // Filter
+                                table.cell( row_exist, 6).data( items[5] );     // Mask
+                                table.cell( row_exist, 7).data( items[6] );     // Rights
+                                table.cell( row_exist, 8).data( items[7] );     // Allowed Remotes
+                                table.cell( row_exist, 9).data( items[8] );     // Allowed EVENTS
+                                table.cell( row_exist, 10).data( vscp.b64DecodeUnicode( items[9] ) );    // Note
+
+                                var row = table.rows( gindexes ).data(); 
+                                var data = row[0]; 
+
+                                curSelectedVariable = data;
+                    
+                                showFullInfo( data );
+                            }
 
                         },
                         onError: function( conn ) {
@@ -561,72 +613,6 @@
                 }
             });                 
 
-            /*vscpConn.createVar({
-
-                name:           curSelectedVariable[0],
-                value:          $('#dlgedit_value').val(),
-                note:           $('#dlgedit_note').val(),
-                type:           vscp.getVarTypeNumerical( $('#dlgedit_type').val() ).toString(), 
-                accessrights:   parseInt( $('#dlgedit_permission').val(), 16).toString(),
-                persistency:    $('#dlgedit_persistent').is(":checked") ? "true" : "false",
-
-                onSuccess: function( conn ) {
-
-                    // Read back the variable
-                    vscpConn.readVar({
-
-                        name: curSelectedVariable[0],                                           // name
-                        type: vscp.getVarTypeNumerical( $('#dlgedit_type').val() ).toString(),  // id for type
-
-                        onSuccess: function( conn, msg ) {
-
-                            var row_exist;
-                            if ( ( row_exist = isVariableInTable( msg.name ) ) < 0 ) {
-                                // Add new row to table
-                                table.row.add( [
-                                    msg.name.toLowerCase(), 
-                                    vscp.getVarTypeName( msg.type ), 
-                                    msg.persistency ? "true" : "false", 
-                                    vscp.user.getUserFromId( msg.userid ), 
-                                    msg.accessright.toString(16), 
-                                    msg.lastchange,
-                                    msg.type,
-                                    msg.userid
-                                ] ).draw( false );  
-                            }
-                            else {
-                                // Update row data
-                                table.cell( row_exist, 1).data( vscp.getVarTypeName( msg.type ) );
-                                table.cell( row_exist, 2).data( msg.persistency ? "true" : "false" );
-                                table.cell( row_exist, 3).data( vscp.user.getUserFromId( msg.userid ) );
-                                table.cell( row_exist, 4).data( msg.accessright.toString(16) );
-                                table.cell( row_exist, 6).data( msg.type );
-                                table.cell( row_exist, 7).data( msg.userid );
-                            }
-                        
-                            ui.enable();
-
-                        },
-
-                        onError: function( conn ) {
-                            ui.enable();
-                        }
-                    });
-
-                    ui.enable();
-                },
-
-                onError: function( conn ) {
-                    BootstrapDialog.alert({
-                        title: 'ERROR',
-                        type: BootstrapDialog.TYPE_DANGER,
-                        message: 'Failed to save variable!'
-                    });
-                    ui.enable();
-                }
-
-            });*/
-
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -635,41 +621,37 @@
         // Duplicate selected user
         //
 
-        function duplicateVariable() 
+        function duplicateUser() 
         {
             var table = $('#userTable').DataTable();
-            //var data = $('#userTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
             var row = table.rows('.selected').data();            
 
             if ( undefined == row[0] ) {
                 BootstrapDialog.alert({
                     title: 'WARNING',
                     type: BootstrapDialog.TYPE_WARNING,
-                    message: 'A row must be selected for a variable to be deleted'
+                    message: 'A row must be selected for a user to be duplicated'
                 });
                 return;
             }
 
             var data = row[0];
             
-            $('#dlgadd_name').val( data[0] + "_new" );                        
-            $('#dlgadd_type').val( data[1] );
-            if ( data[2] == "true" ) {
-                $('#dlgadd_persistent').prop('checked', true );
-            }
-            else {
-                $('#dlgadd_persistent').prop('checked', false );
-            }
-            $('#dlgadd_owner').val( data[3] );
-            $('#dlgadd_permission').val( data[4] );
+            $('#editdlg_header').html("Duplicate existing VSCP system user");            
+            
+            $('#dlgedit_ordinal').val("-1");
+            $('#dlgedit_username').val(data[2]+"_new");
+            $('#dlgedit_password').val(data[3]);
+            $('#dlgedit_password2').val(data[3]);
+            $('#dlgedit_fullname').val(data[4]);
+            $('#dlgedit_filter').val(data[5]);
+            $('#dlgedit_mask').val(data[6]);
+            $('#dlgedit_rights').val(data[7]);
+            $('#dlgedit_remotes').val(data[8]);
+            $('#dlgedit_events').val(data[9]);
+            $('#dlgedit_note').val(data[10]);
 
-            var evmain = ace.edit("editorValue");
-            var enmain = ace.edit("editorNote");
-
-            $('#dlgadd_value').val( evmain.getValue() );
-            $('#dlgadd_note').val( enmain.getValue() );
- 
-            $('#dlgAddVariable').modal();
+            addDialog();
 
         };
 
@@ -679,11 +661,19 @@
 
         function addUser() 
         {
-            var table = $('#userTable').DataTable();
-
-            //var data = table.rows('.selected').data();
-            var data = $('#userTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
+            $('#editdlg_header').html("Add new VSCP system user");            
             
+            $('#dlgedit_ordinal').val("-1");
+            $('#dlgedit_username').val("");
+            $('#dlgedit_password').val("");
+            $('#dlgedit_password2').val("");
+            $('#dlgedit_fullname').val("");
+            $('#dlgedit_filter').val("0,0,0,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00");
+            $('#dlgedit_mask').val("0,0,0,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00");
+            $('#dlgedit_rights').val("0/0/0/0/0/0/0/0");
+            $('#dlgedit_remotes').val("*");
+            $('#dlgedit_events').val("*:*");
+            $('#dlgedit_note').val("");
 
             addDialog();
         }
@@ -697,19 +687,8 @@
         //
 
         function addDialog() 
-        {
-            $('#dlgadd_owner').val( vscpConn.userName );
-            $('#dlgadd_permission').val( '744' );
-            $('#dlgadd_type').val( 'String' );
-
-            var evmain = ace.edit("editorValue");
-            var enmain = ace.edit("editorNote");
-
-            $('#dlgadd_value').val( "" );
-            $('#dlgadd_note').val( "" );
- 
-            $('#dlgAddVariable').modal();
-
+        { 
+            $('#dlgEditUser').modal();
         };
 
         
@@ -722,7 +701,7 @@
             
             for ( i=0; i<table.rows().count(); i++ ) {
                 
-                if ( name.toLowerCase() == $('#userTable').dataTable({bRetrieve: true}).fnGetData(i)[0]  ) {
+                if ( name.toLowerCase() == $('#userTable').dataTable({bRetrieve: true}).fnGetData(i)[2].toLowerCase()  ) {
                     return i;
                 }
             }
@@ -734,85 +713,47 @@
         ///////////////////////////////////////////////////////////////////////////////////////////
         // saveAddResult
         //
-        // Save results from edit dialog
+        // Save results from add dialog
         //
 
         var saveAddResult = function() {
 
-            // Not allowed to add varables with stock variable reserved names
-            if ( $('#dlgadd_name').val().startsWith("vscp.")  ) {
-                BootstrapDialog.alert({
-                        title: 'ERROR',
-                        type: BootstrapDialog.TYPE_DANGER,
-                        message: 'Can\'t add varables that have names that start with \'vscp.\'. Reserved for stock variables.'
-                    });
-            }
+            var user = $('#dlgedit_username').val() + ";" +
+                        $('#dlgedit_password').val() + ";" +
+                        $('#dlgedit_fullname').val() + ";" +
+                        $('#dlgedit_filter').val() + ";" +
+                        $('#dlgedit_mask').val() + ";" +
+                        $('#dlgedit_rights').val() + ";" +
+                        $('#dlgedit_remotes').val() + ";" +
+                        $('#dlgedit_events').val() + ";" +
+                        vscp.b64EncodeUnicode( $('#dlgedit_note').val() );           
 
-            var accessrights = parseInt( $('#dlgadd_permission').val(), 16 );
+            vscpConn.writeVar({ 
 
-            vscpConn.createVar({
-
-                name:           $('#dlgadd_name').val(),
-                value:          $('#dlgadd_value').val(),
-                note:           $('#dlgadd_note').val(),
-                type:           vscp.getVarTypeNumerical( $('#dlgadd_type').val() ).toString(), 
-                user:           $('#dlgadd_user').val(),
-                accessrights:   accessrights.toString(),
-                persistency:    $('#dlgadd_persistent').is(":checked") ? "true" : "false",
+                name: "vscp.user.add",
+                value: user,
+                type: vscp.constants.varTypes.STRING.toString(),
 
                 onSuccess: function( conn ) {
                     
-                    // Read back the variable
-                    vscpConn.readVar({
+                    fetchUsers();
 
-                        name: $('#dlgadd_name').val(),                                          // name
-                        type: vscp.getVarTypeNumerical( $('#dlgadd_type').val() ).toString(),   // id for type
-
-                        onSuccess: function( conn, msg ) {
-
-                            var row_exist;
-                            if ( ( row_exist = isVariableInTable( msg.name ) ) < 0 ) {
-                                // Add new row to table
-                                table.row.add( [
-                                    msg.name.toLowerCase(), 
-                                    vscp.getVarTypeName( msg.type ), 
-                                    msg.persistency ? "true" : "false", 
-                                    vscp.user.getUserFromId( msg.userid ), 
-                                    msg.accessright.toString(16), 
-                                    msg.lastchange,
-                                    msg.type,
-                                    msg.userid
-                                ] ).draw( false );  
-                            }
-                            else {
-                                // Update row data
-
-                            }
-                        
-                            ui.enable();
-
-                        },
-
-                        onError: function( conn ) {
-                            ui.enable();
-                        }
-                    });
+                    ui.enable();
 
                 },
 
                 onError: function( conn ) {
+                    
                     BootstrapDialog.alert({
                         title: 'ERROR',
                         type: BootstrapDialog.TYPE_DANGER,
-                        message: 'Failed to save variable!'
+                        message: 'Failed to add user!'
                     });
+
                     ui.enable();
                 }
-
             });
-
         };
-
 
     </script>
 
@@ -938,100 +879,6 @@
     </div>
 
 
-    <!-- **************************************************************************************-->
-    <!--                              Modal to add variable                                   -->
-    <!-- **************************************************************************************-->
-    <div id="dlgAddUser" class="modal fade" role="dialog">
-        
-        <div class="modal-dialog">
-
-            <!-- Modal content-->
-            <div class="modal-content">
-                
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                    <h4 class="modal-title">Add VSCP remote variable</h4>
-                </div>
-
-                <div class="modal-body">
-   
-                    <form role="form">
-
-                        <div class="form-group">
-                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> name</label>
-                            <input type="text" class="form-control" id="dlgadd_name"  >
-                            <span class="help-block">Enter name for variable. Must be unique.</span>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>                    
-                            <div class="input-group">                                
-                                <input readonly type="text" class="form-control" aria-label="..." id="dlgadd_type">
-                                <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle" 
-                                                data-toggle="dropdown" aria-haspopup="true" 
-                                                aria-expanded="false">types <span class="caret"></span></button>
-                                    <ul id="dlgadd_typedd" class="dropdown-menu dropdown-menu-right">
-                                    </ul>
-                                </div>
-                            </div>
-                            <span class="help-block">Set variable type.</span>
-                        </div>    
-
-                        <div class="form-group">    
-                            <div class="checkbox">
-                                <label><input type="checkbox" id="dlgadd_persistent" value="true" checked ><b>Persistent</b></label>
-                                <span class="help-block">Persistent variables are saved in a database, non persistent variables are saved in memory.</span>
-                            </div>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="owner"><span class="glyphicon glyphicon-asterisk"></span> owner</label>                    
-                            <div class="input-group">                                
-                                <input readonly type="text" class="form-control" aria-label="..." id="dlgadd_owner">
-                                <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle" 
-                                                id="dlgadd_userbtn"
-                                                data-toggle="dropdown" aria-haspopup="true" 
-                                                aria-expanded="false">users <span class="caret"></span></button>
-                                    <ul id="dlgadd_userdd" class="dropdown-menu dropdown-menu-right">
-                                    </ul>
-                                </div>
-                            </div>
-                            <span class="help-block">Set the owner of this variable.</span>
-                        </div>
-                        
-                        <div class="form-group">
-                            <label for="permission"><span class="glyphicon glyphicon-asterisk"></span> permission</label>
-                            <input type="text" class="form-control" id="dlgadd_permission" placeholder="Enter permissions">
-                            <span class="help-block">Set permissions for the variable. Permissions are given as tre hex numbers one each for user/group and others. Each of the digits is three bits for read, write and execute.</span>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="value"><span class="glyphicon glyphicon-asterisk"></span> value</label>
-                            <textarea class="form-control" rows="6" id="dlgadd_value" placeholder="Enter value"></textarea>
-                            <span class="help-block">Enter the value for the variable. May be easier to edit in the mainscreen enitor</span>
-                        </div>
-
-                        <div class="form-group">
-                            <label for="note"><span class="glyphicon glyphicon-asterisk"></span> note</label>
-                            <textarea class="form-control" rows="6" id="dlgadd_note" placeholder="Enter note"></textarea>
-                            <span class="help-block">Enter an optional description for the variable. Presented as HTML. May be easier to edit in the mainscreen enitor</span>
-                        </div>
-                        
-                    </form>
-                </div>
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveAddResult()">Add</button>                  
-                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-
-
     <!-- **********************************************************************************************************************-->
     <!--                                                      Menu                                                             -->
     <!-- **********************************************************************************************************************-->
@@ -1050,7 +897,7 @@
     <!--                                                    Table-area                                                        -->
     <!-- **********************************************************************************************************************-->
     <div class="container-fluid">
-        <h1>VSCP users</h1>
+        <h1>VSCP system users</h1>
 
         <div class="container-fluid">            
             <div class="row">

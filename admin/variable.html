@@ -331,13 +331,15 @@
             table = $('#variableTable').DataTable( {
                 select: 'single',
                 "order": [[ 1, 'asc' ], [ 2, 'asc' ]],
-                dom: 'Bfrtip',
+                "lengthChange": true,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                dom: 'lBfrtip',
                 "oTableTools": {
                     "sRowSelect": "single"
                 },
                 buttons: [
                     'colvis','copy', 'csv','excel', 'pdf','print'
-                ],
+                ],             
                 columns: [
                     { title: "Name" },
                     { title: "Type" },
@@ -579,12 +581,12 @@
                 },
 
                 onError: function( conn ) {
-                    /*BootstrapDialog.alert({
-                        message: 'Could not establish a connection or connection lost.'
-                    });*/
-                    setTimeout(function () {
+                    BootstrapDialog.alert({
+                        message: 'Could not establish a connection or connection lost. Reload page to try again.'
+                    });
+                    /*setTimeout(function () {
                         location.reload()
-                    }, 2000);
+                    }, 2000);*/
                 }
 
             });       
@@ -923,7 +925,7 @@
                 BootstrapDialog.alert({
                     title: 'WARNING',
                     type: BootstrapDialog.TYPE_WARNING,
-                    message: 'A row must be selected for a variable to be deleted'
+                    message: 'A row must be selected for a variable to be duplicated'
                 });
                 return;
             }
