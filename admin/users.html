@@ -161,7 +161,7 @@
             table.on( 'deselect', function ( e, dt, type, indexes ) 
             {
                 if ( type === 'row' ) {
-                    $('#userdata').html("");
+                    $('#userdata').html("");                    
                 }
             });
  
@@ -170,11 +170,10 @@
             //
             
             $('#userTable tbody').on( 'dblclick', 'tr', function () 
-            {
+            {              
                 editUser();              
             });
 
-            
         
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Credential handling
@@ -337,6 +336,9 @@
         //
 
         function fetchUsers() {
+
+            // Clear extended data
+            $('#userdata').html("");
             
             // Clear table
             table.clear().draw();
@@ -951,6 +953,178 @@
             )
         }
 
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // remotesDialog
+        //
+        // Show modal for setting of user allowed remotes
+        //
+
+        function remotesDialog( remotes ) 
+        { 
+            // Empty listbox
+            $('#selRemotes').empty();
+
+            // Fill with remotes
+            items = remotes.split('/');
+            $.each(items, function(key, value) {   
+            $('#selRemotes')
+                .append($('<option>', { value : key })
+                .text(value)); 
+            });
+
+            // mark the first option as selected
+            $("#selRemotes").prop("selectedIndex", 0);
+
+            $('#dlgRemotes').modal();
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // addRemote
+        //
+
+        function addRemote( key ) 
+        {
+            var remote = prompt("Enter remote IP", "*");
+
+            // IP test expression to test for valid IPv4 / IPv6 address
+            var iptest_expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))/;
+
+            if ( ( '*' == remote ) || ( iptest_expression.test( remote ) ) ) {
+                if (remote != null) {
+                    $('#selRemotes').append($("<option></option>")
+                    .attr("value", key )
+                    .text(remote) );
+                }
+            }
+            else {
+                BootstrapDialog.alert({
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Bad IP address!'
+                });
+            }
+
+            
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // deleteRemote
+        //
+
+        function deleteRemote() {
+            $('#selRemotes').find('option:selected').remove();
+            // mark the first option as selected
+            $("#selRemotes").prop("selectedIndex", 0);
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // saveRemotesResult
+        //
+
+        function saveRemotesResult()
+        {
+            var count = $('#selRemotes option').length;
+            var remotes = "";
+
+            $('#selRemotes option').each( function ( index ) {
+                remotes += $(this).text();
+                if ( index != (count-1) ) remotes += "/";
+            }); 
+
+            if ( 0 == remotes.length ) {
+                remotes = "*";
+            }
+
+            $('#dlgedit_remotes').val(remotes);
+
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // eventsDialog
+        //
+        // Show modal for setting of user allowed events
+        //
+
+        function eventsDialog( events ) 
+        { 
+            // Empty listbox
+            $('#selEvents').empty();
+
+            // Fill with remotes
+            items = events.split('/');
+            $.each(items, function(key, value) {   
+            $('#selEvents')
+                .append($('<option>', { value : key })
+                .text(value)); 
+            });
+
+            // mark the first option as selected
+            $("#selEvents").prop("selectedIndex", 0);
+
+            $('#dlgEvents').modal();
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // addEvent
+        //
+
+        function addEvent( key ) 
+        {
+            var event = prompt("Enter event on the form class:type", "*:*");
+
+            // IP test expression to test for valid IPv4 / IPv6 address
+            var iptest_expression = /((^\s*((([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5]))\s*$)|(^\s*((([0-9A-Fa-f]{1,4}:){7}([0-9A-Fa-f]{1,4}|:))|(([0-9A-Fa-f]{1,4}:){6}(:[0-9A-Fa-f]{1,4}|((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){5}(((:[0-9A-Fa-f]{1,4}){1,2})|:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3})|:))|(([0-9A-Fa-f]{1,4}:){4}(((:[0-9A-Fa-f]{1,4}){1,3})|((:[0-9A-Fa-f]{1,4})?:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){3}(((:[0-9A-Fa-f]{1,4}){1,4})|((:[0-9A-Fa-f]{1,4}){0,2}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){2}(((:[0-9A-Fa-f]{1,4}){1,5})|((:[0-9A-Fa-f]{1,4}){0,3}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(([0-9A-Fa-f]{1,4}:){1}(((:[0-9A-Fa-f]{1,4}){1,6})|((:[0-9A-Fa-f]{1,4}){0,4}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:))|(:(((:[0-9A-Fa-f]{1,4}){1,7})|((:[0-9A-Fa-f]{1,4}){0,5}:((25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)(\.(25[0-5]|2[0-4]\d|1\d\d|[1-9]?\d)){3}))|:)))(%.+)?\s*$))/;
+
+            if ( ( '*' == event ) || ( iptest_expression.test( event ) ) ) {
+                if (event != null) {
+                    $('#selEvents').append($("<option></option>")
+                    .attr("value", key )
+                    .text(remote) );
+                }
+            }
+            else {
+                BootstrapDialog.alert({
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Bad event'
+                });
+            }
+
+            
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // deleteEvent
+        //
+
+        function deleteEvent() {
+            $('#selEvents').find('option:selected').remove();
+            // mark the first option as selected
+            $("#selEvents").prop("selectedIndex", 0);
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // saveEventsResult
+        //
+
+        function saveEventsResult()
+        {
+            var count = $('#selEvents option').length;
+            var events = "";
+
+            $('#selEvents option').each( function ( index ) {
+                events += $(this).text();
+                if ( index != (count-1) ) events += "/";
+            }); 
+
+            if ( 0 == events.length ) {
+                events = "*:*";
+            }
+
+            $('#dlgedit_events').val(events);
+
+        };
+
     </script>
 
 </head>
@@ -1039,7 +1213,7 @@
                             <div class="input-group">                                
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_remotes">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success btn-sm">Set remotes</button>
+                                    <button type="button" onclick="remotesDialog( $('#dlgedit_remotes').val() );" class="btn btn-success btn-sm">Set remotes</button>
                                 </div>
                             </div>
                             <span class="help-block">Set remotes this user can log in from ("*" is all).</span>
@@ -1050,7 +1224,7 @@
                             <div class="input-group">                                
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_events">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success btn-sm">Set events</button>
+                                    <button type="button" onclick="eventsDialog( $('#dlgedit_events').val() );" class="btn btn-success btn-sm">Set events</button>
                                 </div>
                             </div>
                             <span class="help-block">Set events this user can send ("*" is all).</span>
@@ -1254,105 +1428,199 @@
                     <form role="form">
 
                         <div class="form-group">
-                            <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte 0 (MSB)</label><br>
-                            <label><input type="checkbox" name="byte0" id="byte0_7" class="form-control-xs" value="128"> Bit 7</label><br>
-                            <label><input type="checkbox" name="byte0" id="byte0_6" class="form-control-xs" value="64"> Bit 6</label><br>
-                            <label><input type="checkbox" name="byte0" id="byte0_5" class="form-control-xs" value="32"> Bit 5</label><br>
-                            <label><input type="checkbox" name="byte0" id="byte0_4" class="form-control-xs" value="16"> Bit 4</label><br>
-                            <label><input type="checkbox" name="byte0" id="byte0_3" class="form-control-xs" value="8"> Bit 3</label><br>
-                            <label><input type="checkbox" name="byte0" id="byte0_2" class="form-control-xs" value="4"> Bit 2</label><br>
-                            <label><input type="checkbox" name="byte0" id="byte0_1" class="form-control-xs" value="2"> Bit 1</label><br>
-                            <label><input type="checkbox" name="byte0" id="byte0_1" class="form-control-xs" value="1"> Bit 0</label><br>
+                            <label  for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte 0 (MSB)</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_7" class="form-control-xs" value="128"> <span id="bt0_7">Bit 7</span></label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_6" class="form-control-xs" value="64"> <span id="bt0_6">Bit 6</label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_5" class="form-control-xs" value="32"> <span id="bt0_5">Bit 5</span></label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_4" class="form-control-xs" value="16"> <span id="bt0_4">Bit 4</span></label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_3" class="form-control-xs" value="8"> <span id="bt0_3">Bit 3</span></label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_2" class="form-control-xs" value="4"> <span id="bt0_2">Bit 2</span></label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_1" class="form-control-xs" value="2"> <span id="bt0_1">Bit 1</span></label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_1" class="form-control-xs" value="1"> <span id="bt0_0">Bit 0</span></label><br>
                         </div>
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  1</label><br>
-                             <label><input type="checkbox" name="byte1" id="byte1_7" class="form-control-xs" value="128"> Bit 7</label><br>
-                             <label><input type="checkbox" name="byte1" id="byte1_6" class="form-control-xs" value="64"> Bit 6</label><br>
-                             <label><input type="checkbox" name="byte1" id="byte1_5" class="form-control-xs" value="32"> Bit 5</label><br>
-                             <label><input type="checkbox" name="byte1" id="byte1_4" class="form-control-xs" value="16"> Bit 4</label><br>
-                             <label><input type="checkbox" name="byte1" id="byte1_3" class="form-control-xs" value="8"> Bit 3</label><br>
-                             <label><input type="checkbox" name="byte1" id="byte1_2" class="form-control-xs" value="4"> Bit 2</label><br>
-                             <label><input type="checkbox" name="byte1" id="byte1_1" class="form-control-xs" value="2"> Bit 1</label><br>
-                             <label><input type="checkbox" name="byte1" id="byte1_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_7" class="form-control-xs" value="128"> <span id="bt1_7">Bit 7</span></label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_6" class="form-control-xs" value="64"> <span id="bt1_6">Bit 6</span></label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_5" class="form-control-xs" value="32"> <span id="bt1_5">Bit 5</span></label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_4" class="form-control-xs" value="16"> <span id="bt1_4">Bit 4</span></label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_3" class="form-control-xs" value="8"> <span id="bt1_3">Bit 3</span></label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_2" class="form-control-xs" value="4"> <span id="bt1_2">Bit 2</span></label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_1" class="form-control-xs" value="2"> <span id="bt1_1">Bit 1</span></label><br>
+                             <label><input type="checkbox" name="byte1" id="byte1_0" class="form-control-xs" value="1"> <span id="bt1_0">Bit 0</span></label><br>
                         </div>
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  2</label><br>
-                             <label><input type="checkbox" name="byte2" id="byte2_7" class="form-control-xs" value="128"> Bit 7</label><br>
-                             <label><input type="checkbox" name="byte2" id="byte2_6" class="form-control-xs" value="64"> Bit 6</label><br>
-                             <label><input type="checkbox" name="byte2" id="byte2_5" class="form-control-xs" value="32"> Bit 5</label><br>
-                             <label><input type="checkbox" name="byte2" id="byte2_4" class="form-control-xs" value="16"> Bit 4</label><br>
-                             <label><input type="checkbox" name="byte2" id="byte2_3" class="form-control-xs" value="8"> Bit 3</label><br>
-                             <label><input type="checkbox" name="byte2" id="byte2_2" class="form-control-xs" value="4"> Bit 2</label><br>
-                             <label><input type="checkbox" name="byte2" id="byte2_1" class="form-control-xs" value="2"> Bit 1</label><br>
-                             <label><input type="checkbox" name="byte2" id="byte2_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_7" class="form-control-xs" value="128"> <span id="bt2_7">Bit 7</span></label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_6" class="form-control-xs" value="64"> <span id="bt2_6">Bit 6</span></label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_5" class="form-control-xs" value="32"> <span id="bt2_5">Bit 5</span></label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_4" class="form-control-xs" value="16"> <span id="bt2_4">Bit 4</span></label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_3" class="form-control-xs" value="8"> <span id="bt2_3">Bit 3</span></label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_2" class="form-control-xs" value="4"> <span id="bt2_2">Bit 2</span></label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_1" class="form-control-xs" value="2"> <span id="bt2_1">Bit 1</span></label><br>
+                             <label><input type="checkbox" name="byte2" id="byte2_0" class="form-control-xs" value="1"> <span id="bt2_0">Bit 0</span></label><br>
                         </div>
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  3</label><br>
-                             <label><input type="checkbox" name="byte3" id="byte3_7" class="form-control-xs" value="128"> Bit 7</label><br>
-                             <label><input type="checkbox" name="byte3" id="byte3_6" class="form-control-xs" value="64"> Bit 6</label><br>
-                             <label><input type="checkbox" name="byte3" id="byte3_5" class="form-control-xs" value="32"> Bit 5</label><br>
-                             <label><input type="checkbox" name="byte3" id="byte3_4" class="form-control-xs" value="16"> Bit 4</label><br>
-                             <label><input type="checkbox" name="byte3" id="byte3_3" class="form-control-xs" value="8"> Bit 3</label><br>
-                             <label><input type="checkbox" name="byte3" id="byte3_2" class="form-control-xs" value="4"> Bit 2</label><br>
-                             <label><input type="checkbox" name="byte3" id="byte3_1" class="form-control-xs" value="2"> Bit 1</label><br>
-                             <label><input type="checkbox" name="byte3" id="byte3_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_7" class="form-control-xs" value="128"> <span id="bt3_7">Bit 7</span></label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_6" class="form-control-xs" value="64"> <span id="bt3_6">Bit 6</span></label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_5" class="form-control-xs" value="32"> <span id="bt3_5">Bit 5</span></label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_4" class="form-control-xs" value="16"> <span id="bt3_4">Bit 4</span></label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_3" class="form-control-xs" value="8"> <span id="bt3_3">Bit 3</span></label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_2" class="form-control-xs" value="4"> <span id="bt3_2">Bit 2</span></label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_1" class="form-control-xs" value="2"> <span id="bt3_1">Bit 1</span></label><br>
+                             <label><input type="checkbox" name="byte3" id="byte3_0" class="form-control-xs" value="1"> <span id="bt3_0">Bit 0</span></label><br>
                         </div>
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  4</label><br>
-                             <label><input type="checkbox" name="byte4" id="byte4_7" class="form-control-xs" value="128"> Bit 7</label><br>
-                             <label><input type="checkbox" name="byte4" id="byte4_6" class="form-control-xs" value="64"> Bit 6</label><br>
-                             <label><input type="checkbox" name="byte4" id="byte4_5" class="form-control-xs" value="32"> Bit 5</label><br>
-                             <label><input type="checkbox" name="byte4" id="byte4_4" class="form-control-xs" value="16"> Bit 4</label><br>
-                             <label><input type="checkbox" name="byte4" id="byte4_3" class="form-control-xs" value="8"> Bit 3</label><br>
-                             <label><input type="checkbox" name="byte4" id="byte4_2" class="form-control-xs" value="4"> Bit 2</label><br>
-                             <label><input type="checkbox" name="byte4" id="byte4_1" class="form-control-xs" value="2"> Bit 1</label><br>
-                             <label><input type="checkbox" name="byte4" id="byte4_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_7" class="form-control-xs" value="128"> <span id="bt4_7">Bit 7</span></label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_6" class="form-control-xs" value="64"> <span id="bt4_6">Bit 6</span></label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_5" class="form-control-xs" value="32"> <span id="bt4_5">Bit 5</span></label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_4" class="form-control-xs" value="16"> <span id="bt4_4">Bit 4</span></label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_3" class="form-control-xs" value="8"> <span id="bt4_3">Bit 3</span></label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_2" class="form-control-xs" value="4"> <span id="bt4_2">Bit 2</span></label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_1" class="form-control-xs" value="2"> <span id="bt4_1">Bit 1</span></label><br>
+                             <label><input type="checkbox" name="byte4" id="byte4_0" class="form-control-xs" value="1"> <span id="bt4_0">Bit 0</span></label><br>
                         </div>
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  5</label><br>
-                             <label><input type="checkbox" name="byte5" id="byte5_7" class="form-control-xs" value="128"> Bit 7</label><br>
-                             <label><input type="checkbox" name="byte5" id="byte5_6" class="form-control-xs" value="64"> Bit 6</label><br>
-                             <label><input type="checkbox" name="byte5" id="byte5_5" class="form-control-xs" value="32"> Bit 5</label><br>
-                             <label><input type="checkbox" name="byte5" id="byte5_4" class="form-control-xs" value="16"> Bit 4</label><br>
-                             <label><input type="checkbox" name="byte5" id="byte5_3" class="form-control-xs" value="8"> Bit 3</label><br>
-                             <label><input type="checkbox" name="byte5" id="byte5_2" class="form-control-xs" value="4"> Bit 2</label><br>
-                             <label><input type="checkbox" name="byte5" id="byte5_1" class="form-control-xs" value="2"> Bit 1</label><br>
-                             <label><input type="checkbox" name="byte5" id="byte5_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_7" class="form-control-xs" value="128"> <span id="bt5_7">Bit 7</span></label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_6" class="form-control-xs" value="64"> <span id="bt5_6">Bit 6</span></label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_5" class="form-control-xs" value="32"> <span id="bt5_5">Bit 5</span></label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_4" class="form-control-xs" value="16"> <span id="bt5_4">Bit 4</span></label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_3" class="form-control-xs" value="8"> <span id="bt5_3">Bit 3</span></label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_2" class="form-control-xs" value="4"> <span id="bt5_2">Bit 2</span></label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_1" class="form-control-xs" value="2"> <span id="bt5_1">Bit 1</span></label><br>
+                             <label><input type="checkbox" name="byte5" id="byte5_0" class="form-control-xs" value="1"> <span id="bt5_0">Bit 0</span></label><br>
                         </div>
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  6</label><br>
-                             <label><input type="checkbox" name="byte6" id="byte6_7" class="form-control-xs" value="128"> Bit 7</label><br>
-                             <label><input type="checkbox" name="byte6" id="byte6_6" class="form-control-xs" value="64"> Bit 6</label><br>
-                             <label><input type="checkbox" name="byte6" id="byte6_5" class="form-control-xs" value="32"> Bit 5</label><br>
-                             <label><input type="checkbox" name="byte6" id="byte6_4" class="form-control-xs" value="16"> Bit 4</label><br>
-                             <label><input type="checkbox" name="byte6" id="byte6_3" class="form-control-xs" value="8"> Bit 3</label><br>
-                             <label><input type="checkbox" name="byte6" id="byte6_2" class="form-control-xs" value="4"> Bit 2</label><br>
-                             <label><input type="checkbox" name="byte6" id="byte6_1" class="form-control-xs" value="2"> Bit 1</label><br>
-                             <label><input type="checkbox" name="byte6" id="byte6_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_7" class="form-control-xs" value="128"> <span id="bt6_7">Bit 7</span></label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_6" class="form-control-xs" value="64"> <span id="bt6_6">Bit 6</span></label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_5" class="form-control-xs" value="32"> <span id="bt6_5">Bit 5</span></label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_4" class="form-control-xs" value="16"> <span id="bt6_4">Bit 4</span></label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_3" class="form-control-xs" value="8"> <span id="bt6_3">Bit 3</span></label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_2" class="form-control-xs" value="4"> <span id="bt6_2">Bit 2</span></label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_1" class="form-control-xs" value="2"> <span id="bt6_1">Bit 1</span></label><br>
+                             <label><input type="checkbox" name="byte6" id="byte6_0" class="form-control-xs" value="1"> <span id="bt6_0">Bit 0</span></label><br>
                         </div>
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> User rights byte  7 (LSB)</label><br>
-                             <label><input type="checkbox" name="byte7" id="byte7_7" class="form-control-xs" value="128"> Bit 7</label><br>
-                             <label><input type="checkbox" name="byte7" id="byte7_6" class="form-control-xs" value="64"> Bit 6</label><br>
-                             <label><input type="checkbox" name="byte7" id="byte7_5" class="form-control-xs" value="32"> Bit 5</label><br>
-                             <label><input type="checkbox" name="byte7" id="byte7_4" class="form-control-xs" value="16"> Bit 4</label><br>
-                             <label><input type="checkbox" name="byte7" id="byte7_3" class="form-control-xs" value="8"> Bit 3</label><br>
-                             <label><input type="checkbox" name="byte7" id="byte7_2" class="form-control-xs" value="4"> Bit 2</label><br>
-                             <label><input type="checkbox" name="byte7" id="byte7_1" class="form-control-xs" value="2"> Bit 1</label><br>
-                             <label><input type="checkbox" name="byte7" id="byte7_0" class="form-control-xs" value="1"> Bit 0</label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_7" class="form-control-xs" value="128"> <span id="bt7_7">Bit 7</span></label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_6" class="form-control-xs" value="64"> <span id="bt7_6">Bit 6</span></label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_5" class="form-control-xs" value="32"> <span id="bt7_5">Bit 5</span></label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_4" class="form-control-xs" value="16"> <span id="bt7_4">Bit 4</span></label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_3" class="form-control-xs" value="8"> <span id="bt7_3">Bit 3</span></label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_2" class="form-control-xs" value="4"> <span id="bt7_2">Bit 2</span></label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_1" class="form-control-xs" value="2"> <span id="bt7_1">Bit 1</span></label><br>
+                             <label><input type="checkbox" name="byte7" id="byte7_0" class="form-control-xs" value="1"> <span id="bt7_0">Bit 0</span></label><br>
                         </div>
  
                     </form>
                 </div>
                 <div class="modal-footer">  
                     <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveRightsResult()">Save</button>                  
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+
+    <!-- **************************************************************************************-->
+    <!--                              Modal to edit remotes                                     -->
+    <!-- **************************************************************************************-->
+    <div id="dlgRemotes" class="modal fade" role="dialog">
+        
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="remotesdlg_header" class="modal-title">Edit VSCP user allowed remotes</h4>
+                </div>
+
+                <div class="modal-body">
+   
+                    <form role="form">
+
+                        <div class="form-group">
+                            <label for="remotes"><span class="glyphicon glyphicon-asterisk"></span> allowed remotes</label>                    
+                            <div class="input-group">                             
+                                <select  class="form-control" size="10" id="selRemotes">
+                                </select>
+                            </div>
+                            <br>
+                            <button type="button" class="btn btn-error" onclick="addRemote(1)">add </button>
+                            <button type="button" class="btn btn-error" onclick="deleteRemote()">delete </button>
+                                  
+                            <span class="help-block">The allowed remotes is a list of IPv4 and/or IPv6 addresses that this user is allowed to 
+                                login from. A single asterisk tells that the user can log in from anywhere. Wild cards are allowed so that
+                                192.168.1.* means a user can login from network 192.168.1.0 </span>
+                        </div>
+
+ 
+                    </form>
+                </div>
+                <div class="modal-footer">  
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveRemotesResult()">Save</button>                  
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- **************************************************************************************-->
+    <!--                              Modal to edit events                                     -->
+    <!-- **************************************************************************************-->
+    <div id="dlgEvents" class="modal fade" role="dialog">
+        
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="eventdlg_header" class="modal-title">Edit VSCP user allowed events</h4>
+                </div>
+
+                <div class="modal-body">
+   
+                    <form role="form">
+
+                        <div class="form-group">
+                            <label for="events"><span class="glyphicon glyphicon-asterisk"></span> allowed events</label>                    
+                            <div class="input-group">                             
+                                <select  class="form-control" size="10" id="selEvents">
+                                </select>
+                            </div>
+                            <br>
+                            <button type="button" class="btn btn-error" onclick="addEvent(1)">add </button>
+                            <button type="button" class="btn btn-error" onclick="deleteEvent()">delete </button>
+                                  
+                            <span class="help-block">The allowed events is a list of VSCP events this user is allowed to send. 
+                                Events should be entered as 'class:type' and wildcards are available. For instance '10:*' means the
+                                user can send all CLASS1.MEASUREMENT events and in the same manner '*:*' means the user can send all events.  
+                            </span>
+                        </div>
+
+ 
+                    </form>
+                </div>
+                <div class="modal-footer">  
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveEventsResult()">Save</button>                  
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
