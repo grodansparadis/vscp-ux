@@ -122,8 +122,8 @@ navBarMenu.content = [
                 url: "acl.html"
             },
             {
-                title: "Server logs",
-                url: "logs.html"
+                title: "Server log file viewer",
+                url: "logview.html"
             },
         ]
     },

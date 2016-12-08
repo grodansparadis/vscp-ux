@@ -614,6 +614,9 @@
         //
 
         function fetchUsers() {
+
+            waitingDialog.show('Fetching users and variables...', {dialogSize: 'xm', progressType: 'warning'});
+            //$('#myPleaseWait').modal('show');
             
             // Fetch users
             vscp.user.fetchUsers( function() {
@@ -635,7 +638,7 @@
                                     
                     // Enable the user interface
                     ui.enable();
-                                    
+
                     // Warn user
                     BootstrapDialog.alert({
                         title: 'ERROR',
@@ -654,8 +657,6 @@
 
             editorValue.setValue("");
             editorNote.setValue("");
-
-            waitingDialog.show('Fetching variables...', {dialogSize: 'xm', progressType: 'warning'});
 
             ui.disable();
 
@@ -1324,7 +1325,7 @@
                     </div>
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-primary col-sm-12" onclick="fetchVariables();">
+                        <button type="button" class="btn btn-primary col-sm-12" onclick="waitingDialog.show('Fetching variables...', {dialogSize: 'xm', progressType: 'warning'});fetchVariables();">
                             <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch variables
                         </button>
                     </div>

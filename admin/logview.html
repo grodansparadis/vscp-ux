@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>VSCP admin interface - Log maintenance</title>
+
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="../js/jquery/3.1.1/jquery-3.1.1.min.js"></script>
+
+    <!-- Tether -->
+    <script type="text/javascript" src="../js/tether/1.3.3/js/tether.min.js"></script>
+    
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- Bootstrap dialogs -->
+    <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
+    <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
+
+    <!-- Bootstrap waitingfor dialog -->
+    <script type="text/javascript" src="../js/waitingfor.js"></script>
+
+    <!-- Bootstrap Datepicker -->
+    <link id="bsdp-css" href="../js/bootstrap-datepicker/css/bootstrap-datepicker3.css" rel="stylesheet">
+    <script src="../js/bootstrap-datepicker/js/bootstrap-datepicker.js"></script>
+
+    <!-- Data tables -->
+    <link rel="stylesheet" href="../js/datatables/datatables.min.css">
+    <script type="text/javascript" src="../js/datatables/datatables.min.js"></script>
+
+    <script src="../js/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
+
+    <!-- Favorite icon -->
+    <link rel="icon" href="favicon.ico">
+
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="../js/settings.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP websocket bases library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP admin library -->
+    <script type="text/javascript" src="../js/vscpadmin.js"></script>
+    <!-- VSCP user library -->
+    <script type="text/javascript" src="../js/vscpuser.js"></script>
+
+    <!-- Menu styles -->
+    <link rel="stylesheet" type="text/css" href="css/menu.css">
+    
+    <!-- Boostrap navigation bar helper functions -->
+    <script type="text/javascript" src="../js/navBar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script type="text/javascript" src="js/menu.js"></script>
+
+    <link rel="stylesheet" type="text/css" href="css/vscp-admin.css">
+
+    <script type="text/javascript">
+
+        var curSelectedVariable;    // Current selected variable
+        var table = null;  
+        var gindexes;               // Curret selected row(s)
+        var editorValue;            // ace editor for value
+        var editorNote;             // ace editor for notes 
+
+        // VSCP websocket connection
+        var vscpConn = null;
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // load ready
+        //
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
+
+            // https://uxsolutions.github.io/bootstrap-datepicker/?markup=range&format=yyyy-mm-dd&weekStart=1&startDate=&endDate=&startView=0&minViewMode=0&maxViewMode=4&todayBtn=linked&clearBtn=false&language=en&orientation=auto&multidate=&multidateSeparator=&calendarWeeks=on&keyboardNavigation=on&forceParse=on&beforeShowMonth=on#sandbox
+            $('#sandbox-container .input-daterange').datepicker({
+                format: "yyyy-mm-dd",
+                weekStart: 1,
+                todayBtn: "linked",
+                calendarWeeks: true,
+                beforeShowMonth: function ( date ){
+                    if ( date.getMonth() == 8 ) {
+                        return false;
+                    }
+                }
+            });
+                
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
+
+            vscp.admin.setStatus( "<b>Server:</b> no server selected.", false );
+
+            if ( typeof( Storage ) !== "undefined" ) {
+                // Server
+                if ( null != localStorage.getItem("vscp-url") ) {
+                    settings.url = localStorage.getItem("vscp-url");
+                }
+
+                vscp.admin.setStatus( settings.url, false );
+
+                // User
+                if ( null != localStorage.getItem("vscp-user") ) {
+                    settings.user = localStorage.getItem("vscp-user");
+                }
+                // Password
+                if ( null != localStorage.getItem("vscp-password") ) {
+                    settings.password = localStorage.getItem("vscp-password");
+                }
+                // AuthDomain
+                if ( null != localStorage.getItem("vscp-authdomain") ) {
+                    settings.authdomain = localStorage.getItem("vscp-authdomain");
+                }
+            } 
+            else {
+                // No Web Storage support.
+                vscp.admin.setStatus( settings.url, false );
+            }   
+
+            table = $('#logTable').DataTable( {
+                "select": 'false',
+                "order": [ 2, 'asc' ],
+                "length": 200,
+                "lengthChange": false,
+                /*
+                "lengthChange": true,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],*/
+                dom: 'Bfrtip',
+                buttons: [
+                    'colvis','copy', 'csv','excel', 'pdf','print'
+                ],
+                columns: [
+                    { title: "Type", visible: true, searchable: false  },
+                    { title: "Date", sort: true, searchable: false },
+                    { title: "Debug level", visible: true, searchable: false },
+                    { title: "Message", visible: true, searchable: true  },               
+                ],
+                
+            });
+
+
+        
+            ///////////////////////////////////////////////////////////////////////////////////////////////
+            // Credential handling
+            //
+
+            if ( typeof( Storage ) !== "undefined" ) {
+
+                // Server
+                if ( null != localStorage.getItem("vscp-url") ) {                    
+                    settings.url = localStorage.getItem("vscp-url");
+                }
+
+                vscp.admin.setStatus( settings.url, false );
+
+                // User
+                if ( null != localStorage.getItem("vscp-user") ) {
+                    settings.user = localStorage.getItem("vscp-user");
+                }
+                // Password
+                if ( null != localStorage.getItem("vscp-password") ) {
+                    settings.password = localStorage.getItem("vscp-password");
+                }
+                // AuthDoamin
+                if ( null != localStorage.getItem("vscp-token") ) {
+                    settings.token = localStorage.getItem("vscp-token");
+                }
+            } 
+            else {
+                // No Web Storage support.
+                //setConnectInfo( settings.url, false );
+            }
+
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
+
+            ui.disable();
+
+            // Connect to VSCP server
+            vscpConn.connect({
+
+                url: settings.url,
+                userName: settings.user,
+                password: settings.password,
+                authdomain: settings.authdomain,
+
+                onSuccess: function( conn ) {
+
+                    // Start receiving VSCP events
+                    vscpConn.start({
+
+                        onSuccess: function( conn ) {
+
+                            if ( 0 == vscpConn.userId ) {
+
+                                // Show conect status
+                                vscp.admin.setStatus( vscpConn.url, true );
+
+                                fetchLog(); 
+                            }
+                            else {
+                                // Warn user
+                                BootstrapDialog.alert({
+                                    title: 'ERROR',
+                                    type: BootstrapDialog.TYPE_DANGER,
+                                    message: 'You must be logged in as the admin user to handle log information.'
+                                });
+                            }
+
+                        },
+
+                        onError: function( conn ) {
+
+                            // Show connect status
+                            vscp.admin.setStatus( vscpConn.url, false );
+
+                            // Warn user
+                            BootstrapDialog.alert({
+                                title: 'ERROR',
+                                type: BootstrapDialog.TYPE_DANGER,
+                                message: 'Unable to connect to server.'
+                            });
+
+                            // Enable the user interface
+                            ui.enable();
+
+                        },
+
+                        onConnError: function( conn ) {
+
+                            // Show connect status
+                            vscp.admin.setStatus( vscpConn.url, false );
+
+                            // Warn user
+                            BootstrapDialog.alert({
+                                type: BootstrapDialog.TYPE_WARNING,
+                                message: 'Connection error.'
+                            });
+                            
+                            // Enable the user interface
+                            ui.enable();
+                        },
+
+                    });
+
+                },
+
+                onError: function( conn ) {
+                    BootstrapDialog.alert({
+                        message: 'Could not establish a connection or connection lost. Reload page to try again.'
+                    });
+                    /*setTimeout(function () {
+                        location.reload()
+                    }, 2000);*/
+                }
+
+            });       
+
+        }); // onLoad
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // ui enable/disable
+        //
+        // User interface data
+        //
+
+        var ui = {
+            enable: function() {
+                $( "#ui :input" ).attr( "disabled", false );
+            },
+
+            disable: function() {
+                $( "#ui :input" ).attr( "disabled", true );
+            }
+        };
+
+        
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // fetchLog
+        //
+
+        function fetchLog() {
+            
+            // Clear table
+            table.clear().draw();
+
+               
+        }
+
+    </script>
+
+</head>
+<body>
+
+    <!-- **********************************************************************************************************************-->
+    <!--                                                      Menu                                                             -->
+    <!-- **********************************************************************************************************************-->
+    <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="index.html">
+                <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="120" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+
+    <!-- **********************************************************************************************************************-->
+    <!--                                                    Table-area                                                        -->
+    <!-- **********************************************************************************************************************-->
+    <div class="container-fluid">
+        <h1>VSCP system users</h1>
+
+        <div class="container-fluid">            
+            <div class="row">
+                
+            </div>
+            <div class="row">                
+                <div class="col-sm-3">
+                    
+                    <div class="input-group col-sm-8">
+                        <button type="button" class="btn btn-primary col-sm-12" onclick="fetchLog();">
+                            <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch log
+                        </button>
+                    </div>
+                    </p>
+
+                    <p>
+                    <div class="input-group col-sm-8" id="sandbox-container">
+                        <div class="input-daterange input-group" id="datepicker">
+                            <input type="text" class="input-sm form-control" name="start" />
+                            <span class="input-group-addon">to</span>
+                            <input type="text" class="input-sm form-control" name="end" />
+                        </div>
+
+                    </div>
+                    </p>
+       
+                </div>
+                
+                <div class="col-sm-8">
+                    <table id="logTable"  class="table table-striped table-bordered table-hover display nowrap" cellspacing="50" width="100%"></table>
+                </div>
+                <div class="col-sm-1"></div>
+            </div>
+
+            
+            <div class="row">
+                <div class="col-sm-3"> </div>                
+                <div class="col-sm-8" >
+                    <p>
+                        <div id="userdata"/>
+                    </p> 
+                </div>         
+                <div class="col-sm-1"></div>
+            </div>
+
+            <br>
+            <div class="row">
+                <div class="col-sm-2"></div>                
+                <div class="col-sm-9"></div>         
+                <div class="col-sm-1"></div>
+            </div>     
+
+        </div>
+        
+    </div>
+    
+    <!-- <div id="copyright-info" /> -->
+
+    <footer>
+        <div id="status-footer"/>
+    </footer>
+    
+</body>
+</html>

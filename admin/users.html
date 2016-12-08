@@ -339,10 +339,12 @@
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
-        // fetchVariables
+        // fetchUsers
         //
 
         function fetchUsers() {
+
+            waitingDialog.show('Fetching users...', {dialogSize: 'xm', progressType: 'warning'});
 
             // Clear extended data
             $('#userdata').html("");
@@ -358,6 +360,7 @@
 
                     var idx = 0;
                     vscp.user.userinfo.forEach( function( u ) { 
+
                         //alert( u[vscp.user.records.NOTE] );
                         table.row.add( [
                                     idx++,
@@ -377,12 +380,16 @@
 
                     // Enable the user interface
                     ui.enable();      
+
+                    waitingDialog.hide();
                 },
                 // Error
                 function() {
                                     
                     // Enable the user interface
                     ui.enable();
+
+                    waitingDialog.hide();
                                     
                     // Warn user
                     BootstrapDialog.alert({
