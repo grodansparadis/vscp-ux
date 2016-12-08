@@ -314,19 +314,26 @@
 
         function showFullInfo( data )
         {
+            var remotes = data[8].trim();
+            var events = data[9].trim();
+
+            if ( 0 == remotes.length ) remotes = "*";
+
+            if ( 0 == events.length ) events = "*:*";
+
             var user_html_content = "<h4>User data</h4>" +
                                 "<table class='table table-striped table-hover table-condensed'>" +
-                                "<tr><td> <b>Ordinal: </b></td><td>" + data[0] + "</td><tr>" +
-                                "<tr><td> <b>User id: </b></td><td>" + data[1] + "</td><tr>" +
+                                "<tr class='success'><td> <b>Ordinal: </b></td><td>" + data[0] + "</td><tr>" +
+                                "<tr class='success'><td> <b>User id: </b></td><td>" + data[1] + "</td><tr>" +
                                 "<tr class='success'><td> <b>User name: </b></td><td>" + data[2] + "</td><tr>" +
-                                "<tr><td> <b>Password: </b></td><td>" + data[3] + "</td><tr>" +
-                                "<tr><td> <b>Full name: </b></td><td>" + data[4] + "</td><tr>" +
-                                "<tr><td> <b>Filter: </b></td><td>" + data[5] + "</td><tr>" +
-                                "<tr><td> <b>Mask: </b></td><td>" + data[6] + "</td><tr>" +
-                                "<tr><td> <b>Rights: </b></td><td>" + data[7] + "</td><tr>" +
-                                "<tr><td> <b>Allowed Remotes: </b></td><td>" + data[8] + "</td><tr>" +
-                                "<tr><td> <b>Allowed Events: </b></td><td>" + data[9] + "</td><tr>" +
-                                "<tr><td> <b>Note: </b></td><td>" + data[10] + "</td><tr>" +
+                                "<tr class='success'><td> <b>Password: </b></td><td>" + data[3] + "</td><tr>" +
+                                "<tr class='success'><td> <b>Full name: </b></td><td>" + data[4] + "</td><tr>" +
+                                "<tr class='success'><td> <b>Filter: </b></td><td>" + data[5] + "</td><tr>" +
+                                "<tr class='success'><td> <b>Mask: </b></td><td>" + data[6] + "</td><tr>" +
+                                "<tr class='success'><td> <b>Rights: </b></td><td>" + data[7] + "</td><tr>" +
+                                "<tr class='success'><td> <b>Allowed Remotes: </b></td><td>" + remotes + "</td><tr>" +
+                                "<tr class='success'><td> <b>Allowed Events: </b></td><td>" + events + "</td><tr>" +
+                                "<tr class='success'><td> <b>Note: </b></td><td>" + data[10] + "</td><tr>" +
                                 "</table>";
             $('#userdata').html( user_html_content );
         }
@@ -500,6 +507,12 @@
 
             $('#editdlg_header').html("Edit VSCP system user");
 
+            var remotes = data[ 8 ].trim();
+            var events = data[ 9 ].trim();
+
+            if ( 0 == remotes.length ) remotes = "*";
+            if ( 0 == events.length ) events = "*:*";
+
             // Can not change username
             $("#dlgedit_username").prop("readonly", true);
             
@@ -511,8 +524,8 @@
             $('#dlgedit_filter').val( data[ 5 ] );
             $('#dlgedit_mask').val( data[ 6 ] );
             $('#dlgedit_rights').val( data[ 7 ] );
-            $('#dlgedit_remotes').val( data[ 8 ] );
-            $('#dlgedit_events').val( data[ 9 ] );
+            $('#dlgedit_remotes').val( remotes );
+            $('#dlgedit_events').val( events );
             $('#dlgedit_note').val( data[ 10 ] );
 
             doPasswordOnKeyUp();
@@ -539,8 +552,6 @@
 
                 return;
             }
-
-            $('#dlgEditUser').modal("hide");
 
             ui.disable();
 
@@ -610,6 +621,8 @@
                                 showFullInfo( data );
                             }
 
+                            $('#dlgEditUser').modal('hide');
+
                         },
                         onError: function( conn ) {
                             BootstrapDialog.alert({
@@ -617,6 +630,8 @@
                                 type: BootstrapDialog.TYPE_DANGER,
                                 message: 'Failed to read back user data ' + options.name
                             });
+
+                            $('#dlgEditUser').modal('hide');
                         }
                     });
 
@@ -630,6 +645,7 @@
                         message: 'Failed to save variable!'
                     });
 
+                    $('#dlgEditUser').modal('hide');
                     ui.enable();
                 }
             });                 
@@ -745,7 +761,18 @@
 
         var saveAddResult = function() {
 
-            if ( $("#pw1grp").hasClass("has-error") ) {
+            if ( 0 == $('#dlgedit_username').val().length ) {
+                
+                BootstrapDialog.alert({
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Username can not be empty.'
+                });;
+
+                return;
+            }
+
+            if ( $("#pw1grp").hasClass("has-error") || $("#pw2grp").hasClass("has-error") ) {
                 
                 BootstrapDialog.alert({
                         title: 'ERROR',
@@ -776,6 +803,7 @@
                     
                     fetchUsers();
 
+                    $('#dlgEditUser').modal('hide');
                     ui.enable();
 
                 },
@@ -788,6 +816,7 @@
                         message: 'Failed to add user!'
                     });
 
+                    $('#dlgEditUser').modal('hide');
                     ui.enable();
                 }
             });
@@ -890,6 +919,478 @@
         { 
             items = rights.split('/');
 
+            // ************************
+            // * * * Init. byte 0 * * *
+            // ************************
+            if ( parseInt( items[0] ) & 0x80 ) {
+                 $('#byte0_7').prop('checked', true);
+            }
+            else {
+                $('#byte0_7').prop('checked', false);
+            }
+
+            if ( parseInt( items[0] ) & 0x40 ) {
+                 $('#byte0_6').prop('checked', true);
+            }
+            else {
+                $('#byte0_6').prop('checked', false);
+            }
+
+            if ( parseInt( items[0] ) & 0x20 ) {
+                 $('#byte0_5').prop('checked', true);
+            }
+            else {
+                $('#byte0_5').prop('checked', false);
+            }
+
+            if ( parseInt( items[0] ) & 0x10 ) {
+                 $('#byte0_4').prop('checked', true);
+            }
+            else {
+                $('#byte0_4').prop('checked', false);
+            }
+
+            if ( parseInt( items[0] ) & 0x08 ) {
+                 $('#byte0_3').prop('checked', true);
+            }
+            else {
+                $('#byte0_3').prop('checked', false);
+            }
+
+            if ( parseInt( items[0] ) & 0x04 ) {
+                 $('#byte0_2').prop('checked', true);
+            }
+            else {
+                $('#byte0_2').prop('checked', false);
+            }
+
+            if ( parseInt( items[0] ) & 0x02 ) {
+                 $('#byte0_1').prop('checked', true);
+            }
+            else {
+                $('#byte0_1').prop('checked', false);
+            }
+
+            if ( parseInt( items[0] ) & 0x01 ) {
+                 $('#byte0_0').prop('checked', true);
+            }
+            else {
+                $('#byte0_0').prop('checked', false);
+            }
+
+            // ************************
+            // * * * Init. byte 1 * * *
+            // ************************
+            if ( parseInt( items[1] ) & 0x80 ) {
+                 $('#byte1_7').prop('checked', true);
+            }
+            else {
+                $('#byte1_7').prop('checked', false);
+            }
+
+            if ( parseInt( items[1] ) & 0x40 ) {
+                 $('#byte1_6').prop('checked', true);
+            }
+            else {
+                $('#byte1_6').prop('checked', false);
+            }
+
+            if ( parseInt( items[1] ) & 0x20 ) {
+                 $('#byte1_5').prop('checked', true);
+            }
+            else {
+                $('#byte1_5').prop('checked', false);
+            }
+
+            if ( parseInt( items[1] ) & 0x10 ) {
+                 $('#byte1_4').prop('checked', true);
+            }
+            else {
+                $('#byte1_4').prop('checked', false);
+            }
+
+            if ( parseInt( items[1] ) & 0x08 ) {
+                 $('#byte1_3').prop('checked', true);
+            }
+            else {
+                $('#byte1_3').prop('checked', false);
+            }
+
+            if ( parseInt( items[1] ) & 0x04 ) {
+                 $('#byte1_2').prop('checked', true);
+            }
+            else {
+                $('#byte1_2').prop('checked', false);
+            }
+
+            if ( parseInt( items[1] ) & 0x02 ) {
+                 $('#byte1_1').prop('checked', true);
+            }
+            else {
+                $('#byte1_1').prop('checked', false);
+            }
+
+            if ( parseInt( items[1] ) & 0x01 ) {
+                 $('#byte1_0').prop('checked', true);
+            }
+            else {
+                $('#byte1_0').prop('checked', false);
+            }
+
+            // ************************
+            // * * * Init. byte 2 * * *
+            // ************************
+            if ( parseInt( items[2] ) & 0x80 ) {
+                 $('#byte2_7').prop('checked', true);
+            }
+            else {
+                $('#byte2_7').prop('checked', false);
+            }
+
+            if ( parseInt( items[2] ) & 0x40 ) {
+                 $('#byte2_6').prop('checked', true);
+            }
+            else {
+                $('#byte2_6').prop('checked', false);
+            }
+
+            if ( parseInt( items[2] ) & 0x20 ) {
+                 $('#byte2_5').prop('checked', true);
+            }
+            else {
+                $('#byte2_5').prop('checked', false);
+            }
+
+            if ( parseInt( items[2] ) & 0x10 ) {
+                 $('#byte2_4').prop('checked', true);
+            }
+            else {
+                $('#byte2_4').prop('checked', false);
+            }
+
+            if ( parseInt( items[2] ) & 0x08 ) {
+                 $('#byte2_3').prop('checked', true);
+            }
+            else {
+                $('#byte2_3').prop('checked', false);
+            }
+
+            if ( parseInt( items[2] ) & 0x04 ) {
+                 $('#byte2_2').prop('checked', true);
+            }
+            else {
+                $('#byte2_2').prop('checked', false);
+            }
+
+            if ( parseInt( items[2] ) & 0x02 ) {
+                 $('#byte2_1').prop('checked', true);
+            }
+            else {
+                $('#byte2_1').prop('checked', false);
+            }
+
+            if ( parseInt( items[2] ) & 0x01 ) {
+                 $('#byte2_0').prop('checked', true);
+            }
+            else {
+                $('#byte2_0').prop('checked', false);
+            }
+
+            // ************************
+            // * * * Init. byte 3 * * *
+            // ************************
+            if ( parseInt( items[3] ) & 0x80 ) {
+                 $('#byte3_7').prop('checked', true);
+            }
+            else {
+                $('#byte3_7').prop('checked', false);
+            }
+
+            if ( parseInt( items[3] ) & 0x40 ) {
+                 $('#byte3_6').prop('checked', true);
+            }
+            else {
+                $('#byte3_6').prop('checked', false);
+            }
+
+            if ( parseInt( items[3] ) & 0x20 ) {
+                 $('#byte3_5').prop('checked', true);
+            }
+            else {
+                $('#byte3_5').prop('checked', false);
+            }
+
+            if ( parseInt( items[3] ) & 0x10 ) {
+                 $('#byte3_4').prop('checked', true);
+            }
+            else {
+                $('#byte3_4').prop('checked', false);
+            }
+
+            if ( parseInt( items[3] ) & 0x08 ) {
+                 $('#byte3_3').prop('checked', true);
+            }
+            else {
+                $('#byte3_3').prop('checked', false);
+            }
+
+            if ( parseInt( items[3] ) & 0x04 ) {
+                 $('#byte3_2').prop('checked', true);
+            }
+            else {
+                $('#byte3_2').prop('checked', false);
+            }
+
+            if ( parseInt( items[3] ) & 0x02 ) {
+                 $('#byte3_1').prop('checked', true);
+            }
+            else {
+                $('#byte3_1').prop('checked', false);
+            }
+
+            if ( parseInt( items[3] ) & 0x01 ) {
+                 $('#byte3_0').prop('checked', true);
+            }
+            else {
+                $('#byte3_0').prop('checked', false);
+            }
+
+            // ************************
+            // * * * Init. byte 4 * * *
+            // ************************
+            if ( parseInt( items[4] ) & 0x80 ) {
+                 $('#byte4_7').prop('checked', true);
+            }
+            else {
+                $('#byte4_7').prop('checked', false);
+            }
+
+            if ( parseInt( items[4] ) & 0x40 ) {
+                 $('#byte4_6').prop('checked', true);
+            }
+            else {
+                $('#byte4_6').prop('checked', false);
+            }
+
+            if ( parseInt( items[4] ) & 0x20 ) {
+                 $('#byte4_5').prop('checked', true);
+            }
+            else {
+                $('#byte4_5').prop('checked', false);
+            }
+
+            if ( parseInt( items[4] ) & 0x10 ) {
+                 $('#byte4_4').prop('checked', true);
+            }
+            else {
+                $('#byte4_4').prop('checked', false);
+            }
+
+            if ( parseInt( items[4] ) & 0x08 ) {
+                 $('#byte4_3').prop('checked', true);
+            }
+            else {
+                $('#byte4_3').prop('checked', false);
+            }
+
+            if ( parseInt( items[4] ) & 0x04 ) {
+                 $('#byte4_2').prop('checked', true);
+            }
+            else {
+                $('#byte4_2').prop('checked', false);
+            }
+
+            if ( parseInt( items[4] ) & 0x02 ) {
+                 $('#byte4_1').prop('checked', true);
+            }
+            else {
+                $('#byte4_1').prop('checked', false);
+            }
+
+            if ( parseInt( items[4] ) & 0x01 ) {
+                 $('#byte4_0').prop('checked', true);
+            }
+            else {
+                $('#byte4_0').prop('checked', false);
+            }
+
+            // ************************
+            // * * * Init. byte 5 * * *
+            // ************************
+            if ( parseInt( items[5] ) & 0x80 ) {
+                 $('#byte5_7').prop('checked', true);
+            }
+            else {
+                $('#byte5_7').prop('checked', false);
+            }
+
+            if ( parseInt( items[5] ) & 0x40 ) {
+                 $('#byte5_6').prop('checked', true);
+            }
+            else {
+                $('#byte5_6').prop('checked', false);
+            }
+
+            if ( parseInt( items[5] ) & 0x20 ) {
+                 $('#byte5_5').prop('checked', true);
+            }
+            else {
+                $('#byte5_5').prop('checked', false);
+            }
+
+            if ( parseInt( items[5] ) & 0x10 ) {
+                 $('#byte5_4').prop('checked', true);
+            }
+            else {
+                $('#byte5_4').prop('checked', false);
+            }
+
+            if ( parseInt( items[5] ) & 0x08 ) {
+                 $('#byte5_3').prop('checked', true);
+            }
+            else {
+                $('#byte5_3').prop('checked', false);
+            }
+
+            if ( parseInt( items[5] ) & 0x04 ) {
+                 $('#byte5_2').prop('checked', true);
+            }
+            else {
+                $('#byte5_2').prop('checked', false);
+            }
+
+            if ( parseInt( items[5] ) & 0x02 ) {
+                 $('#byte5_1').prop('checked', true);
+            }
+            else {
+                $('#byte5_1').prop('checked', false);
+            }
+
+            if ( parseInt( items[5] ) & 0x01 ) {
+                 $('#byte5_0').prop('checked', true);
+            }
+            else {
+                $('#byte5_0').prop('checked', false);
+            }
+
+            // ************************
+            // * * * Init. byte 6 * * *
+            // ************************
+            if ( parseInt( items[6] ) & 0x80 ) {
+                 $('#byte6_7').prop('checked', true);
+            }
+            else {
+                $('#byte6_7').prop('checked', false);
+            }
+
+            if ( parseInt( items[6] ) & 0x40 ) {
+                 $('#byte6_6').prop('checked', true);
+            }
+            else {
+                $('#byte6_6').prop('checked', false);
+            }
+
+            if ( parseInt( items[6] ) & 0x20 ) {
+                 $('#byte6_5').prop('checked', true);
+            }
+            else {
+                $('#byte6_5').prop('checked', false);
+            }
+
+            if ( parseInt( items[6] ) & 0x10 ) {
+                 $('#byte6_4').prop('checked', true);
+            }
+            else {
+                $('#byte6_4').prop('checked', false);
+            }
+
+            if ( parseInt( items[6] ) & 0x08 ) {
+                 $('#byte6_3').prop('checked', true);
+            }
+            else {
+                $('#byte6_3').prop('checked', false);
+            }
+
+            if ( parseInt( items[6] ) & 0x04 ) {
+                 $('#byte6_2').prop('checked', true);
+            }
+            else {
+                $('#byte6_2').prop('checked', false);
+            }
+
+            if ( parseInt( items[6] ) & 0x02 ) {
+                 $('#byte6_1').prop('checked', true);
+            }
+            else {
+                $('#byte6_1').prop('checked', false);
+            }
+
+            if ( parseInt( items[6] ) & 0x01 ) {
+                 $('#byte6_0').prop('checked', true);
+            }
+            else {
+                $('#byte6_0').prop('checked', false);
+            }
+
+            // ************************
+            // * * * Init. byte 7 * * *
+            // ************************
+            if ( parseInt( items[7] ) & 0x80 ) {
+                 $('#byte7_7').prop('checked', true);
+            }
+            else {
+                $('#byte7_7').prop('checked', false);
+            }
+
+            if ( parseInt( items[7] ) & 0x40 ) {
+                 $('#byte7_6').prop('checked', true);
+            }
+            else {
+                $('#byte7_6').prop('checked', false);
+            }
+
+            if ( parseInt( items[7] ) & 0x20 ) {
+                 $('#byte7_5').prop('checked', true);
+            }
+            else {
+                $('#byte7_5').prop('checked', false);
+            }
+
+            if ( parseInt( items[7] ) & 0x10 ) {
+                 $('#byte7_4').prop('checked', true);
+            }
+            else {
+                $('#byte7_4').prop('checked', false);
+            }
+
+            if ( parseInt( items[7] ) & 0x08 ) {
+                 $('#byte7_3').prop('checked', true);
+            }
+            else {
+                $('#byte7_3').prop('checked', false);
+            }
+
+            if ( parseInt( items[7] ) & 0x04 ) {
+                 $('#byte7_2').prop('checked', true);
+            }
+            else {
+                $('#byte7_2').prop('checked', false);
+            }
+
+            if ( parseInt( items[7] ) & 0x02 ) {
+                 $('#byte7_1').prop('checked', true);
+            }
+            else {
+                $('#byte7_1').prop('checked', false);
+            }
+
+            if ( parseInt( items[7] ) & 0x01 ) {
+                 $('#byte7_0').prop('checked', true);
+            }
+            else {
+                $('#byte7_0').prop('checked', false);
+            }
+
             $('#dlgRights').modal();
         };
 
@@ -966,11 +1467,13 @@
 
             // Fill with remotes
             items = remotes.split('/');
-            $.each(items, function(key, value) {   
-            $('#selRemotes')
-                .append($('<option>', { value : key })
-                .text(value)); 
-            });
+            $.each(items, function(key, value) {
+                value = value.trim();
+                if ( 0 == value.length ) value = "*";   
+                $('#selRemotes')
+                    .append($('<option>', { value : key })
+                    .text(value)); 
+                });
 
             // mark the first option as selected
             $("#selRemotes").prop("selectedIndex", 0);
@@ -1052,10 +1555,11 @@
 
             // Fill with remotes
             items = events.split('/');
-            $.each(items, function(key, value) {   
-            $('#selEvents')
-                .append($('<option>', { value : key })
-                .text(value)); 
+            $.each(items, function(key, value) {
+                value = value.trim();   
+                $('#selEvents')
+                    .append($('<option>', { value : key })
+                    .text(value)); 
             });
 
             // mark the first option as selected
@@ -1436,7 +1940,7 @@
                             <label><input type="checkbox" name="byte0" id="byte0_3" class="form-control-xs" value="8"> <span id="bt0_3">Bit 3</span></label><br>
                             <label><input type="checkbox" name="byte0" id="byte0_2" class="form-control-xs" value="4"> <span id="bt0_2">Bit 2</span></label><br>
                             <label><input type="checkbox" name="byte0" id="byte0_1" class="form-control-xs" value="2"> <span id="bt0_1">Bit 1</span></label><br>
-                            <label><input type="checkbox" name="byte0" id="byte0_1" class="form-control-xs" value="1"> <span id="bt0_0">Bit 0</span></label><br>
+                            <label><input type="checkbox" name="byte0" id="byte0_0" class="form-control-xs" value="1"> <span id="bt0_0">Bit 0</span></label><br>
                         </div>
 
                         <div class="form-group">
