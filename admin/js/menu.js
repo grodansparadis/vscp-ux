@@ -60,12 +60,16 @@ navBarMenu.content = [
         ]
     },
     {
-        title: "Session",
+        title: "Client",
         url: "#",
         dropDown: [
             {
-                title: "Session window",
-                url: "javascript:doSession();"
+                title: "Open new client session",
+                url: "client.html"
+            },
+            {
+                title: "Open new client session in new window/tab",
+                url: "javascript:window.open('client.html');",
             },
         ]
     },

@@ -2011,6 +2011,16 @@ vscp.Connection = function() {
         AUTHENTICATED: 2
     };
 
+    /** Substates of the VSCP websocket
+     * @enum {number}
+     */
+    this.substates = {
+        /** No events sent from server */
+        CLOSED: 0,
+        /** Events sent from server */
+        OPEN: 1
+    };
+
     /** Websocket
      * @member {object}
      */
@@ -2100,6 +2110,11 @@ vscp.Connection = function() {
      * @member {number}
      */
     this.state = this.states.DISCONNECTED;
+
+    /** VSCP event traffic is closed
+     * @member {number}
+     */
+    this.substate = this.substates.CLOSED;
 
     /** VSCP server command
      * @class
@@ -2540,10 +2555,12 @@ vscp.Connection.prototype.onWebSocketMessage = function( msg ) {
             }
             else if ( "OPEN" === msgItems[ 1 ] ) {
                 console.info( vscp.utility.getTime() + " Receiving events started." );
+                this.substate = this.substates.OPEN;
                 this.signalSuccess( msgItems[ 1 ] );
             }
             else if ( "CLOSE" === msgItems[ 1 ] ) {
                 console.info( vscp.utility.getTime() + " Receiving events stopped." );
+                this.substate = this.substates.CLOSE;
                 this.signalSuccess( msgItems[ 1 ] );
             }
             else if ( "CLRQ" === msgItems[ 1 ] ) {
@@ -3000,6 +3017,7 @@ vscp.Connection.prototype.disconnect = function() {
         this.socket.close();
         this.socket = null;
         this.state = this.states.DISCONNECTED;
+        this.substate = this.substates.CLOSED;
         this.cmdQueue = [];
     }
 };
