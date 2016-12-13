@@ -62,7 +62,8 @@
 
     <script type="text/javascript">
 
-        var curSelectedVariable;    // Current selected variable
+        var selected_type = 0;      // type that should be shown. 0 == all
+        var selected_level = 0;     // level that should be shown. 0 == all
         var table = null;  
         var gindexes;               // Curret selected row(s)
         var editorValue;            // ace editor for value
@@ -78,7 +79,7 @@
         $( document ).ready( function() {
 
             // https://uxsolutions.github.io/bootstrap-datepicker/?markup=range&format=yyyy-mm-dd&weekStart=1&startDate=&endDate=&startView=0&minViewMode=0&maxViewMode=4&todayBtn=linked&clearBtn=false&language=en&orientation=auto&multidate=&multidateSeparator=&calendarWeeks=on&keyboardNavigation=on&forceParse=on&beforeShowMonth=on#sandbox
-            $('#sandbox-container .input-daterange').datepicker({
+            $('#datepicker-container .input-daterange').datepicker({
                 format: "yyyy-mm-dd",
                 weekStart: 1,
                 todayBtn: "linked",
@@ -122,20 +123,21 @@
             }   
 
             table = $('#logTable').DataTable( {
-                "select": 'false',
-                "order": [ 2, 'asc' ],
-                "length": 200,
-                "lengthChange": false,
+                "select": 'single',
+                "order": [ 0, 'desc' ],
+                "pageLength": 50,
+                "lengthChange": true,
+                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
                 /*
                 "lengthChange": true,
                 "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],*/
-                dom: 'Bfrtip',
+                dom: 'lBfrtip',
                 buttons: [
                     'colvis','copy', 'csv','excel', 'pdf','print'
                 ],
                 columns: [
-                    { title: "Type", visible: true, searchable: false  },
                     { title: "Date", sort: true, searchable: false },
+                    { title: "Type", visible: true, searchable: false  },                    
                     { title: "Debug level", visible: true, searchable: false },
                     { title: "Message", visible: true, searchable: true  },               
                 ],
@@ -278,18 +280,165 @@
             }
         };
 
-        
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // getSymbolicType
+        //
+
+        function getSymbolicType( type ) 
+        {
+            if ( 0 == type ) {
+                return "General";
+            }
+            else if ( 1 == type ) {
+                return "Security";
+            }
+            else if ( 2 == type ) {
+                return "Access";
+            }
+            else if ( 3 == type ) {
+                return "Decision Matrix";
+            }
+            else {
+                return "Unknown";
+            }
+        }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////
+        // getSymbolicLevel
+        //
+
+        function getSymbolicLevel( type ) 
+        {
+            if ( 0 == type ) {
+                return "None";
+            }
+            else if ( 1 == type ) {
+                return "Normal";
+            }
+            else if ( 2 == type ) {
+                return "Debug";
+            }
+            else {
+                return "Unknown";
+            }
+        }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // fetchLog
         //
 
-        function fetchLog() {
-            
+        function fetchLog() 
+        {
+            waitingDialog.show('Fetching log data rows...', {dialogSize: 'xm', progressType: 'warning'});
+
             // Clear table
             table.clear().draw();
 
+            var limit = $('#filter_limit').val();
+            limit.trim();
+            var from = $('#filter_from').val();
+            from.trim();
+            var to = $('#filter_to').val();
+            to.trim();
+            var sql = "";
+
+            // date range
+            if ( from.length && to.length ) {
+                sql = "WHERE date(date) BETWEEN ";
+                sql += "'" + from + "' AND ";
+                sql += "'" + to + "' ";
+            }
+
+            // type
+            if ( 0 != selected_type ) {
+                if ( sql.length ) {
+                    sql += " AND ";
+                }
+                sql += "type=" +  selected_type;
+            }
+
+            // level
+            if ( 0 != selected_level ) {
+                if ( sql.length ) {
+                    sql += " AND ";
+                }
+                sql += "level=" +  selected_level;
+            }
+
+            if ( limit.length ) {
+                sql += " ORDER BY date DESC LIMIT " + limit;
+            }
+            else {
+                sql += " ORDER BY date DESC LIMIT 500;"
+            }
+
+            $('#sqlheader').html( sql );
+
+            if ( 1 ) {
+                ui.disable();
+
+                vscpConn.writeVar({
+
+                    name:   "vscp.log.database.sql",
+                    type:   vscp.constants.varTypes.SQL.toString(),
+                    //value:  "WHERE date(date) BETWEEN '2016-12-07' AND '2016-12-09' AND type=1 and level=1 LIMIT 100;",
+                    value:  sql,
+
+                    onSuccess: function( conn ) {
+                        ui.enable();
+                        readLog();
+                    },
+
+                    onError: function( conn ) {
+                        BootstrapDialog.alert({
+                            type: BootstrapDialog.TYPE_WARNING,
+                            message: 'Failed to save variable!'
+                        });                                
+                        ui.enable();
+                        waitingDialog.hide();
+                    }
+
+                });
+
+            }
+            else {
+                readLog();   
+            }
+
                
+        }
+
+        function readLog()
+        {
+            vscpConn.readVar( {
+
+                name: "vscp.log.database.search",
+                type: vscp.constants.varTypes.SQL,
+
+                onSuccess: function( conn, msg ) {            
+                    ui.enable();
+                   
+                    msg.value.split(";").forEach( function ( item ) {
+                        if ( 0 != item.length ) {
+                        var logrow = item.split(",");
+                        table.row.add( [ 
+                                    logrow[2].substring(0,10) + " " + logrow[2].substring(11), // date 
+                                    getSymbolicType( logrow[1] ),       // type
+                                    getSymbolicLevel( logrow[3] ),      // Debug level
+                                    vscp.b64DecodeUnicode( logrow[4] )  // Message 
+                                ] ).draw( false );
+                        }
+                    });
+
+                    waitingDialog.hide();
+
+                 },
+
+                onError: function( conn ) {
+                    ui.enable();
+                    waitingDialog.hide();
+                }
+             });
         }
 
     </script>
@@ -315,12 +464,14 @@
     <!--                                                    Table-area                                                        -->
     <!-- **********************************************************************************************************************-->
     <div class="container-fluid">
-        <h1>VSCP system users</h1>
+        <h1>VSCP daemon log</h1>
 
-        <div class="container-fluid">            
+        <div class="container-fluid"> 
+
             <div class="row">
                 
             </div>
+
             <div class="row">                
                 <div class="col-sm-3">
                     
@@ -328,49 +479,100 @@
                         <button type="button" class="btn btn-primary col-sm-12" onclick="fetchLog();">
                             <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch log
                         </button>
+                        <span class="help-block">Will fetch the last 500 records without extra filter setting below.</span>
                     </div>
                     </p>
-
-                    <p>
-                    <div class="input-group col-sm-8" id="sandbox-container">
+   
+                    <div class="input-group col-sm-8" id="datepicker-container">
+                        <label><span class="glyphicon glyphicon-asterisk"></span>Date range</label>
                         <div class="input-daterange input-group" id="datepicker">
-                            <input type="text" class="input-sm form-control" name="start" />
+                            <input type="text" id="filter_from" class="input-sm form-control" name="start" />
                             <span class="input-group-addon">to</span>
-                            <input type="text" class="input-sm form-control" name="end" />
+                            <input type="text" id="filter_to" class="input-sm form-control" name="end" />
                         </div>
-
+                        <span class="help-block">Select date range to filter on.</span>
                     </div>
-                    </p>
-       
-                </div>
+
+                    <div class="input-group col-sm-8">
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>                    
+                            <div class="input-group">                                
+                                <input readonly type="text" class="form-control input-sm" aria-label="..." id="filter_type">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-success dropdown-toggle input-sm" 
+                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                aria-expanded="false">set <span class="caret"></span></button>
+                                    <ul id="filter_typedd" class="dropdown-menu dropdown-menu-right">
+                                        <li><a href="javascript:$('#filter_type').val('All');selected_type=0;">All</a></li>
+                                        <li><a href="javascript:$('#filter_type').val('General');selected_type=1;">General</a></li>
+                                        <li><a href="javascript:$('#filter_type').val('Security');selected_type=2;">Security</a></li>
+                                        <li><a href="javascript:$('#filter_type').val('Access');selected_type=3;">Access</a></li>
+                                        <li><a href="javascript:$('#filter_type').val('Decision Matrix');selected_type=4;">Decision Matrix</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <span class="help-block">Select type to filter on.</span>
+                    </div>
+
+                    <div class="input-group col-sm-8">
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> level</label>                    
+                            <div class="input-group">                                
+                                <input readonly type="text" class="form-control input-sm" aria-label="..." id="filter_level">
+                                <div class="input-group-btn">
+                                    <button type="button" class="btn btn-success dropdown-toggle input-sm" 
+                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                aria-expanded="false">set <span class="caret"></span></button>
+                                    <ul id="filter_leveldd" class="dropdown-menu dropdown-menu-right">
+                                        <li><a href="javascript:$('#filter_level').val('All');selected_level=0;">All</a></li>
+                                        <li><a href="javascript:$('#filter_level').val('Normal');selected_level=1;">Normal</a></li>
+                                        <li><a href="javascript:$('#filter_level').val('Debug');selected_level=2;">Debug</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <span class="help-block">Select type to filter on.</span>
+                    </div>
+
+                    <div class="input-group col-sm-8">
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> limit</label>                                                    
+                            <input type="text" class="form-control input-sm" aria-label="..." id="filter_limit">
+                    </div>
+
+               </div>     
                 
                 <div class="col-sm-8">
-                    <table id="logTable"  class="table table-striped table-bordered table-hover display nowrap" cellspacing="50" width="100%"></table>
+                    <p class="bg-info">
+                    <span class="active" id="sqlheader"><strong>SQL:</strong> ORDER BY date LIMIT 500</span>
+                    </p>
                 </div>
                 <div class="col-sm-1"></div>
-            </div>
 
+                <div class="row">
+                    <div class="col-sm-3"> </div>                
+                    <div class="col-sm-8" >
+                            <table id="logTable"  class="table table-striped table-bordered table-hover display compact nowrap" cellspacing="50" width="100%"></table> 
+                    </div>         
+                    <div class="col-sm-1"></div>
+                </div>
             
-            <div class="row">
-                <div class="col-sm-3"> </div>                
-                <div class="col-sm-8" >
+                <div class="row">
+                    <div class="col-sm-3"> </div>                
+                    <div class="col-sm-8" >
                     <p>
                         <div id="userdata"/>
                     </p> 
-                </div>         
-                <div class="col-sm-1"></div>
+                    </div>         
+                    <div class="col-sm-1"></div>
+                </div>
+
+                <br>
+                <div class="row">
+                    <div class="col-sm-3"></div>                
+                    <div class="col-sm-8"></div>         
+                    <div class="col-sm-1"></div>
+                </div>     
+
             </div>
-
-            <br>
-            <div class="row">
-                <div class="col-sm-2"></div>                
-                <div class="col-sm-9"></div>         
-                <div class="col-sm-1"></div>
-            </div>     
-
-        </div>
         
-    </div>
+        </div>
     
     <!-- <div id="copyright-info" /> -->
 
