@@ -32,6 +32,9 @@
 
     <script src="../js/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
+    <link href="../js/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
+    <script src="../js/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
+
     <!-- Favorite icon -->
     <link rel="icon" href="favicon.ico">
 
@@ -58,12 +61,22 @@
 
     <script type="text/javascript">
 
+        txtypes = {
+            /** TX data is in the dialog */
+            DIALOG: 0,
+            /** Tx data is in listbox */
+            LIST: 1
+        };
+
         var table = null;  
         var curSelectedData         // Data for current selected line
         var gindexes;               // Curret selected row(s)
 
         // VSCP websocket connection
         var vscpConn = null;
+
+        var txEvents = [];          // TX event array
+                                    // { name: 'name of event', event: vscp.event object }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // load ready
@@ -229,7 +242,7 @@
 
                         },
 
-                        onError: function( conn ) {
+                        onError: function( conn ) {                           
 
                             // Warn user
                             BootstrapDialog.alert({
@@ -281,6 +294,8 @@
 
                     // Show connect status
                     vscp.admin.setStatus( vscpConn.url, false );
+
+                    $('#btnConnect').bootstrapToggle('off');
 
                     BootstrapDialog.alert({
                         message: 'Could not establish a connection or connection lost. Reload page to try again.'
@@ -373,13 +388,14 @@
         {
   
             if ( vscpConn.substate == vscpConn.substates.OPEN ) {
+
                 // vscpConn.states.AUTHENTICATED or vscpConn.states.CONNECTED
                 vscpConn.stop({
                     onSuccess: function( conn ) {
                         $('#status_connection').html("closed");
-                        $('#btnConnect').html('<span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Open');
                     }, 
                     onError: function( conn ) {
+
                         // Warn user
                         BootstrapDialog.alert({
                                 title: 'ERROR',
@@ -390,6 +406,19 @@
                 });
             }
             else {
+
+                if ( vscpConn.state != vscpConn.states.AUTHENTICATED ) {
+
+                    BootstrapDialog.alert({
+                                title: 'ERROR',
+                                type: BootstrapDialog.TYPE_DANGER,
+                                message: 'Please reload page to connect to remote device or check remote device.'
+                        });
+                       
+                    /*setTimeout(function () {
+                        location.reload();
+                    }, 2000);*/
+                }
  
                 // Start receiving VSCP events
                 vscpConn.start({
@@ -397,7 +426,6 @@
                     onSuccess: function( conn ) {
                         // Add event listener
                         vscpConn.addEventListener( eventListener );
-                        $('#btnConnect').html('<span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Close');
                         $('#status_connection').html("open");
                     }, 
                     onError: function( conn ) {
@@ -411,6 +439,26 @@
                 });
             }
         }
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Handle connection button change
+        //
+
+        $(function() {
+            $('#btnConnect').change(function() {
+                handleConnection();
+            })
+        });  
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Handle filter button change
+        //
+
+        $(function() {
+            $('#btnFilter').change(function() {
+                alert("Filter");
+            })
+        });
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // clrTable
@@ -432,6 +480,115 @@
         var handleSoftFilter = function()
         {
 
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // sendTxEvent
+        //
+
+        var sendTxEvent = function()
+        {
+                                       
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // addTxEvent
+        //
+
+        var addTxEvent = function()
+        {
+            $('#dlgTxRow').modal('show');
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // removeTxEvent
+        //
+
+        var removeTxEvent = function()
+        {
+            
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // saveTxEvent
+        //
+
+        var saveTxEvent = function()
+        {
+            
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // loadTxEvent
+        //
+
+        var loadTxEvent = function()
+        {
+
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // sendTxEvent
+        //
+
+        var sendTxEvent = function( txtype )
+        {
+            var evt = new vscp.Event();
+
+            // Send event from tx event dialog
+            if ( txtype == txtypes.DIALOG ) {
+
+                evt.setPriority( parseInt( $("#tx_priority").val() ) );
+                evt.vscpClass = vscp.utility.readValue( $("#tx_class").val() );
+                evt.vscpType = vscp.utility.readValue( $("#tx_type").val() );
+                evt.vscpObId = 0;
+                evt.vscpTimeStamp = 0;
+                evt.vscpGuid = vscp.utility.strToGuid( $("#tx_guid").val() );
+                var txtData = $("#tx_data").val().trim()
+                if ( txtData.length ) {
+                    txtData = txtData.split(",");
+                    alert(txtData.length);
+                    if ( 0 < txtData.length ) {
+                        txtData.forEach( function( item ) {
+                            evt.vscpData.push( vscp.utility.readValue( item ) ); 
+                        });
+                    }
+                }
+
+                // Send the event
+                vscpConn.sendEvent({
+
+                    event: evt,
+
+                    onSuccess: function( conn ) {
+                        console.debug("Event sent!");
+                    }, 
+                    onError: function( conn ) {
+                        // Event was not sent
+                        BootstrapDialog.alert({
+                                title: 'ERROR',
+                                type: BootstrapDialog.TYPE_DANGER,
+                                message: 'Failed to send event.'
+                        });
+                    },
+
+                });
+
+            }
+            // Send selected event(s) from tx list
+            else if ( txtype == txtypes.LIST ) {
+
+            }
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // saveTxRowResult
+        //
+
+        var saveTxRowResult = function()
+        {
+            // txEvents = [];       // TX event array
+                                    // { name: 'name of event', event: vscp.event object }
         };
 
     </script>
@@ -464,23 +621,35 @@
                             <span class="help-block">Name for the transmission row. "class:type" will be used if not entered.</span>
                         </div>
 
-                        <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Priority</label>                    
+                        <div class="input-group col-sm-8">
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> priority</label>                    
                             <div class="input-group">                                
-                                <input readonly type="text" class="form-control" aria-label="..." id="tx_priority" value="normal">
+                                <input readonly type="text" class="form-control input-sm" aria-label="..." value="3 - normal" id="tx_priority">
                                 <div class="input-group-btn">
-                                    <button type="button" onclick="filterDialog( $('#tx_priority').val() );" class="btn btn-success btn-sm">Set priority</button>
+                                    <button type="button" class="btn btn-success dropdown-toggle input-sm" 
+                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                aria-expanded="false">set <span class="caret"></span></button>
+                                    <ul id="tx_prioritydd" class="dropdown-menu dropdown-menu-right">
+                                        <li><a href="javascript:$('#tx_priority').val('0 - very high');selected_type=0;">very high</a></li>
+                                        <li><a href="javascript:$('#tx_priority').val('1 - high');selected_type=1;">high</a></li>
+                                        <li><a href="javascript:$('#tx_priority').val('2 - above normal');selected_type=1;">above normal</a></li>
+                                        <li><a href="javascript:$('#tx_priority').val('3 - normal');selected_type=2;">normal</a></li>
+                                        <li><a href="javascript:$('#tx_priority').val('4 - below normal');selected_type=2;">below normal</a></li>
+                                        <li><a href="javascript:$('#tx_priority').val('5 - low');selected_type=2;">low</a></li>
+                                        <li><a href="javascript:$('#tx_priority').val('6 - lower still');selected_type=3;">lower still</a></li>
+                                        <li><a href="javascript:$('#tx_priority').val('7 - very low');selected_type=4;">very low</a></li>
+                                    </ul>
                                 </div>
                             </div>
                             <span class="help-block">Set event priority.</span>
-                        </div>
+                    </div>
 
                         <div class="form-group">
                             <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> VSCP class</label>                    
                             <div class="input-group">                                
-                                <input readonly type="text" class="form-control" aria-label="..." id="tx_class">
+                                <input type="text" class="form-control" aria-label="..." id="tx_class">
                                 <div class="input-group-btn">
-                                    <button type="button" onclick="filterDialog( $('#dlgedit_filter').val() );" class="btn btn-success btn-sm">Set filter</button>
+                                    <button type="button" onclick="selectClass( $('#tx_class').val() );" class="btn btn-success btn-md">...</button>
                                 </div>
                             </div>
                             <span class="help-block">Set VSCP class for event.</span>
@@ -489,9 +658,9 @@
                         <div class="form-group">
                             <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> VSCP type</label>                    
                             <div class="input-group">                                
-                                <input readonly type="text" class="form-control" aria-label="..." id="tx_type">
+                                <input type="text" class="form-control" aria-label="..." id="tx_type">
                                 <div class="input-group-btn">
-                                    <button type="button" onclick="filterDialog( $('#dlgedit_filter').val() );" class="btn btn-success btn-sm">Set filter</button>
+                                    <button type="button" onclick="selectType( $('#tx_type').val() );" class="btn btn-success btn-md">...</button>
                                 </div>
                             </div>
                             <span class="help-block">Set VSCP type for event.</span>
@@ -499,7 +668,7 @@
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> originating GUID</label>
-                            <input type="text" class="form-control" id="tx_guid"  >
+                            <input type="text" class="form-control" id="tx_guid" value="-" >
                             <span class="help-block">Set GUID to useas originating address. Set to "-" (without apostrophes) to use GUID of interface." </span>
                         </div>
 
@@ -513,7 +682,8 @@
                     </form>
                 </div>
                 <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" onclick="saveEditResult()">Save</button>                  
+                    <button type="button" class="btn btn-warning btn-lg" onclick="sendTxEvent( txtypes.DIALOG );">Send</button>
+                    <button type="button" class="btn btn-success btn-lg" onclick="saveTxRowResult();">Save</button>                  
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -549,7 +719,16 @@
             </div>
 
             <div class="row">
-                <div class="col-sm-2"> </div>                
+                <div class="col-sm-2"> 
+                    <label>
+                        <input id="btnConnect" checked data-toggle="toggle" type="checkbox" >
+                        Connection
+                    </label>  
+                    <label>
+                        <input id="btnFilter" data-toggle="toggle" type="checkbox" >
+                        Filter
+                    </label>
+                </div>                  
                 <div class="col-sm-9" >
                     <p class="bg-info">
                     <span class="active" >
@@ -565,9 +744,10 @@
                 <div class="col-sm-2">
                     
                     <div class="input-group col-sm-8">
+                        <!--
                         <button type="button" id="btnConnect" class="btn btn-primary col-sm-12" onclick="handleConnection();" data-toggle="tooltip" title="Connect/disconnect to/from VSCP server">
                             <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Close
-                        </button>
+                        </button> -->
                     </div>
                     </p>
 
@@ -618,14 +798,28 @@
                             <option>2:89</option>
                             <option>3:40</option>
                             <option>4:4</option>
+                            <option>10:6</option>
+                            <option>2:89</option>
+                            <option>3:40</option>
+                            <option>4:4</option>
                         </select> 
                         <p>
-                        <div class="btn-group">
-                            <button type="button" class="btn btn-success btn-md" data-toggle="tooltip" title="Send event">>></button>
-                            <button type="button" class="btn btn-info btn-md" data-toggle="tooltip" title="Add event">+</button>
-                            <button type="button" class="btn btn-info btn-md" data-toggle="tooltip" title="Delete event">-</button>
-                            <button type="button" class="btn btn-info btn-md" data-toggle="tooltip" title="Save TX events to disk">S</button>
-                            <button type="button" class="btn btn-info btn-md" data-toggle="tooltip" title="Load TX event from disk">L</button>
+                        <div class="btn-group">   
+                            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="addTxEvent();" title="Add event">
+                                <span class="glyphicon glyphicon-plus"></span>
+                            </button>
+                            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="removeTxEvent();"  title="Remove event">
+                                <span class="glyphicon glyphicon-minus"></span>    
+                            </button>
+                            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="saveTxEvent();"  title="Save TX events to disk">
+                                <span class="glyphicon glyphicon-cloud-upload"></span>     
+                            </button>
+                            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="loadTxEvent();"  title="Load TX event from disk">
+                                <span class="glyphicon glyphicon-cloud-download"></span>
+                            </button>
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip" onclick="sendTxEvent();"  title="Send event">
+                                <span class="glyphicon glyphicon-log-out"></span>
+                            </button>
                         </div>    
                         </p>
                     </div>                   
@@ -635,6 +829,33 @@
                 <div class="col-sm-9">
                     <table id="clientTable"  class="table table-striped table-bordered table-hover display compact nowrap" cellspacing="50" width="100%"></table>    
                 </div>
+
+                <br><br><br>
+
+                <form class="form-inline">
+                    <div class="form-group">
+                        <label for="email">Class:</label>
+                        <input type="email" class="form-control" id="email">
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd">Type:</label>
+                        <input type="password" class="form-control" id="pwd">
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd">Data:</label>
+                        <input type="password" class="form-control" id="pwd">
+                    </div>
+                    <div class="form-group">
+                        <label for="pwd">GUID:</label>
+                        <input type="password" class="form-control" id="pwd">
+                    </div>
+                    <!--<div class="checkbox">
+                        <label><input type="checkbox"> Remember me</label>
+                    </div>
+                    <button type="submit" class="btn btn-default">Submit</button>-->
+                </form>    
+
+
                 <div class="col-sm-1"></div>
 
             </div>

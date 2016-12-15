@@ -1592,6 +1592,8 @@ vscp.getEditorModeFromType = function ( n ) {
 
 
 
+
+
 /* ---------------------------------------------------------------------- */
 
 
@@ -1684,9 +1686,6 @@ vscp.encodeValueIfBase64 = function ( type, value ) {
  * @param {number} options.vscpPriority                 - Priority
  * @param {boolean} options.vscpHardCoded               - Hard coded node id
  * @param {boolean} options.vscpCalcCRC                 - Calculate CRC
- * @param {boolean} options.vscpIsCANMessage            - Is CAN message or not
- * @param {boolean} options.vscpIsExtendedCANMessage    - Is extended CAN message or not
- * @param {boolean} options.vscpIsRemoteFrame           - Is a CAN remote frame or not
  * @param {number} options.vscpClass                    - VSCP class
  * @param {number} options.vscpType                     - VSCP type
  * @param {number} options.vscpObId                     - Object id
@@ -1740,7 +1739,7 @@ vscp.Event = function ( options ) {
         if ( "number" === typeof options.vscpPriority ) {
             if ( ( 0 <= options.vscpPriority ) && ( 7 >= options.vscpPriority ) ) {
                 this.vscpHead &= 0x1f;
-                this.vscpHead |= options.vscpPriority << 5;
+                this.vscpHead |= ( options.vscpPriority << 5 );
             }
         }
         
@@ -1761,34 +1760,7 @@ vscp.Event = function ( options ) {
                 this.vscpHead |= 0x08;
             }
         }
-        
-        if ( "boolean" === typeof options.vscpIsCANMessage ) {
-            if ( false === options.vscpIsCANMessage ) {
-                this.vscpHead &= 0xfb;
-            }
-            else {
-                this.vscpHead |= 0x04;
-            }
-        }
-        
-        if ( "boolean" === typeof options.vscpIsExtendedCANMessage ) {
-            if ( false === options.vscpIsExtendedCANMessage ) {
-                this.vscpHead &= 0xfd;
-            }
-            else {
-                this.vscpHead |= 0x02;
-            }
-        }
-        
-        if ( "boolean" === typeof options.vscpIsRemoteFrame ) {
-            if ( false === options.vscpIsRemoteFrame ) {
-                this.vscpHead &= 0xfe;
-            }
-            else {
-                this.vscpHead |= 0x01;
-            }
-        }
-        
+
         if ( "number" === typeof options.vscpClass ) {
             this.vscpClass = options.vscpClass;
         }
@@ -1816,6 +1788,13 @@ vscp.Event = function ( options ) {
 };
 
 /**
+ * Set GUID as IP v6 address
+ */
+vscp.Event.prototype.setIPV6Addr = function() {
+    this.vscpHead |= 0x8000;
+};
+
+/**
  * Is GUID a IP v6 address or not?
  *
  * @return {boolean} If the GUID is a IP v6 address, it will return true, otherwise false.
@@ -1831,6 +1810,18 @@ vscp.Event.prototype.isIPV6Addr = function() {
 };
 
 /**
+ * Set the VSCP event priority.
+ *
+ * @param {number} priority  -  Priority
+ */
+vscp.Event.prototype.setPriority = function( priority ) {
+    if ( ( 0 <= priority ) && ( 7 >= priority ) ) {
+        this.vscpHead &= 0x1f;
+        this.vscpHead |= ( priority << 5 );
+    }
+};
+
+/**
  * Get the VSCP event priority.
  *
  * @return {number} Priority of the event.
@@ -1838,6 +1829,13 @@ vscp.Event.prototype.isIPV6Addr = function() {
 vscp.Event.prototype.getPriority = function() {
     return ( this.vscpHead >> 5 ) & 0x0007;
 };
+
+/**
+ * Set the node id of the event sender as hard coded?
+ */
+vscp.Event.prototype.setHardCodedAddr = function() {
+    this.vscpHead |= 0x0010;
+}
 
 /**
  * Is the node id of the event sender hard coded or not?
@@ -1854,6 +1852,28 @@ vscp.Event.prototype.isHardCodedAddr = function() {
     return result;
 };
 
+/**
+ * Set flag for no CRC calculation?
+ */
+vscp.Event.prototype.setDoNotCalcCRC = function() {
+    this.vscpHead |= 0x0008;
+}
+
+/**
+ * Is CRC calculated or not?
+ *
+ * @return {boolean} If nor CRC should be calculated true is returned.
+ */
+vscp.Event.prototype.isDoNotCalcCRC = function() {
+    var result = false;
+
+    if ( 0 < ( this.vscpHead & 0x0008 ) ) {
+        result = true;
+    }
+
+    return result;
+};
+
 /* ---------------------------------------------------------------------- */
 
 /**
@@ -1861,6 +1881,26 @@ vscp.Event.prototype.isHardCodedAddr = function() {
  * @namespace vscp.utility
  */
 vscp._createNS( "vscp.utility" );
+
+
+///////////////////////////////////////////////////////////////////////////////////////////////
+// readValue
+//
+// Read a hex or decimal value and return as an integer
+// 
+
+vscp.utility.readValue = function( input ) {
+    var txtvalue = input.toLowerCase();
+    var pos = txtvalue.indexOf("0x");
+    if ( -1 == pos ) {
+        return parseInt( txtvalue );
+    }
+    else {
+        txtvalue = txtvalue.substring( pos + 2 );
+        return parseInt( txtvalue, 16 );
+    }
+}
+
 
 /**
  * Utility function which returns the current time in the following format: hh:mm:ss.us
@@ -1957,6 +1997,11 @@ vscp.utility.strToGuid = function( str ) {
 
     if ( "string" !== typeof str ) {
         return guid;
+    }
+
+    // If GUID is "-" use interface GUID
+    if ( "-" === str ) {
+        str = "00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00";
     }
 
     items = str.split( ":" );
@@ -3184,7 +3229,7 @@ vscp.Connection.prototype.sendEvent = function ( options ) {
     cmdData += options.event.vscpType.toString() + ",";
     cmdData += options.event.vscpObId.toString() + ",";
     cmdData += options.event.vscpTimeStamp.toString() + ",";
-    cmdData += options.event.vscpGuid.toString();
+    cmdData += vscp.utility.guidToStr( options.event.vscpGuid );
 
     if ( options.event.vscpData instanceof Array ) {
 
