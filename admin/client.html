@@ -460,6 +460,7 @@
             })
         });
 
+
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // clrTable
         //
@@ -547,7 +548,6 @@
                 var txtData = $("#tx_data").val().trim()
                 if ( txtData.length ) {
                     txtData = txtData.split(",");
-                    alert(txtData.length);
                     if ( 0 < txtData.length ) {
                         txtData.forEach( function( item ) {
                             evt.vscpData.push( vscp.utility.readValue( item ) ); 
@@ -578,7 +578,33 @@
             // Send selected event(s) from tx list
             else if ( txtype == txtypes.LIST ) {
 
-            }
+                $('#seltxevent :selected').each( function( i, sel ) { 
+
+                    //var idx = $("#seltxevent option:selected").val();
+                    var idx = $(sel).val();
+                    var evt = txEvents[ idx ].event;
+
+                    // Send the event
+                    vscpConn.sendEvent({
+
+                        event: evt,
+
+                        onSuccess: function( conn ) {
+                            console.debug("Event sent!");
+                        }, 
+                        onError: function( conn ) {
+                            // Event was not sent
+                            BootstrapDialog.alert({
+                                title: 'ERROR',
+                                type: BootstrapDialog.TYPE_DANGER,
+                                message: 'Failed to send event.'
+                            });
+                        },
+
+                    });
+
+                }); // each
+            }; // LIST
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -586,10 +612,137 @@
         //
 
         var saveTxRowResult = function()
-        {
-            // txEvents = [];       // TX event array
-                                    // { name: 'name of event', event: vscp.event object }
+        {      
+            var evt = new vscp.Event();
+
+            evt.setPriority( parseInt( $("#tx_priority").val() ) );
+            evt.vscpClass = vscp.utility.readValue( $("#tx_class").val() );
+            evt.vscpType = vscp.utility.readValue( $("#tx_type").val() );
+            evt.vscpObId = 0;
+            evt.vscpTimeStamp = 0;
+            evt.vscpGuid = vscp.utility.strToGuid( $("#tx_guid").val() );
+            var txtData = $("#tx_data").val().trim()
+            if ( txtData.length ) {
+                txtData = txtData.split(",");
+                if ( 0 < txtData.length ) {
+                    txtData.forEach( function( item ) {
+                        evt.vscpData.push( vscp.utility.readValue( item ) ); 
+                    });
+                }
+            }   
+
+            var name = $("#tx_name").val().trim();
+            if ( 0 == name.length ) {
+                name = "" + evt.vscpClass + ":" + evt.vscpType;
+            }
+
+            // Add to array
+            var idx = txEvents.push({
+                                    name: name,
+                                    event: evt
+                                });
+
+            // Add to tx event selection box
+            $("#seltxevent").append($("<option></option>")
+                    .attr( "value", idx - 1 )
+                    .text( name ) ); 
+
         };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Handle change event for tx event select
+        //
+
+        $( function() {
+            $('#seltxevent').change( function() {
+
+                var content ="";
+                $('#seltxevent :selected').each( function( i, sel ) {
+                    var data = " ";
+                    txEvents[ $(sel).val() ].event.vscpData.forEach( function( item ) {
+                        data += item.toString() + " ";
+                    });
+                    content += "<b>Prio: </b>" + txEvents[ $(sel).val() ].event.getPriority() + " " +
+                                    "<b>Class:</b> " + txEvents[ $(sel).val() ].event.vscpClass + " " +
+                                    "<b>Type:</b> " + txEvents[ $(sel).val() ].event.vscpType + "<br>" +
+                                    "<b>Data: </b>" + data + "<br>" +
+                                    "<b>GUID: </b> <span class='vscpsmallguid'>" + 
+                                    vscp.utility.guidToStr( txEvents[ $(sel).val() ].event.vscpGuid ) + "</span>";
+                    content += "<br>";                                                
+                });
+
+                $('#txevent_detail').html( content );
+            })
+        });
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Handle doubl click event for tx event select
+        //
+
+        $( function() {
+            $('#seltxevent').dblclick( function() {
+                //alert('Double click ' + $(this).val() );
+            })
+        });
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // Read txd file from disk
+        //
+
+       var  readTxdFile = function ( f )
+       {
+            var file = f.files[0];
+            var reader = new FileReader();
+
+            $('#dlgReadEvents').modal('hide');
+
+            reader.onload = function( e ) {
+                
+                var xmltxd = e.target.result
+                     
+                $xml = $( $.parseXML( xmltxd ) );
+                    $xml.find("set").each( function() {
+                        
+                        var evt = new vscp.Event();
+
+                        /*alert( $(this).find('name').text() );
+                        alert( $(this).find('class').text() );
+                        alert( $(this).find('type').text() );
+                        alert( $(this).find('data').text() );
+                        alert( $(this).find('guid').text() );
+                        alert( $(this).find('guid').attr('default') );*/
+                        var name = $(this).find('name').text();
+                        evt.vscpClass = $(this).find('class').text();
+                        evt.vscpType = $(this).find('type').text();
+                        evt.vscpGuid  = vscp.utility.strToGuid( $(this).find('guid').text() );
+                        var txtData = $(this).find('data').text().trim();
+                        if ( txtData.length ) {
+                            txtData = txtData.split(",");
+                            if ( 0 < txtData.length ) {
+                                txtData.forEach( function( item ) {
+                                    evt.vscpData.push( vscp.utility.readValue( item ) ); 
+                                });
+                            }
+                        }  
+
+                        // Add to array
+                        var idx = txEvents.push({
+                                    name: name,
+                                    event: evt
+                                });
+
+                        // Add to tx event selection box
+                        $("#seltxevent").append($("<option></option>")
+                            .attr( "value", idx - 1 )
+                            .text( name ) );
+
+                    });
+            };
+
+            reader.readAsText( file );
+  
+       }
+
 
     </script>
 
@@ -693,6 +846,47 @@
     </div>
 
 
+    <!-- **************************************************************************************-->
+    <!--                              Modal for tx row read in                              -->
+    <!-- **************************************************************************************-->
+    <div id="dlgReadEvents" class="modal fade" role="dialog">
+        
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="dlgReadEvents_header" class="modal-title">Select file</h4>
+                </div>
+
+                <div class="modal-body">
+   
+                    <form role="form">
+
+                        <div class="form-group">
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> File to read</label>                    
+                            <div class="input-group">                                
+                                <input type="file" class="form-control" aria-label="..." accept=".txd" id="dlgReadEvents_readfile">
+                            </div>
+                            <span class="help-block">Select TX event file to read in.</span>
+                        </div>
+
+                    </form>
+                </div>
+
+                <div class="modal-footer">  
+                    <button type="button" class="btn btn-warning btn-lg" onclick="readTxdFile( document.getElementById('dlgReadEvents_readfile') );">Read events</button>               
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
     <!-- **********************************************************************************************************************-->
     <!--                                                      Menu                                                             -->
     <!-- **********************************************************************************************************************-->
@@ -785,23 +979,21 @@
 
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="deleteUser();" data-toggle="tooltip" title="Load RX event from disk">
+                        <button type="button" class="btn btn-success col-sm-12" onclick="$('#dlgReadEvents').modal('show');" data-toggle="tooltip" title="Load RX event from disk">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Load events
                         </button>
                     </div>
                     </p>
 
+                    <p><hr></p>
+
                     <div class="form-group">
-                        <label for="sel1">Send Event(s):</label>
-                        <select multiple class="form-control" id="sel1">
-                            <option>10:6</option>
+                        <label for="sel1">TX Event(s):</label>
+                        <select multiple class="form-control" id="seltxevent">
+                            <!-- <option>10:6</option>
                             <option>2:89</option>
                             <option>3:40</option>
-                            <option>4:4</option>
-                            <option>10:6</option>
-                            <option>2:89</option>
-                            <option>3:40</option>
-                            <option>4:4</option>
+                            <option>4:4</option> -->
                         </select> 
                         <p>
                         <div class="btn-group">   
@@ -817,45 +1009,19 @@
                             <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="loadTxEvent();"  title="Load TX event from disk">
                                 <span class="glyphicon glyphicon-cloud-download"></span>
                             </button>
-                            <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip" onclick="sendTxEvent();"  title="Send event">
+                            <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip" onclick="sendTxEvent( txtypes.LIST );"  title="Send event">
                                 <span class="glyphicon glyphicon-log-out"></span>
                             </button>
                         </div>    
                         </p>
-                    </div>                   
-       
+                    </div>  
+                    <div id="txevent_detail">                 
+                    </div>        
                 </div>
                 
                 <div class="col-sm-9">
                     <table id="clientTable"  class="table table-striped table-bordered table-hover display compact nowrap" cellspacing="50" width="100%"></table>    
                 </div>
-
-                <br><br><br>
-
-                <form class="form-inline">
-                    <div class="form-group">
-                        <label for="email">Class:</label>
-                        <input type="email" class="form-control" id="email">
-                    </div>
-                    <div class="form-group">
-                        <label for="pwd">Type:</label>
-                        <input type="password" class="form-control" id="pwd">
-                    </div>
-                    <div class="form-group">
-                        <label for="pwd">Data:</label>
-                        <input type="password" class="form-control" id="pwd">
-                    </div>
-                    <div class="form-group">
-                        <label for="pwd">GUID:</label>
-                        <input type="password" class="form-control" id="pwd">
-                    </div>
-                    <!--<div class="checkbox">
-                        <label><input type="checkbox"> Remember me</label>
-                    </div>
-                    <button type="submit" class="btn btn-default">Submit</button>-->
-                </form>    
-
-
                 <div class="col-sm-1"></div>
 
             </div>

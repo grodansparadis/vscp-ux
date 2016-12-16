@@ -76,6 +76,12 @@ img.logo {
     height: 100%;
 }
 
+/* Small GUID */
+.vscpsmallguid {
+    font-size: 8pt;
+    text-align: center;  
+}
+
 /* 
   Fix for bootstrap modal multiopen issue
   https://github.com/nakupanda/bootstrap3-dialog/issues/70
