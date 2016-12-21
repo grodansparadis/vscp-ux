@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html>
+
 <head>
     <meta charset="UTF-8">
     <title>VSCP admin interface - Client window</title>
@@ -13,10 +14,10 @@
 
     <!-- Tether -->
     <script type="text/javascript" src="../js/tether/1.3.3/js/tether.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
     <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- Bootstrap dialogs -->
@@ -51,7 +52,7 @@
 
     <!-- Menu styles -->
     <link rel="stylesheet" type="text/css" href="css/menu.css">
-    
+
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
@@ -60,7 +61,6 @@
     <link rel="stylesheet" type="text/css" href="css/vscp-admin.css">
 
     <script type="text/javascript">
-
         txtypes = {
             /** TX data is in the dialog */
             DIALOG: 0,
@@ -68,149 +68,188 @@
             LIST: 1
         };
 
-        var table = null;  
-        var curSelectedData         // Data for current selected line
-        var gindexes;               // Curret selected row(s)
+        var table = null;
+        var curSelectedData // Data for current selected line
+        var gindexes; // Curret selected row(s)
 
         // VSCP websocket connection
         var vscpConn = null;
 
-        var txEvents = [];          // TX event array
-                                    // { name: 'name of event', event: vscp.event object }
+        var txEvents = []; // TX event array
+        // { name: 'name of event', event: vscp.event object }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // load ready
         //
         // Wait until the whole website is loaded
-        $( document ).ready( function() {
-                
+        $(document).ready(function() {
+
             // Show navigation bar menu
-            navBarMenu.show( "menu", navBarMenu.content );
+            navBarMenu.show("menu", navBarMenu.content);
 
             //vscp.admin.setCopyright();
-            vscp.admin.setStatus( "<b>Server:</b> no server selected.", false );
+            vscp.admin.setStatus("<b>Server:</b> no server selected.", false);
 
-            if ( typeof( Storage ) !== "undefined" ) {
+            if (typeof(Storage) !== "undefined") {
                 // Server
-                if ( null != localStorage.getItem("vscp-url") ) {
+                if (null != localStorage.getItem("vscp-url")) {
                     settings.url = localStorage.getItem("vscp-url");
                 }
 
-                vscp.admin.setStatus( settings.url, false );
+                vscp.admin.setStatus(settings.url, false);
 
                 // User
-                if ( null != localStorage.getItem("vscp-user") ) {
+                if (null != localStorage.getItem("vscp-user")) {
                     settings.user = localStorage.getItem("vscp-user");
                 }
                 // Password
-                if ( null != localStorage.getItem("vscp-password") ) {
+                if (null != localStorage.getItem("vscp-password")) {
                     settings.password = localStorage.getItem("vscp-password");
                 }
                 // AuthDomain
-                if ( null != localStorage.getItem("vscp-authdomain") ) {
+                if (null != localStorage.getItem("vscp-authdomain")) {
                     settings.authdomain = localStorage.getItem("vscp-authdomain");
                 }
-            } 
-            else {
+            } else {
                 // No Web Storage support.
-                vscp.admin.setStatus( settings.url, false );
-            }   
+                vscp.admin.setStatus(settings.url, false);
+            }
 
-            table = $('#clientTable').DataTable( {
+            table = $('#clientTable').DataTable({
                 select: 'single',
-                "order": [[ 1, 'asc' ], [ 2, 'asc' ]],
+                "order": [
+                    [1, 'asc'],
+                    [2, 'asc']
+                ],
                 "lengthChange": true,
-                "lengthMenu": [[10, 25, 50, -1], [10, 25, 50, "All"]],
+                "lengthMenu": [
+                    [10, 25, 50, -1],
+                    [10, 25, 50, "All"]
+                ],
                 dom: 'l Bfrtip',
                 "oTableTools": {
                     "sRowSelect": "single"
                 },
                 buttons: [
-                    'colvis','copy', 'csv','excel', 'pdf','print'
+                    'colvis', 'copy', 'csv', 'excel', 'pdf', 'print'
                 ],
-                columns: [
-                    { title: "Dir", visible: false, searchable: false  },
-                    { title: "Date", visible: false, searchable: false  },
-                    { title: "Time", visible: true, searchable: false  },
-                    { title: "Class", visible: true, sort: true, searchable: true },
-                    { title: "Type", visible: true , sort: true, searchable: true },
-                    { title: "Node", visible: true, sort: true, searchable: true  },
-                    { title: "GUID", visible: true, sort: true, searchable: true  }, 
-                    { title: "Priority", visible: false, sort: true, searchable: false  },
-                    { title: "Timestamp", visible: false, sort: true, searchable: false  },                                
-                ],
-                
+                columns: [{
+                    title: "Dir",
+                    visible: true,
+                    searchable: false
+                }, {
+                    title: "Date",
+                    visible: false,
+                    searchable: false
+                }, {
+                    title: "Time",
+                    visible: true,
+                    searchable: false
+                }, {
+                    title: "Class",
+                    visible: true,
+                    sort: true,
+                    searchable: true
+                }, {
+                    title: "Type",
+                    visible: true,
+                    sort: true,
+                    searchable: true
+                }, {
+                    title: "Node",
+                    visible: true,
+                    sort: true,
+                    searchable: true
+                }, {
+                    title: "GUID",
+                    visible: true,
+                    sort: true,
+                    searchable: true
+                }, {
+                    title: "Priority",
+                    visible: false,
+                    sort: true,
+                    searchable: false
+                }, {
+                    title: "Timestamp",
+                    visible: false,
+                    sort: true,
+                    searchable: false
+                }, {
+                    title: "Data",
+                    visible: true,
+                    sort: true,
+                    searchable: true
+                }, ],
+
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // select row
             //
 
-            table.on( 'select', function ( e, dt, type, indexes ) {
-                
-                if ( type === 'row' ) {
+            table.on('select', function(e, dt, type, indexes) {
+
+                if (type === 'row') {
 
                     gindexes = indexes;
-                    var row = table.rows( indexes ).data(); 
-                    var data = row[0]; 
+                    var row = table.rows(indexes).data();
+                    var data = row[0];
 
                     curSelectedData = data;
-                    
+
                     showFullInfo( data );
                 }
-                
+
             });
 
-            
+
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // deselect row
             //
 
-            table.on( 'deselect', function ( e, dt, type, indexes ) 
-            {
-                if ( type === 'row' ) {
-                    $('#rowdata').html("");                    
+            table.on('deselect', function(e, dt, type, indexes) {
+                if (type === 'row') {
+                    $('#rowdata').html("");
                 }
             });
- 
+
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Double click row
             //
-            
-            $('#userTable tbody').on( 'dblclick', 'tr', function () 
-            {              
-                //editUser();              
+
+            $('#userTable tbody').on('dblclick', 'tr', function() {
+
             });
 
-        
+
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Credential handling
             //
 
-            if ( typeof( Storage ) !== "undefined" ) {
+            if (typeof(Storage) !== "undefined") {
 
                 // Server
-                if ( null != localStorage.getItem("vscp-url") ) {                    
+                if (null != localStorage.getItem("vscp-url")) {
                     settings.url = localStorage.getItem("vscp-url");
                 }
 
-                vscp.admin.setStatus( settings.url, false );
+                vscp.admin.setStatus(settings.url, false);
 
                 // User
-                if ( null != localStorage.getItem("vscp-user") ) {
+                if (null != localStorage.getItem("vscp-user")) {
                     settings.user = localStorage.getItem("vscp-user");
                 }
                 // Password
-                if ( null != localStorage.getItem("vscp-password") ) {
+                if (null != localStorage.getItem("vscp-password")) {
                     settings.password = localStorage.getItem("vscp-password");
                 }
                 // AuthDoamin
-                if ( null != localStorage.getItem("vscp-token") ) {
+                if (null != localStorage.getItem("vscp-token")) {
                     settings.token = localStorage.getItem("vscp-token");
                 }
-            } 
-            else {
+            } else {
                 // No Web Storage support.
                 //setConnectInfo( settings.url, false );
             }
@@ -228,21 +267,21 @@
                 password: settings.password,
                 authdomain: settings.authdomain,
 
-                onSuccess: function( conn ) {
+                onSuccess: function(conn) {
 
-                    vscp.admin.setStatus( vscpConn.url, true );
+                    vscp.admin.setStatus(vscpConn.url, true);
 
                     // Start receiving VSCP events
                     vscpConn.start({
 
-                        onSuccess: function( conn ) {
+                        onSuccess: function(conn) {
 
-                             // Add event listener
-                            vscpConn.addEventListener( eventListener );
+                            // Add event listener
+                            vscpConn.addEventListener(eventListener);
 
                         },
 
-                        onError: function( conn ) {                           
+                        onError: function(conn) {
 
                             // Warn user
                             BootstrapDialog.alert({
@@ -256,32 +295,32 @@
 
                         },
 
-                        onConnError: function( conn ) {
+                        onConnError: function(conn) {
 
                             // Show connect status
-                            vscp.admin.setStatus( vscpConn.url, false );
+                            vscp.admin.setStatus(vscpConn.url, false);
 
                             // Warn user
                             BootstrapDialog.alert({
                                 type: BootstrapDialog.TYPE_WARNING,
                                 message: 'Connection error.'
                             });
-                            
+
                             // Enable the user interface
                             ui.enable();
                         },
 
-                        onEvent: function( conn ) {
+                        onEvent: function(conn) {
 
                             // Show connect status
-                            vscp.admin.setStatus( vscpConn.url, false );
+                            vscp.admin.setStatus(vscpConn.url, false);
 
                             // Warn user
                             BootstrapDialog.alert({
                                 type: BootstrapDialog.TYPE_WARNING,
                                 message: 'Connection error.'
                             });
-                            
+
                             // Enable the user interface
                             ui.enable();
                         },
@@ -290,10 +329,10 @@
 
                 },
 
-                onError: function( conn ) {
+                onError: function(conn) {
 
                     // Show connect status
-                    vscp.admin.setStatus( vscpConn.url, false );
+                    vscp.admin.setStatus(vscpConn.url, false);
 
                     $('#btnConnect').bootstrapToggle('off');
 
@@ -305,7 +344,7 @@
                     }, 2000);*/
                 }
 
-            });       
+            });
 
         }); // onLoad
 
@@ -313,31 +352,35 @@
         // getNodeId
         //
 
-        var getNodeId = function( strguid ) 
-        {
-            var guid = strguid.split(":");
-            return ( ( parseInt( guid[14], 16 ) << 256) + parseInt( guid[15], 16 ) );
+        var getNodeId = function(guid) {
+            return ((parseInt(guid[14], 16) << 256) + parseInt(guid[15], 16));
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // eventListener
         //
 
-        var eventListener = function( conn, evt ) 
-        {
+        var eventListener = function(conn, evt) {
+
             var dateTime = new Date();
 
-            table.row.add( [
-                             "RX",
-                             dateTime.toISOString(),
-                             dateTime.toLocaleTimeString(),
-                             evt.vscpClass,
-                             evt.vscpType,
-                             getNodeId( evt.vscpGuid ),
-                             evt.vscpGuid,
-                             evt.getPriority(),
-                             evt.vscpTimeStamp
-                    ] ).draw( false ); 
+            var data = " ";
+            evt.vscpData.forEach(function(item) {
+                data += item.toString() + " ";
+            });
+
+            table.row.add([
+                "RX",
+                dateTime.toISOString(),
+                dateTime.toLocaleTimeString(),
+                evt.vscpClass,
+                evt.vscpType,
+                getNodeId(evt.vscpGuid),
+                evt.vscpGuid,
+                evt.getPriority(),
+                evt.vscpTimeStamp,
+                data
+            ]).draw(false);
         };
 
 
@@ -349,11 +392,11 @@
 
         var ui = {
             enable: function() {
-                $( "#ui :input" ).attr( "disabled", false );
+                $("#ui :input").attr("disabled", false);
             },
 
             disable: function() {
-                $( "#ui :input" ).attr( "disabled", true );
+                $("#ui :input").attr("disabled", true);
             }
         };
 
@@ -361,81 +404,77 @@
         // showFullInfo
         //
 
-        function showFullInfo( data )
-        {
-            var html_content = "<h4>User data</h4>" +
-                                "<table class='table table-striped table-hover table-condensed'>" +
-                                "<tr class='success'><td> <b>Ordinal: </b></td><td>" + "1" + "</td><tr>" +
-                                "<tr class='success'><td> <b>User id: </b></td><td>" + "2"  + "</td><tr>" +
-                                "<tr class='success'><td> <b>User name: </b></td><td>" + "3"  + "</td><tr>" +
-                                "<tr class='success'><td> <b>Password: </b></td><td>" + "4"  + "</td><tr>" +
-                                "<tr class='success'><td> <b>Full name: </b></td><td>" + "5"  + "</td><tr>" +
-                                "<tr class='success'><td> <b>Filter: </b></td><td>" + "6"  + "</td><tr>" +
-                                "<tr class='success'><td> <b>Mask: </b></td><td>" + "7"  + "</td><tr>" +
-                                "<tr class='success'><td> <b>Rights: </b></td><td>" + "8"  + "</td><tr>" +
-                                "<tr class='success'><td> <b>Allowed Remotes: </b></td><td>" + "9"  + "</td><tr>" +
-                                "<tr class='success'><td> <b>Allowed Events: </b></td><td>" + "10"  + "</td><tr>" +
-                                "<tr class='success'><td> <b>Note: </b></td><td>" + "11"  + "</td><tr>" +
-                                "</table>";
-            $('#rowdata').html( html_content );
+        function showFullInfo(data) {
+
+            var html_content = "<h4>Event data</h4>" +
+                "<b>Direction: <span class='text-primary'>" + data[0] + "</span></b><br>" +
+                "<b>Date (GMT): <span class='text-primary'>" + data[1] + "</span></b><br>" +
+                "<b>Local time: <span class='text-primary'>" + data[2] + "</span></b><br>" +
+                "<b>VSCP Class: <span class='text-primary'>" + data[3] + "</span></b><br>" +
+                "<b>VSCP Type: <span class='text-primary'>" + data[4] + "</span></b><br>" +
+                "<b>GUID: <span class='text-primary'>" + data[6] + "</span></b><br>" +
+                "<b>Level I node id: <span class='text-primary'>" + data[5] + " (when valid)</span></b><br>" +
+                "<b>VSCP Priority: <span class='text-primary'>" + data[7] + "</span></b><br>" +
+                "<b>VSCP Timestamp: <span class='text-primary'>" + data[8] + "</span></b><br>" +
+                "<b>VSCP Data: <span class='text-primary'>" + data[9] + "</span></b><br>";    
+  
+            $('#rowdata').html(html_content);
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // handleConnection
         //
 
-        var handleConnection = function()
-        {
-  
-            if ( vscpConn.substate == vscpConn.substates.OPEN ) {
+        var handleConnection = function() {
+
+            if (vscpConn.substate == vscpConn.substates.OPEN) {
 
                 // vscpConn.states.AUTHENTICATED or vscpConn.states.CONNECTED
                 vscpConn.stop({
-                    onSuccess: function( conn ) {
+                    onSuccess: function(conn) {
                         $('#status_connection').html("closed");
-                    }, 
-                    onError: function( conn ) {
+                    },
+                    onError: function(conn) {
 
                         // Warn user
                         BootstrapDialog.alert({
-                                title: 'ERROR',
-                                type: BootstrapDialog.TYPE_DANGER,
-                                message: 'Unable to disconnect from server..'
+                            title: 'ERROR',
+                            type: BootstrapDialog.TYPE_DANGER,
+                            message: 'Unable to disconnect from server..'
                         });
-                    }, 
+                    },
                 });
-            }
-            else {
+            } else {
 
-                if ( vscpConn.state != vscpConn.states.AUTHENTICATED ) {
+                if (vscpConn.state != vscpConn.states.AUTHENTICATED) {
 
                     BootstrapDialog.alert({
-                                title: 'ERROR',
-                                type: BootstrapDialog.TYPE_DANGER,
-                                message: 'Please reload page to connect to remote device or check remote device.'
-                        });
-                       
+                        title: 'ERROR',
+                        type: BootstrapDialog.TYPE_DANGER,
+                        message: 'Please reload page to connect to remote device or check remote device.'
+                    });
+
                     /*setTimeout(function () {
                         location.reload();
                     }, 2000);*/
                 }
- 
+
                 // Start receiving VSCP events
                 vscpConn.start({
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function(conn) {
                         // Add event listener
-                        vscpConn.addEventListener( eventListener );
+                        vscpConn.addEventListener(eventListener);
                         $('#status_connection').html("open");
-                    }, 
-                    onError: function( conn ) {
+                    },
+                    onError: function(conn) {
                         // Warn user
                         BootstrapDialog.alert({
-                                title: 'ERROR',
-                                type: BootstrapDialog.TYPE_DANGER,
-                                message: 'Unable to connect to server.'
+                            title: 'ERROR',
+                            type: BootstrapDialog.TYPE_DANGER,
+                            message: 'Unable to connect to server.'
                         });
-                    },      
+                    },
                 });
             }
         }
@@ -448,7 +487,7 @@
             $('#btnConnect').change(function() {
                 handleConnection();
             })
-        });  
+        });
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // Handle filter button change
@@ -465,92 +504,143 @@
         // clrTable
         //
 
-        var clrTable = function()
-        {
+        var clrTable = function() {
             table
                 .clear()
                 .draw();
 
-            $('#rowdata').html("");     
+            $('#rowdata').html("");
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // handleSoftFilter
         //
 
-        var handleSoftFilter = function()
-        {
+        var handleSoftFilter = function() {
 
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
-        // sendTxEvent
+        // handleHardFilter
         //
 
-        var sendTxEvent = function()
-        {
-                                       
+        var handleHardFilter = function() {
+            $('#dlgHardFilter').modal('show');                
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // SetHardFilter
+        //
+
+        var SetHardFilter = function() {
+            
+            filter.filterPriority = vscp.utility.readValue( $('#dlgHardFilter_priofilter').val() );
+            filter.filterClass = vscp.utility.readValue( $('#dlgHardFilter_classfilter').val()  );
+            filter.filterType = vscp.utility.readValue( $('#dlgHardFilter_typefilter').val() );
+            filter.filterGuid = vscp.utility.strToGuid( $('#dlgHardFilter_guidfilter').val() );
+            
+            filter.maskPriority = vscp.utility.readValue( $('#dlgHardFilter_priomask').val() );          
+            filter.maskClass = vscp.utility.readValue( $('#dlgHardFilter_classmask').val() );
+            filter.maskType = vscp.utility.readValue( $('#dlgHardFilter_typemask').val() );
+            filter.maskGuid = vscp.utility.strToGuid( $('#dlgHardFilter_guidmask').val() );
+        
+            vscpConn.setFilter({
+                filterPriority: filter.filterPriority,
+                filterClass: filter.filterClass,
+                filterType: filter.filterType,
+                filterGuid: filter.filterGuid,
+                maskPriority: filter.maskPriority,
+                maskClass: filter.maskClass,
+                maskType: filter.maskType,
+                maskGuid: filter.maskGuid,
+                onSuccess: function() {
+                    BootstrapDialog.alert( "Hard filter successful set." );
+                },
+                onError: function() {
+                    BootstrapDialog.alert( "Failed to set hard filter." );
+                }
+            });
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // addTxEvent
         //
 
-        var addTxEvent = function()
-        {
+        var addTxEvent = function() {
+            $("#tx_id").val( -1 );
+            $('#tx_name').prop('readonly', false);
             $('#dlgTxRow').modal('show');
+        };
+
+        ///////////////////////////////////////////////////////////////////////////////////////////////
+        // editTxEvent
+        //
+
+        var editTxEvent = function() {
+
+            $('#seltxevent :selected').each(function(i, sel) {
+
+                var idx = $(sel).val();
+                var evt = txEvents[idx].event;
+
+                $('#tx_name').prop('readonly', true);
+
+                $("#tx_id").val( idx );
+                $("#tx_name").val( $(this).text() );
+                $("#tx_priority").val( evt.getPriority() );
+                $("#tx_class").val( evt.vscpClass );
+                $("#tx_type").val( evt.vscpType );
+                $("#tx_guid").val( vscp.utility.guidToStr( evt.vscpGuid ) );
+                $("#tx_data").val( evt.vscpData.toString() );
+  
+                $('#dlgTxRow').modal('show');
+
+            });
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // removeTxEvent
         //
 
-        var removeTxEvent = function()
-        {
-            
+        var removeTxEvent = function() {
+            $('#seltxevent :selected').each(function(i, sel) {
+
+                //var idx = $("#seltxevent option:selected").val();
+                var idx = $(sel).val();
+                //txEvents[idx].remove;
+                delete txEvents[idx]; // Will give a hole but it does not matter as new id will
+                // go to new index
+            })
+
+            $("#seltxevent :selected").remove();
+            $('#txevent_detail').html("")
         };
 
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // saveTxEvent
-        //
 
-        var saveTxEvent = function()
-        {
-            
-        };
-
-        ///////////////////////////////////////////////////////////////////////////////////////////////
-        // loadTxEvent
-        //
-
-        var loadTxEvent = function()
-        {
-
-        };
 
         ///////////////////////////////////////////////////////////////////////////////////////////////
         // sendTxEvent
         //
 
-        var sendTxEvent = function( txtype )
-        {
+        var sendTxEvent = function(txtype) {
+
             var evt = new vscp.Event();
 
             // Send event from tx event dialog
-            if ( txtype == txtypes.DIALOG ) {
+            if (txtype == txtypes.DIALOG) {
 
-                evt.setPriority( parseInt( $("#tx_priority").val() ) );
-                evt.vscpClass = vscp.utility.readValue( $("#tx_class").val() );
-                evt.vscpType = vscp.utility.readValue( $("#tx_type").val() );
+                evt.setPriority(parseInt($("#tx_priority").val()));
+                evt.vscpClass = vscp.utility.readValue($("#tx_class").val());
+                evt.vscpType = vscp.utility.readValue($("#tx_type").val());
                 evt.vscpObId = 0;
                 evt.vscpTimeStamp = 0;
-                evt.vscpGuid = vscp.utility.strToGuid( $("#tx_guid").val() );
+                evt.vscpGuid = vscp.utility.strToGuid($("#tx_guid").val());
                 var txtData = $("#tx_data").val().trim()
-                if ( txtData.length ) {
+                if (txtData.length) {
                     txtData = txtData.split(",");
-                    if ( 0 < txtData.length ) {
-                        txtData.forEach( function( item ) {
-                            evt.vscpData.push( vscp.utility.readValue( item ) ); 
+                    if (0 < txtData.length) {
+                        txtData.forEach(function(item) {
+                            evt.vscpData.push(vscp.utility.readValue(item));
                         });
                     }
                 }
@@ -560,15 +650,42 @@
 
                     event: evt,
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function(conn) {
+
                         console.debug("Event sent!");
-                    }, 
-                    onError: function( conn ) {
+
+                        var dateTime = new Date();
+
+                        var data = " ";
+                            evt.vscpData.forEach(function(item) {
+                                data += item.toString() + " ";
+                            });
+
+                        var rowNode = table.row.add([
+                                "TX",
+                                dateTime.toISOString(),
+                                dateTime.toLocaleTimeString(),
+                                evt.vscpClass,
+                                evt.vscpType,
+                                getNodeId(evt.vscpGuid),
+                                vscp.utility.guidToStr(evt.vscpGuid),
+                                evt.getPriority(),
+                                evt.vscpTimeStamp,
+                                data
+                            ]).draw(false).node();
+                            
+                            // Set new foreground color for tx-row
+                            for ( i=0; i<10; i++ ) {
+                                $( rowNode ).find('td').eq(i).addClass('text-primary');
+                            }
+                      
+                    },
+                    onError: function(conn) {
                         // Event was not sent
                         BootstrapDialog.alert({
-                                title: 'ERROR',
-                                type: BootstrapDialog.TYPE_DANGER,
-                                message: 'Failed to send event.'
+                            title: 'ERROR',
+                            type: BootstrapDialog.TYPE_DANGER,
+                            message: 'Failed to send event.'
                         });
                     },
 
@@ -576,23 +693,50 @@
 
             }
             // Send selected event(s) from tx list
-            else if ( txtype == txtypes.LIST ) {
+            else if (txtype == txtypes.LIST) {
 
-                $('#seltxevent :selected').each( function( i, sel ) { 
+                $('#seltxevent :selected').each(function(i, sel) {
 
                     //var idx = $("#seltxevent option:selected").val();
                     var idx = $(sel).val();
-                    var evt = txEvents[ idx ].event;
+                    var evt = txEvents[idx].event;
 
                     // Send the event
                     vscpConn.sendEvent({
 
                         event: evt,
 
-                        onSuccess: function( conn ) {
+                        onSuccess: function(conn) {
+
                             console.debug("Event sent!");
-                        }, 
-                        onError: function( conn ) {
+
+                            var dateTime = new Date();
+
+                            var data = " ";
+                            evt.vscpData.forEach(function(item) {
+                                data += item.toString() + " ";
+                            });
+
+                            var rowNode = table.row.add([
+                                "TX",
+                                dateTime.toISOString(),
+                                dateTime.toLocaleTimeString(),
+                                evt.vscpClass,
+                                evt.vscpType,
+                                getNodeId(evt.vscpGuid),
+                                vscp.utility.guidToStr(evt.vscpGuid),
+                                evt.getPriority(),
+                                evt.vscpTimeStamp,
+                                data
+                            ]).draw(false).node();
+                            
+                            // Set new foreground color for tx-row
+                            for ( i=0; i<10; i++ ) {
+                                $( rowNode ).find('td').eq(i).addClass('text-primary');
+                            }
+
+                        },
+                        onError: function(conn) {
                             // Event was not sent
                             BootstrapDialog.alert({
                                 title: 'ERROR',
@@ -611,41 +755,68 @@
         // saveTxRowResult
         //
 
-        var saveTxRowResult = function()
-        {      
+        var saveTxRowResult = function() {
+
             var evt = new vscp.Event();
+            var idx = parseInt( $("#tx_id").val() );
 
-            evt.setPriority( parseInt( $("#tx_priority").val() ) );
-            evt.vscpClass = vscp.utility.readValue( $("#tx_class").val() );
-            evt.vscpType = vscp.utility.readValue( $("#tx_type").val() );
-            evt.vscpObId = 0;
-            evt.vscpTimeStamp = 0;
-            evt.vscpGuid = vscp.utility.strToGuid( $("#tx_guid").val() );
-            var txtData = $("#tx_data").val().trim()
-            if ( txtData.length ) {
-                txtData = txtData.split(",");
-                if ( 0 < txtData.length ) {
-                    txtData.forEach( function( item ) {
-                        evt.vscpData.push( vscp.utility.readValue( item ) ); 
-                    });
-                }
-            }   
-
-            var name = $("#tx_name").val().trim();
-            if ( 0 == name.length ) {
-                name = "" + evt.vscpClass + ":" + evt.vscpType;
+            // Fetch event if this is an edit operation
+            if ( -1 != idx ) {
+                evt = txEvents[idx].event;
+                evt.vscpData = [];
             }
 
-            // Add to array
-            var idx = txEvents.push({
-                                    name: name,
-                                    event: evt
-                                });
+            evt.setPriority(parseInt($("#tx_priority").val()));
+            evt.vscpClass = vscp.utility.readValue($("#tx_class").val());
+            evt.vscpType = vscp.utility.readValue($("#tx_type").val());
+            evt.vscpObId = 0;
+            evt.vscpTimeStamp = 0;
+            evt.vscpGuid = vscp.utility.strToGuid($("#tx_guid").val());
+            var txtData = $("#tx_data").val().trim()
+            if (txtData.length) {
+                txtData = txtData.split(",");
+                if (0 < txtData.length) {
+                    txtData.forEach(function(item) {
+                        evt.vscpData.push(vscp.utility.readValue(item));
+                    });
+                }
+            }
 
-            // Add to tx event selection box
-            $("#seltxevent").append($("<option></option>")
-                    .attr( "value", idx - 1 )
-                    .text( name ) ); 
+            // If edit operation we are done
+            if ( -1 == idx ) {
+
+                var name = $("#tx_name").val().trim();
+                if (0 == name.length) {
+                    name = "" + evt.vscpClass + ":" + evt.vscpType;
+                }
+
+                // Add to array
+                var idx = txEvents.push({
+                    name: name,
+                    event: evt
+                });
+
+                // Add to tx event selection box
+                $("#seltxevent").append($("<option></option>")
+                    .attr("value", idx)
+                    .text(name));
+
+                // Close dialog    
+                $('#dlgTxRow').modal('hide');
+
+            }
+            else {
+                
+                // Save event
+                txEvents[idx].event = evt;
+
+                // Trigger change to fill in data
+                $('#seltxevent').trigger("change");
+
+                // Close dialog
+                $('#dlgTxRow').modal('hide');
+
+            }
 
         };
 
@@ -653,25 +824,30 @@
         // Handle change event for tx event select
         //
 
-        $( function() {
-            $('#seltxevent').change( function() {
+        $(function() {
+            $('#seltxevent').change(function() {
 
-                var content ="";
-                $('#seltxevent :selected').each( function( i, sel ) {
+                var content = "";
+                $('#seltxevent :selected').each(function(i, sel) {
                     var data = " ";
-                    txEvents[ $(sel).val() ].event.vscpData.forEach( function( item ) {
+                    txEvents[$(sel).val()].event.vscpData.forEach(function(item) {
                         data += item.toString() + " ";
                     });
-                    content += "<b>Prio: </b>" + txEvents[ $(sel).val() ].event.getPriority() + " " +
-                                    "<b>Class:</b> " + txEvents[ $(sel).val() ].event.vscpClass + " " +
-                                    "<b>Type:</b> " + txEvents[ $(sel).val() ].event.vscpType + "<br>" +
-                                    "<b>Data: </b>" + data + "<br>" +
-                                    "<b>GUID: </b> <span class='vscpsmallguid'>" + 
-                                    vscp.utility.guidToStr( txEvents[ $(sel).val() ].event.vscpGuid ) + "</span>";
-                    content += "<br>";                                                
+                    var guid = vscp.utility.guidToStr(txEvents[$(sel).val()].event.vscpGuid);
+                    var data = txEvents[$(sel).val()].event.vscpData.toString();
+                    if ( data.length>30) data = data.substr(0,25) + "...";
+                    content += "<b>Prio: </b>" + txEvents[$(sel).val()].event.getPriority() + " " +
+                        "<b>Class:</b> " + txEvents[$(sel).val()].event.vscpClass + " " +
+                        "<b>Type:</b> " + txEvents[$(sel).val()].event.vscpType + "<br>" +
+                        "<b>GUID: </b> <span class='vscpsmallguid'><br>" +
+                        guid.substring(0,24) + "<br>" + guid.substring(24) + "<br>" +
+                        "</span><b>Data: </b> <span class='vscpsmallguid'><br>" + 
+                        data
+                        "</span>";
+                    content += "<br>";
                 });
 
-                $('#txevent_detail').html( content );
+                $('#txevent_detail').html(content);
             })
         });
 
@@ -679,8 +855,8 @@
         // Handle doubl click event for tx event select
         //
 
-        $( function() {
-            $('#seltxevent').dblclick( function() {
+        $(function() {
+            $('#seltxevent').dblclick(function() {
                 //alert('Double click ' + $(this).val() );
             })
         });
@@ -689,99 +865,97 @@
         // Read txd file from disk
         //
 
-       var  readTxdFile = function ( f )
-       {
+        var readTxdFile = function(f) {
+
             var file = f.files[0];
             var reader = new FileReader();
 
-            $('#dlgReadEvents').modal('hide');
+            // Clear the checkbox
+            if ($("#dlgReadTxEvents_clear").is(':checked')) {
+                $("#seltxevent").empty();
+            }
 
-            reader.onload = function( e ) {
-                
+            $('#dlgReadTxEvents').modal('hide');
+
+            reader.onload = function(e) {
+
                 var xmltxd = e.target.result
-                     
-                $xml = $( $.parseXML( xmltxd ) );
-                    $xml.find("set").each( function() {
-                        
-                        var evt = new vscp.Event();
 
-                        /*alert( $(this).find('name').text() );
-                        alert( $(this).find('class').text() );
-                        alert( $(this).find('type').text() );
-                        alert( $(this).find('data').text() );
-                        alert( $(this).find('guid').text() );
-                        alert( $(this).find('guid').attr('default') );*/
-                        var name = $(this).find('name').text();
-                        evt.vscpClass = $(this).find('class').text();
-                        evt.vscpType = $(this).find('type').text();
-                        evt.vscpGuid  = vscp.utility.strToGuid( $(this).find('guid').text() );
-                        var txtData = $(this).find('data').text().trim();
-                        if ( txtData.length ) {
-                            txtData = txtData.split(",");
-                            if ( 0 < txtData.length ) {
-                                txtData.forEach( function( item ) {
-                                    evt.vscpData.push( vscp.utility.readValue( item ) ); 
-                                });
-                            }
-                        }  
+                $xml = $($.parseXML(xmltxd));
+                $xml.find("set").each(function() {
 
-                        // Add to array
-                        var idx = txEvents.push({
-                                    name: name,
-                                    event: evt
-                                });
+                    var evt = new vscp.Event();
 
-                        // Add to tx event selection box
-                        $("#seltxevent").append($("<option></option>")
-                            .attr( "value", idx - 1 )
-                            .text( name ) );
+                    var name = $(this).find('name').text();
+                    evt.vscpClass = $(this).find('class').text();
+                    evt.vscpType = $(this).find('type').text();
+                    evt.vscpGuid = vscp.utility.strToGuid($(this).find('guid').text());
+                    var txtData = $(this).find('data').text().trim();
+                    if (txtData.length) {
+                        txtData = txtData.split(",");
+                        if (0 < txtData.length) {
+                            txtData.forEach(function(item) {
+                                evt.vscpData.push(vscp.utility.readValue(item));
+                            });
+                        }
+                    }
 
+                    // Add to array
+                    var idx = txEvents.push({
+                        name: name,
+                        event: evt
                     });
+
+                    // Add to tx event selection box
+                    $("#seltxevent").append($("<option></option>")
+                        .attr("value", idx - 1)
+                        .text(name));
+
+                });
             };
 
-            reader.readAsText( file );
-  
-       }
+            reader.readAsText(file);
 
-
+        }
     </script>
 
 </head>
+
 <body>
 
     <!-- **************************************************************************************-->
     <!--                              Modal for transmission row                               -->
     <!-- **************************************************************************************-->
     <div id="dlgTxRow" class="modal fade" role="dialog">
-        
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="editdlg_header" class="modal-title">Add/edit VSCP tx row</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
-                        <div class="form-group" >
+                        <input type="hidden" class="form-control" id="tx_id"  >
+
+                        <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> name</label>
-                            <input type="text" class="form-control" id="tx_name"  >
+                            <input type="text" class="form-control" id="tx_name">
                             <span class="help-block">Name for the transmission row. "class:type" will be used if not entered.</span>
                         </div>
 
                         <div class="input-group col-sm-8">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> priority</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> priority</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control input-sm" aria-label="..." value="3 - normal" id="tx_priority">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle input-sm" 
-                                                data-toggle="dropdown" aria-haspopup="true" 
-                                                aria-expanded="false">set <span class="caret"></span></button>
+                                    <button type="button" class="btn btn-success dropdown-toggle input-sm" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">set <span class="caret"></span></button>
                                     <ul id="tx_prioritydd" class="dropdown-menu dropdown-menu-right">
                                         <li><a href="javascript:$('#tx_priority').val('0 - very high');selected_type=0;">very high</a></li>
                                         <li><a href="javascript:$('#tx_priority').val('1 - high');selected_type=1;">high</a></li>
@@ -795,11 +969,11 @@
                                 </div>
                             </div>
                             <span class="help-block">Set event priority.</span>
-                    </div>
+                        </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> VSCP class</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> VSCP class</label>
+                            <div class="input-group">
                                 <input type="text" class="form-control" aria-label="..." id="tx_class">
                                 <div class="input-group-btn">
                                     <button type="button" onclick="selectClass( $('#tx_class').val() );" class="btn btn-success btn-md">...</button>
@@ -809,8 +983,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> VSCP type</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> VSCP type</label>
+                            <div class="input-group">
                                 <input type="text" class="form-control" aria-label="..." id="tx_type">
                                 <div class="input-group-btn">
                                     <button type="button" onclick="selectType( $('#tx_type').val() );" class="btn btn-success btn-md">...</button>
@@ -821,22 +995,22 @@
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> originating GUID</label>
-                            <input type="text" class="form-control" id="tx_guid" value="-" >
+                            <input type="text" class="form-control" id="tx_guid" value="-">
                             <span class="help-block">Set GUID to useas originating address. Set to "-" (without apostrophes) to use GUID of interface." </span>
                         </div>
 
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> VSCP data</label>
-                            <input type="text" class="form-control" id="tx_data"  >
+                            <input type="text" class="form-control" id="tx_data">
                             <span class="help-block">Comma separated list with data. Can be a mix of decimal or hexadecimal data where
                                 hexadecimal data should be preceeded with '0x'.  </span>
                         </div>
-                      
+
                     </form>
                 </div>
-                <div class="modal-footer">  
+                <div class="modal-footer">
                     <button type="button" class="btn btn-warning btn-lg" onclick="sendTxEvent( txtypes.DIALOG );">Send</button>
-                    <button type="button" class="btn btn-success btn-lg" onclick="saveTxRowResult();">Save</button>                  
+                    <button type="button" class="btn btn-success btn-lg" onclick="saveTxRowResult();">Save</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -847,37 +1021,129 @@
 
 
     <!-- **************************************************************************************-->
-    <!--                              Modal for tx row read in                              -->
+    <!--                              Modal for tx row read in                                 -->
     <!-- **************************************************************************************-->
-    <div id="dlgReadEvents" class="modal fade" role="dialog">
-        
+    <div id="dlgReadTxEvents" class="modal fade" role="dialog">
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="dlgReadEvents_header" class="modal-title">Select file</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> File to read</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> File to read</label>
+                            <div class="input-group">
                                 <input type="file" class="form-control" aria-label="..." accept=".txd" id="dlgReadEvents_readfile">
                             </div>
                             <span class="help-block">Select TX event file to read in.</span>
                         </div>
 
+                        <div class="form-group">
+                            <div class="checkbox">
+                                <label><input type="checkbox" id="dlgReadTxEvents_clear" value="true" ><b>Delete current content</b></label>
+                                <span class="help-block">Check to clear current tx event content before new content is loaded.</span>
+                            </div>
+                        </div>
+
                     </form>
                 </div>
 
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-warning btn-lg" onclick="readTxdFile( document.getElementById('dlgReadEvents_readfile') );">Read events</button>               
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning btn-lg" onclick="readTxdFile( document.getElementById('dlgReadEvents_readfile') );">Read events</button>
+                    <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- **************************************************************************************-->
+    <!--                               Modal for hard filter                                   -->
+    <!-- **************************************************************************************-->
+    <div id="dlgHardFilter" class="modal fade" role="dialog">
+
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 id="dlgReadEvents_header" class="modal-title">Set hard filter</h4>
+                </div>
+
+                <div class="modal-body">
+
+                    <form role="form">
+
+                        <!-- MASK -->        
+                        <div class="form-group">
+                            <label for="dlgHardFilter_priomask"><span class="glyphicon glyphicon-asterisk"></span> Mask for priority</label>
+                            <input type="text" class="form-control" id="hfilter_mask_priority"  value="0xff">
+                            <span class="help-block">Mask for priority. 0x07/0xff means all bits o the priority filter must match.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dlgHardFilter_classmask"><span class="glyphicon glyphicon-asterisk"></span> Mask for VSCP class</label>
+                            <input type="text" class="form-control" id="hfilter_mask_class"  value="0xffff">
+                            <span class="help-block">Mask for VSCP class. 0xffff means that all bits in class filter must match.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dlgHardFilter_typemask"><span class="glyphicon glyphicon-asterisk"></span> Mask for VSCP type</label>
+                            <input type="text" class="form-control" id="hfilter_mask_class"  value="0xffff">
+                            <span class="help-block">Mask for VSCP type. 0xffff means that all bits in type filter must match.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dlgHardFilter_guidmask"><span class="glyphicon glyphicon-asterisk"></span> Mask for VSCP GUID</label>
+                            <input type="text" class="form-control" id="hfilter_mask_guid"  value="FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF">
+                            <span class="help-block">Mask for VSCP GUID. FF in all positions means that all bits in GUID filter must match.</span>
+                        </div>
+
+                        <!-- FILTER -->
+                        <div class="form-group">
+                            <label for="dlgHardFilter_priofilter"><span class="glyphicon glyphicon-asterisk"></span> Filter for priority</label>
+                            <input type="text" class="form-control" id="hfilter_filter_priority" value="0">
+                            <span class="help-block">Filter for priority. If priority mask is 0x07/0xff set VSCP åriority that must match here.
+                                The value should be between 0 - 7.
+                            </span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dlgHardFilter_classfilter"><span class="glyphicon glyphicon-asterisk"></span> Filter for VSCP class</label>
+                            <input type="text" class="form-control" id="hfilter_filter_class" value="0">
+                            <span class="help-block">Filter for VSCP class. If class mask is 0xffff set VSCP class that must match here.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dlgHardFilter_typefilter"><span class="glyphicon glyphicon-asterisk"></span> Filter for VSCP type</label>
+                            <input type="text" class="form-control" id="hfilter_filter_class" value="0">
+                            <span class="help-block">Filter for VSCP type. If type mask is 0xffff set VSCP type that must match here.</span>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="dlgHardFilter_guidfilter"><span class="glyphicon glyphicon-asterisk"></span> Filter for VSCP GUID</label>
+                            <input type="text" class="form-control" id="hfilter_filter_guid" value="00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00">
+                            <span class="help-block">Filter for VSCP GUID. If GUID mask have FF in all positions set GUID that must match here.</span>
+                        </div> 
+
+                    </form>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning btn-lg" onclick="SetHardFilter();">Set hard filter</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
 
@@ -894,7 +1160,7 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="index.html">
-                <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="120" alt="vscp logo" /></a>
+                    <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="120" alt="vscp logo" /></a>
             </div>
             <div id="menu">
             </div>
@@ -907,36 +1173,36 @@
     <div class="container-fluid">
         <h1>VSCP Client Window</h1>
 
-        <div class="container-fluid">            
-            
-            <div class="row">                
+        <div class="container-fluid">
+
+            <div class="row">
             </div>
 
             <div class="row">
-                <div class="col-sm-2"> 
+                <div class="col-sm-2">
                     <label>
                         <input id="btnConnect" checked data-toggle="toggle" type="checkbox" >
                         Connection
-                    </label>  
+                    </label>
                     <label>
                         <input id="btnFilter" data-toggle="toggle" type="checkbox" >
                         Filter
                     </label>
-                </div>                  
-                <div class="col-sm-9" >
+                </div>
+                <div class="col-sm-9">
                     <p class="bg-info">
-                    <span class="active" >
+                        <span class="active">
                         <strong> Soft filter: </strong><span id="status_header">no</span>
                         <strong> Connection: </strong><span id="status_connection">open</span>
-                    </span>
+                        </span>
                     </p>
-                </div>         
+                </div>
                 <div class="col-sm-1"></div>
             </div>
 
-            <div class="row">                
+            <div class="row">
                 <div class="col-sm-2">
-                    
+
                     <div class="input-group col-sm-8">
                         <!--
                         <button type="button" id="btnConnect" class="btn btn-primary col-sm-12" onclick="handleConnection();" data-toggle="tooltip" title="Connect/disconnect to/from VSCP server">
@@ -946,32 +1212,33 @@
                     </p>
 
                     <p>
-                    <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="clrTable();" data-toggle="tooltip" title="Clear receive data">
+                        <div class="input-group col-sm-8">
+                            <button type="button" class="btn btn-success col-sm-12" onclick="clrTable();" data-toggle="tooltip" title="Clear receive data">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Clear
                         </button>
-                    </div>
+                        </div>
                     </p>
 
                     <p>
-                    <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="handleHardFilter();" data-toggle="tooltip" title="Handle connection receive filter">
+                        <div class="input-group col-sm-8">
+                            <button type="button" class="btn btn-success col-sm-12" onclick="handleHardFilter();" data-toggle="tooltip" title="Handle connection receive filter">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Hard filter
                         </button>
-                    </div>
-                    </p>
-                    
-                    <p>
-                    <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="handleSoftFilter();" data-toggle="tooltip" title="Handle soft receive filter">
-                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Soft filter
-                        </button>
-                    </div>
+                        </div>
                     </p>
 
                     <p>
+                        <div class="input-group col-sm-8">
+                            <button type="button" class="btn btn-success col-sm-12" onclick="handleSoftFilter();" data-toggle="tooltip" title="Handle soft receive filter">
+                            <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Soft filter
+                        </button>
+                        </div>
+                    </p>
+
+                    <!-- TODO
+                    <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="deleteUser();" data-toggle="tooltip" title="Save RX events to disk">
+                        <button type="button" class="btn btn-success col-sm-12" onclick="delr();" data-toggle="tooltip" title="Save RX events to disk">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Save events
                         </button>
                     </div>
@@ -979,13 +1246,16 @@
 
                     <p>
                     <div class="input-group col-sm-8">
-                        <button type="button" class="btn btn-success col-sm-12" onclick="$('#dlgReadEvents').modal('show');" data-toggle="tooltip" title="Load RX event from disk">
+                        <button type="button" class="btn btn-success col-sm-12" onclick="" data-toggle="tooltip" title="Load RX event from disk">
                             <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Load events
                         </button>
                     </div>
                     </p>
+                    -->
 
-                    <p><hr></p>
+                    <p>
+                        <hr>
+                    </p>
 
                     <div class="form-group">
                         <label for="sel1">TX Event(s):</label>
@@ -994,74 +1264,79 @@
                             <option>2:89</option>
                             <option>3:40</option>
                             <option>4:4</option> -->
-                        </select> 
+                        </select>
                         <p>
-                        <div class="btn-group">   
-                            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="addTxEvent();" title="Add event">
+                            <div class="btn-group">
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="addTxEvent();" title="Add TX event">
                                 <span class="glyphicon glyphicon-plus"></span>
                             </button>
-                            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="removeTxEvent();"  title="Remove event">
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="removeTxEvent();" title="Remove TX event">
                                 <span class="glyphicon glyphicon-minus"></span>    
                             </button>
-                            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="saveTxEvent();"  title="Save TX events to disk">
+                            </button>
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="editTxEvent();" title="Exit TX event">
+                                <span class="glyphicon glyphicon-edit"></span>    
+                            </button>
+                                <!-- TODO
+                            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="saveTxdFile();"  title="Save TX events to disk">
                                 <span class="glyphicon glyphicon-cloud-upload"></span>     
                             </button>
-                            <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="loadTxEvent();"  title="Load TX event from disk">
+                            -->
+                                <button type="button" class="btn btn-info btn-sm" data-toggle="tooltip" onclick="$('#dlgReadTxEvents').modal('show');" title="Load TX events from disk">
                                 <span class="glyphicon glyphicon-cloud-download"></span>
                             </button>
-                            <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip" onclick="sendTxEvent( txtypes.LIST );"  title="Send event">
+                                <button type="button" class="btn btn-warning btn-sm" data-toggle="tooltip" onclick="sendTxEvent( txtypes.LIST );" title="Send event">
                                 <span class="glyphicon glyphicon-log-out"></span>
                             </button>
-                        </div>    
+                            </div>
                         </p>
-                    </div>  
-                    <div id="txevent_detail">                 
-                    </div>        
+                    </div>
+                    <div id="txevent_detail">
+                    </div>
                 </div>
-                
+
                 <div class="col-sm-9">
-                    <table id="clientTable"  class="table table-striped table-bordered table-hover display compact nowrap" cellspacing="50" width="100%"></table>    
+                    <table id="clientTable" class="table table-striped table-bordered table-hover display compact nowrap" cellspacing="50" width="100%"></table>
                 </div>
                 <div class="col-sm-1"></div>
 
             </div>
 
             <div class="row">
-                <div class="col-sm-2"> </div>                
-                <div class="col-sm-9" >
-                    <p>
-                        <div id="rowdata"/>
-                    </p> 
-                </div>         
+                <div class="col-sm-2"> </div>
+                <div class="col-sm-9">
+                    <div id="rowdata" />
+                </div>
                 <div class="col-sm-1"></div>
             </div>
-            
+
             <div class="row">
                 <div class="col-sm-2">
 
-                </div>                
-                <div class="col-sm-9" >
-                    
-                </div>         
+                </div>
+                <div class="col-sm-9">
+
+                </div>
                 <div class="col-sm-1"></div>
             </div>
 
             <br>
             <div class="row">
-                <div class="col-sm-2"></div>                
-                <div class="col-sm-9"></div>         
+                <div class="col-sm-2"></div>
+                <div class="col-sm-9"></div>
                 <div class="col-sm-1"></div>
-            </div>     
+            </div>
 
         </div>
-        
+
     </div>
-    
+
     <!-- <div id="copyright-info" /> -->
 
     <footer>
-        <div id="status-footer"/>
+        <div id="status-footer" />
     </footer>
-    
+
 </body>
+
 </html>

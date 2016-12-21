@@ -1,0 +1,540 @@
+{
+    "CLASS1.PROTOCOL": {
+        "vscpclass" : 0,
+        "vscpclass512": "CLASS2.CLASS1_PROTOCOL",
+        "description" : "VSCP Protocol Functionality",
+        "vscptype" : {
+            "PROTOCOL_GENERAL" : {
+                "type" : 0,
+                "description" : "Undefined protocol function."
+            },
+            "SEGCTRL_HEARTBEAT" : {
+                "type" : 1,
+                "description" : "Segment Controller Heartbeat"
+            },
+            "NEW_NODE_ONLINE" : {
+                "type" : 2,
+                "description" : "New node on line / Probe"
+            },
+            "PROBE_ACK" : {
+                "type" : 3,
+                "description" : "Probe ACK"
+            },
+            "reserved" : {
+                "type" : 4,
+                "description" : "Reserved for future use"
+            },
+            "reserved" : {
+                "type" : 5,
+                "description" : "Reserved for future use"
+            },
+            "SET_NICKNAME" : {
+                "type" : 6,
+                "description" : "Set nickname-ID for node"
+            },
+            "NICKNAME_ACCEPTED" : {
+                "type" : 7,
+                "description" : "Nickname-ID accepted"
+            },
+            "DROP_NICKNAME" : {
+                "type" : 8,
+                "description" : "Drop nickname-ID / Reset Device"
+            },
+            "READ_REGISTER" : {
+                "type" : 9,
+                "description" : "Read register"
+            },
+            "RW_RESPONSE" : {
+                "type" : 10,
+                "description" : "Read/Write response"
+            },
+            "WRITE_REGISTER" : {
+                "type" : 11,
+                "description" : "Write register"
+            },
+            "ENTER_BOOT_LOADER" : {
+                "type" : 12,
+                "description" : "Enter boot loader mode"
+            },
+            "ACK_BOOT_LOADER" : {
+                "type" : 13,
+                "description" : "ACK boot loader mode"
+            },
+            "NACK_BOOT_LOADER" : {
+                "type" : 14,
+                "description" : "NACK boot loader mode"
+            },
+            "START_BLOCK" : {
+                "type" : 15,
+                "description" : "Start block data transfer"
+            },
+            "BLOCK_DATA" : {
+                "type" : 16,
+                "description" : "Block data"
+            },
+            "BLOCK_DATA_ACK" : {
+                "type" : 17,
+                "description" : "ACK data block"
+            },
+            "BLOCK_DATA_NACK" : {
+                "type" : 18,
+                "description" : "NACK data block"
+            },
+            "PROGRAM_BLOCK_DATA" : {
+                "type" : 19,
+                "description" : "Program data block"
+            },
+            "PROGRAM_BLOCK_DATA_ACK" : {
+                "type" : 20,
+                "description" : "ACK program data block"
+            },
+            "PROGRAM_BLOCK_DATA_NACK" : {
+                "type" : 21,
+                "description" : "NACK program data block"
+            },
+            "ACTIVATE_NEW_IMAGE" : {
+                "type" : 22,
+                "description" : "Activate new image"
+            },
+            "RESET_DEVICE" : {
+                "type" : 23,
+                "description" : "GUID drop nickname-ID / reset device"
+            },
+            "PAGE_READ" : {
+                "type" : 24,
+                "description" : "Page read"
+            },
+            "PAGE_WRITE" : {
+                "type" : 25,
+                "description" : "Page write"
+            },
+            "RW_PAGE_RESPONSE" : {
+                "type" : 26,
+                "description" : "Read/Write page response"
+            },
+            "HIGH_END_SERVER_PROBE" : {
+                "type" : 27,
+                "description" : "High end server probe"
+            },
+            "HIGH_END_SERVER_RESPONSE" : {
+                "type" : 28,
+                "description" : "High end server response"
+            },
+            "INCREMENT_REGISTER" : {
+                "type" : 29,
+                "description" : "Increment register"
+            },
+            "DECREMENT_REGISTER" : {
+                "type" : 30,
+                "description" : "Decrement register"
+            },
+            "WHO_IS_THERE" : {
+                "type" : 31,
+                "description" : "Who is there?"
+            },
+            "WHO_IS_THERE_RESPONSE" : {
+                "type" : 32,
+                "description" : "Who is there response"
+            },
+            "GET_MATRIX_INFO" : {
+                "type" : 33,
+                "description" : "Get decision matrix info"
+            },
+            "GET_MATRIX_INFO_RESPONSE" : {
+                "type" : 34,
+                "description" : "Decision matrix info response"
+            },
+            "GET_EMBEDDED_MDF" : {
+                "type" : 35,
+                "description" : "Get embedded MDF"
+            },
+            "GET_EMBEDDED_MDF_RESPONSE" : {
+                "type" : 36,
+                "description" : "Embedded MDF response"
+            },
+            "EXTENDED_PAGE_READ_REGISTER" : {
+                "type" : 37,
+                "description" : "Extended page read register"
+            },
+            "EXTENDED_PAGE_WRITE_REGISTER" : {
+                "type" : 38,
+                "description" : "Extended page write register"
+            },
+            "EXTENDED_PAGE_RW_RESPONSE" : {
+                "type" : 39,
+                "description" : "Extended page read/write response"
+            },
+            "GET_EVENT_INTEREST" : {
+                "type" : 40,
+                "description" : "Get event interest"
+            },
+            "GET_EVENT_INTEREST_RESPONSE" : {
+                "type" : 41,
+                "description" : "Get event interest response"
+            },
+            "reserved" : {
+                "type" : 42,
+                "description" : "Reserved for future use"
+            },
+            "reserved" : {
+                "type" : 43,
+                "description" : "Reserved for future use"
+            },
+            "reserved" : {
+                "type" : 44,
+                "description" : "Reserved for future use"
+            },
+            "reserved" : {
+                "type" : 45,
+                "description" : "Reserved for future use"
+            },
+            "reserved" : {
+                "type" : 46,
+                "description" : "Reserved for future use"
+            },
+            "reserved" : {
+                "type" : 47,
+                "description" : "Reserved for future use"
+            },
+            "ACTIVATE_NEW_IMAGE_ACK" : {
+                "type" : 48,
+                "description" : "Activate new image ACK"
+            },
+            "ACTIVATE_NEW_IMAGE_NACK" : {
+                "type" : 49,
+                "description" : "Activate new image NACK"
+            },
+            "BLOCK_DATA_TRANSFER_ACK" : {
+                "type" : 50,
+                "description" : "Block data transfer ACK"
+            },
+            "BLOCK_DATA_TRANSFER_NACK" : {
+                "type" : 51,
+                "description" : "Block data transfer NACK"
+            },
+        },
+
+    "CLASS1.ALARM": {
+        "vscpclass" : 1,
+        "vscpclass512": "CLASS2.CLASS1_ALARM",
+        "description" : "Alarm functionality",
+        "vscptype" : {
+            "ALARM_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.SECURITY": {
+        "vscpclass" : 2,
+        "vscpclass512": "CLASS2.CLASS1_SECURITY",
+        "description" : "Security",
+        "vscptype" : {
+            "SECURITY_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.MEASUREMENT": {
+        "vscpclass" : 10,
+        "vscpclass512": "CLASS2.CLASS1_MEASUREMENT",
+        "description" : "Measurement",
+        "vscptype" : {
+            "MEASUREMENT_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.DATA": {
+        "vscpclass" : 15,
+        "vscpclass512": "CLASS2.CLASS1_DATA",
+        "description" : "Data",
+        "vscptype" : {
+            "DATA_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.INFORMATION": {
+        "vscpclass" : 20,
+        "vscpclass512": "CLASS2.CLASS1_INFORMATION",
+        "description" : "Information",
+        "vscptype" : {
+            "INFORMATION_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.CONTROL": {
+        "vscpclass" : 30,
+        "vscpclass512": "CLASS2.CLASS1_CONTROL",
+        "description" : "Control",
+        "vscptype" : {
+            "CONTROL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.MULTIMEDIA": {
+        "vscpclass" : 40,
+        "vscpclass512": "CLASS2.CLASS1_MULTIMEDIA",
+        "description" : "Multimedia",
+        "vscptype" : {
+            "MULTIMEDIA_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.AOL": {
+        "vscpclass" : 50,
+        "vscpclass512": "CLASS2.CLASS1_AOL",
+        "description" : "Alert On LAN",
+        "vscptype" : {
+            "AOL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.MEASUREMENT64": {
+        "vscpclass" : 60,
+        "vscpclass512": "CLASS2.CLASS1_MEASUREMENT64",
+        "description" : "Double precision floating point measurement",
+        "vscptype" : {
+            "MEASUREMENT64_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.MEASUREZONE": {
+        "vscpclass" : 65,
+        "vscpclass512": "CLASS2.CLASS1_MEASUREZONE",
+        "description" : "Measurement with zone",
+        "vscptype" : {
+            "MEASUREZONE_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.MEASUREMENT32": {
+        "vscpclass" : 70,
+        "vscpclass512": "CLASS2.CLASS1_MEASUREMENT32",
+        "description" : "Single precision floating point measurement",
+        "vscptype" : {
+            "MEASUREMENT32_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.SETVALUEZONE": {
+        "vscpclass" : 85,
+        "vscpclass512": "CLASS2.CLASS1_SETVALUEZONE",
+        "description" : "Set value with zone",
+        "vscptype" : {
+            "SETVALUEZONE_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.WEATHER": {
+        "vscpclass" : 90,
+        "vscpclass512": "CLASS2.CLASS1_WEATHER",
+        "description" : "Weather",
+        "vscptype" : {
+            "WEATHER_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.WEATHER_FORECAST": {
+        "vscpclass" : 95,
+        "vscpclass512": "CLASS2.CLASS1_WEATHER_FORECAST",
+        "description" : "Weather forecast",
+        "vscptype" : {
+            "WEATHER_FORECASTGENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.PHONE": {
+        "vscpclass" : 100,
+        "vscpclass512": "CLASS2.CLASS1_PHONE",
+        "description" : "Phone",
+        "vscptype" : {
+            "PHONE_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+
+    "CLASS1.DISPLAY": {
+        "vscpclass" : 102,
+        "vscpclass512": "CLASS2.CLASS1_DISPLAY",
+        "description" : "Display",
+        "vscptype" : {
+            "DISPLAY_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.REMOTE": {
+        "vscpclass" : 110,
+        "vscpclass512": "CLASS2.CLASS1_REMOTE",
+        "description" : "Remote control functionality",
+        "vscptype" : {
+            "REMOTE_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.GPS": {
+        "vscpclass" : 206,
+        "vscpclass512": "CLASS2.CLASS1_GPS",
+        "description" : "",
+        "vscptype" : {
+            "GPS_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.WIRELESS": {
+        "vscpclass" : 212,
+        "vscpclass512": "CLASS2.CLASS1_WIRELESS",
+        "description" : "",
+        "vscptype" : {
+            "WIRELESS_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.DIAGNOSTIC": {
+        "vscpclass" : 506,
+        "vscpclass512": "CLASS2.CLASS1_DIAGNOSTIC",
+        "description" : "",
+        "vscptype" : {
+            "DIAGNOSTIC_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.ERROR": {
+        "vscpclass" : 508,
+        "vscpclass512": "CLASS2.CLASS1_ERROR",
+        "description" : "",
+        "vscptype" : {
+            "ERROR_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.LOG": {
+        "vscpclass" : 509,
+        "vscpclass512": "CLASS2.CLASS1_LOG",
+        "description" : "",
+        "vscptype" : {
+            "LOG_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.LAB": {
+        "vscpclass" : 510,
+        "vscpclass512": "CLASS2.CLASS1_LAB",
+        "description" : "",
+        "vscptype" : {
+            "LAB_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS1.LOCAL": {
+        "vscpclass" : 511,
+        "vscpclass512": "CLASS2.LEVEL1_LOCAL",
+        "description" : "",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS2.PROTOCOL": {
+        "vscpclass" : 1024,
+        "description" : "Level II protocol functionality",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS2.CONTROL": {
+        "vscpclass" : 1025,
+        "description" : "",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+    "CLASS2.INFORMATION": {
+        "vscpclass" : 1026,
+        "description" : "",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+   "CLASS2.TEXT2SPEECH": {
+        "vscpclass" : 1028,
+        "description" : "",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+   "CLASS2.CUSTOM": {
+        "vscpclass" : 1029,
+        "description" : "",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+   "CLASS2.DISPLAY": {
+        "vscpclass" : 1030,
+        "description" : "",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+   "CLASS2.MEASUREMENT_STR": {
+        "vscpclass" : 1040,
+        "description" : "",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+   "CLASS2.MEASUREMENT_FLOAT": {
+        "vscpclass" : 1060,
+        "description" : "",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+   "CLASS2.MEASUREMENT_VSCPD": {
+        "vscpclass" : 1060,
+        "description" : "",
+        "vscptype" : {
+            "LOCAL_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function."
+                },
+
+}
+
