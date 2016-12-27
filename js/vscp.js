@@ -59,6 +59,7 @@ vscp.version = {
  * @param {string} namespace Complete namespace, e.g. "a.b.c.d"
  */
 vscp._createNS = function(namespace) {
+    
     var nsparts = namespace.split(".");
     var parent = vscp;
 
@@ -3212,28 +3213,14 @@ vscp.Connection.prototype.setFilter = function(options) {
     cmdData += "0x" + filterClass.toString(16) + ",";
     cmdData += "0x" + filterType.toString(16) + ",";
 
-    for (index = 0; index < 16; ++index) {
-
-        cmdData += "0x" + (filterGuid[index] & 0xff).toString(16);
-
-        if (15 > index) {
-            cmdData += ":";
-        }
-    }
+    cmdData += vscp.utility.guidToStr(filterGuid);
 
     cmdData += ";";
     cmdData += "0x" + maskPriority.toString(16) + ",";
     cmdData += "0x" + maskClass.toString(16) + ",";
     cmdData += "0x" + maskType.toString(16) + ",";
 
-    for (index = 0; index < 16; ++index) {
-
-        cmdData += "0x" + (maskGuid[index] & 0xff).toString(16);
-
-        if (15 > index) {
-            cmdData += ":";
-        }
-    }
+    cmdData += vscp.utility.guidToStr(maskGuid);
 
     this._sendCommand({
         command: "SF",
