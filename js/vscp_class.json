@@ -239,10 +239,451 @@
         "vscpclass512": "CLASS2.CLASS1_MEASUREMENT",
         "description" : "Measurement",
         "vscptype" : {
+
             "MEASUREMENT_GENERAL" : {
                     "type" : 0,
-                    "description" : "Undefined protocol function."
+                    "description" : "Undefined protocol function.",
+                    "unit" : [],
+                    "htmlunit" : [],
+                    "unitdescription" : []
                 },
+            
+            "MEASUREMENT_COUNT" : {
+                    "type" : 1,
+                    "description" : "This is a discrete value typical for a count. There is no unit for this measurement just a discrete value. ",
+                    "unit" : [],
+                    "htmlunit" : [],
+                    "unitdescription" : []
+                },
+            
+            "MEASUREMENT_LENGTH" : {
+                    "type" : 2,
+                    "description" : "This is a measurement of a length or a distance.",
+                    "unit" : ["m"],
+                    "htmlunit" : ["m"],
+                    "unitdescription" : ["Meter"]
+                },    
+            
+            "MEASUREMENT_MASS" : {
+                    "type" : 3,
+                    "description" : "This is a measurement of a mass.",
+                    "unit" : ["kg"],
+                    "htmlunit" : ["kg"],
+                    "unitdescription" : ["Kilogram"]
+                },
+
+            "MEASUREMENT_TIME" : {
+                    "type" : 4,
+                    "description" : "A time measurement.",
+                    "unit" : ["s","ms","",""],
+                    "htmlunit" : ["s","ms","",""],
+                    "unitdescription" : ["Seconds","Milliseconds","Binary: y-y-m-d-h-m-s","String: 'HHMMSS' "]
+                },    
+            
+            "MEASUREMENT_ELECTRIC_CURRENT" : {
+                    "type" : 5,
+                    "description" : "This is a measurement of an electric current.",
+                    "unit" : ["A"],
+                    "htmlunit" : ["A"],
+                    "unitdescription" : ["Ampere"]
+                },
+
+            "MEASUREMENT_TEMPERATURE" : {
+                    "type" : 6,
+                    "description" : "This is a temperture measurement.",
+                    "unit" : ["K","C","F"],
+                    "htmlunit" : ["K","&#x2103;","&#x2109;"],
+                    "unitdescription" : ["Degrees Kelvin","Degrees Celisus","Degrees Fahrenheit"]
+                },
+
+            "MEASUREMENT_AMOUNT_OF_SUBSTANCE" : {
+                    "type" : 7,
+                    "description" : "This is a measurement of an amount of a substance.",
+                    "unit" : ["mol"],
+                    "htmlunit" : ["mol"],
+                    "unitdescription" : ["Mole"]
+                },     
+
+            "MEASUREMENT_INTENSITY_OF_LIGHT" : {
+                    "type" : 8,
+                    "description" : "Luminous Intensity (Intensity of light).",
+                    "unit" : ["cd"],
+                    "htmlunit" : ["cd"],
+                    "unitdescription" : ["candela"]
+                }, 
+
+            "MEASUREMENT_FREQUENCY" : {
+                    "type" : 9,
+                    "description" : "This is a measurement of regular events during a second, frequency.",
+                    "unit" : ["Hz"],
+                    "htmlunit" : ["Hz"],
+                    "unitdescription" : ["hertz"]
+                },
+
+            "MEASUREMENT_RADIOACTIVITY" : {
+                    "type" : 10,
+                    "description" : "This is a measurement of rates of things, which happen randomly, or are unpredictable. Typically radioactivity and other random events.",
+                    "unit" : ["Bq","Ci"],
+                    "htmlunit" : ["Bq","Ci"],
+                    "unitdescription" : ["becquerel","curie"]
+                },
+
+            "MEASUREMENT_FORCE" : {
+                    "type" : 11,
+                    "description" : "This is a measurement of force.",
+                    "unit" : ["N"],
+                    "htmlunit" : ["N"],
+                    "unitdescription" : ["newton"]
+                },
+
+            "MEASUREMENT_PRESSURE" : {
+                    "type" : 12,
+                    "description" : "This is a measurement of pressure.",
+                    "unit" : ["N","bar","psi"],
+                    "htmlunit" : ["N","bar","psi"],
+                    "unitdescription" : ["pascal","bar","psi"]
+                },
+
+            "MEASUREMENT_ENERGY" : {
+                    "type" : 13,
+                    "description" : "This is a measurement of energy.",
+                    "unit" : ["J","KWh"],
+                    "htmlunit" : ["J","KWh"],
+                    "unitdescription" : ["joule","KWh"]
+                },
+
+            "MEASUREMENT_POWER" : {
+                    "type" : 14,
+                    "description" : "This is a measurement of power.",
+                    "unit" : ["W","hp"],
+                    "htmlunit" : ["W","hp"],
+                    "unitdescription" : ["watt","Horse Power"]
+                },                
+
+            "MEASUREMENT_ELECTRICAL_CHARGE" : {
+                    "type" : 15,
+                    "description" : "This is a measurement electrical charge.",
+                    "unit" : ["C"],
+                    "htmlunit" : ["C"],
+                    "unitdescription" : ["coulomb"]
+                }, 
+
+            "MEASUREMENT_ELECTRICAL_POTENTIAL" : {
+                    "type" : 16,
+                    "description" : "This is a measurement of electrical potential voltage.",
+                    "unit" : ["V"],
+                    "htmlunit" : ["V"],
+                    "unitdescription" : ["volt"]
+                }, 
+
+            "MEASUREMENT_ELECTRICAL_CAPACITANCE" : {
+                    "type" : 17,
+                    "description" : "This is a measurement of electric capacitance.",
+                    "unit" : ["F"],
+                    "htmlunit" : ["F"],
+                    "unitdescription" : ["farad"]
+                },                 
+
+            "MEASUREMENT_ELECTRICAL_RECISTANCE" : {
+                    "type" : 18,
+                    "description" : "This is a measurement of resistance.",
+                    "unit" : ["ohm"],
+                    "htmlunit" : ["&#x2126;"],
+                    "unitdescription" : ["ohm"]
+                },   
+
+            "MEASUREMENT_ELECTRICAL_CONDUCTANCE" : {
+                    "type" : 19,
+                    "description" : "This is a measurement of electrical conductance.",
+                    "unit" : ["S"],
+                    "htmlunit" : ["S"],
+                    "unitdescription" : ["siemens"]
+                },  
+
+            "MEASUREMENT_MAGNETIC_FIELD_STRENGTH" : {
+                    "type" : 20,
+                    "description" : "This is a measurement of magnetic field strength.",
+                    "unit" : ["H","B"],
+                    "htmlunit" : ["H","B"],
+                    "unitdescription" : ["amperes per meter","teslas"]
+                },
+
+            "MEASUREMENT_MAGNETIC_FLUX" : {
+                    "type" : 21,
+                    "description" : "This is a measurement of magnetic flux.",
+                    "unit" : ["Wb"],
+                    "htmlunit" : ["Wb"],
+                    "unitdescription" : ["weber"]
+                },
+
+            "MEASUREMENT_MAGNETIC_FLUX_DENSITY" : {
+                    "type" : 22,
+                    "description" : "This is a measurement of flux density or field strength for magnetic fields (also called the magnetic induction).",
+                    "unit" : ["B"],
+                    "htmlunit" : ["B"],
+                    "unitdescription" : ["tesla"]
+                },
+
+            "MEASUREMENT_INDUCTANCE" : {
+                    "type" : 23,
+                    "description" : "This is a measurement of inductance.",
+                    "unit" : ["H"],
+                    "htmlunit" : ["H"],
+                    "unitdescription" : ["hendry"]
+                },
+
+            "MEASUREMENT_FLUX_OF_LIGHT" : {
+                    "type" : 24,
+                    "description" : "This is a measurement of luminous flux (luminous power).",
+                    "unit" : ["lm"],
+                    "htmlunit" : ["lm"],
+                    "unitdescription" : ["lumen (cd * sr)"]
+                },
+
+            "MEASUREMENT_ILLUMINANCE" : {
+                    "type" : 25,
+                    "description" : "This is used to express both Illuminance (incidence of light) and Luminous Emittance (emission of light).",
+                    "unit" : ["lx"],
+                    "htmlunit" : ["lx"],
+                    "unitdescription" : ["lux ( lx = lm / m² )" ]
+                },
+
+            "MEASUREMENT_RADIATION_DOSE" : {
+                    "type" : 26,
+                    "description" : "This is a measurement of a radiation dose (Absorbed dose of ionizing radiation).",
+                    "unit" : ["Gy","Sv"],
+                    "htmlunit" : ["Gy","Sv"],
+                    "unitdescription" : ["gray","sievert" ]
+                },
+
+            "MEASUREMENT_CATALYTIC_ACITIVITY" : {
+                    "type" : 27,
+                    "description" : "This is a measurement of catalytic activity used in biochemistry.",
+                    "unit" : ["z"],
+                    "htmlunit" : ["z"],
+                    "unitdescription" : ["katal (mol/s)" ]
+                },
+
+            "MEASUREMENT_VOLUME" : {
+                    "type" : 28,
+                    "description" : "This is a measurement of volume.",
+                    "unit" : ["m3","l", "dl", "cl", "ml"],
+                    "htmlunit" : ["&#x33a5;","l", "dl", "cl", "ml"],
+                    "unitdescription" : ["Cubic Meter", "litre (dm³)", "decilitre (100 cm³)", "centilitre (10 cm³)", "millilitre (cm³)" ]
+                },
+
+            "MEASUREMENT_SOUND_INTENSITY" : {  
+                    "type" : 29,
+                    "description" : "This is a measurement of sound intensity (acoustic intensity).",
+                    "unit" : ["W/m2"],
+                    "htmlunit" : ["W/&#x33a1;"],
+                    "unitdescription" : ["watt per square meter"]
+                },
+
+            "MEASUREMENT_ANGLE" : {
+                    "type" : 30,
+                    "description" : "This is a measurement of an angle.",
+                    "unit" : ["rad","deg","min","sec"],
+                    "htmlunit" : ["&#x33ad;","&#xb0;","&#x2032;","&#x2033;"],
+                    "unitdescription" : ["radian","degree", "arcminute", "arcsecond"]
+                },
+
+            "MEASUREMENT_POSITION" : {
+                    "type" : 31,
+                    "description" : "This is a measurement of a position as of WGS 84.",
+                    "unit" : ["long","lat"],
+                    "htmlunit" : ["long","lat"],
+                    "unitdescription" : ["longitude","latitude"]
+                },
+
+            "MEASUREMENT_SPEED" : {
+                    "type" : 32,
+                    "description" : "This is a measurement of a speed.",
+                    "unit" : ["m/s","km/h","mph"],
+                    "htmlunit" : ["m/s","km/h","mph"],
+                    "unitdescription" : ["Meters per second","Kilometers per hour","Miles per hour"]
+                },
+
+            "MEASUREMENT_ACCELERATION" : {
+                    "type" : 33,
+                    "description" : "This is a measurement of acceleration.",
+                    "unit" : ["m/s2"],
+                    "htmlunit" : ["m/s2"],
+                    "unitdescription" : ["Meters per second second"]
+                },                
+
+            "MEASUREMENT_TENSION" : {
+                    "type" : 34,
+                    "description" : "This is a measurement of tension.",
+                    "unit" : ["N/m"],
+                    "htmlunit" : ["N/m"],
+                    "unitdescription" : ["Newton per meter"]
+                }, 
+
+            "MEASUREMENT_HUMIDITY" : {
+                    "type" : 35,
+                    "description" : "Damp/moist (Hygrometer reading).",
+                    "unit" : ["%"],
+                    "htmlunit" : ["%"],
+                    "unitdescription" : ["Relative percentage 0-100%"]
+                }, 
+
+            "MEASUREMENT_FLOW" : {
+                    "type" : 36,
+                    "description" : "This is a measurement of flow.",
+                    "unit" : ["m3/s","l/s"],
+                    "htmlunit" : ["&#x33a5;/s","l/s"],
+                    "unitdescription" : ["Cubic meters per second","Liters per second"]
+                },
+
+            "MEASUREMENT_THERMAL_RESISTANCE" : {
+                    "type" : 37,
+                    "description" : "This is a measurement of flow.",
+                    "unit" : ["K/W"],
+                    "htmlunit" : ["K/W"],
+                    "unitdescription" : ["Kelvin per watt"]
+                },
+
+            "MEASUREMENT_REFRACTIVE_POWER" : {
+                    "type" : 38,
+                    "description" : "This is a measurement of refractive power.",
+                    "unit" : ["dpt"],
+                    "htmlunit" : ["dpt"],
+                    "unitdescription" : ["dioptre"]
+                },
+
+            "MEASUREMENT_DYNAMIC_VISCOSITY" : {
+                    "type" : 39,
+                    "description" : "This is a measurement of dynamic viscosity.",
+                    "unit" : ["Pl"],
+                    "htmlunit" : ["Pl"],
+                    "unitdescription" : ["poiseuille"]
+                },
+
+            "MEASUREMENT_SOUND_IMPEDANCE" : {
+                    "type" : 40,
+                    "description" : "This is a measurement of sound impedance.",
+                    "unit" : ["rayl"],
+                    "htmlunit" : ["rayl"],
+                    "unitdescription" : ["Pa·s/m"]
+                },                
+
+            "MEASUREMENT_SOUND_RESISTANCE" : {
+                    "type" : 41,
+                    "description" : "This is a measurement of sound resistance .",
+                    "unit" : ["Acoustic ohm"],
+                    "htmlunit" : ["Acoustic ohm"],
+                    "unitdescription" : ["Acoustic ohm Pa · s/ m³"]
+                },   
+
+            "MEASUREMENT_ELECTRIC_ELASTANCE" : {
+                    "type" : 42,
+                    "description" : "This is a measurement of sound resistance .",
+                    "unit" : ["F−1"],
+                    "htmlunit" : ["F−1"],
+                    "unitdescription" : ["daraf"]
+                }, 
+
+            "MEASUREMENT_ELECTRIC_ELASTANCE" : {
+                    "type" : 43,
+                    "description" : "This is a measurement of luminous energy.",
+                    "unit" : ["tb"],
+                    "htmlunit" : ["tb"],
+                    "unitdescription" : ["talbot"]
+                },
+
+            "MEASUREMENT_LUMINANCE" : {
+                    "type" : 44,
+                    "description" : "This is a measurement of luminance.",
+                    "unit" : ["cd/m2"],
+                    "htmlunit" : ["cd/m2"],
+                    "unitdescription" : ["candela per square metre"]
+                },
+
+           "MEASUREMENT_CHEMICAL_CONCENTRATION" : {
+                    "type" : 45,
+                    "description" : "Chemical concentration",
+                    "unit" : ["molal"],
+                    "htmlunit" : ["molal"],
+                    "unitdescription" : ["mol per kg"]
+                },
+
+           "MEASUREMENT_RESERVED1" : {
+                    "type" : 46,
+                    "description" : "Reserved",
+                    "unit" : [],
+                    "htmlunit" : [],
+                    "unitdescription" : []
+                },
+
+           "MEASUREMENT_DOSE_EQVIVALENT" : {
+                    "type" : 47,
+                    "description" : "This is a measurement of dose equivalent.",
+                    "unit" : ["sievert"],
+                    "htmlunit" : ["sievert"],
+                    "unitdescription" : ["joule per kilo"]
+                },
+
+           "MEASUREMENT_RESERVED2" : {
+                    "type" : 48,
+                    "description" : "Reserved",
+                    "unit" : [],
+                    "htmlunit" : [],
+                    "unitdescription" : []
+                },
+
+           "MEASUREMENT_DEWPOINT" : {
+                    "type" : 49,
+                    "description" : "This is a measurement of the Dew Point. ",
+                    "unit" : ["K","C","F"],
+                    "htmlunit" : ["K","&#x2103;","&#x2109;"],
+                    "unitdescription" : ["Degrees Kelvin","Degrees Celisus","Degrees Fahrenheit"]
+            },
+
+           "MEASUREMENT_RELATIVE_LEVEL" : {
+                    "type" : 50,
+                    "description" : "This is a relative value for a level measurement without a unit. It is just relative to the min/max value for the selected data representation. , typically percentage or per mille or similar",
+                    "unit" : ["K","C","F"],
+                    "htmlunit" : ["K","&#x2103;","&#x2109;"],
+                    "unitdescription" : ["Relative value"]
+            },
+
+           "MEASUREMENT_ALTITUDE" : {
+                    "type" : 51,
+                    "description" : "This is a measurement of the Dew Point.",
+                    "unit" : ["m","ft","in"],
+                    "htmlunit" : ["m","ft","in"],
+                    "unitdescription" : ["meters","feet","inches"]
+            },
+
+            "MEASUREMENT_AREA" : {
+                    "type" : 52,
+                    "description" : "Altitude in meters.",
+                    "unit" : ["m2"],
+                    "htmlunit" : ["&#x33a1;"],
+                    "unitdescription" : ["Square meters]
+            },
+
+            "MEASUREMENT_RADIANT_INTENSITY" : {
+                    "type" : 53,
+                    "description" : "This is a measurement of the Dew Point. ",
+                    "unit" : ["m2"],
+                    "htmlunit" : ["&#x33a1;"],
+                    "unitdescription" : ["Square meters]
+            },
+
+
+#define VSCP_TYPE_MEASUREMENT_RADIANT_INTENSITY             53
+#define VSCP_TYPE_MEASUREMENT_RADIANCE                      54
+#define VSCP_TYPE_MEASUREMENT_IRRADIANCE                    55
+#define VSCP_TYPE_MEASUREMENT_SPECTRAL_RADIANCE             56
+
+        "MEASUREMENT_SOUND_PRESSURE" : {
+                    "type" : 57,
+                    "description" : "This is a measurement of sound pressure (acoustic pressure).",
+                    "unit" : ["Pa"],
+                    "unitdescription" : ["pascal"]
+                },                             
 
     "CLASS1.DATA": {
         "vscpclass" : 15,
