@@ -212,7 +212,8 @@
                 "type" : 51,
                 "description" : "Block data transfer NACK"
             },
-        },
+        }
+    }
 
     "CLASS1.ALARM": {
         "vscpclass" : 1,
@@ -222,7 +223,9 @@
             "ALARM_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }            
 
     "CLASS1.SECURITY": {
         "vscpclass" : 2,
@@ -232,7 +235,9 @@
             "SECURITY_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }            
 
     "CLASS1.MEASUREMENT": {
         "vscpclass" : 10,
@@ -253,7 +258,12 @@
                     "description" : "This is a discrete value typical for a count. There is no unit for this measurement just a discrete value. ",
                     "unit" : [],
                     "htmlunit" : [],
-                    "unitdescription" : []
+                    "unitdescription" : [],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ],
+                    "displayvalue" : "%vscp-measurement %vscp-unit"
                 },
             
             "MEASUREMENT_LENGTH" : {
@@ -261,7 +271,11 @@
                     "description" : "This is a measurement of a length or a distance.",
                     "unit" : ["m"],
                     "htmlunit" : ["m"],
-                    "unitdescription" : ["Meter"]
+                    "unitdescription" : ["Meter"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },    
             
             "MEASUREMENT_MASS" : {
@@ -269,7 +283,11 @@
                     "description" : "This is a measurement of a mass.",
                     "unit" : ["kg"],
                     "htmlunit" : ["kg"],
-                    "unitdescription" : ["Kilogram"]
+                    "unitdescription" : ["Kilogram"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_TIME" : {
@@ -277,7 +295,11 @@
                     "description" : "A time measurement.",
                     "unit" : ["s","ms","",""],
                     "htmlunit" : ["s","ms","",""],
-                    "unitdescription" : ["Seconds","Milliseconds","Binary: y-y-m-d-h-m-s","String: 'HHMMSS' "]
+                    "unitdescription" : ["Seconds","Milliseconds","Binary: y-y-m-d-h-m-s","String: 'HHMMSS' "],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },    
             
             "MEASUREMENT_ELECTRIC_CURRENT" : {
@@ -285,7 +307,11 @@
                     "description" : "This is a measurement of an electric current.",
                     "unit" : ["A"],
                     "htmlunit" : ["A"],
-                    "unitdescription" : ["Ampere"]
+                    "unitdescription" : ["Ampere"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_TEMPERATURE" : {
@@ -293,7 +319,11 @@
                     "description" : "This is a temperture measurement.",
                     "unit" : ["K","C","F"],
                     "htmlunit" : ["K","&#x2103;","&#x2109;"],
-                    "unitdescription" : ["Degrees Kelvin","Degrees Celisus","Degrees Fahrenheit"]
+                    "unitdescription" : ["Degrees Kelvin","Degrees Celisus","Degrees Fahrenheit"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_AMOUNT_OF_SUBSTANCE" : {
@@ -301,15 +331,24 @@
                     "description" : "This is a measurement of an amount of a substance.",
                     "unit" : ["mol"],
                     "htmlunit" : ["mol"],
-                    "unitdescription" : ["Mole"]
+                    "unitdescription" : ["Mole"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },     
 
             "MEASUREMENT_INTENSITY_OF_LIGHT" : {
                     "type" : 8,
                     "description" : "Luminous Intensity (Intensity of light).",
-                    "unit" : ["cd"],
+    }
+    }                "unit" : ["cd"],
                     "htmlunit" : ["cd"],
-                    "unitdescription" : ["candela"]
+                    "unitdescription" : ["candela"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 }, 
 
             "MEASUREMENT_FREQUENCY" : {
@@ -317,7 +356,11 @@
                     "description" : "This is a measurement of regular events during a second, frequency.",
                     "unit" : ["Hz"],
                     "htmlunit" : ["Hz"],
-                    "unitdescription" : ["hertz"]
+                    "unitdescription" : ["hertz"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_RADIOACTIVITY" : {
@@ -325,7 +368,11 @@
                     "description" : "This is a measurement of rates of things, which happen randomly, or are unpredictable. Typically radioactivity and other random events.",
                     "unit" : ["Bq","Ci"],
                     "htmlunit" : ["Bq","Ci"],
-                    "unitdescription" : ["becquerel","curie"]
+                    "unitdescription" : ["becquerel","curie"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_FORCE" : {
@@ -333,7 +380,11 @@
                     "description" : "This is a measurement of force.",
                     "unit" : ["N"],
                     "htmlunit" : ["N"],
-                    "unitdescription" : ["newton"]
+                    "unitdescription" : ["newton"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_PRESSURE" : {
@@ -341,7 +392,11 @@
                     "description" : "This is a measurement of pressure.",
                     "unit" : ["N","bar","psi"],
                     "htmlunit" : ["N","bar","psi"],
-                    "unitdescription" : ["pascal","bar","psi"]
+                    "unitdescription" : ["pascal","bar","psi"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_ENERGY" : {
@@ -349,7 +404,11 @@
                     "description" : "This is a measurement of energy.",
                     "unit" : ["J","KWh"],
                     "htmlunit" : ["J","KWh"],
-                    "unitdescription" : ["joule","KWh"]
+                    "unitdescription" : ["joule","KWh"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_POWER" : {
@@ -357,7 +416,11 @@
                     "description" : "This is a measurement of power.",
                     "unit" : ["W","hp"],
                     "htmlunit" : ["W","hp"],
-                    "unitdescription" : ["watt","Horse Power"]
+                    "unitdescription" : ["watt","Horse Power"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },                
 
             "MEASUREMENT_ELECTRICAL_CHARGE" : {
@@ -365,7 +428,11 @@
                     "description" : "This is a measurement electrical charge.",
                     "unit" : ["C"],
                     "htmlunit" : ["C"],
-                    "unitdescription" : ["coulomb"]
+                    "unitdescription" : ["coulomb"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 }, 
 
             "MEASUREMENT_ELECTRICAL_POTENTIAL" : {
@@ -373,7 +440,11 @@
                     "description" : "This is a measurement of electrical potential voltage.",
                     "unit" : ["V"],
                     "htmlunit" : ["V"],
-                    "unitdescription" : ["volt"]
+                    "unitdescription" : ["volt"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 }, 
 
             "MEASUREMENT_ELECTRICAL_CAPACITANCE" : {
@@ -381,7 +452,11 @@
                     "description" : "This is a measurement of electric capacitance.",
                     "unit" : ["F"],
                     "htmlunit" : ["F"],
-                    "unitdescription" : ["farad"]
+                    "unitdescription" : ["farad"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },                 
 
             "MEASUREMENT_ELECTRICAL_RECISTANCE" : {
@@ -389,7 +464,11 @@
                     "description" : "This is a measurement of resistance.",
                     "unit" : ["ohm"],
                     "htmlunit" : ["&#x2126;"],
-                    "unitdescription" : ["ohm"]
+                    "unitdescription" : ["ohm"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },   
 
             "MEASUREMENT_ELECTRICAL_CONDUCTANCE" : {
@@ -397,7 +476,11 @@
                     "description" : "This is a measurement of electrical conductance.",
                     "unit" : ["S"],
                     "htmlunit" : ["S"],
-                    "unitdescription" : ["siemens"]
+                    "unitdescription" : ["siemens"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },  
 
             "MEASUREMENT_MAGNETIC_FIELD_STRENGTH" : {
@@ -405,7 +488,11 @@
                     "description" : "This is a measurement of magnetic field strength.",
                     "unit" : ["H","B"],
                     "htmlunit" : ["H","B"],
-                    "unitdescription" : ["amperes per meter","teslas"]
+                    "unitdescription" : ["amperes per meter","teslas"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_MAGNETIC_FLUX" : {
@@ -413,7 +500,11 @@
                     "description" : "This is a measurement of magnetic flux.",
                     "unit" : ["Wb"],
                     "htmlunit" : ["Wb"],
-                    "unitdescription" : ["weber"]
+                    "unitdescription" : ["weber"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_MAGNETIC_FLUX_DENSITY" : {
@@ -421,7 +512,11 @@
                     "description" : "This is a measurement of flux density or field strength for magnetic fields (also called the magnetic induction).",
                     "unit" : ["B"],
                     "htmlunit" : ["B"],
-                    "unitdescription" : ["tesla"]
+                    "unitdescription" : ["tesla"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_INDUCTANCE" : {
@@ -429,7 +524,11 @@
                     "description" : "This is a measurement of inductance.",
                     "unit" : ["H"],
                     "htmlunit" : ["H"],
-                    "unitdescription" : ["hendry"]
+                    "unitdescription" : ["hendry"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_FLUX_OF_LIGHT" : {
@@ -437,7 +536,11 @@
                     "description" : "This is a measurement of luminous flux (luminous power).",
                     "unit" : ["lm"],
                     "htmlunit" : ["lm"],
-                    "unitdescription" : ["lumen (cd * sr)"]
+                    "unitdescription" : ["lumen (cd * sr)"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_ILLUMINANCE" : {
@@ -445,7 +548,11 @@
                     "description" : "This is used to express both Illuminance (incidence of light) and Luminous Emittance (emission of light).",
                     "unit" : ["lx"],
                     "htmlunit" : ["lx"],
-                    "unitdescription" : ["lux ( lx = lm / m² )" ]
+                    "unitdescription" : ["lux ( lx = lm / m² )" ],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_RADIATION_DOSE" : {
@@ -453,7 +560,11 @@
                     "description" : "This is a measurement of a radiation dose (Absorbed dose of ionizing radiation).",
                     "unit" : ["Gy","Sv"],
                     "htmlunit" : ["Gy","Sv"],
-                    "unitdescription" : ["gray","sievert" ]
+                    "unitdescription" : ["gray","sievert" ],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_CATALYTIC_ACITIVITY" : {
@@ -461,7 +572,11 @@
                     "description" : "This is a measurement of catalytic activity used in biochemistry.",
                     "unit" : ["z"],
                     "htmlunit" : ["z"],
-                    "unitdescription" : ["katal (mol/s)" ]
+                    "unitdescription" : ["katal (mol/s)" ],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_VOLUME" : {
@@ -469,7 +584,11 @@
                     "description" : "This is a measurement of volume.",
                     "unit" : ["m3","l", "dl", "cl", "ml"],
                     "htmlunit" : ["&#x33a5;","l", "dl", "cl", "ml"],
-                    "unitdescription" : ["Cubic Meter", "litre (dm³)", "decilitre (100 cm³)", "centilitre (10 cm³)", "millilitre (cm³)" ]
+                    "unitdescription" : ["Cubic Meter", "litre (dm³)", "decilitre (100 cm³)", "centilitre (10 cm³)", "millilitre (cm³)" ],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_SOUND_INTENSITY" : {  
@@ -477,7 +596,11 @@
                     "description" : "This is a measurement of sound intensity (acoustic intensity).",
                     "unit" : ["W/m2"],
                     "htmlunit" : ["W/&#x33a1;"],
-                    "unitdescription" : ["watt per square meter"]
+                    "unitdescription" : ["watt per square meter"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_ANGLE" : {
@@ -485,7 +608,11 @@
                     "description" : "This is a measurement of an angle.",
                     "unit" : ["rad","deg","min","sec"],
                     "htmlunit" : ["&#x33ad;","&#xb0;","&#x2032;","&#x2033;"],
-                    "unitdescription" : ["radian","degree", "arcminute", "arcsecond"]
+                    "unitdescription" : ["radian","degree", "arcminute", "arcsecond"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_POSITION" : {
@@ -493,7 +620,11 @@
                     "description" : "This is a measurement of a position as of WGS 84.",
                     "unit" : ["long","lat"],
                     "htmlunit" : ["long","lat"],
-                    "unitdescription" : ["longitude","latitude"]
+                    "unitdescription" : ["longitude","latitude"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_SPEED" : {
@@ -501,7 +632,11 @@
                     "description" : "This is a measurement of a speed.",
                     "unit" : ["m/s","km/h","mph"],
                     "htmlunit" : ["m/s","km/h","mph"],
-                    "unitdescription" : ["Meters per second","Kilometers per hour","Miles per hour"]
+                    "unitdescription" : ["Meters per second","Kilometers per hour","Miles per hour"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_ACCELERATION" : {
@@ -509,7 +644,11 @@
                     "description" : "This is a measurement of acceleration.",
                     "unit" : ["m/s2"],
                     "htmlunit" : ["m/s2"],
-                    "unitdescription" : ["Meters per second second"]
+                    "unitdescription" : ["Meters per second second"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },                
 
             "MEASUREMENT_TENSION" : {
@@ -517,7 +656,11 @@
                     "description" : "This is a measurement of tension.",
                     "unit" : ["N/m"],
                     "htmlunit" : ["N/m"],
-                    "unitdescription" : ["Newton per meter"]
+                    "unitdescription" : ["Newton per meter"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 }, 
 
             "MEASUREMENT_HUMIDITY" : {
@@ -525,7 +668,11 @@
                     "description" : "Damp/moist (Hygrometer reading).",
                     "unit" : ["%"],
                     "htmlunit" : ["%"],
-                    "unitdescription" : ["Relative percentage 0-100%"]
+                    "unitdescription" : ["Relative percentage 0-100%"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 }, 
 
             "MEASUREMENT_FLOW" : {
@@ -533,7 +680,11 @@
                     "description" : "This is a measurement of flow.",
                     "unit" : ["m3/s","l/s"],
                     "htmlunit" : ["&#x33a5;/s","l/s"],
-                    "unitdescription" : ["Cubic meters per second","Liters per second"]
+                    "unitdescription" : ["Cubic meters per second","Liters per second"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_THERMAL_RESISTANCE" : {
@@ -541,7 +692,11 @@
                     "description" : "This is a measurement of flow.",
                     "unit" : ["K/W"],
                     "htmlunit" : ["K/W"],
-                    "unitdescription" : ["Kelvin per watt"]
+                    "unitdescription" : ["Kelvin per watt"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_REFRACTIVE_POWER" : {
@@ -549,7 +704,11 @@
                     "description" : "This is a measurement of refractive power.",
                     "unit" : ["dpt"],
                     "htmlunit" : ["dpt"],
-                    "unitdescription" : ["dioptre"]
+                    "unitdescription" : ["dioptre"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_DYNAMIC_VISCOSITY" : {
@@ -557,7 +716,11 @@
                     "description" : "This is a measurement of dynamic viscosity.",
                     "unit" : ["Pl"],
                     "htmlunit" : ["Pl"],
-                    "unitdescription" : ["poiseuille"]
+                    "unitdescription" : ["poiseuille"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_SOUND_IMPEDANCE" : {
@@ -565,7 +728,11 @@
                     "description" : "This is a measurement of sound impedance.",
                     "unit" : ["rayl"],
                     "htmlunit" : ["rayl"],
-                    "unitdescription" : ["Pa·s/m"]
+                    "unitdescription" : ["Pa·s/m"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },                
 
             "MEASUREMENT_SOUND_RESISTANCE" : {
@@ -573,7 +740,11 @@
                     "description" : "This is a measurement of sound resistance .",
                     "unit" : ["Acoustic ohm"],
                     "htmlunit" : ["Acoustic ohm"],
-                    "unitdescription" : ["Acoustic ohm Pa · s/ m³"]
+                    "unitdescription" : ["Acoustic ohm Pa · s/ m³"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },   
 
             "MEASUREMENT_ELECTRIC_ELASTANCE" : {
@@ -581,7 +752,11 @@
                     "description" : "This is a measurement of sound resistance .",
                     "unit" : ["F−1"],
                     "htmlunit" : ["F−1"],
-                    "unitdescription" : ["daraf"]
+                    "unitdescription" : ["daraf"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 }, 
 
             "MEASUREMENT_ELECTRIC_ELASTANCE" : {
@@ -589,7 +764,11 @@
                     "description" : "This is a measurement of luminous energy.",
                     "unit" : ["tb"],
                     "htmlunit" : ["tb"],
-                    "unitdescription" : ["talbot"]
+                    "unitdescription" : ["talbot"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
             "MEASUREMENT_LUMINANCE" : {
@@ -597,7 +776,11 @@
                     "description" : "This is a measurement of luminance.",
                     "unit" : ["cd/m2"],
                     "htmlunit" : ["cd/m2"],
-                    "unitdescription" : ["candela per square metre"]
+                    "unitdescription" : ["candela per square metre"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
            "MEASUREMENT_CHEMICAL_CONCENTRATION" : {
@@ -605,7 +788,11 @@
                     "description" : "Chemical concentration",
                     "unit" : ["molal"],
                     "htmlunit" : ["molal"],
-                    "unitdescription" : ["mol per kg"]
+                    "unitdescription" : ["mol per kg"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
            "MEASUREMENT_RESERVED1" : {
@@ -613,7 +800,11 @@
                     "description" : "Reserved",
                     "unit" : [],
                     "htmlunit" : [],
-                    "unitdescription" : []
+                    "unitdescription" : [],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
            "MEASUREMENT_DOSE_EQVIVALENT" : {
@@ -621,7 +812,11 @@
                     "description" : "This is a measurement of dose equivalent.",
                     "unit" : ["sievert"],
                     "htmlunit" : ["sievert"],
-                    "unitdescription" : ["joule per kilo"]
+                    "unitdescription" : ["joule per kilo"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
            "MEASUREMENT_RESERVED2" : {
@@ -629,7 +824,11 @@
                     "description" : "Reserved",
                     "unit" : [],
                     "htmlunit" : [],
-                    "unitdescription" : []
+                    "unitdescription" : [],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
                 },
 
            "MEASUREMENT_DEWPOINT" : {
@@ -637,7 +836,11 @@
                     "description" : "This is a measurement of the Dew Point. ",
                     "unit" : ["K","C","F"],
                     "htmlunit" : ["K","&#x2103;","&#x2109;"],
-                    "unitdescription" : ["Degrees Kelvin","Degrees Celisus","Degrees Fahrenheit"]
+                    "unitdescription" : ["Degrees Kelvin","Degrees Celisus","Degrees Fahrenheit"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
             },
 
            "MEASUREMENT_RELATIVE_LEVEL" : {
@@ -645,7 +848,11 @@
                     "description" : "This is a relative value for a level measurement without a unit. It is just relative to the min/max value for the selected data representation. , typically percentage or per mille or similar",
                     "unit" : ["K","C","F"],
                     "htmlunit" : ["K","&#x2103;","&#x2109;"],
-                    "unitdescription" : ["Relative value"]
+                    "unitdescription" : ["Relative value"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
             },
 
            "MEASUREMENT_ALTITUDE" : {
@@ -653,7 +860,11 @@
                     "description" : "This is a measurement of the Dew Point.",
                     "unit" : ["m","ft","in"],
                     "htmlunit" : ["m","ft","in"],
-                    "unitdescription" : ["meters","feet","inches"]
+                    "unitdescription" : ["meters","feet","inches"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
             },
 
             "MEASUREMENT_AREA" : {
@@ -661,29 +872,110 @@
                     "description" : "Altitude in meters.",
                     "unit" : ["m2"],
                     "htmlunit" : ["&#x33a1;"],
-                    "unitdescription" : ["Square meters]
+                    "unitdescription" : ["Square meters"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
             },
 
             "MEASUREMENT_RADIANT_INTENSITY" : {
                     "type" : 53,
-                    "description" : "This is a measurement of the Dew Point. ",
-                    "unit" : ["m2"],
-                    "htmlunit" : ["&#x33a1;"],
-                    "unitdescription" : ["Square meters]
+                    "description" : "Radiated power per room angle.",
+                    "unit" : ["W/sr"],
+                    "htmlunit" : ["W/sr"],
+                    "unitdescription" : ["watt per steradian"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
             },
 
+            "MEASUREMENT_RADIANCE" : {
+                    "type" : 54,
+                    "description" : "This is the radiant flux emitted, reflected, transmitted or received by a surface.",
+                    "unit" : [" W/(sr * m2)"],
+                    "htmlunit" : [" W / (sr * &#x33a1;)"],
+                    "unitdescription" : ["watt per steradian per square metre"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
+            },
 
-#define VSCP_TYPE_MEASUREMENT_RADIANT_INTENSITY             53
-#define VSCP_TYPE_MEASUREMENT_RADIANCE                      54
-#define VSCP_TYPE_MEASUREMENT_IRRADIANCE                    55
-#define VSCP_TYPE_MEASUREMENT_SPECTRAL_RADIANCE             56
+            "MEASUREMENT_IRRADIANCE" : {
+                    "type" : 55,
+                    "description" : "Power emitted from or striking onto a surface or area. ",
+                    "unit" : [" W/m2"],
+                    "htmlunit" : [" W/&#x33a1;"],
+                    "unitdescription" : ["watt per square metre"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
+            },
 
-        "MEASUREMENT_SOUND_PRESSURE" : {
+            "MEASUREMENT_SPECTRAL_RADIANCE" : {
+                    "type" : 56,
+                    "description" : "Radiance of a surface per unit frequency or wavelength.",
+                    "unit" : [" W/m2","W·sr-1·m-3","W·sr-1·m-3"],
+                    "htmlunit" : [" W/&#x33a1;","W·sr-1·m-3","W·sr-1·m-3"],
+                    "unitdescription" : ["watt per square metre", "watt per steradian per meter3", "watt per steradian per square metre per hertz"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
+            },
+
+            "MEASUREMENT_SOUND_IRRADIANCE" : {
                     "type" : 57,
+                    "description" : "Irradiance of a surface per unit frequency or wavelength.",
+                    "unit" : ["W·m-2·nm-1","W·m-3","W·m-2·Hz-1"],
+                    "htmlunit" : ["W·m-2·nm-1","W·m-3","W·m-2·Hz-1"],
+                    "unitdescription" : ["watt per square metre per nm","watt per metre3","watt per square metre per hertz"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
+                },
+
+            "MEASUREMENT_SOUND_PRESSURE" : {
+                    "type" : 58,
                     "description" : "This is a measurement of sound pressure (acoustic pressure).",
                     "unit" : ["Pa"],
-                    "unitdescription" : ["pascal"]
-                },                             
+                    "htmlunit" : ["Pa"],
+                    "unitdescription" : ["pascal"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
+                },
+
+             "MEASUREMENT_SOUND_DENSITY" : {
+                    "type" : 59,
+                    "description" : "Sound energy density or sound density is the sound energy per unit volume. ",
+                    "unit" : ["Pa"],
+                    "htmlunit" : ["Pa"],
+                    "unitdescription" : ["pascal"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
+                },
+
+            "MEASUREMENT_SOUND_LEVEL" : {
+                    "type" : 60,
+                    "description" : "Sound level expressed in decibel. This event is supplied for convenience.",
+                    "unit" : ["dB"],
+                    "htmlunit" : ["dB"],
+                    "unitdescription" : ["decibel"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ]
+            },
+        }
+    }
 
     "CLASS1.DATA": {
         "vscpclass" : 15,
@@ -693,7 +985,9 @@
             "DATA_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.INFORMATION": {
         "vscpclass" : 20,
@@ -703,7 +997,9 @@
             "INFORMATION_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.CONTROL": {
         "vscpclass" : 30,
@@ -713,7 +1009,9 @@
             "CONTROL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }        
 
     "CLASS1.MULTIMEDIA": {
         "vscpclass" : 40,
@@ -723,7 +1021,9 @@
             "MULTIMEDIA_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.AOL": {
         "vscpclass" : 50,
@@ -733,7 +1033,9 @@
             "AOL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.MEASUREMENT64": {
         "vscpclass" : 60,
@@ -743,7 +1045,9 @@
             "MEASUREMENT64_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.MEASUREZONE": {
         "vscpclass" : 65,
@@ -753,7 +1057,9 @@
             "MEASUREZONE_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.MEASUREMENT32": {
         "vscpclass" : 70,
@@ -763,7 +1069,9 @@
             "MEASUREMENT32_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.SETVALUEZONE": {
         "vscpclass" : 85,
@@ -773,7 +1081,9 @@
             "SETVALUEZONE_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.WEATHER": {
         "vscpclass" : 90,
@@ -783,7 +1093,9 @@
             "WEATHER_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.WEATHER_FORECAST": {
         "vscpclass" : 95,
@@ -793,7 +1105,9 @@
             "WEATHER_FORECASTGENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.PHONE": {
         "vscpclass" : 100,
@@ -803,8 +1117,9 @@
             "PHONE_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
-
+            },
+        }
+    }
 
     "CLASS1.DISPLAY": {
         "vscpclass" : 102,
@@ -814,7 +1129,9 @@
             "DISPLAY_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.REMOTE": {
         "vscpclass" : 110,
@@ -824,7 +1141,9 @@
             "REMOTE_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.GPS": {
         "vscpclass" : 206,
@@ -834,7 +1153,9 @@
             "GPS_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.WIRELESS": {
         "vscpclass" : 212,
@@ -844,7 +1165,9 @@
             "WIRELESS_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.DIAGNOSTIC": {
         "vscpclass" : 506,
@@ -854,7 +1177,9 @@
             "DIAGNOSTIC_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.ERROR": {
         "vscpclass" : 508,
@@ -864,7 +1189,9 @@
             "ERROR_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.LOG": {
         "vscpclass" : 509,
@@ -874,7 +1201,9 @@
             "LOG_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.LAB": {
         "vscpclass" : 510,
@@ -884,7 +1213,9 @@
             "LAB_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS1.LOCAL": {
         "vscpclass" : 511,
@@ -894,7 +1225,9 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS2.PROTOCOL": {
         "vscpclass" : 1024,
@@ -903,7 +1236,9 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS2.CONTROL": {
         "vscpclass" : 1025,
@@ -912,7 +1247,9 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
     "CLASS2.INFORMATION": {
         "vscpclass" : 1026,
@@ -921,7 +1258,10 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }            
+            
 
    "CLASS2.TEXT2SPEECH": {
         "vscpclass" : 1028,
@@ -930,7 +1270,9 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }            
 
    "CLASS2.CUSTOM": {
         "vscpclass" : 1029,
@@ -939,7 +1281,9 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }            
 
    "CLASS2.DISPLAY": {
         "vscpclass" : 1030,
@@ -948,7 +1292,9 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }            
 
    "CLASS2.MEASUREMENT_STR": {
         "vscpclass" : 1040,
@@ -957,7 +1303,9 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }            
 
    "CLASS2.MEASUREMENT_FLOAT": {
         "vscpclass" : 1060,
@@ -966,7 +1314,9 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }            
 
    "CLASS2.MEASUREMENT_VSCPD": {
         "vscpclass" : 1060,
@@ -975,7 +1325,9 @@
             "LOCAL_GENERAL" : {
                     "type" : 0,
                     "description" : "Undefined protocol function."
-                },
+            },
+        }
+    }
 
 }
 
