@@ -1,5 +1,5 @@
-Display escapes
-===============
+Display escapes used for VSCP
+============================
 
 %vscp-class         - VSCP class as a decimal number,
 %vscp-type          - VSCP type for event as a decimal number.
@@ -7,7 +7,11 @@ Display escapes
 %vscp-hextype       - VSCP type for event as a hexadecimal number.
 %vscp-priority      - VSCP priority as a decimal number,
 %vscp-hexpriority   - VSCP priority as a hexadcimal number,
-
+%vscp-guid          - VSCP GUID on stadard form.
+%vscp-timestamp     - VSCP timestamp as a decimal number
+%vscp-hextimestamp  - VSCP timestamp as a hexadecimal number
+%vscp-obid          - VSCP obid as a decimal number
+%vscp-hexobid       - VSCP obid as a hexadecimal number
 %vscp-measurement   - A VSCP measurement value from a standard VSCP measurement.
 %vscp-unit          - A VSCP unit from an event with a VSCP datacoding byte.
 %vscp-sensor        - A VSCP sensor id from an event with a VSCP datacoding byte.
@@ -17,4 +21,53 @@ Display escapes
 %vscp-zone          - Zone from an event that has an zone in the second databyte.
 %vscp-subzone       - Sub zone from an event that have a sub zone in the third databyte.
 %vscp-data[n]       - Data byte n in decimal.
-%vscp-hexdata[n]    - Databyte n i hexadecimal.
+%vscp-hexdata[n]    - Databyte n in hexadecimal.
+%vscp-alldata       - All data bytes space separated in decimal.
+%vscp-hexalldata    - All data bytes space separated in hexadecimal.
+
+
+
+"data", "displayvalue" and "htmlinfo" can either be placed in the class-section and will then be used as
+the default for all types but if present in the type section that value will be used instead.
+
+"CLASS1.MEASUREMENT": {
+        "vscpclass" : 10,
+        "vscpclass512": "CLASS2.CLASS1_MEASUREMENT",
+        "description" : "Measurement",
+        "data" : [
+            { "ordinal" : "0", "description" : "Data coding byte"},
+            { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+        ],
+        "displayvalue" : "%vscp-measurement %vscp-unit",
+        "htmlinfo" : "<strong>Sensor index</strong>: %vscp-sensor<br><strong>Coding</strong>: %vscp-coding (%vscp-coding-text)<br><strong>Value</strong>: %vscp-measurement %vscp-unit<br>"
+        "vscptype" : {
+
+            "MEASUREMENT_GENERAL" : {
+                    "type" : 0,
+                    "description" : "Undefined protocol function.",
+                    "unit" : [],
+                    "htmlunit" : [],
+                    "unitdescription" : []
+                },
+            
+            "MEASUREMENT_COUNT" : {
+                    "type" : 1,
+                    "description" : "This is a discrete value typical for a count. There is no unit for this measurement just a discrete value. ",
+                    "unit" : [],
+                    "htmlunit" : [],
+                    "unitdescription" : []
+                },
+            
+            "MEASUREMENT_LENGTH" : {
+                    "type" : 2,
+                    "description" : "This is a measurement of a length or a distance.",
+                    "unit" : ["m"],
+                    "htmlunit" : ["m"],
+                    "unitdescription" : ["Meter"],
+                    "data" : [
+                        { "ordinal" : "0", "description" : "Data coding byte"},
+                        { "ordinal" : "1..7", "description" : "1-7 bytes of data with format defined by the data coding byte."}
+                    ],
+                    "displayvalue" : "%vscp-measurement %vscp-unit",
+                    "htmlinfo" : "<strong>Sensor index</strong>: %vscp-sensor<br><strong>Coding</strong>: %vscp-coding (%vscp-coding-text)<br><strong>Value</strong>: %vscp-measurement %vscp-unit<br>"
+                }, 
