@@ -1,0 +1,20 @@
+Display escapes
+===============
+
+%vscp-class         - VSCP class as a decimal number,
+%vscp-type          - VSCP type for event as a decimal number.
+%vscp-hexclass      - VSCP class as a hexacimal number,
+%vscp-hextype       - VSCP type for event as a hexadecimal number.
+%vscp-priority      - VSCP priority as a decimal number,
+%vscp-hexpriority   - VSCP priority as a hexadcimal number,
+
+%vscp-measurement   - A VSCP measurement value from a standard VSCP measurement.
+%vscp-unit          - A VSCP unit from an event with a VSCP datacoding byte.
+%vscp-sensor        - A VSCP sensor id from an event with a VSCP datacoding byte.
+%vscp-coding        - A VSCP sensor coding id from an event with a VSCP datacoding byte.
+%vscp-coding-text   - A VSCP sensor coding real text from an event with a VSCP datacoding byte.
+%vscp-index         - Index from an event that has an index in the first databyte.
+%vscp-zone          - Zone from an event that has an zone in the second databyte.
+%vscp-subzone       - Sub zone from an event that have a sub zone in the third databyte.
+%vscp-data[n]       - Data byte n in decimal.
+%vscp-hexdata[n]    - Databyte n i hexadecimal.
