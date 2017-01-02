@@ -24,8 +24,24 @@ Display escapes used for VSCP
 %vscp-hexdata[n]    - Databyte n in hexadecimal.
 %vscp-alldata       - All data bytes space separated in decimal.
 %vscp-hexalldata    - All data bytes space separated in hexadecimal.
+%vscp-int8[n]       - Print 8-bit signed decimal byte from data byte at position n.
+%vscp-hexint8[n]    - Print 8-bit signed hexadecimal byte from data byte at position n.
+%vscp-uint8[n]      - Print 8-bit unsigned decimal byte from data byte at position n.
+%vscp-hexuint16[n]  - Print 8-bit unsigned hexadecimal byte from data byte at position n.
+%vscp-int16[n]      - Print 16-bit signed decimal integer from integer stored in big endian starting at databyte n.
+%vscp-hexint16[n]   - Print 16-bit signed hexadecimal integer from integer stored in big endian starting at databyte n.
+%vscp-uint16[n]     - Print 16-bit unsigned decimal integer from integer stored in big endian starting at databyte n.
+%vscp-hexuint16[n]  - Print 16-bit unsigned hexadecimal integer from integer stored in big endian starting at databyte n.
+%vscp-int32[n]      - Print 32-bit signed decimal long from integer stored in big endian starting at databyte n.
+%vscp-hexint32[n]   - Print 32-bit signed hexadecimal long from integer stored in big endian starting at databyte n.
+%vscp-uint32[n]     - Print 32-bit unsigned decimal long from integer stored in big endian starting at databyte n.
+%vscp-hexuint32[n]  - Print 32-bit unsigned hexadecimal long from integer stored in big endian starting at databyte n.
+%vscp-int64[n]      - Print 64-bit signed decimal longlong from integer stored in big endian starting at databyte n.
+%vscp-hexint64[n]   - Print 64-bit signed hexadecimal longlong from integer stored in big endian starting at databyte n.
+%vscp-uint64[n]     - Print 64-bit unsigned decimal longlong from integer stored in big endian starting at databyte n.
+%vscp-hexuint64[n]  - Print 64-bit unsigned hexadecimal longlong from integer stored in big endian starting at databyte n.
 
-
+----------------------------------------------------------------------------------------------------------------------------
 
 "data", "displayvalue" and "htmlinfo" can either be placed in the class-section and will then be used as
 the default for all types but if present in the type section that value will be used instead.
