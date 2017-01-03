@@ -40,30 +40,30 @@
                     As a segment can be without a segment controller this event is not available on all segments and is not 
                     mandatory. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>8-bit CRC of the segment controller GUID.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>MSB of time since epoch (optional).</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Time since epoch (optional).</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>Time since epoch (optional).</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>LSB of time since epoch (optional).</td >
                     </tr> 
@@ -121,14 +121,14 @@
                 It is recommended that also level II nodes send this event when they come alive.In this
                 case the 16 - byte data is the GUID of the node. 
                 </p> 
-                <table>
+                <table class="vscp_evttbl">
                     <thead >
-                        <tr>
+                        <tr class="vscp_evttbl_row">
                             <th>Data byte</th>
                             <th>Description</th >
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td> <strong>Target address</strong > .This is the probe nickname that the new node is using to 
                         test if this is a valid target node.If there is a node with this nickname address it should answer 
@@ -170,18 +170,18 @@
                     This event can be used to change the nickname
                     for a node.The node just uses the new nickname and don & #039;t start nickname discovery or similar.
                 </p>
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Old nickname for node.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>The new nickname for the node.</td >
                     </tr> 
@@ -211,22 +211,22 @@
                     Request a node to drop its nickname.The node should drop its nickname and then behave in the same manner 
                     as when it was first powered up on the segment. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th> Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>The current nickname for the node.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td><strong>Optional:</strong >Flags.</td> 
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td><strong>Optional:</strong>Time the node should wait before it starts a nickname discovery or starts 
                             the device.The time is in seconds.</td> 
@@ -235,42 +235,42 @@
                 <p>
                     <strong >Optional byte 1 flags </strong> 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Bit</th>
                             <th> Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Reserved.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Reserved.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Reserved.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>Reserved.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>Reserved.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td >5</td>
                         <td>Reset device. Keep nickname.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>6</td>
                         <td>Set persistent storage to default.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>7</td>
                         <td>Go idle. Do not start up again.</td>
                     </tr> 
@@ -297,11 +297,7 @@
                 <p>
                     There is a variant of this where the GUID is used instead of the nickname to identify the device, 
                     Class = 0, Type = 23. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "READ_REGISTER": {
                 "type": 9,
@@ -315,18 +311,18 @@
                     choose for reading as the page also is set when reading register using that type.The standard registers 
                     can always be read without setting a page though as they are always mapped into the upper 128 bytes.</em> 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node address.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Register to read.</td >
                     </tr> 
@@ -338,29 +334,26 @@
                     The following format can be used for nodes on a Level II segment as a midway between a full Level II handling 
                     as specified in Class = 1024 and Level I. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 - 15</td>
                         <td>GUID (MSB → LSB).</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>16</td>
                         <td>Reserved.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>17</td>
                         <td>Register to read.</td >
                     </tr> 
-                </table>",
-                "data": [
-                    { "ordinal": "0", "description": "" }, 
-                ]
+                </table>"
             },
             "RW_RESPONSE": {
                 "type": 10,
@@ -370,26 +363,22 @@
                     Response for a read / write event..Note that the data is returned for both a read and a write and can and 
                     probably should be checked for validity. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Register read/written.</td> 
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Content of register.</td >
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "WRITE_REGISTER": {
                 "type": 11,
@@ -403,22 +392,22 @@
                     choose for writing as the page is also set when writing a register using that type.The standard registers can 
                     always be read without setting a page though as they are always mapped into the upper 128 bytes. < /em> 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node address.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Register to write.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Content for register.</td >
                     </tr> 
@@ -430,34 +419,30 @@
                     The following format can be used for nodes on a Level II segment as a midway between a full Level II 
                     handling as specified in Class = 1024 and Level I. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th >
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 - 15</td>
                         <td>GUID (MSB → LSB).</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>16</td>
                         <td> Reserved.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>17</td>
                         <td>Register to write.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>18</td>
                         <td>Content of register.</td >
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "ENTER_BOOT_LOADER": {
                 "type": 12,
@@ -472,42 +457,42 @@
                     boot loader mode.This also means that the node should not react on other events(commands) then the boot 
                     loader related. 
                 </p> 
-                <table>
+                <table class="vscp_evttbl">
                     <thead >
-                        <tr>
+                        <tr class="vscp_evttbl_row">
                             <th>Data byte</th>
                             <th>Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>The nickname for the node.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Code that select boot loader algorithm to use.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2< /td>
                         <td>GUID byte 0 (MSB)</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>GUID byte 3 (MSB + 3)</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>GUID byte 5 (MSB + 5)</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5</td>
                         <td>GUID byte 7 (MSB + 7)</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>6</td>
                         <td>Content of register 0x92, Page select MSB.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>7</td>
                         <td>Content of register 0x93, Page select LSB.</td >
                     </tr> 
@@ -516,18 +501,18 @@
                     The following format can be used for nodes on a Level II segment as a midway between a full Level II 
                     handling as specified in Class = 1024 and Level I. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th >
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 - 15 </td>
                         <td>GUID.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>16</td>
                         <td>Boot-loader algorithm code.</td >
                     </tr> 
@@ -536,40 +521,36 @@
                 <strong>Boot - loader Codes </strong> 
                 </p>
                 < table>
-                    <thead>
-                        <tr>
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Code</th>
                             <th> Algorithm</th >
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0x00</td>
                         <td>VSCP algorithm.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0x01</td>
                         <td>Microchip PIC algorithm</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0x10</td>
                         <td>Atmel AVR algorithm 0</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0x20</td>
                         <td>NXP ARM algorithm 0</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0x30</td>
                         <td>ST ARM algorithm 0</td >
                     </tr> 
                 </table>
                 <p>
                     All other reserved. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "ACK_BOOT_LOADER": {
                 "type": 13,
@@ -581,50 +562,46 @@
                 <p>
                     The node confirms that it has entered boot loader mode.This is only sent for the VSCP boot loader algorithm. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>MSB of flash block size.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Flash block size.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Flash block size.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>LSB of flash block size.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>MSB of number of block s available.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5</td>
                         <td>Number of block s available.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>6</td>
                         <td>Number of block s available.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>7</td>
                         <td>LSB of number of blocks available.</td >
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "NACK_BOOT_LOADER": {
                 "type": 14,
@@ -634,22 +611,18 @@
                     The node was unable to enter boot loader mode.The reason is given by a user specified error code byte.
                     This event has no meaning for any node that is not in boot mode and should be disregarded. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Optional user defined error code.</td >
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "START_BLOCK": {
                 "type": 15,
@@ -659,9 +632,9 @@
                     Begin transfer of data for a block of memory.This event has no meaning for any node that is not in boot 
                     mode and should be disregarded. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th >
                         </tr> 
@@ -670,23 +643,23 @@
                         <td>0</td>
                         <td>MSB of block number.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Block number.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Block number.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>LSB of block number.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>(optional) Type of Memory we want to write. See table below </td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5</td>
                         <td>(optional) Bank/Image to be written Used together with byte 4 to specify either separate Flash 
                         or EEPROM / MRAM spaces.If absent or set to zero normally, means first memory from the view of the 
@@ -699,30 +672,30 @@
                 <p>
                     <strong > Type of memory to write(byte 4) < /strong> 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Memory type</th>
                             <th>Description </th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 or byte absent</td>
                         <td>PROGRAM Flash (status quo for old nodes)</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>DATA (EEPROM, MRAM, FRAM)</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>CONFIG (Fuses, CPU configuration)</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>RAM</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4 - 255 </td>
                         <td>Currently undefined - send a NACK as response </td >
                     </tr> 
@@ -731,11 +704,7 @@
                     Response can be Class = 0, Type = 50(Start block data transfer ACK) or Class = 0, Type = 51(Start block 
                     data transfer NACK). 
                 <
-                /p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                /p>"
             },
             "BLOCK_DATA": {
                 "type": 16,
@@ -745,42 +714,42 @@
                     Data for a block of memory.This event has no meaning for any node that is not in boot mode and should be 
                     disregarded. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description </th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Data.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Data.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Data.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>Data.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>Data.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5</td>
                         <td>Data.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>6</td>
                         <td>Data.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>7</td>
                         <td>Data.</td >
                     </tr> 
@@ -788,11 +757,7 @@
                 <p>
                     A <stong>Block Data ACK</strong> (or a <strong>Block data NACK</strong> on failure) is sent as a response 
                     for each event received.
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "BLOCK_DATA_ACK": {
                 "type": 17,
@@ -802,34 +767,34 @@
                     Confirm the reception of a complete data block.This event has no meaning
                     for any node that is not in boot mode and should be disregarded. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th >
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>MSB of 16-bit CRC for block.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>LSB for 16-bit CRC for block.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>MSB of write pointer.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>write pointer.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                     <td>write pointer.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5</td>
                         <td>LSB of write pointer.</td >
                     </tr> 
@@ -837,11 +802,7 @@
                 <p>
                     The write pointer is the actual pointer after the last data has been written i, e the next position on which data 
                     will be written. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "BLOCK_DATA_NACK": {
                 "type": 18,
@@ -852,29 +813,29 @@
                     for any node that is not in boot mode and should be disregarded. 
                 </p> 
                 < table>
-                    <thead>
-                        <tr>
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description </th >
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>User defined error code.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>MSB of write pointer.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2< /td>
                         <td>write pointer. </td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>write pointer.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>LSB of write pointer.</td >
                     </tr> 
@@ -882,11 +843,7 @@
                 <p>
                     The write pointer is the actual pointer after the last data has been written i, e the next position on 
                     which data will be written. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "PROGRAM_BLOCK_DATA": {
                 "type": 19,
@@ -896,34 +853,30 @@
                     Request from a node to program a data block that has been uploaded and confirmed.This event has no meaning
                     for any node that is not in boot mode and should be disregarded. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th> Description</th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>MSB of block number.</td>
                     </tr>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Block number.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Block number.</td>
                     </tr>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>LSB of block number.</td >
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "PROGRAM_BLOCK_DATA_ACK": {
                 "type": 20,
@@ -933,34 +886,30 @@
                     A node confirms the successful programming of a block.This event has no meaning
                     for any node that is not in boot mode and should be disregarded. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description </th>
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>MSB of block number.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Block number.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Block number.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>LSB of block number.</td>
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "PROGRAM_BLOCK_DATA_NACK": {
                 "type": 21,
@@ -970,38 +919,34 @@
                     A node failed to program a data block.This event has no meaning
                     for any node that is not in boot mode and should be disregarded. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>User defined error code.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>MSB of block number.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Block number.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>Block number.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>LSB of block number.</td>
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "ACTIVATE_NEW_IMAGE": {
                 "type": 22,
@@ -1013,17 +958,17 @@
                     argument.This must be correct for the reset / activation to be performed.NACK boot loader mode will be 
                     sent if the CRC is not correct and the node will not leave boot loader mode. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th><th>Description</th>
                         </tr> 
                     </thead>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>16 bit CRC of full flash data block, MSB </td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>16 bit CRC of full flash data block LSB </td>
                     </tr> 
@@ -1033,11 +978,7 @@
                     code but it can still be activated with this event as long as the CRC is correct.This event has no meaning
                     for any node that is not in boot mode and should be disregarded.Response can be Class = 0, type = 48 
                     (Activate new image ACK) or Class = 0, Type = 49(Activate new image NACK). 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "RESET_DEVICE": {
                 "type": 23,
@@ -1053,30 +994,30 @@
                     As the GUID is 16 bytes this is a multi - frame event.To ease the storage requirements on the nodes 
                     only four GUID bytes are send in each frame.The frames must be sent out within one second interval. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>index.</td >
                     </tr>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>GUID byte.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>GUID byte.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>GUID byte.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td> GUID byte</td>
                     </tr> 
@@ -1084,9 +1025,9 @@
                 <p>
                     where index goes from 0 - 3 and GUID bytes are sent MSB first, like 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Index = Byte 0</th>
                             <th>Byte 1</th> 
                             <th>Byte 2</th>
@@ -1094,28 +1035,28 @@
                             <th>Byte 4</th> 
                         </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>Index = 0</td>
                         <td>GUID byte 15</td> 
                         <td>GUID byte 14</td>
                         <td>GUID byte 13</td> 
                         <td>GUID byte 12</td> 
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>Index = 1</td>
                         <td>GUID byte 11</td >
                         <td>GUID byte 10</td>
                         <td>GUID byte 9</td>
                         <td>GUID byte 8</td> 
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>Index = 2</td>
                         <td>GUID byte 7</td> 
                         <td>GUID byte 6</td>
                         <td>GUID byte 5</td> 
                         <td>GUID byte 4</td> 
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>Index = 3</td>
                         <td>GUID byte 3</td > 
                         <td>GUID byte 2</td>
@@ -1134,11 +1075,7 @@
                     initialized.This event can be used to assign nickname - IDs to silent nodes.This is nodes that does not 
                     start the nickname discovery process on startup and instead just sits and wait until they are assigned an 
                     ID with this event. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "PAGE_READ": {
                 "type": 24,
@@ -1159,22 +1096,22 @@
                     Note that the page select registers only selects a virtual page that can be accessed with page read / write 
                     and not with the ordinary read / write. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node-ID which registers should be read.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Index into page.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Number of bytes to read (1-255).</td>
                     </tr> 
@@ -1188,30 +1125,26 @@
                     for nodes on a Level II segment as a midway between a full Level II handling as specified in Class = 1024 
                     and Level I. 
                 </p> 
-                <table>
-                    <thead>
-                        <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                        <tr class="vscp_evttbl_row_head">
                             <th>Data byte</th>
                             <th>Description</th>
                         </tr> 
                     </thead>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 - 15</td>
                         <td>GUID.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>16</td>
                         <td>Index into page.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>17</td>
                         <td>Number of bytes to read (1-255).</td >
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "PAGE_WRITE": {
                 "type": 25,
@@ -1227,22 +1160,22 @@
                     This is because VSCP at Level I is aimed at low end devices with limited resources meaning 
                     little room for buffers. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node-ID </td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Register start.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2-7</td>
                         <td> Data.</td >
                     </tr> 
@@ -1255,33 +1188,29 @@
                     The following format can be used for nodes on a Level II segment as a midway between a full Level II 
                     handling as specified in Class = 1024 and Level I. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 - 15 </td>
                         <td>GUID.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td> 16 < /td>
                         <td> Base index. </td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td> 18 - … </td>
                         <td> Data. </td >
                     </tr> 
                 </table>
                 <p>
                     Data count can be as many as the buffer of the Level II node accepts. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "RW_PAGE_RESPONSE": {
                 "type": 26,
@@ -1291,18 +1220,18 @@
                     This is a response frame for the read / write page command.The Sequence number goes from 0 up 
                     to the last sent frame for a read page request. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Sequence number.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1 - 7</td>
                         <td>Data.</td >
                     </tr> 
@@ -1312,32 +1241,28 @@
                     Level II handling as specified in Class = 1024 and Level I. 
                 </p> 
                 < table>
-                    <thead>
-                    <tr>
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 - 15</td>
                         <td>GUID.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>16</td>
                         <td>Sequence number.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>17 - … </td>
                         <td>Data.</td>
                     </tr> 
                 </table>
                 <p>
                     Data count can be as many as the buffer of the Level II node accepts. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "HIGH_END_SERVER_PROBE": {
                 "type": 27,
@@ -1348,18 +1273,18 @@
                 <p>
                     This event can be broad - casted on a segment by a node to get information about available servers. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Code for node type.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1 - 7</td>
                         <td>Meaning depends on code in byte 0.</td>
                     </tr> 
@@ -1385,11 +1310,7 @@
                 </p>
                 <p>
                     The VSCP daemon documentation have a description on how server discovery works[sub: Server - discovery] 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "HIGH_END_SERVER_RESPONSE": {
                 "type": 28,
@@ -1403,42 +1324,42 @@
                     For Level II devices the <strong>CLASS2.PROTOCOL, Type = 20(0x14) High end server capabilities </strong> 
                     is the solution to this problem. 
                 </p> 
-                <table>
-                <thead>
-                <tr>
+                <table class="vscp_evttbl">
+                <thead class="vscp_evttbl_head">
+                <tr class="vscp_evttbl_row_head">
                     <th>Data byte</th>
                     <th>Description</th>
                 </tr> 
                 </thead>
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>0</td>
                     <td>VSCP server 16-bit capability code MSB</td >
                 </tr> 
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>1</td>
                     <td>Code for server capabilities LSB</td >
                 </tr> 
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>2</td>
                     <td>Server IP address MSB - or other relevant data as of server capabilities (Network byte order)</td>
                 </tr> 
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>3</td>
                  <td>Server IP address - or other relevant data as of server capabilities (Network byte order)</td>
                 </tr> 
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>4</td>
                     <td>Server IP address - or other relevant data as of server capabilities (Network byte order)</td>
                 </tr> 
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>5</td>
                     <td>Server IP address LSB - or other relevant data as of server capabilities (Network byte order) </td>
                 </tr> 
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>6</td>
                     <td> Server Port MSB - or other relevant data as of server capabilities </td>
                 </tr> 
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>7</td>
                     <td>Server Port LSB - or other relevant data as of server capabilities</td>
                 </tr> 
@@ -1462,11 +1383,7 @@
             </p>
             <p>
                 The VSCP daemon documentation have a description on how server discovery works. 
-            </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+            </p>"
             },
             "INCREMENT_REGISTER": {
                 "type": 29,
@@ -1475,29 +1392,25 @@
                 <p>
                     Increment a register content by one with no risk of it changing in between 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node-ID</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Register to increment.</td>
                     </tr> 
                 </table>
                 <p>
                     Node should answer with Read / Write register response.Class = 0, Type = 10 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "DECREMENT_REGISTER": {
                 "type": 30,
@@ -1506,29 +1419,25 @@
                 <p>
                     Decrement a register content by one with no risk of it changing in between 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node-ID</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Register to decrement.</td>
                     </tr> 
                 </table>
                 <p>
                     Node should answer with Read / Write register response.Class = 0, Type = 10 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "WHO_IS_THERE": {
                 "type": 31,
@@ -1538,14 +1447,14 @@
                     This event can be used as a fast way to find out which nodes there is on a segment.All nodes receiving 
                     it should respond. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node-ID or 0xFF for all nodes.</td>
                     </tr> 
@@ -1553,11 +1462,7 @@
                 <p>
                     Response is 
                 </p> 
-                <pre class = "code" > Class = 0, Type = 32. < /pre>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                <pre class = "code" > Class = 0, Type = 32. < /pre>"
             },
             "WHO_IS_THERE_RESPONSE": {
                 "type": 32,
@@ -1566,9 +1471,9 @@
                 <p>
                     Response from node(s) looks like this 
                 </p> 
-                 <table>
-                    <thead>
-                    <tr>
+                 <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>byte 0</th>
                         <th>byte 1</th> 
                         <th>byte 2 </th>
@@ -1579,7 +1484,7 @@
                         <th>byte 7</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>GUID15</td> 
                         <td>GUID14</td>
@@ -1589,7 +1494,7 @@
                         <td>GUID10</td>
                         <td>GUID9</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>GUID8</td> 
                         <td>GUID7</td>
@@ -1599,7 +1504,7 @@
                         <td>GUID3</td>
                         <td>GUID2</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>GUID1</td>
                         <td>GUID0</td>
@@ -1609,7 +1514,7 @@
                         <td>MDF3</td>
                         <td>MDF4</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>MDF5</td> 
                         <td>MDF6</td>
@@ -1619,7 +1524,7 @@
                         <td>MDF10</td>
                         <td>MDF11</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>MDF12</td> 
                         <td>MDF13</td>
@@ -1629,7 +1534,7 @@
                         <td>MDF17</td>
                         <td>MDF18</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5</td>
                         <td>MDF19</td> 
                         <td>MDF20</td>
@@ -1639,7 +1544,7 @@
                         <td>MDF24</td>
                         <td>MDF25</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>6</td>
                         <td>MDF26</td> 
                         <td>MDF27</td>
@@ -1650,13 +1555,24 @@
                         <td>0</td>
                     </tr> 
                 </table>
-                <p>
+                <p>"data": [{
+                        "ordinal": "0",
+                        "description": "8-bit CRC of the segment controller GUID."
+                    }, {
+                        "ordinal": "1",
+                        "description": "MSB of time since epoch (optional)."
+                    }, {
+                        "ordinal": "2",
+                        "description": "Time since epoch (optional)."
+                    }, {
+                        "ordinal": "3",
+                        "description": "Time since epoch (optional)."
+                    }, {
+                        "ordinal": "4",
+                        "description": "LSB of time since epoch (optional)."
+                    }]
                     All seven frames should be sent also if the MDF URL is shorter then 32 characters, 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "GET_MATRIX_INFO": {
                 "type": 33,
@@ -1665,14 +1581,14 @@
                 <p>
                     Request a node to report size and offset for its decision matrix. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th >
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node address.</td >
                     </tr> 
@@ -1681,25 +1597,21 @@
                     The following format can be used for nodes on a Level II segment as a midway between a full Level II 
                     handling as specified in Class = 1024 and Level I. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 - 15</td>
                         <td>GUID.</td>
                     </tr> 
                 </table>
                 <p>
                     A node that does not have a decision matrix should return zero rows. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "GET_MATRIX_INFO_RESPONSE": {
                 "type": 34,
@@ -1712,38 +1624,38 @@
                     a decision matrix can also skip to implement this event but it & #039;s better if it returns a decision 
                     matrix size of zero. 
                 </p>
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Matrix size (number of rows). Zero for a device with no decision matrix.</td>
                     </tr>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Offset in register space.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Optional page start MSB ( Interpret as zero if not sent )</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>Optional page start LSB ( Interpret as zero if not sent )</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>Optional page end MSB ( Interpret as zero if not sent ) Deprecated. Set to zero.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5</td>
                         <td>Optional page end LSB ( Interpret as zero if not sent ) Deprecated. Set to zero.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>6</td>
                         <td>For a Level II node this is the size of a decision matrix row.</td>
                     </tr> 
@@ -1753,26 +1665,22 @@
                     paged read / write.The decision matrix can also be stored indexed.In that case the first byte is the 
                     index and the second is the data.If the index is in location 0x7f then an indexed matrix is assumed. 
                 </p> 
-                <table>
-                <thead>
-                <tr>
+                <table class="vscp_evttbl">
+                <thead class="vscp_evttbl_head">
+                <tr class="vscp_evttbl_row_head">
                     <th>Register position</th>
                     <th>Description</th>
                 </tr> 
                 </thead> 
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>0x77</td>
                     <td>Index for row in decision matrix.</td>
                 </tr> 
-                <tr>
+                <tr class="vscp_evttbl_row">
                     <td>0x78 - 0x7F</td>
                     <td>Level I decision matrix row.</td>
                 </tr> 
-            </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+            </table>"
             },
             "GET_EMBEDDED_MDF": {
                 "type": 35,
@@ -1782,22 +1690,18 @@
                     A node that get this event and has an embedded MDF description in flash or similar respond 
                     with the description. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th >
                     </tr> 
                     </thead>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node-ID.</td >
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "GET_EMBEDDED_MDF_RESPONSE": {
                 "type": 36,
@@ -1818,22 +1722,22 @@
                 <p>
                     should be sent. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td> High byte of MDF description index.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Low byte of MDF description index.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2 - 7</td>
                         <td>MDF data.</td>
                     </tr> 
@@ -1841,11 +1745,7 @@
                 <p>
                     Note that if sending the events back to back some devices will not be able to cope with the data stream.
                     It is therefor advisable to have a short delay between each mdf data frame sent out. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "EXTENDED_PAGE_READ_REGISTER": {
                 "type": 37,
@@ -1858,30 +1758,45 @@
                     Implementation must take care so all page register change done by these routines must restore the content 
                     of the page registers to there original content when they are done. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr>
                     </thead>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node address.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">                    "data": [{
+                        "ordinal": "0",
+                        "description": "8-bit CRC of the segment controller GUID."
+                    }, {
+                        "ordinal": "1",
+                        "description": "MSB of time since epoch (optional)."
+                    }, {
+                        "ordinal": "2",
+                        "description": "Time since epoch (optional)."
+                    }, {
+                        "ordinal": "3",
+                        "description": "Time since epoch (optional)."
+                    }, {
+                        "ordinal": "4",
+                        "description": "LSB of time since epoch (optional)."
+                    }]
                         <td>1</td>
                         <td>MSB of page where the register is located.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>LSB of page where the register is located.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>Register to read (offset into page).</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>Optional: Number of registers to read.</td>
                     </tr> 
@@ -1900,38 +1815,34 @@
                     The following format can be used for nodes on a Level II segment as a midway between a full Level II 
                     handling as specified in Class = 1024 and Level I. 
                 </p>
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 - 15</td>
                         <td>GUID.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>16</td>
                         <td>MSB of page where the register is located.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>17</td>
                         <td>LSB of page where the register is located.</td>
                     </tr>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>18</td>
                         <td>Register to read.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                     <td>19</td>
                     <td>Optional: bytes to read (1-255).</td>
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "EXTENDED_PAGE_WRITE_REGISTER": {
                 "type": 38,
@@ -1944,34 +1855,34 @@
                     Implementation must take care so all page register change done by these routines must restore the 
                     content of the page registers to there original content when they are done. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th >
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Node address.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td> MSB of page where the register is located.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>LSB of page where the register is located.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>Register to write.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>Content for register.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td> 5, 6, 7 </td>
                         <td>Optional extra data bytes to write.</td>
                     </tr> 
@@ -1987,38 +1898,34 @@
                     The following format can be used for nodes on a Level II segment as a midway between a full Level II 
                     handling as specified in Class = 1024 and Level I. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0 - 15</td>
                         <td>GUID.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>16</td>
                         <td>MSB of page where the register is located.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>17</td>
                         <td> LSB of page where the register is located.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>18</td>
                         <td>Register to write.</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>19</td>
                         <td>Content of register. byte 20-buffer-size Optional extra data bytes to write.</td>
                     </tr> 
-                </table>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </table>"
             },
             "EXTENDED_PAGE_RW_RESPONSE": {
                 "type": 39,
@@ -2027,34 +1934,34 @@
                 <p>
                     This is the replay sent for events CLASS1.PROTOCOL, Type = 40, 41. 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr>
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Index (starts at zero).</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>MSB of page where the register is located.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>LSB of page where the register is located.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>Register read/written.</td> 
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>Content of register.</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5 - 7</td>
                         <td>Content of register if multi register read/write.</td> 
                     </tr> 
@@ -2063,11 +1970,7 @@
                     A multi.register read / write can generate up to 256 events of this type.Index will then be increased 
                     by one for each event sent. < em> Some nodes my have small buffers so this bursts of messages may be a 
                     problem.Therefore send them with a low priority. < /em> 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "GET_EVENT_INTEREST": {
                 "type": 40,
@@ -2083,11 +1986,7 @@
                 <p>
                     The event is intended for very low bandwidth nodes like low power wireless nodes where it saves a lot of 
                     bandwidth if only events that really concerns the node is sent to it. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "GET_EVENT_INTEREST_RESPONSE": {
                 "type": 41,
@@ -2096,82 +1995,82 @@
                 <p>
                     Response for event CLASS1.PROTOCOL, Type = 40. The node report all events it is interested in . 
                 </p> 
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Data byte</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Index</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>class bit 9 (see table)</td>
                     </tr>
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>class 1</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>type 1</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>class 2</td >
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5</td>
                         <td>type 2</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>6</td>
                         <td>class 3 </td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>7</td>
                         <td>type 3</td>
                     </tr> 
                 </table>
-                <table>
-                    <thead>
-                    <tr>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
                         <th>Bit</th>
                         <th>Description</th>
                     </tr> 
                     </thead> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>0</td>
                         <td>Bit 9 for class 1</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>1</td>
                         <td>Bit 9 for class 2 </td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>2</td>
                         <td>Bit 9 for class 3 </td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>3</td>
                         <td>All Type 1 is recognized (set type to zero).</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>4</td>
                         <td>All Type 2 is recognized (set type to zero).</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>5</td>
                         <td>All Type 3 is recognized (set type to zero).</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>6</td>
                         <td>0</td>
                     </tr> 
-                    <tr>
+                    <tr class="vscp_evttbl_row">
                         <td>7</td>
                         <td>0</td >
                     </tr> 
@@ -2188,65 +2087,37 @@
                 </p>
                 <p>
                     Fill unused pairs with zero. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "reserved": {
                 "type": 42,
                 "name": "Reserved for future use",
-                "description": "",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                "description": ""
             },
             "reserved": {
                 "type": 43,
                 "name": "Reserved for future use",
-                "description": "",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                "description": ""
             },
             "reserved": {
                 "type": 44,
                 "name": "Reserved for future use",
-                "description": "",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                "description": ""
             },
             "reserved": {
                 "type": 45,
                 "name": "Reserved for future use",
-                "description": "",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                "description": ""
             },
             "reserved": {
                 "type": 46,
                 "name": "Reserved for future use",
-                "description": "",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                "description": ""
             },
             "reserved": {
                 "type": 47,
                 "name": "Reserved for future use",
-                "description": "",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                "description": ""
             },
             "ACTIVATE_NEW_IMAGE_ACK": {
                 "type": 48,
@@ -2256,11 +2127,7 @@
                     Part of the VSCP boot - loader functionality.This is the positive response after a node received a 
                     CLASS1.PROTOCOL, Type = 22, Activate new image.It is sent by the node before the new firmware is booted 
                     into. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "ACTIVATE_NEW_IMAGE_NACK": {
                 "type": 49,
@@ -2270,11 +2137,7 @@
                     Part of the VSCP boot - loader functionality.This is the negative response after a node received a 
                     CLASS1.PROTOCOL, Type = 22, Activate new image.It is sent by the node to inform it that it will(or can not) 
                     switch to the new firmware image. 
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "BLOCK_DATA_TRANSFER_ACK": {
                 "type": 50,
@@ -2284,11 +2147,7 @@
                     Part of the VSCP boot - loader functionality.This is the positive response after a node received a 
                     <strong>CLASS1.PROTOCOL, Type = 16 </strong>, block data transfer. It is sent by the node as a validation 
                     that it can handle the block data transfer.  
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
             "BLOCK_DATA_TRANSFER_NACK": {
                 "type": 51,
@@ -2298,11 +2157,7 @@
                     Part of the VSCP boot-loader functionality. This is the negative response after a node received a 
                     <strong>CLASS1.PROTOCOL, Type=16</strong>, block data transfer. It is sent by the node as an indication 
                     that it can NOT handle the block data transfer.
-                </p>",
-                "data": [{
-                    "ordinal": "0",
-                    "description": ""
-                }, ]
+                </p>"
             },
         }
     }
@@ -2354,7 +2209,23 @@
 
             "MEASUREMENT_COUNT": {
                 "type": 1,
-                "description": "This is a discrete value typical for a count. There is no unit for this measurement just a discrete value. ",
+                "description": "<p>This is a discrete value typical for a count. There is no unit for this measurement just a discrete value.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": [],
                 "htmlunit": [],
                 "unitdescription": []
@@ -2362,7 +2233,23 @@
 
             "MEASUREMENT_LENGTH": {
                 "type": 2,
-                "description": "This is a measurement of a length or a distance.",
+                "description": "<p>This is a measurement of a length or a distance.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["m"],
                 "htmlunit": ["m"],
                 "unitdescription": ["Meter"],
@@ -2370,7 +2257,23 @@
 
             "MEASUREMENT_MASS": {
                 "type": 3,
-                "description": "This is a measurement of a mass.",
+                "description": "<p>This is a measurement of a mass.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["kg"],
                 "htmlunit": ["kg"],
                 "unitdescription": ["Kilogram"],
@@ -2378,7 +2281,23 @@
 
             "MEASUREMENT_TIME": {
                 "type": 4,
-                "description": "A time measurement.",
+                "description": "<p>A time measurement.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["s", "ms", "", ""],
                 "htmlunit": ["s", "ms", "", ""],
                 "unitdescription": ["Seconds", "Milliseconds", "Binary: y-y-m-d-h-m-s", "String: 'HHMMSS' "],
@@ -2386,7 +2305,23 @@
 
             "MEASUREMENT_ELECTRIC_CURRENT": {
                 "type": 5,
-                "description": "This is a measurement of an electric current.",
+                "description": "<p>This is a measurement of an electric current.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["A"],
                 "htmlunit": ["A"],
                 "unitdescription": ["Ampere"],
@@ -2394,7 +2329,23 @@
 
             "MEASUREMENT_TEMPERATURE": {
                 "type": 6,
-                "description": "This is a temperture measurement.",
+                "description": "<p>This is a temperture measurement.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["K", "C", "F"],
                 "htmlunit": ["K", "&#x2103;", "&#x2109;"],
                 "unitdescription": ["Degrees Kelvin", "Degrees Celisus", "Degrees Fahrenheit"],
@@ -2402,7 +2353,23 @@
 
             "MEASUREMENT_AMOUNT_OF_SUBSTANCE": {
                 "type": 7,
-                "description": "This is a measurement of an amount of a substance.",
+                "description": "<p>This is a measurement of an amount of a substance.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["mol"],
                 "htmlunit": ["mol"],
                 "unitdescription": ["Mole"],
@@ -2410,7 +2377,23 @@
 
             "MEASUREMENT_INTENSITY_OF_LIGHT": {
                 "type": 8,
-                "description": "Luminous Intensity (Intensity of light).",
+                "description": "<p>Luminous Intensity (Intensity of light).</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["cd"],
                 "htmlunit": ["cd"],
                 "unitdescription": ["candela"],
@@ -2418,7 +2401,23 @@
 
             "MEASUREMENT_FREQUENCY": {
                 "type": 9,
-                "description": "This is a measurement of regular events during a second, frequency.",
+                "description": "<p>This is a measurement of regular events during a second, frequency.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["Hz"],
                 "htmlunit": ["Hz"],
                 "unitdescription": ["hertz"],
@@ -2426,7 +2425,23 @@
 
             "MEASUREMENT_RADIOACTIVITY": {
                 "type": 10,
-                "description": "This is a measurement of rates of things, which happen randomly, or are unpredictable. Typically radioactivity and other random events.",
+                "description": "<p>This is a measurement of rates of things, which happen randomly, or are unpredictable. Typically radioactivity and other random events.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["Bq", "Ci"],
                 "htmlunit": ["Bq", "Ci"],
                 "unitdescription": ["becquerel", "curie"],
@@ -2434,7 +2449,23 @@
 
             "MEASUREMENT_FORCE": {
                 "type": 11,
-                "description": "This is a measurement of force.",
+                "description": "<p>This is a measurement of force.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["N"],
                 "htmlunit": ["N"],
                 "unitdescription": ["newton"],
@@ -2442,7 +2473,23 @@
 
             "MEASUREMENT_PRESSURE": {
                 "type": 12,
-                "description": "This is a measurement of pressure.",
+                "description": "<p>This is a measurement of pressure.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["N", "bar", "psi"],
                 "htmlunit": ["N", "bar", "psi"],
                 "unitdescription": ["pascal", "bar", "psi"],
@@ -2450,7 +2497,23 @@
 
             "MEASUREMENT_ENERGY": {
                 "type": 13,
-                "description": "This is a measurement of energy.",
+                "description": "<p>This is a measurement of energy.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["J", "KWh"],
                 "htmlunit": ["J", "KWh"],
                 "unitdescription": ["joule", "KWh"],
@@ -2458,7 +2521,23 @@
 
             "MEASUREMENT_POWER": {
                 "type": 14,
-                "description": "This is a measurement of power.",
+                "description": "<p>This is a measurement of power.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["W", "hp"],
                 "htmlunit": ["W", "hp"],
                 "unitdescription": ["watt", "Horse Power"],
@@ -2466,7 +2545,23 @@
 
             "MEASUREMENT_ELECTRICAL_CHARGE": {
                 "type": 15,
-                "description": "This is a measurement electrical charge.",
+                "description": "<p>This is a measurement electrical charge.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["C"],
                 "htmlunit": ["C"],
                 "unitdescription": ["coulomb"],
@@ -2474,7 +2569,23 @@
 
             "MEASUREMENT_ELECTRICAL_POTENTIAL": {
                 "type": 16,
-                "description": "This is a measurement of electrical potential voltage.",
+                "description": "<p>This is a measurement of electrical potential voltage.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["V"],
                 "htmlunit": ["V"],
                 "unitdescription": ["volt"],
@@ -2482,7 +2593,23 @@
 
             "MEASUREMENT_ELECTRICAL_CAPACITANCE": {
                 "type": 17,
-                "description": "This is a measurement of electric capacitance.",
+                "description": "<p>This is a measurement of electric capacitance.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["F"],
                 "htmlunit": ["F"],
                 "unitdescription": ["farad"],
@@ -2490,7 +2617,23 @@
 
             "MEASUREMENT_ELECTRICAL_RECISTANCE": {
                 "type": 18,
-                "description": "This is a measurement of resistance.",
+                "description": "<p>This is a measurement of resistance.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["ohm"],
                 "htmlunit": ["&#x2126;"],
                 "unitdescription": ["ohm"],
@@ -2498,7 +2641,23 @@
 
             "MEASUREMENT_ELECTRICAL_CONDUCTANCE": {
                 "type": 19,
-                "description": "This is a measurement of electrical conductance.",
+                "description": "<p>This is a measurement of electrical conductance.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["S"],
                 "htmlunit": ["S"],
                 "unitdescription": ["siemens"],
@@ -2506,7 +2665,23 @@
 
             "MEASUREMENT_MAGNETIC_FIELD_STRENGTH": {
                 "type": 20,
-                "description": "This is a measurement of magnetic field strength.",
+                "description": "<p>This is a measurement of magnetic field strength.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["H", "B"],
                 "htmlunit": ["H", "B"],
                 "unitdescription": ["amperes per meter", "teslas"],
@@ -2514,7 +2689,23 @@
 
             "MEASUREMENT_MAGNETIC_FLUX": {
                 "type": 21,
-                "description": "This is a measurement of magnetic flux.",
+                "description": "<p>This is a measurement of magnetic flux.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["Wb"],
                 "htmlunit": ["Wb"],
                 "unitdescription": ["weber"],
@@ -2522,7 +2713,23 @@
 
             "MEASUREMENT_MAGNETIC_FLUX_DENSITY": {
                 "type": 22,
-                "description": "This is a measurement of flux density or field strength for magnetic fields (also called the magnetic induction).",
+                "description": "<p>This is a measurement of flux density or field strength for magnetic fields (also called the magnetic induction).</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["B"],
                 "htmlunit": ["B"],
                 "unitdescription": ["tesla"],
@@ -2530,7 +2737,23 @@
 
             "MEASUREMENT_INDUCTANCE": {
                 "type": 23,
-                "description": "This is a measurement of inductance.",
+                "description": "<p>This is a measurement of inductance.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["H"],
                 "htmlunit": ["H"],
                 "unitdescription": ["hendry"],
@@ -2538,7 +2761,23 @@
 
             "MEASUREMENT_FLUX_OF_LIGHT": {
                 "type": 24,
-                "description": "This is a measurement of luminous flux (luminous power).",
+                "description": "<p>This is a measurement of luminous flux (luminous power).</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["lm"],
                 "htmlunit": ["lm"],
                 "unitdescription": ["lumen (cd * sr)"],
@@ -2546,7 +2785,23 @@
 
             "MEASUREMENT_ILLUMINANCE": {
                 "type": 25,
-                "description": "This is used to express both Illuminance (incidence of light) and Luminous Emittance (emission of light).",
+                "description": "<p>This is used to express both Illuminance (incidence of light) and Luminous Emittance (emission of light).</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["lx"],
                 "htmlunit": ["lx"],
                 "unitdescription": ["lux ( lx = lm / m² )"],
@@ -2554,7 +2809,23 @@
 
             "MEASUREMENT_RADIATION_DOSE": {
                 "type": 26,
-                "description": "This is a measurement of a radiation dose (Absorbed dose of ionizing radiation).",
+                "description": "<p>This is a measurement of a radiation dose (Absorbed dose of ionizing radiation).</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["Gy", "Sv"],
                 "htmlunit": ["Gy", "Sv"],
                 "unitdescription": ["gray", "sievert"],
@@ -2562,7 +2833,23 @@
 
             "MEASUREMENT_CATALYTIC_ACITIVITY": {
                 "type": 27,
-                "description": "This is a measurement of catalytic activity used in biochemistry.",
+                "description": "<p>This is a measurement of catalytic activity used in biochemistry.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["z"],
                 "htmlunit": ["z"],
                 "unitdescription": ["katal (mol/s)"],
@@ -2570,7 +2857,23 @@
 
             "MEASUREMENT_VOLUME": {
                 "type": 28,
-                "description": "This is a measurement of volume.",
+                "description": "<p>This is a measurement of volume.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["m3", "l", "dl", "cl", "ml"],
                 "htmlunit": ["&#x33a5;", "l", "dl", "cl", "ml"],
                 "unitdescription": ["Cubic Meter", "litre (dm³)", "decilitre (100 cm³)", "centilitre (10 cm³)", "millilitre (cm³)"],
@@ -2578,7 +2881,23 @@
 
             "MEASUREMENT_SOUND_INTENSITY": {
                 "type": 29,
-                "description": "This is a measurement of sound intensity (acoustic intensity).",
+                "description": "<p>This is a measurement of sound intensity (acoustic intensity).</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["W/m2"],
                 "htmlunit": ["W/&#x33a1;"],
                 "unitdescription": ["watt per square meter"],
@@ -2586,7 +2905,23 @@
 
             "MEASUREMENT_ANGLE": {
                 "type": 30,
-                "description": "This is a measurement of an angle.",
+                "description": "<p>This is a measurement of an angle.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["rad", "deg", "min", "sec"],
                 "htmlunit": ["&#x33ad;", "&#xb0;", "&#x2032;", "&#x2033;"],
                 "unitdescription": ["radian", "degree", "arcminute", "arcsecond"],
@@ -2594,7 +2929,23 @@
 
             "MEASUREMENT_POSITION": {
                 "type": 31,
-                "description": "This is a measurement of a position as of WGS 84.",
+                "description": "<p>This is a measurement of a position as of WGS 84.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["long", "lat"],
                 "htmlunit": ["long", "lat"],
                 "unitdescription": ["longitude", "latitude"],
@@ -2602,7 +2953,23 @@
 
             "MEASUREMENT_SPEED": {
                 "type": 32,
-                "description": "This is a measurement of a speed.",
+                "description": "<p>This is a measurement of a speed.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["m/s", "km/h", "mph"],
                 "htmlunit": ["m/s", "km/h", "mph"],
                 "unitdescription": ["Meters per second", "Kilometers per hour", "Miles per hour"],
@@ -2610,7 +2977,23 @@
 
             "MEASUREMENT_ACCELERATION": {
                 "type": 33,
-                "description": "This is a measurement of acceleration.",
+                "description": "<p>This is a measurement of acceleration.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["m/s2"],
                 "htmlunit": ["m/s2"],
                 "unitdescription": ["Meters per second second"],
@@ -2618,7 +3001,23 @@
 
             "MEASUREMENT_TENSION": {
                 "type": 34,
-                "description": "This is a measurement of tension.",
+                "description": "<p>This is a measurement of tension.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["N/m"],
                 "htmlunit": ["N/m"],
                 "unitdescription": ["Newton per meter"],
@@ -2626,7 +3025,23 @@
 
             "MEASUREMENT_HUMIDITY": {
                 "type": 35,
-                "description": "Damp/moist (Hygrometer reading).",
+                "description": "<p>Damp/moist (Hygrometer reading).</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["%"],
                 "htmlunit": ["%"],
                 "unitdescription": ["Relative percentage 0-100%"],
@@ -2634,7 +3049,23 @@
 
             "MEASUREMENT_FLOW": {
                 "type": 36,
-                "description": "This is a measurement of flow.",
+                "description": "<p>This is a measurement of flow.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["m3/s", "l/s"],
                 "htmlunit": ["&#x33a5;/s", "l/s"],
                 "unitdescription": ["Cubic meters per second", "Liters per second"],
@@ -2642,7 +3073,23 @@
 
             "MEASUREMENT_THERMAL_RESISTANCE": {
                 "type": 37,
-                "description": "This is a measurement of flow.",
+                "description": "<p>This is a measurement of flow.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["K/W"],
                 "htmlunit": ["K/W"],
                 "unitdescription": ["Kelvin per watt"],
@@ -2650,7 +3097,23 @@
 
             "MEASUREMENT_REFRACTIVE_POWER": {
                 "type": 38,
-                "description": "This is a measurement of refractive power.",
+                "description": "<p>This is a measurement of refractive power.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["dpt"],
                 "htmlunit": ["dpt"],
                 "unitdescription": ["dioptre"],
@@ -2658,7 +3121,23 @@
 
             "MEASUREMENT_DYNAMIC_VISCOSITY": {
                 "type": 39,
-                "description": "This is a measurement of dynamic viscosity.",
+                "description": "<p>This is a measurement of dynamic viscosity.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["Pl"],
                 "htmlunit": ["Pl"],
                 "unitdescription": ["poiseuille"],
@@ -2666,7 +3145,23 @@
 
             "MEASUREMENT_SOUND_IMPEDANCE": {
                 "type": 40,
-                "description": "This is a measurement of sound impedance.",
+                "description": "<p>This is a measurement of sound impedance.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["rayl"],
                 "htmlunit": ["rayl"],
                 "unitdescription": ["Pa·s/m"],
@@ -2674,7 +3169,23 @@
 
             "MEASUREMENT_SOUND_RESISTANCE": {
                 "type": 41,
-                "description": "This is a measurement of sound resistance .",
+                "description": "<p>This is a measurement of sound resistance .</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["Acoustic ohm"],
                 "htmlunit": ["Acoustic ohm"],
                 "unitdescription": ["Acoustic ohm Pa · s/ m³"],
@@ -2682,7 +3193,23 @@
 
             "MEASUREMENT_ELECTRIC_ELASTANCE": {
                 "type": 42,
-                "description": "This is a measurement of sound resistance .",
+                "description": "<p>This is a measurement of sound resistance.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["F−1"],
                 "htmlunit": ["F−1"],
                 "unitdescription": ["daraf"],
@@ -2690,7 +3217,23 @@
 
             "MEASUREMENT_ELECTRIC_ELASTANCE": {
                 "type": 43,
-                "description": "This is a measurement of luminous energy.",
+                "description": "<p>This is a measurement of luminous energy.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["tb"],
                 "htmlunit": ["tb"],
                 "unitdescription": ["talbot"],
@@ -2698,7 +3241,23 @@
 
             "MEASUREMENT_LUMINANCE": {
                 "type": 44,
-                "description": "This is a measurement of luminance.",
+                "description": "<p>This is a measurement of luminance.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["cd/m2"],
                 "htmlunit": ["cd/m2"],
                 "unitdescription": ["candela per square metre"],
@@ -2706,7 +3265,23 @@
 
             "MEASUREMENT_CHEMICAL_CONCENTRATION": {
                 "type": 45,
-                "description": "Chemical concentration",
+                "description": "<p>Chemical concentration.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["molal"],
                 "htmlunit": ["molal"],
                 "unitdescription": ["mol per kg"],
@@ -2714,7 +3289,7 @@
 
             "MEASUREMENT_RESERVED1": {
                 "type": 46,
-                "description": "Reserved",
+                "description": "<p>Reserved.</p>",
                 "unit": [],
                 "htmlunit": [],
                 "unitdescription": [],
@@ -2722,7 +3297,23 @@
 
             "MEASUREMENT_DOSE_EQVIVALENT": {
                 "type": 47,
-                "description": "This is a measurement of dose equivalent.",
+                "description": "<p>This is a measurement of dose equivalent.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["sievert"],
                 "htmlunit": ["sievert"],
                 "unitdescription": ["joule per kilo"],
@@ -2730,7 +3321,7 @@
 
             "MEASUREMENT_RESERVED2": {
                 "type": 48,
-                "description": "Reserved",
+                "description": "<p>Reserved.</p>",
                 "unit": [],
                 "htmlunit": [],
                 "unitdescription": [],
@@ -2738,7 +3329,23 @@
 
             "MEASUREMENT_DEWPOINT": {
                 "type": 49,
-                "description": "This is a measurement of the Dew Point. ",
+                "description": "<p>This is a measurement of the Dew Point.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["K", "C", "F"],
                 "htmlunit": ["K", "&#x2103;", "&#x2109;"],
                 "unitdescription": ["Degrees Kelvin", "Degrees Celisus", "Degrees Fahrenheit"],
@@ -2746,7 +3353,23 @@
 
             "MEASUREMENT_RELATIVE_LEVEL": {
                 "type": 50,
-                "description": "This is a relative value for a level measurement without a unit. It is just relative to the min/max value for the selected data representation. , typically percentage or per mille or similar",
+                "description": "<p>This is a relative value for a level measurement without a unit. It is just relative to the min/max value for the selected data representation. , typically percentage or per mille or similar</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["K", "C", "F"],
                 "htmlunit": ["K", "&#x2103;", "&#x2109;"],
                 "unitdescription": ["Relative value"],
@@ -2754,7 +3377,23 @@
 
             "MEASUREMENT_ALTITUDE": {
                 "type": 51,
-                "description": "This is a measurement of the Dew Point.",
+                "description": "<p>This is a measurement of the Dew Point.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["m", "ft", "in"],
                 "htmlunit": ["m", "ft", "in"],
                 "unitdescription": ["meters", "feet", "inches"],
@@ -2762,7 +3401,23 @@
 
             "MEASUREMENT_AREA": {
                 "type": 52,
-                "description": "Altitude in meters.",
+                "description": "<p>Altitude in meters.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["m2"],
                 "htmlunit": ["&#x33a1;"],
                 "unitdescription": ["Square meters"],
@@ -2770,7 +3425,23 @@
 
             "MEASUREMENT_RADIANT_INTENSITY": {
                 "type": 53,
-                "description": "Radiated power per room angle.",
+                "description": "<p>Radiated power per room angle.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["W/sr"],
                 "htmlunit": ["W/sr"],
                 "unitdescription": ["watt per steradian"],
@@ -2778,7 +3449,23 @@
 
             "MEASUREMENT_RADIANCE": {
                 "type": 54,
-                "description": "This is the radiant flux emitted, reflected, transmitted or received by a surface.",
+                "description": "<p>This is the radiant flux emitted, reflected, transmitted or received by a surface.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": [" W/(sr * m2)"],
                 "htmlunit": [" W / (sr * &#x33a1;)"],
                 "unitdescription": ["watt per steradian per square metre"],
@@ -2786,7 +3473,23 @@
 
             "MEASUREMENT_IRRADIANCE": {
                 "type": 55,
-                "description": "Power emitted from or striking onto a surface or area. ",
+                "description": "<p>Power emitted from or striking onto a surface or area.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": [" W/m2"],
                 "htmlunit": [" W/&#x33a1;"],
                 "unitdescription": ["watt per square metre"],
@@ -2794,7 +3497,23 @@
 
             "MEASUREMENT_SPECTRAL_RADIANCE": {
                 "type": 56,
-                "description": "Radiance of a surface per unit frequency or wavelength.",
+                "description": "<p>Radiance of a surface per unit frequency or wavelength.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": [" W/m2", "W·sr-1·m-3", "W·sr-1·m-3"],
                 "htmlunit": [" W/&#x33a1;", "W·sr-1·m-3", "W·sr-1·m-3"],
                 "unitdescription": ["watt per square metre", "watt per steradian per meter3", "watt per steradian per square metre per hertz"],
@@ -2802,7 +3521,23 @@
 
             "MEASUREMENT_SOUND_IRRADIANCE": {
                 "type": 57,
-                "description": "Irradiance of a surface per unit frequency or wavelength.",
+                "description": "<p>Irradiance of a surface per unit frequency or wavelength.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["W·m-2·nm-1", "W·m-3", "W·m-2·Hz-1"],
                 "htmlunit": ["W·m-2·nm-1", "W·m-3", "W·m-2·Hz-1"],
                 "unitdescription": ["watt per square metre per nm", "watt per metre3", "watt per square metre per hertz"],
@@ -2810,7 +3545,23 @@
 
             "MEASUREMENT_SOUND_PRESSURE": {
                 "type": 58,
-                "description": "This is a measurement of sound pressure (acoustic pressure).",
+                "description": "<p>This is a measurement of sound pressure (acoustic pressure).</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["Pa"],
                 "htmlunit": ["Pa"],
                 "unitdescription": ["pascal"],
@@ -2818,7 +3569,23 @@
 
             "MEASUREMENT_SOUND_DENSITY": {
                 "type": 59,
-                "description": "Sound energy density or sound density is the sound energy per unit volume. ",
+                "description": "<p>Sound energy density or sound density is the sound energy per unit volume.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["Pa"],
                 "htmlunit": ["Pa"],
                 "unitdescription": ["pascal"],
@@ -2826,7 +3593,23 @@
 
             "MEASUREMENT_SOUND_LEVEL": {
                 "type": 60,
-                "description": "Sound level expressed in decibel. This event is supplied for convenience.",
+                "description": "<p>Sound level expressed in decibel. This event is supplied for convenience.</p>
+                <table class="vscp_evttbl">
+                    <thead class="vscp_evttbl_head">
+                    <tr class="vscp_evttbl_row_head">
+                        <th>Data byte</th>
+                        <th>Description</th >
+                    </tr> 
+                    </thead> 
+                    <tr class="vscp_evttbl_row">
+                        <td>0</td>
+                        <td>Data coding.</td >
+                    </tr> 
+                    <tr class="vscp_evttbl_row">
+                        <td>1 - 7</td>
+                        <td>Data with format defined by byte 0.</td>
+                    </tr> 
+                </table>",
                 "unit": ["dB"],
                 "htmlunit": ["dB"],
                 "unitdescription": ["decibel"],
