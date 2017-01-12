@@ -10,5 +10,5 @@ var vscp_ux_version = {
     release: 0,
     build: 2,
     full: "1.8.0.2",
-    copyright: "Copyright (c) 2012-2016 Grodans Paradis AB (Paradise of the Frog)"
+    copyright: "Copyright (c) 2012-2017 Grodans Paradis AB (Paradise of the Frog)"
 };
