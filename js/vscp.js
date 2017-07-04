@@ -11,7 +11,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2016 Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2017 Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -59,7 +59,7 @@ vscp.version = {
  * @param {string} namespace Complete namespace, e.g. "a.b.c.d"
  */
 vscp._createNS = function(namespace) {
-    
+
     var nsparts = namespace.split(".");
     var parent = vscp;
 
@@ -1045,6 +1045,7 @@ vscp.constants.types = {
     VSCP2_TYPE_PROTOCOL_WRITE_REGISTER: 2,
     VSCP2_TYPE_PROTOCOL_READ_WRITE_RESPONSE: 3,
     VSCP2_TYPE_PROTOCOL_HIGH_END_SERVER_CAPS: 20,
+    VSCP2_TYPE_PROTOCOL_WHO_IS_THERE_RESPONE: 32,
 
     // Level II Control functionality Class=1025 (0x401)
     VSCP2_TYPE_CONTROL_GENERAL: 0,
@@ -1257,7 +1258,7 @@ vscp.constants.varTypes = {
     DATE_TIME: 13, // Date + Time in ISO format 2008-11-07T20:10.00
     DATE: 14, //  ISO date 2008-11-07
     TIME: 15, //  ISO Time 20:10.00
-    BLOB: 16, //  Base64 encoded binary data.    
+    BLOB: 16, //  Base64 encoded binary data.
     MIME: 100, //  Base64 mime types data base64(mimetype;data)
     HTML: 101, //  Base64 encoded HTML data.
     JAVASCIPT: 102, //  Base64 encoded Javascript data.
@@ -1291,7 +1292,7 @@ vscp.constants.arrTypeNames = [
     "Data/Time", // Date + Time in ISO format 2008-11-07T20:10.00
     "Date", //  ISO date 2008-11-07
     "Time", //  ISO Time 20:10.00
-    "Blob", //  Base64 encoded binary data.    
+    "Blob", //  Base64 encoded binary data.
     "Mime", //  Base64 mime types data base64(mimetype;data)
     "HTML", //  Base64 encoded HTML data.
     "JavaScript", //  Base64 encoded Javascript data.
@@ -1310,7 +1311,7 @@ vscp.constants.arrTypeNames = [
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.getVarTypeName
 //
-// Return variable type description/name from numerical code 
+// Return variable type description/name from numerical code
 //
 
 vscp.getVarTypeName = function(n) {
@@ -1382,7 +1383,7 @@ vscp.getVarTypeName = function(n) {
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.getVarTypeName
 //
-// Return variable type from textual representation 
+// Return variable type from textual representation
 //
 
 vscp.getVarTypeNumerical = function(str) {
@@ -1452,7 +1453,7 @@ vscp.getVarTypeNumerical = function(str) {
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.getEditorModeFromType
 //
-// Return ace editor formation mode string  from numerical vriable type code 
+// Return ace editor formation mode string  from numerical vriable type code
 //
 
 vscp.getEditorModeFromType = function(n) {
@@ -1528,18 +1529,18 @@ vscp.getEditorModeFromType = function(n) {
 /* ---------------------------------------------------------------------- */
 
 
-// Since DOMStrings are 16-bit-encoded strings, in most browsers calling window.btoa 
-// on a Unicode string will cause a Character Out Of Range exception if a character 
+// Since DOMStrings are 16-bit-encoded strings, in most browsers calling window.btoa
+// on a Unicode string will cause a Character Out Of Range exception if a character
 // exceeds the range of a 8-bit ASCII-encoded character.
 
-// Base64 unicode safe encode 
+// Base64 unicode safe encode
 vscp.b64EncodeUnicode = function(str) {
     return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
         return String.fromCharCode('0x' + p1);
     }));
 }
 
-// Base64 unicode safe decode 
+// Base64 unicode safe decode
 vscp.b64DecodeUnicode = function(str) {
     return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
@@ -1579,7 +1580,7 @@ vscp.isBase64Type = function(type) {
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.decodeValueIfBase64
 //
-// Return decoded value if type is BASE64 encoded type 
+// Return decoded value if type is BASE64 encoded type
 // else return original value.
 //
 
@@ -1594,7 +1595,7 @@ vscp.decodeValueIfBase64 = function(type, value) {
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.encodeValueIfBase64
 //
-// Return encoded value if type is type that should be BASE64 encoded 
+// Return encoded value if type is type that should be BASE64 encoded
 // else return original value.
 //
 
@@ -1814,7 +1815,7 @@ vscp._createNS("vscp.utility");
 // readValue
 //
 // Read a hex or decimal value and return as an integer
-// 
+//
 
 vscp.utility.readValue = function(input) {
     var txtvalue = input.toLowerCase();
@@ -2609,9 +2610,9 @@ vscp.Connection.prototype.onWebSocketMessage = function(msg) {
                     name: msgItems[4], // Variable name
                     type: msgItems[5], // Variable type
                     userid: parseInt(msgItems[6]), // Variable user
-                    accessright: parseInt(msgItems[7]), // Variable access rights               
-                    persistency: ("false" === msgItems[8]) ? false : true, // Variable persistency         
-                    lastchange: msgItems[9], // Variable date                        
+                    accessright: parseInt(msgItems[7]), // Variable access rights
+                    persistency: ("false" === msgItems[8]) ? false : true, // Variable persistency
+                    lastchange: msgItems[9], // Variable date
                 });
             } else if (("GT" === msgItems[1]) || ("GETTABLE" === msgItems[1])) {
                 console.info(vscp.utility.getTime() + " Table successfully read.");
@@ -3271,7 +3272,7 @@ vscp.Connection.prototype.createVar = function(options) {
     var onSuccess = null;
     var onError = null;
     var type = vscp.constants.varTypes.STRING; // default type is string
-    var accessrights = 744; // default access rights 
+    var accessrights = 744; // default access rights
     var persistency = 0; // Not persistent
     var note = ""; // No note
 
