@@ -49,7 +49,7 @@ var vscp = vscp || {};
  */
 vscp.version = {
     major: 0,
-    minor: 1,
+    minor: 2,
     subMinor: 0
 };
 
