@@ -1650,6 +1650,11 @@ vscp.Event = function(options) {
      */
     this.vscpTimeStamp = 0;
 
+    /** date/time for package in us
+     * @member {date}
+     */
+    this.vscpDateTime = new Date();
+
     /** Node global unique id LSB(15) -> MSB(0)
      * @member {string}
      */
@@ -1705,11 +1710,23 @@ vscp.Event = function(options) {
             this.vscpTimeStamp = options.vscpTimeStamp;
         }
 
+        if ("string" === typeof options.vscpTimeStamp) {
+            // Time in UTC for events but conversion
+            // is done in send routine
+            this.vscpDateTime  = new Date(options.vscpDateTime);
+        }
+
+        if ("date" === typeof options.vscpTimeStamp) {
+            // Time should be local
+            this.vscpDateTime = options.vscpDateTime;
+        }
+
         if ("string" === typeof options.vscpGuid) {
             this.vscpGuid = options.vscpGuid;
         }
 
-        if (("string" === typeof options.vscpData) || (options.vscpData instanceof Array)) {
+        if (("string" === typeof options.vscpData) ||
+            (options.vscpData instanceof Array)) {
             this.vscpData = options.vscpData;
         }
     }
@@ -1869,13 +1886,30 @@ vscp.utility.getTime = function() {
  *
  * @param {string} userName - User name
  * @param {string} password - Password
- * @param {string} sid      - Session id
+ * @param {string} str_iv   - 16 random byte iv in hex form
  *
- * @return {string} Authentication hash
+ * @return {string} Authentication ("encrypted user:password")
  */
-vscp.utility.getWebSocketAuthHash = function(userName, password, sid) {
+vscp.utility.getWebSocketAuthHash = function(userName, password, vscpkey, str_iv ) {
+    var iv = aesjs.utils.hex.toBytes(""+str_iv);
 
-    return hex_md5(userName + ":" + password + ":" + sid);
+    // We use AES-128 so 16-byte key
+    var key = aesjs.utils.hex.toBytes(vscpkey.substring(0,32));
+
+    var txt = ""+userName + ":" + password;
+
+    // Pad to multiple of 16 byte
+    while ( txt.length % 16 ) {
+        txt += " ";
+    }
+
+    var textBytes = aesjs.utils.utf8.toBytes(txt);
+
+    // Encrypt
+    var aes_cbc = new aesjs.ModeOfOperation.cbc(key, iv);
+    var encryptedBytes = aes_cbc.encrypt( textBytes );
+
+    return str_iv + ";" + aesjs.utils.hex.fromBytes(encryptedBytes);
 };
 
 /**
@@ -2042,6 +2076,11 @@ vscp.Connection = function() {
      * @member {string}
      */
     this.password = "";
+
+    /** Secret key used for connection establishment
+     * @member {string}
+     */
+    this.vscpkey = "";
 
     /** authdomain used for connection establishment
      * @member {string}
@@ -2490,10 +2529,10 @@ vscp.Connection.prototype.onWebSocketMessage = function(msg) {
 
                     this._sendCommand({
                         command: "AUTH",
-                        data: this.userName + ";" +
-                            vscp.utility.getWebSocketAuthHash(this.userName,
-                                this.passwordHash,
-                                msgItems[2] // sid
+                        data: vscp.utility.getWebSocketAuthHash( this.userName,
+                                                                 this.password,
+                                                                 this.vscpkey,
+                                                                 msgItems[2] // iv
                             ),
                         onSuccess: null,
                         onError: null
@@ -2787,8 +2826,9 @@ vscp.Connection.prototype.onWebSocketMessage = function(msg) {
             evt.vscpClass = parseInt(eventItems[1]);
             evt.vscpType = parseInt(eventItems[2]);
             evt.vscpObId = parseInt(eventItems[3]);
-            evt.vscpTimeStamp = parseInt(eventItems[4]);
-            evt.vscpGuid = eventItems[5];
+            evt.vscpDateTime = Date(eventItems[4]);
+            evt.vscpTimeStamp = parseInt(eventItems[5]);
+            evt.vscpGuid = eventItems[6];
             evt.vscpData = [];
 
             if ((512 <= evt.vscpClass) && (1024 > evt.vscpClass)) {
@@ -2813,6 +2853,7 @@ vscp.Connection.prototype.onWebSocketMessage = function(msg) {
  * @param {string} options.url              - URL to the VSCP server, e.g. ws://
  * @param {string} options.userName         - User name used for authentication
  * @param {string} options.password         - Password used for authentication
+ * @param {string} options.vscpkey          - Secret key used for authentication
  * @param {function} [options.onMessage]    - Function which is called on any received VSCP response message.
  * @param {function} [options.onSuccess]    - Function which is called on a successful connection establishment.
  * @param {function} [options.onError]      - Function which is called on a failed connection establishment or in case the connection is lost during the session.
@@ -2859,6 +2900,13 @@ vscp.Connection.prototype.connect = function(options) {
 
     this.authdomain = options.authdomain;
 
+    if ("string" !== typeof options.vscpkey) {
+        console.error(vscp.utility.getTime() + " vscpkey is missing.");
+        return;
+    }
+
+    this.vscpkey = options.vscpkey;
+
     if ("function" !== typeof options.onMessage) {
         this.onMessage = null;
     } else {
@@ -2876,9 +2924,10 @@ vscp.Connection.prototype.connect = function(options) {
     }
 
     // Calculate password hash
-    this.passwordHash = vscp.utility.getWebSocketAuthHash(this.userName,
-        this.authdomain,
-        this.password);
+    /*this.passwordHash =
+        vscp.utility.getWebSocketAuthHash(this.userName,
+                                            this.password,
+                                            settings.vscpkey );*/
 
     console.info(vscp.utility.getTime() +
         " Websocket connect to " + options.url +
@@ -3090,6 +3139,7 @@ vscp.Connection.prototype.sendEvent = function(options) {
     cmdData += options.event.vscpClass.toString() + ",";
     cmdData += options.event.vscpType.toString() + ",";
     cmdData += options.event.vscpObId.toString() + ",";
+    cmdData += options.event.vscpDateTime.toISOString() + ",";
     cmdData += options.event.vscpTimeStamp.toString() + ",";
     cmdData += vscp.utility.guidToStr(options.event.vscpGuid);
 
