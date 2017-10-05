@@ -10,7 +10,7 @@
 
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -23,6 +23,8 @@
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
 
@@ -136,6 +138,7 @@
                     url: settings.url,
                     userName: settings.user,
                     password: settings.password,
+                    vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain, 
 
                     onSuccess: function( conn ) {
@@ -208,7 +211,7 @@
         <h1>VSCP HTML5 progress bar</h1>
         <p>
             This is just the standard HTML5 progress bar with some extra styling. It is connected to the <b>vscp.Connection</b>
-            and configured to write the value to the progress bars from the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.CONTROL, 
+            and configured to write the value to the progress bars from the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.CONTROL,
                 Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>
             event.
         </p>

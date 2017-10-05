@@ -10,7 +10,7 @@
 
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -23,6 +23,8 @@
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
 
@@ -53,6 +55,7 @@
                     url: settings.url,
                     userName: settings.user,
                     password: settings.password,
+                    vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain, 
 
                     onSuccess: function( conn ) {
@@ -152,14 +155,14 @@
         <h1>VSCP HTML5 slider demo</h1>
         <p>
             This demo demonstrates how to use the HTML slider control with VSCP. When you drag the slider it
-            sends <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL, 
+            sends <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL,
             Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> with zone=1, subzone=20. This event
             have a value between 0-100 in byte zero and zone/subzone in byte 1/2.
         </p>
         <p>
-            The usual response from a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL, 
+            The usual response from a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL,
             Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> event is
-            <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.INFORMATION, 
+            <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.INFORMATION,
             Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>. So a mask is set to only receive
             this event and if it is received it will set the value of the slider after checking that the zone/subzone
             is the expected ones.
@@ -172,7 +175,7 @@
             You can update the slider by sending
         </p>
         <p>
-            <pre>send 0,20,40,0,0,-,90,1,20</pre> 
+            <pre>send 0,20,40,0,0,-,90,1,20</pre>
         </p>
         <p>
             Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
@@ -215,7 +218,7 @@
             <input id="sliderCtrl1" style="width: 600px;" type="range" min="0" max="100" value="0" step="5" list="datalist" onchange="sliderChange( this.value )" />
             <span id="sliderText1">0</span>
         <div>
-        </p>    
+        </p>
         <p>
             <input id="sliderCtrl2" type="range" min="0" max="100" value="0" step="5" name="grade" orient="vertical" list="datalist" style="width: 20px; height: 200px; -webkit-appearance: slider-vertical; writing-mode: bt-lr;">
         </p>

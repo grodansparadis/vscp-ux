@@ -10,7 +10,7 @@
 
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -25,6 +25,8 @@
     <script type="text/javascript" src="../js/md5.js"></script>
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP widget library, dependend on the VSCP websocket base library and jCanvas -->
     <script type="text/javascript" src="../js/vscpWidgets.js"></script>
     <!-- jCanvas is a jQuery plugin that makes the HTML5 canvas easy to work with. -->
@@ -66,6 +68,7 @@
                     url: settings.url,
                     userName: settings.user,
                     password: settings.password,
+                    vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain, 
 
                     onSuccess: function( conn ) {
@@ -196,12 +199,12 @@
             You can use the <a href="event.html" target="new">event.html</a> demo to send the expected replies and also
             see the events sent.
         </p>
-        
+
         <p>
-            If you have the <a href="http://www.vscp.org/docs/vscpd/doku.php?id=level2_driver_simulation">simulation driver</a> installed with the default variables it has it's decision matrix programmed 
+            If you have the <a href="http://www.vscp.org/docs/vscpd/doku.php?id=level2_driver_simulation">simulation driver</a> installed with the default variables it has it's decision matrix programmed
             to respond to TurnOn/TurnOff events from the two lower buttons so they will get the expected replies and appear
             to work as the upper buttons. The difference is important though as the lower two buttons really tell the outcome
-            of the command sent.  
+            of the command sent.
         </p>
 
         <canvas id="myCanvas" width="670px" height="800px">

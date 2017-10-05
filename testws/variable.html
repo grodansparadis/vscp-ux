@@ -10,7 +10,7 @@
 
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -23,6 +23,8 @@
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
 
@@ -51,7 +53,8 @@
                     url: settings.url,
                     userName: settings.user,
                     password: settings.password,
-                    authdomain: settings.authdomain, 
+                    vscpkey: settings.vscpkey,
+                    authdomain: settings.authdomain,
 
                     onSuccess: function( conn ) {
 
@@ -89,7 +92,7 @@
                     $( "#ui :input" ).attr( "disabled", true );
                 }
             };
-            
+
             // Delete <num> rows in table by tableID
             function stripRows( tableID, num ) {
                 try {
@@ -118,7 +121,7 @@
                 vscpConn.createVar({
 
                     name:           "demovariable",
-                    type:           vscp.constants.varTypes.BOOLEAN,    // Optional, defaults to 
+                    type:           vscp.constants.varTypes.BOOLEAN,    // Optional, defaults to
                     accessrights:   0x777,                              // Optional, defaults to 744
                     value:          "true",                             // Optional. defaults to empty
                     note:           "This is a simple variable.",       // Optional. default to empty
@@ -254,7 +257,7 @@
                     name: "demovariable",
 
                     onSuccess: function( conn, options ) {
-                        $("#mystatus").text( options.name + " was last changed " + options.lastChange + "." );                        
+                        $("#mystatus").text( options.name + " was last changed " + options.lastChange + "." );
                         ui.enable();
                     },
 
@@ -271,16 +274,16 @@
                 ui.disable();
 
                 var localregex = $("#myRegExp").val();
-                
-                
+
+
                 $("#myVariables tr").remove();
-                $( "#myVariables" ).append( "<tr><th><b>" + "Name" + 
-                                                        "</b></th><th>" + "Type" + 
-                                                        "</th><th>" + "UserID" + 
-                                                        "</th><th>" + "AccessRight" + 
-                                                        "</th><th>" + "Last change" + 
-                                                        "</th><th>" + "Persistent" + 
-                                                        "</th></tr>" ); 
+                $( "#myVariables" ).append( "<tr><th><b>" + "Name" +
+                                                        "</b></th><th>" + "Type" +
+                                                        "</th><th>" + "UserID" +
+                                                        "</th><th>" + "AccessRight" +
+                                                        "</th><th>" + "Last change" +
+                                                        "</th><th>" + "Persistent" +
+                                                        "</th></tr>" );
 
                 vscpConn.listVar({
 
@@ -288,11 +291,11 @@
 
                     onVariable: function( conn, variable ) {
                         //alert( variable.name + ", " +  variable.type + ", " + variable.persistency );
-                        $( "#myVariables" ).append( "<tr><td><b>" + variable.name + 
-                                                        "</b></td><td>" + variable.type + 
-                                                        "</td><td>" + variable.userid + 
-                                                        "</td><td>" + variable.accessright.toString(16) + 
-                                                        "</td><td>" + variable.lastchange + 
+                        $( "#myVariables" ).append( "<tr><td><b>" + variable.name +
+                                                        "</b></td><td>" + variable.type +
+                                                        "</td><td>" + variable.userid +
+                                                        "</td><td>" + variable.accessright.toString(16) +
+                                                        "</td><td>" + variable.lastchange +
                                                         "</td><td>" + variable.persistency + "</td></tr>" );
                     },
 
@@ -335,7 +338,7 @@
                                 name: "demovariable",
                                 onSuccess: function( conn, options ) {
                                     $("#mystatus").text( "value = " + options.value );
-                                    if ( "true" === options.value ) {                                        
+                                    if ( "true" === options.value ) {
                                         document.body.style.backgroundColor = "#00FF00";
                                         //$("#mystatus").body.style.backgroundColor = "#00FF00";
                                     }
@@ -389,16 +392,16 @@
         </p>
         <p>
             In this demo we just monitor the boolean variable <b>demovariable</b> and show information when
-            it's value has changed. You can add a variable, either in code as we do here, or by adding it in the 
+            it's value has changed. You can add a variable, either in code as we do here, or by adding it in the
             VSCP daemon administrative interface or adding it in the REST or the TCP/IP interfaces.
         </p>
         <p>
-            There is also another way to add it. You can add it to the <b>variable.xml</b> file and restart the 
+            There is also another way to add it. You can add it to the <b>variable.xml</b> file and restart the
             VSCP daemon. Info on how to add variabes here is in the file that comes with the distribution.
         </p>
         <p>
-            There are also <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles#stock_variables">stock variables</a> 
-            defined which hold system and similar information. You can read all about variables 
+            There are also <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles#stock_variables">stock variables</a>
+            defined which hold system and similar information. You can read all about variables
             <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles">here.</a>
         </p>
         <p>
@@ -435,14 +438,14 @@
             <input id="btnMonitor" type="button" class="btn btn-primary" value="Start to monitor variable" onclick="monitorVariable(!bMonitorActive)" />
         </div>
         <br />
-        <pre><div id="mystatus"> </div></pre>    
-        <br />        
+        <pre><div id="mystatus"> </div></pre>
+        <br />
 
         <div>
             <h3>Variables</h3>
             <table id="myVariables" class="table table-striped"></table>
         </div>
-            
+
         <br /><br />
         <hr>
         Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>

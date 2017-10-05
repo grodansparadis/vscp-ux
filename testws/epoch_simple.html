@@ -10,7 +10,7 @@
 
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
@@ -23,6 +23,8 @@
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP measurement functions, which are dependend on the VSCP websocket base library -->
@@ -80,6 +82,7 @@
                 url: settings.url,
                 userName: settings.user,
                 password: settings.password,
+                vscpkey: settings.vscpkey,
                 authdomain: settings.authdomain, 
 
                 onSuccess: function( conn ) {
@@ -160,14 +163,14 @@
                 areaChartInstance1.push( data );
             }
         };
-        
-        
-        var formatdate = function(d) { 
+
+
+        var formatdate = function(d) {
             var now = new Date();
-            /*return now.getHours().toString() + ':' + 
+            /*return now.getHours().toString() + ':' +
                     now.getMinutes().toString() + ':' +
                     now.getSeconds().toString(); */
-            return now.toTimeString();          
+            return now.toTimeString();
         };
 
     </script>
@@ -202,10 +205,10 @@
             type: 'time.bar',
             ticks: { left: 5, bottom: 5, right: 5 },
             /*tickFormats: { time: function(d) { return 'AAAA'; } },*/
-            tickFormats: { 
+            tickFormats: {
                 bottom: function(d) { return formatdate(d); }
             },
-                
+
             data: lineChartData,
             axes: ['left', 'right', 'bottom']
           });
