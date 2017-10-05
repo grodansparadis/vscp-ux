@@ -74,11 +74,10 @@
 
 </div>
 
-<!-- load ace -->
-<script src="../src/ace.js"></script>
-<!-- load ace themelist extension -->
-<script src="../src/ext-themelist.js"></script>
+<script src="kitchen-sink/require.js"></script>
 <script>
+require.config({paths: { "ace" : "../lib/ace"}});
+require(["ace/ace", "ace/ext/themelist"], function(ace) {
 
 var $ = document.getElementById.bind(document);
 var dom = require("ace/lib/dom");
@@ -149,6 +148,7 @@ var themes = require("ace/ext/themelist").themes.map(function(t){return t.theme}
 
 window.add = add;
 window.scroll = scroll;
+});
 </script>
 
 </body>
