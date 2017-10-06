@@ -10,37 +10,39 @@
 
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
     <script type="text/javascript" src="../js/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-    
+
     <!-- Bootstrap dialogs -->
     <link rel="stylesheet" href="../js/bootstrap3-dialog/1.34.6/css/bootstrap-dialog.min.css">
     <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
 
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
-    
+
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
     <script type="text/javascript" src="menu.js"></script>
-    
+
     <script type="text/javascript">
         /*jshint bitwise: false */
 
         // VSCP websocket connection
         var vscpConn = null;
-                    
+
         // VSCP event array max. size
         var maxEvent = 20;
 
@@ -55,7 +57,7 @@
             maskType: 0,
             maskGuid: [ 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 ]
         }
-        
+
         // Wait until the whole website is loaded
         $( document ).ready( function() {
 
@@ -64,7 +66,7 @@
 
             // Show filter
             showFilter();
-            
+
             // Create a VSCP websocket
             vscpConn = new vscp.Connection();
 
@@ -72,12 +74,12 @@
             connect()
             .then( startReceivingEvents )
             .done( function() {
-            
+
                 // Add event listener
                 vscpConn.addEventListener( eventListener );
             });
         });
-        
+
         // Connect to the VSCP daemon
         function connect() {
             var deferred = new $.Deferred();
@@ -88,10 +90,11 @@
                 url: settings.url,
                 userName: settings.user,
                 password: settings.password,
+                vscpkey: settings.vscpkey,
                 authdomain: settings.authdomain,  
 
                 onSuccess: function( conn ) {
-                    deferred.resolve();                    
+                    deferred.resolve();
                 },
 
                 onError: function( conn ) {
@@ -99,45 +102,45 @@
                     deferred.reject();
                 }
             });
-            
+
             return deferred.promise();
         }
-        
+
         // Start receiving VSCP events
-        function startReceivingEvents() 
+        function startReceivingEvents()
         {
             var deferred = new $.Deferred();
-            
+
             // Start receiving VSCP events
             vscpConn.start({
-                
+
                 onSuccess: function( conn ) {
                     deferred.resolve();
                 },
-                
+
                 onError: function( conn ) {
                     BootstrapDialog.alert( "Server error!" );
                     deferred.reject();
                 }
             });
-            
+
             return deferred.promise();
         }
-                
+
         // Catch all events and show them in the trace tab.
-        var eventListener = function( conn, evt ) 
+        var eventListener = function( conn, evt )
         {
 
             var dateTime = new Date();
             var rowCount = $( "#eventTable > tbody > tr" ).length;
             var index    = 0;
             var row      = "";
-        
+
             // Remove first row in case that the max. number of rows are reached
             if ( maxEvent <= rowCount ) {
                 $( "#eventTable > tbody > tr:first" ).remove();
             }
-        
+
             // Build row
             row =   "<tr>" +
                     "<td>" + dateTime.toLocaleString() + "</td>" +
@@ -147,7 +150,7 @@
                     "<td>" + evt.getPriority() + "</td>" +
                     "<td>" + evt.isHardCodedAddr() + "</td>" +
                     "<td>" + evt.vscpGuid + "</td>";
-                    
+
             // L1 event?
             if ( 512 > evt.vscpClass ) {
                 row += "<td>" + vscp.utility.getNodeId( evt.vscpGuid ) + "</td>";
@@ -155,47 +158,47 @@
             else {
                 row += "<td>-</td>";
             }
-            
+
             row +=  "<td>";
-                    
+
             for( index = 0; index < evt.vscpData.length; ++index ) {
                 row += "" + evt.vscpData[ index ];
                 row += " (" + convertToHex( evt.vscpData[ index ], 2 ) + ")";
-                
+
                 if ( evt.vscpData.length > ( index + 1) ) {
                     row += ", ";
                 }
             }
-            
+
             row += "</td>";
             row += "</tr>";
-                
+
             // Append event
             $( "#eventTable > tbody" ).append( row );
-                            
+
         };
-        
+
         // Convert a number to hexdecimal with the given width.
-        function convertToHex( number, width ) 
+        function convertToHex( number, width )
         {
             var hex = Number( number ).toString( 16 );
 
             while( hex.length < width ) {
-            
+
                 hex = "0" + hex;
             }
-            
+
             hex = "0x" + hex.toUpperCase();
 
             return hex;
         }
-        
+
         // Show the even input filter in the filter tab.
-        function showFilter() 
+        function showFilter()
         {
-        
+
             var row = "";
-            
+
             row += "<tr>";
             row += "<td>";
             row += "<input id=\"filterPriority\" type=\"text\" class=\"form-control\" value=\"" + filter.filterPriority + "\" />";
@@ -225,14 +228,14 @@
             row += "<input type=\"submit\" class=\"form-control\" value=\"Set\" onclick=\"setFilter();\" />";
             row += "</td>";
             row += "</tr>";
-        
+
             $( "#filterTable > tbody" ).append( row );
         }
-        
+
         // Set a filter according to the values from the filter tab.
-        function setFilter() 
+        function setFilter()
         {
-        
+
             var filterPriority  = $( "#filterPriority" ).val();
             var filterClass     = $( "#filterClass" ).val();
             var filterType      = $( "#filterType" ).val();
@@ -244,57 +247,57 @@
             var maskGuid        = $( "#maskGuid" ).val();
             var maskGuidArray   = maskGuid.split( ":" );
             var index           = 0;
-            
+
             if ( "0x" === filterPriority.substring( 0, 2 ) ) {
                 filter.filterPriority = parseInt( filterPriority.substring( 2 ), 16 );
             }
             else {
                 filter.filterPriority = parseInt( filterPriority );
             }
-            
+
             if ( "0x" === filterClass.substring( 0, 2 ) ) {
                 filter.filterClass = parseInt( filterClass.substring( 2 ), 16 );
             }
             else {
                 filter.filterClass = parseInt( filterClass );
             }
-            
+
             if ( "0x" === filterType.substring( 0, 2 ) ) {
                 filter.filterType = parseInt( filterType.substring( 2 ), 16 );
             }
             else {
                 filter.filterType = parseInt( filterType );
             }
-            
+
             for( index = 0; index < filterGuidArray.length; ++index ) {
                 filter.filterGuid[ index ] = parseInt( filterGuidArray[ index ], 16 );
             }
-            
+
             if ( "0x" === maskPriority.substring( 0, 2 ) ) {
                 filter.maskPriority = parseInt( maskPriority.substring( 2 ), 16 );
             }
             else {
                 filter.maskPriority = parseInt( maskPriority );
             }
-            
+
             if ( "0x" === maskClass.substring( 0, 2 ) ) {
                 filter.maskClass = parseInt( maskClass.substring( 2 ), 16 );
             }
             else {
                 filter.maskClass = parseInt( maskClass );
             }
-            
+
             if ( "0x" === maskType.substring( 0, 2 ) ) {
                 filter.maskType = parseInt( maskType.substring( 2 ), 16 );
             }
             else {
                 filter.maskType = parseInt( maskType );
             }
-            
+
             for( index = 0; index < maskGuidArray.length; ++index ) {
                 filter.maskGuid[ index ] = parseInt( maskGuidArray[ index ], 16 );
             }
-        
+
             vscpConn.setFilter({
                 filterPriority: filter.filterPriority,
                 filterClass: filter.filterClass,
@@ -311,9 +314,9 @@
                     BootstrapDialog.alert( "Failed to set filter." );
                 }
             });
-        
+
         }
-                    
+
     </script>
 </head>
 <body>

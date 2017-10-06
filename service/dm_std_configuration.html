@@ -27,6 +27,8 @@
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP register access, depends on the websocket base library -->
@@ -44,7 +46,7 @@
         var vscpConn = null;
 
         // Standard decision matrix row
-        var DMStdRow = function( options ) 
+        var DMStdRow = function( options )
         {
 
             this.oAddr = 0;
@@ -131,7 +133,7 @@
         };
 
         // Wait until the whole website is loaded
-        $( document ).ready( function() 
+        $( document ).ready( function()
         {
 
             // Show navigation bar menu
@@ -155,7 +157,7 @@
         });
 
         // Connect to the VSCP daemon
-        function connect() 
+        function connect()
         {
             var deferred = new $.Deferred();
 
@@ -165,6 +167,7 @@
                 url: settings.url,
                 userName: settings.user,
                 password: settings.password,
+                vscpkey: settings.vscpkey,
                 authdomain: settings.authdomain,  
 
                 onSuccess: function( conn ) {
@@ -181,7 +184,7 @@
         }
 
         // Set a filter for CLASS1.Protocol
-        function setFilter() 
+        function setFilter()
         {
             var deferred = new $.Deferred();
 
@@ -206,7 +209,7 @@
         }
 
         // Start receiving VSCP events
-        function startReceivingEvents() 
+        function startReceivingEvents()
         {
             var deferred = new $.Deferred();
 
@@ -227,7 +230,7 @@
         }
 
         // Update the configuration, which is shown the user
-        function update( id ) 
+        function update( id )
         {
             var head        = "";
             var body        = "";
@@ -293,7 +296,7 @@
         }
 
         // Read configuration from node
-        function readConfigFromNode() 
+        function readConfigFromNode()
         {
 
             var size = ui.getNumberOfRows() * 8;
@@ -377,7 +380,7 @@
         }
 
         // Write configuration to node
-        function writeConfigToNode() 
+        function writeConfigToNode()
         {
 
             var index   = 0;

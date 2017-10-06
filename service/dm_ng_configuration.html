@@ -27,6 +27,8 @@
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP register access, depends on the websocket base library -->
@@ -89,26 +91,27 @@
             .then( setFilter )
             .then( startReceivingEvents )
             .done( function() {
-            
+
                 // Add event listener
                 vscpConn.addEventListener( vscpEventCallback );
-            
+
                 // Enable user interface
                 ui.enable();
             });
         });
 
         // Connect to the VSCP daemon
-        function connect() 
+        function connect()
         {
             var deferred = new $.Deferred();
 
             // Connect to VSCP server
             vscpConn.connect({
 
-                url: settings.url
+                url: settings.url,
                 userName: settings.user,
-                password: settings.passwordHash,
+                password: settings.password,
+                vscpkey: settings.vscpkey,
                 authdomain: settings.authdomain, 
 
                 onSuccess: function( conn ) {
@@ -125,7 +128,7 @@
         }
 
         // Set a filter for CLASS1.Protocol
-        function setFilter() 
+        function setFilter()
         {
             var deferred = new $.Deferred();
 
@@ -150,7 +153,7 @@
         }
 
         // Start receiving VSCP events
-        function startReceivingEvents() 
+        function startReceivingEvents()
         {
             var deferred = new $.Deferred();
 
@@ -171,7 +174,7 @@
         }
 
         // Insert a rule
-        function insertRule( index ) 
+        function insertRule( index )
         {
             console.log( "Insert rule at index " + index );
 
@@ -184,7 +187,7 @@
         }
 
         // Delete a rule
-        function deleteRule( index ) 
+        function deleteRule( index )
         {
             console.log( "Delete rule at index " + index );
 
@@ -194,7 +197,7 @@
         }
 
         // Update conditions of a rule
-        function updateConditions( ruleIndex, conditionIndex ) 
+        function updateConditions( ruleIndex, conditionIndex )
         {
             var value = dmNGInst.rules[ ruleIndex ].conditions[ conditionIndex ].logicOperator;
 
@@ -499,7 +502,7 @@
                     else {
                         ++operation.read.offset;
                         operation.read.state = operation.read.states.READ_RULE;
-                        
+
                         // Clear response data
                         operation.read.responseData = [];
 
@@ -524,31 +527,31 @@
                 else if ( operation.read.states.READ_RULE === operation.read.state ) {
 
                     var dataSize = evt.vscpData.length - 4;
-                
+
                     // Store response data
                     operation.read.responseData.push({
                         index: evt.vscpData[ 0 ],
                         data: evt.vscpData.slice( 4 )
                     });
-                    
+
                     operation.read.ruleSize -= dataSize;
                     operation.read.offset += dataSize;
-                    
+
                     if ( 0 > operation.read.ruleSize ) {
                         alert( "Internal error ocurred." );
                         operation.state = operation.states.NO_OPERATION;
                     }
                     else if ( 0 === operation.read.ruleSize ) {
-                    
+
                         // Sort responses according to the response index
                         operation.read.responseData.sort( function(a, b) {
                             return a.index - b.index;
                         });
-                        
+
                         for( index = 0; index < operation.read.responseData.length; ++index ) {
                             operation.read.config = operation.read.config.concat( operation.read.responseData[ index ].data );
                         }
-                    
+
                         --operation.read.ruleNum;
 
                         // Next rule?
