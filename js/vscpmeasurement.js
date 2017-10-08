@@ -344,7 +344,7 @@ vscp.measurement.decodeClass60Number = function( data ) {
     var sign        = 0;
     var exp         = 0;
     var mantissa    = 0;
-    
+
     if ( 8 === data.length ) {
 
         sign = data[0] & 0x80;  // Negative if != 0
@@ -356,10 +356,10 @@ vscp.measurement.decodeClass60Number = function( data ) {
                     data[5] << 16 +
                     data[6] << 8 +
                     data[7];
-                    
+
         // sign * 2^exponent * mantissa
         rval = Math.pow( 2, exp ) * mantissa;
-        
+
         if ( 0 !== sign ) {
             rval = -1 * rval;
         }
@@ -542,6 +542,7 @@ vscp.measurement.Decoder = function( options ) {
      * @property {string} vscpGuid      - Node GUID string
      * @property {number} vscpClass     - VSCP class
      * @property {number} vscpType      - VSCP type
+     * @property {date}   datetime      - datetime
      * @property {number} sensorIndex   - Sensor index
      * @property {number} zone          - Zone
      * @property {number} subZone       - Sub-zone
@@ -553,16 +554,16 @@ vscp.measurement.Decoder = function( options ) {
         if ( true === ( options.connection instanceof vscp.Connection ) ) {
             this.connection = options.connection;
         }
-        
+
         if ( "function" === typeof options.onValue ) {
             this.onValue = options.onValue;
         }
-        
+
         if ( "object" === typeof options.filter ) {
             this.filter = options.filter;
         }
     }
-    
+
     if ( null !== this.connection ) {
         this.connection.addEventListener( this.eventListener.bind( this ) );
     }
@@ -589,34 +590,34 @@ vscp.measurement.Decoder.prototype.eventListener = function( conn, evt ) {
     if ( "undefined" === typeof evt ) {
         return;
     }
-    
+
     if ( false === ( evt instanceof vscp.Event ) ) {
         return;
     }
-    
+
     // Apply pre filter
     if ( null !== this.filter ) {
-        
+
         if ( ( "undefined" !== typeof this.filter.vscpGuid ) &&
              ( evt.vscpGuid.toLowerCase() !== this.filter.vscpGuid.toLowerCase() ) ) {
             return;
         }
-        
+
         if ( ( "undefined" !== typeof this.filter.vscpClass ) &&
              ( evt.vscpClass !== this.filter.vscpClass ) ) {
             return;
         }
-        
+
         if ( ( "undefined" !== typeof this.filter.vscpType ) &&
              ( evt.vscpType !== this.filter.vscpType ) ) {
             return;
         }
     }
-    
+
     // Classes with data coding byte
     if ( ( vscp.constants.classes.VSCP_CLASS1_MEASUREMENT === evt.vscpClass ) ||
          ( vscp.constants.classes.VSCP_CLASS1_DATA === evt.vscpClass ) ) {
-    
+
         sensorIndex = vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
         value = vscp.measurement.decodeClass10( evt.vscpData );
         unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
@@ -636,7 +637,7 @@ vscp.measurement.Decoder.prototype.eventListener = function( conn, evt ) {
         for( index = 3; index < evt.vscpData.length; ++index ) {
             mimicData.push( evt.vscpData[ index ] );
         }
-              
+
         sensorIndex = vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
         value = vscp.measurement.decodeClass10( mimicData );
         unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
@@ -647,26 +648,26 @@ vscp.measurement.Decoder.prototype.eventListener = function( conn, evt ) {
     else {
         return;
     }
-    
+
     // Apply post filter
     if ( null !== this.filter ) {
-        
+
         if ( ( "undefined" !== typeof this.filter.sensorIndex ) &&
              ( sensorIndex !== this.filter.sensorIndex ) ) {
             return;
         }
-        
+
         if ( ( "undefined" !== typeof this.filter.zone ) &&
              ( zone !== this.filter.zone ) ) {
             return;
         }
-        
+
         if ( ( "undefined" !== typeof this.filter.subZone ) &&
              ( subZone !== this.filter.subZone ) ) {
             return;
         }
     }
-    
+
     // Signal application
     if ( null !== this.onValue ) {
         this.onValue({

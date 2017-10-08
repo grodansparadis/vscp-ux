@@ -2816,17 +2816,18 @@ vscp.Connection.prototype.onWebSocketMessage = function(msg) {
                     }
                 );
             }
+        /* Incoming event */
         } else if ("E" === msgItems[0]) {
 
             eventItems = msgItems[1].split(",");
 
             evt = new vscp.Event();
 
-            evt.vscpHead = parseInt(eventItems[0]);
-            evt.vscpClass = parseInt(eventItems[1]);
-            evt.vscpType = parseInt(eventItems[2]);
-            evt.vscpObId = parseInt(eventItems[3]);
-            evt.vscpDateTime = Date(eventItems[4]);
+            evt.vscpHead = parseInt( eventItems[0] );
+            evt.vscpClass = parseInt( eventItems[1] );
+            evt.vscpType = parseInt( eventItems[2] );
+            evt.vscpObId = parseInt( eventItems[3] );
+            evt.vscpDateTime = new Date( eventItems[4] );
             evt.vscpTimeStamp = parseInt(eventItems[5]);
             evt.vscpGuid = eventItems[6];
             evt.vscpData = [];
@@ -2835,11 +2836,17 @@ vscp.Connection.prototype.onWebSocketMessage = function(msg) {
                 offset = 16;
             }
 
-            for (index = 0; index < (eventItems.length - 6 - offset); ++index) {
-                evt.vscpData[index] = parseInt(eventItems[offset + 6 + index]);
+            for (index = 0; index < (eventItems.length - 7 - offset); ++index) {
+                evt.vscpData[index] = parseInt(eventItems[offset + 7 + index]);
             }
 
-            console.debug(vscp.utility.getTime() + " Evt: GUID = " + evt.vscpGuid + " CLASS = " + evt.vscpClass + " TYPE = " + evt.vscpType + " PRIORITY = " + evt.getPriority() + " DATA = " + evt.vscpData);
+            console.debug(vscp.utility.getTime() + " Evt: " +
+                " CLASS = " + evt.vscpClass +
+                " TYPE = " + evt.vscpType +
+                " GUID = " + evt.vscpGuid +
+                " DATETIME = "  + evt.vscpDateTime.toISOString() +
+                " PRIORITY = " + evt.getPriority() +
+                " DATA = " + evt.vscpData);
 
             this.signalEvent(evt);
         }

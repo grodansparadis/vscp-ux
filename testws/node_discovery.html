@@ -29,7 +29,7 @@
     <script type="text/javascript" src="../js/vscp.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
-    <script type="text/javascript" src="../js/navBar.js"></script>
+    <script type="text/javascript" src="../js/navbar.js"></script>
     <!-- Navigation bar menu structure -->
     <script type="text/javascript" src="menu.js"></script>
 
@@ -58,7 +58,7 @@
                     userName: settings.user,
                     password: settings.password,
                     vscpkey: settings.vscpkey,
-                    authdomain: settings.authdomain, 
+                    authdomain: settings.authdomain,
 
                     onSuccess: function( conn ) {
 
@@ -147,7 +147,7 @@
         <p>
             This demo waits for <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_9_0x09_node_heartbeat">CLASS1.INFORMATION, Type=9/Heartbeats</a> and if the heartbeat has not been seen yet it is
             added to the list. You can send one from the tcp/ip interface with <br />
-            <p><pre> send 0,20,9,0,0,"-",0,0,0</pre></p>
+            <p><pre> send 0,20,9,0,,0,"-",0,0,0</pre></p>
             or you can use the event send list in the <a href="event.html" target="new" >event.html</a> demo.
         </p>
         <div id="id3">Wait...</div>
