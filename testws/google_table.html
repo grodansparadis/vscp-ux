@@ -8,6 +8,37 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+
+</head>
+<body>
+   <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <br>
+        <h1>VSCP HTML5 websocket Google Charts Table demo</h1>
+        <p>
+            This demo uses the Table from Google charts to display dynamic temperature measurement values in degrees Celsius. It displays
+            all CLASS1.MEASUREMENT, Type=6/Temperature values that comes from any sensor of that device. That is not just sensoridx=2 aside
+            the other demo do.
+        </p>
+        <p>
+            The <a href="event.html">event.html</a> sample can be used to set temperature values if you don't have live hardware.
+        </p>
+        <h2>Demo</h2>
+        <div id="table_div" style="width: 600px; height: 420px;"></div>  <!-- dimensions is not needed -->
+
+        <br /><br />
+        <hr />
+        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+    </div>
+
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
 
@@ -165,33 +196,6 @@
         })();
 
     </script>
-</head>
-<body>
-   <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
-            </div>
-            <div id="menu">
-            </div>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <h1>VSCP HTML5 websocket Google Charts Table demo</h1>
-        <p>
-            This demo uses the Table from Google charts to display dynamic temperature measurement values in degrees Celsius. It displays
-            all CLASS1.MEASUREMENT, Type=6/Temperature values that comes from any sensor of that device. That is not just sensoridx=2 aside
-            the other demo do.
-        </p>
-        <p>
-            The <a href="event.html">event.html</a> sample can be used to set temperature values if you don't have live hardware.
-        </p>
-        <h2>Demo</h2>
-        <div id="table_div" style="width: 600px; height: 420px;"></div>  <!-- dimensions is not needed -->
-
-        <br /><br />
-        <hr />
-        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
+    
 </body>
 </html>

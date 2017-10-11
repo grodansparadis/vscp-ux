@@ -50,7 +50,7 @@ var vscp = vscp || {};
 vscp.version = {
     major: 0,
     minor: 2,
-    subMinor: 0
+    release: 0
 };
 
 /** Create a general purpose namespace method. This will allow us to create
@@ -1274,8 +1274,8 @@ vscp.constants.varTypes = {
     FILTER: 503 //  Base64 encoded Filter data data.
 };
 
-// Use to fill dtop down booxes and simular
-vscp.constants.arrTypeNames = [
+// Use to fill dtop down boxes and similar
+vscp.constants.varTypeNames = [
     "Unassigned", // Unassigned variable
     "String", // String value (Base64 encoded)
     "Boolean", // Boolean value (true, false, 0 or 1)
@@ -1305,7 +1305,7 @@ vscp.constants.arrTypeNames = [
     "DMRow", //  Base64 encoded DM data row.
     "Driver", //  Base64 encoded Driver data row.
     "User", //  Base64 encoded User data row.
-    "Filter"
+    "Filter"  // Filter for channel
 ];
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -2930,12 +2930,6 @@ vscp.Connection.prototype.connect = function(options) {
         this.onConnError = options.onError;
     }
 
-    // Calculate password hash
-    /*this.passwordHash =
-        vscp.utility.getWebSocketAuthHash(this.userName,
-                                            this.password,
-                                            settings.vscpkey );*/
-
     console.info(vscp.utility.getTime() +
         " Websocket connect to " + options.url +
         " (user name: " + this.userName + ", password: " + this.passwordHash + ")");
@@ -3312,7 +3306,7 @@ vscp.Connection.prototype.setFilter = function(options) {
 };
 
 /**
- * Create a a VSCP server variable.
+ * Create a a VSCP remote variable.
  *
  * @param {object} options                      - Options
  * @param {string} options.name                 - Variable name
@@ -3329,40 +3323,58 @@ vscp.Connection.prototype.createVar = function(options) {
     var onSuccess = null;
     var onError = null;
     var type = vscp.constants.varTypes.STRING; // default type is string
-    var accessrights = 744; // default access rights
-    var persistency = 0; // Not persistent
-    var note = ""; // No note
+    var accessrights = 744;     // default access rights
+    var persistency = false;    // Not persistent
+    var note = "";              // No note
+    var value = "";
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options is missing. ");
         return;
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Variable name is missing. ");
+        console.error(vscp.utility.getTime() + " Option 'name' is missing. ");
         return;
     }
 
-    if ("string" !== typeof options.type) {
-        console.error(vscp.utility.getTime() + " Variable type is missing. ");
+    if ("number" !== typeof options.type) {
+        console.error(vscp.utility.getTime() + " Option 'type' is missing. ");
         return;
     }
 
-    if ("string" === typeof options.accessrights) {
+    if ("number" === typeof options.accessrights) {
         accessrights = options.accessrights;
     }
 
     if ("string" === typeof options.persistency) {
 
         if ('false' === options.persistency.toLowerCase()) {
-            persistency = 0;
-        } else {
-            persistency = 1;
+            persistency = false;
         }
+        else {
+            persistency = true;
+        }
+    }
+    else if ("boolean" === typeof options.persistency) {
+        persistency = options.persistency;
+    }
+    else {
+        console.error(vscp.utility.getTime() + " Option 'persistency' is missing. ");
+        return;
     }
 
     if ("string" !== typeof options.value) {
-        console.error(vscp.utility.getTime() + " Variable value is missing. ");
+        value = options.value;
+    }
+    else if ("number" !== typeof options.value) {
+        value = options.value.toString();
+    }
+    else if ("boolean" !== typeof options.value) {
+        value = (options.value ? "true" : "false");
+    }
+    else {
+        console.error(vscp.utility.getTime() + " Option 'value' is missing. ");
         return;
     }
 
@@ -3383,8 +3395,8 @@ vscp.Connection.prototype.createVar = function(options) {
         data: options.name + ";" +
             options.type + ";" +
             accessrights + ";" +
-            persistency + ";" +
-            vscp.encodeValueIfBase64(options.type, options.value) + ";" +
+            ( persistency ? 1 : 0 ) + ";" +
+            vscp.encodeValueIfBase64(options.type, value) + ";" +
             vscp.b64EncodeUnicode(options.note),
         onSuccess: onSuccess,
         onError: onError
@@ -3444,6 +3456,7 @@ vscp.Connection.prototype.writeVar = function(options) {
 
     var onSuccess = null;
     var onError = null;
+    var value = "";
 
     if ("undefined" === typeof options) {
         console.error(vscp.utility.getTime() + " Options is missing. ");
@@ -3451,17 +3464,26 @@ vscp.Connection.prototype.writeVar = function(options) {
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Variable name is missing. ");
+        console.error(vscp.utility.getTime() + " Option name is missing. ");
         return;
     }
 
     if ("string" !== typeof options.value) {
-        console.error(vscp.utility.getTime() + " Variable value is missing. ");
+        value = options.value;
+    }
+    else if ("number" !== typeof options.value) {
+        value = options.value.toString();
+    }
+    else if ("boolean" !== typeof options.value) {
+        value = (options.value ? "true" : "false");
+    }
+    else {
+        console.error(vscp.utility.getTime() + " Option 'value' is missing. ");
         return;
     }
 
-    if ("string" !== typeof options.type) {
-        console.error(vscp.utility.getTime() + " Variable type is missing. ");
+    if ("number" !== typeof options.type) {
+        console.error(vscp.utility.getTime() + " Option type is missing. ");
         return;
     }
 
@@ -3475,7 +3497,7 @@ vscp.Connection.prototype.writeVar = function(options) {
 
     this._sendCommand({
         command: "WVAR",
-        data: options.name + ";" + vscp.encodeValueIfBase64(options.type, options.value),
+        data: options.name + ";" + vscp.encodeValueIfBase64(options.type, value),
         onSuccess: onSuccess,
         onError: onError
     });

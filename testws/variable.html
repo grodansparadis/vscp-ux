@@ -47,6 +47,7 @@
             defined which hold system and similar information. You can read all about variables
             <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles">here.</a>
         </p>
+        <hr />
         <p>
             You can also create the variable ("DEMOVARIABLE") by clicking this button
         </p>
@@ -55,9 +56,10 @@
             <input type="button" class="btn btn-primary" value="Create variable" onclick="createVariable();" disabled />
             </p>
             <p>
-            Variables is created if they are written to but is non existing so all this button does is to write
+            Variables is created if they are written to and is non existing so all this button does is to write
             the value <b>true</b> to the variable with name <i>demovariable</i>.
             </p>
+            <hr/>
             <p>
             <input type="button" class="btn btn-primary" value="Set variable value to 'true' (writeVariable)" onclick="setVariableTrue()" disabled />
             <input type="button" class="btn btn-primary" value="Set variable value to 'false' (writeVariable)" onclick="setVariableFalse()" disabled />
@@ -72,9 +74,7 @@
             <input type="button" class="btn btn-primary" value="List all variables" onclick="listVariable()" disabled />
             Optional <a href="http://marvin.cs.uidaho.edu/Handouts/regex.html">regular expression</a> to select variables:  <input id="myRegExp" type="text">
             </p>
-            <p>
-            <input type="button" class="btn btn-primary" value="Save variables" onclick="saveVariable()" disabled />
-            </p>
+            <hr/>
             <p>
             Now when you have the <i>"demovariable"</i> variable defined you can start to monitor the variables value by clicking this button.
             </p>
@@ -235,6 +235,7 @@
 
                     name:   "demovariable",
                     value:  "true",
+                    type:   vscp.constants.varTypes.BOOLEAN,
 
                     onSuccess: function( conn ) {
                         $("#mystatus").text("'demovariable' value successfully set to 'true'.");
@@ -257,6 +258,7 @@
 
                     name:   "demovariable",
                     value:  "false",
+                    type:   vscp.constants.varTypes.BOOLEAN,
 
                     onSuccess: function( conn ) {
                         $("#mystatus").text("'demovariable' value successfully set to 'false'.");
@@ -377,10 +379,10 @@
 
                     onVariable: function( conn, variable ) {
                         //alert( variable.name + ", " +  variable.type + ", " + variable.persistency );
-                        $( "#myVariables" ).append( "<tr><td><b>" + variable.name +
+                        $( "#myVariables" ).append( "<tr><td><b>" + variable.name.toLowerCase() +
                                                         "</b></td><td>" + variable.type +
                                                         "</td><td>" + variable.userid +
-                                                        "</td><td>" + variable.accessright.toString(16) +
+                                                        "</td><td>" + "0x" + variable.accessright.toString(16) +
                                                         "</td><td>" + variable.lastchange +
                                                         "</td><td>" + variable.persistency + "</td></tr>" );
                     },

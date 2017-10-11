@@ -46,6 +46,51 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+
+
+</head>
+
+<body>
+
+    <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html">
+                    <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid">
+        <br>
+        <h3>VSCP REST interface demo code</h3>
+
+        <p>
+            This demo demonstrates the VSCP daemon REST interface functionality. The VSCP daemon REST interface is documented
+            <a href="http://www.vscp.org/docs/vscpd/doku.php?id=vscp_daemon_vscp_daemon_rest_interface">here</a> and you can find the code for this example on <a href="https://github.com/grodansparadis/vscp-ux">GitHub.</a>
+        </p>
+        <p>
+            Open a session (Open REST session) and possible define a server (set Server) before you start, to work with the other available menu items.
+        </p>
+        <p>
+            Open the console log window of your browser to see status from this demo as it use log functionality for info about what is done under the hood.
+            <p>
+                <hr>
+                <p id="host">Host: </p>
+                <p id="sessionkey">Sessionkey: </p>
+                <p id="nevents"> </p>
+                <font size="2" color="green">
+                    <p id="events"> </p>
+                </font>
+                <font size="2" color="blue">
+                    <p id="log"> </p>
+                </font>
+                <br /><br />
+                <hr /> Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+    </div>
+
     <!-- Settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
 
@@ -76,7 +121,7 @@
         var VscpSessionKey = ""; // Session key
         var VscpServer = "http://127.0.0.1:8884"; // Host
         var VscpEventCount = 0; // Events in inqueue
-        var txtSendEvent = "0,10,6,0,0,-,138,0,255"; // Event sent by send event 
+        var txtSendEvent = "0,10,6,0,0,-,138,0,255"; // Event sent by send event
         // Filter/Mask to filter just to receive heart beats CLASS1.INFORMATION, Type=9 Node heartbeat
         // both are "priority,class,type,guid"
         var txtVscpFilter = "0x0000,0x14,0x09,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00";
@@ -89,7 +134,7 @@
                 // Show navigation bar menu
                 navBarMenu.show("menu", navBarMenu.content);
 
-                // Show current server settings	
+                // Show current server settings
                 $("#host").html("<b>Host</b>: " + VscpServer);
 
             });
@@ -964,9 +1009,9 @@
         };
 
 
-        /*	
+        /*
         	function getQueryParams(qs) {
-        	
+
         		qs = qs.split('+').join(' ');
 
         		var params = {},
@@ -989,48 +1034,6 @@
         	}
         */
     </script>
-
-</head>
-
-<body>
-
-    <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html">
-                    <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
-            </div>
-            <div id="menu">
-            </div>
-        </div>
-    </nav>
-
-    <div class="container-fluid">
-        <h3>VSCP REST interface demo code</h3>
-
-        <p>
-            This demo demonstrates the VSCP daemon REST interface functionality. The VSCP daemon REST interface is documented
-            <a href="http://www.vscp.org/docs/vscpd/doku.php?id=vscp_daemon_vscp_daemon_rest_interface">here</a> and you can find the code for this example on <a href="https://github.com/grodansparadis/vscp-ux">GitHub.</a>
-        </p>
-        <p>
-            Open a session (Open REST session) and possible define a server (set Server) before you start, to work with the other available menu items.
-        </p>
-        <p>
-            Open the console log window of your browser to see status from this demo as it use log functionality for info about what is done under the hood.
-            <p>
-                <hr>
-                <p id="host">Host: </p>
-                <p id="sessionkey">Sessionkey: </p>
-                <p id="nevents"> </p>
-                <font size="2" color="green">
-                    <p id="events"> </p>
-                </font>
-                <font size="2" color="blue">
-                    <p id="log"> </p>
-                </font>
-                <br /><br />
-                <hr /> Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
 
 </body>
 

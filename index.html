@@ -3,35 +3,6 @@
 <head>
     <meta charset="UTF-8">
     <title>VSCP &amp; Friends</title>
-
-    <!-- JQuery -->
-    <script type="text/javascript" src="js/jquery/2.2.1/jquery-2.2.1.min.js"></script>
-
-    <!-- Bootstrap -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="js/bootstrap/4.0.0.beta/css/bootstrap.min.css">
-    <script type="text/javascript" src="js/bootstrap/4.0.0.beta/js/bootstrap.min.js"></script>
-
-    <!-- VSCP UX version -->
-    <script type="text/javascript" src="js/version.js"></script>
-
-    <!-- Favorite icon -->
-    <link rel="icon" href="favicon.ico">
-
-    <script type="text/javascript">
-        (function() {
-
-            // Wait until the whole website is loaded
-            $( document ).ready( function() {
-                // Set version
-                $("#version").text("Version: " + vscp_ux_version.full );
-            });
-
-        })();
-   </script>
-
-
-
 </head>
 <body>
     <div class="container-fluid">
@@ -129,5 +100,33 @@ content. You find it <a href="https://github.com/grodansparadis/vscp-ux">here</a
         <hr />
         Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
     </div>
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="js/jquery/2.2.1/jquery-2.2.1.min.js"></script>
+
+    <!-- Bootstrap -->
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="js/bootstrap/3.3.7/css/bootstrap.min.css">
+    <script type="text/javascript" src="js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- VSCP UX version -->
+    <script type="text/javascript" src="js/vscp.js"></script>
+    <script type="text/javascript" src="js/version.js"></script>
+
+    <!-- Favorite icon -->
+    <link rel="icon" href="favicon.ico">
+
+    <script type="text/javascript">
+        (function() {
+
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+                // Set version
+                $("#version").text("Version: " + vscp_ux_version.full );
+            });
+
+        })();
+   </script>
+
 </body>
 </html>
