@@ -15,6 +15,7 @@ ace                 1.2.8       https://ace.c9.io/
 d3                  4.11.0      https://d3js.org/
 flot                0.8.3       http://www.flotcharts.org/
 sjcl                            http://bitwiseshiftleft.github.io/sjcl/doc/sjcl.cipher.aes.html
+popper              1.12.5      https://github.com/FezVrasta/popper.js
 
 icons
 =====

@@ -8,6 +8,61 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+
+
+</head>
+
+<body>
+   <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <br>
+        <h1>VSCP HTML5 progress bar</h1>
+        <p>
+            This is just the standard HTML5 progress bar with some extra styling. It is connected to the <b>vscp.Connection</b>
+            and configured to write the value to the progress bars from the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.CONTROL,
+                Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>
+            event.
+        </p>
+        <p>
+            You can update the slider by sending
+            <p>
+            <pre>send 0,20,40,0,0,"-",90,1,20</pre>
+            </p>
+        </p>
+        <p>
+            Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
+            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b>there to
+            set the slider value to either 0,10,50 or 100.
+        </p>
+        <div>
+            <progress id="bar" max="100" >33%</progress>
+            <br /><br /><br />
+
+            <progress id="progress1" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
+            <br /><br /><br />
+        </div>
+
+        <div>
+            <progress id="progress2" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
+        </div>
+
+        <div>
+            <progress id="progress3" style="width: 600px; height: 30px;" value="90" max="100"  >33%</progress>
+        </div>
+
+        <br /><br />
+        <hr />
+        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+    </div>
+
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
 
@@ -195,56 +250,5 @@
 
     </script>
 
-</head>
-
-<body>
-   <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
-            </div>
-            <div id="menu">
-            </div>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <h1>VSCP HTML5 progress bar</h1>
-        <p>
-            This is just the standard HTML5 progress bar with some extra styling. It is connected to the <b>vscp.Connection</b>
-            and configured to write the value to the progress bars from the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.CONTROL,
-                Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>
-            event.
-        </p>
-        <p>
-            You can update the slider by sending
-            <p>
-            <pre>send 0,20,40,0,0,"-",90,1,20</pre>
-            </p>
-        </p>
-        <p>
-            Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
-            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b>there to
-            set the slider value to either 0,10,50 or 100.
-        </p>
-        <div>
-            <progress id="bar" max="100" >33%</progress>
-            <br /><br /><br />
-
-            <progress id="progress1" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
-            <br /><br /><br />
-        </div>
-
-        <div>
-            <progress id="progress2" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
-        </div>
-
-        <div>
-            <progress id="progress3" style="width: 600px; height: 30px;" value="90" max="100"  >33%</progress>
-        </div>
-
-        <br /><br />
-        <hr />
-        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
 </body>
 </html>

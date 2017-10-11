@@ -8,6 +8,98 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+
+
+</head>
+<body>
+   <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <br>
+        <h1>VSCP HTML5 slider demo</h1>
+        <p>
+            This demo demonstrates how to use the HTML slider control with VSCP. When you drag the slider it
+            sends <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL,
+            Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> with zone=1, subzone=20. This event
+            have a value between 0-100 in byte zero and zone/subzone in byte 1/2.
+        </p>
+        <p>
+            The usual response from a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL,
+            Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> event is
+            <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.INFORMATION,
+            Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>. So a mask is set to only receive
+            this event and if it is received it will set the value of the slider after checking that the zone/subzone
+            is the expected ones.
+        </p>
+        <p>
+            If one have several sliders one may be tempted to react on <b>CLASS1.CONTROL, Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</b>
+            also but it is better to just use the CLASS1-INFORMATION event to avoid message loops.
+        </p>
+        <p>
+            You can update the slider by sending
+        </p>
+        <p>
+            <pre>send 0,20,40,0,0,-,90,1,20</pre>
+        </p>
+        <p>
+            Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
+            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b> there to
+            set the slider value to either 0,10,50 or 100.
+        </p>
+        <p>
+            For those wanting to experiment there is a style in the beginning if this file that change the appearance
+            of the slider that is commented out.
+        </p>
+        <p>
+            The VSCP_TYPE_CONTROL_BIG_CHANGE_LEVEL, VSCP_TYPE_INFORMATION_BIG_ LEVEL_CHANGED events can be used if you need ranges
+            other than 0-100
+        </p>
+        <p>
+        <div>
+            <datalist id="datalist">
+                <option>0</option>
+                <option>5</option>
+                <option>10</option>
+                <option>15</option>
+                <option>20</option>
+                <option>25</option>
+                <option>30</option>
+                <option>35</option>
+                <option>40</option>
+                <option>45</option>
+                <option>50</option>
+                <option>55</option>
+                <option>60</option>
+                <option>65</option>
+                <option>70</option>
+                <option>75</option>
+                <option>80</option>
+                <option>85</option>
+                <option>90</option>
+                <option>95</option>
+                <option>100</option>
+            </datalist>
+            <input id="sliderCtrl1" style="width: 600px;" type="range" min="0" max="100" value="0" step="5" list="datalist" onchange="sliderChange( this.value )" />
+            <span id="sliderText1">0</span>
+        <div>
+        </p>
+        <p>
+            <input id="sliderCtrl2" type="range" min="0" max="100" value="0" step="5" name="grade" orient="vertical" list="datalist" style="width: 20px; height: 200px; -webkit-appearance: slider-vertical; writing-mode: bt-lr;">
+        </p>
+        <br>
+
+        <br /><br />
+        <hr />
+        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+    </div>
+
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
 
@@ -139,94 +231,6 @@
         })();
 
     </script>
-
-</head>
-<body>
-   <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
-            </div>
-            <div id="menu">
-            </div>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <h1>VSCP HTML5 slider demo</h1>
-        <p>
-            This demo demonstrates how to use the HTML slider control with VSCP. When you drag the slider it
-            sends <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL,
-            Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> with zone=1, subzone=20. This event
-            have a value between 0-100 in byte zero and zone/subzone in byte 1/2.
-        </p>
-        <p>
-            The usual response from a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL,
-            Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> event is
-            <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.INFORMATION,
-            Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>. So a mask is set to only receive
-            this event and if it is received it will set the value of the slider after checking that the zone/subzone
-            is the expected ones.
-        </p>
-        <p>
-            If one have several sliders one may be tempted to react on <b>CLASS1.CONTROL, Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</b>
-            also but it is better to just use the CLASS1-INFORMATION event to avoid message loops.
-        </p>
-        <p>
-            You can update the slider by sending
-        </p>
-        <p>
-            <pre>send 0,20,40,0,0,-,90,1,20</pre>
-        </p>
-        <p>
-            Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
-            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b> there to
-            set the slider value to either 0,10,50 or 100.
-        </p>
-        <p>
-            For those wanting to experiment there is a style in the beginning if this file that change the appearance
-            of the slider that is commented out.
-        </p>
-        <p>
-            The VSCP_TYPE_CONTROL_BIG_CHANGE_LEVEL, VSCP_TYPE_INFORMATION_BIG_ LEVEL_CHANGED events can be used if you need ranges
-            other than 0-100
-        </p>
-        <p>
-        <div>
-            <datalist id="datalist">
-                <option>0</option>
-                <option>5</option>
-                <option>10</option>
-                <option>15</option>
-                <option>20</option>
-                <option>25</option>
-                <option>30</option>
-                <option>35</option>
-                <option>40</option>
-                <option>45</option>
-                <option>50</option>
-                <option>55</option>
-                <option>60</option>
-                <option>65</option>
-                <option>70</option>
-                <option>75</option>
-                <option>80</option>
-                <option>85</option>
-                <option>90</option>
-                <option>95</option>
-                <option>100</option>
-            </datalist>
-            <input id="sliderCtrl1" style="width: 600px;" type="range" min="0" max="100" value="0" step="5" list="datalist" onchange="sliderChange( this.value )" />
-            <span id="sliderText1">0</span>
-        <div>
-        </p>
-        <p>
-            <input id="sliderCtrl2" type="range" min="0" max="100" value="0" step="5" name="grade" orient="vertical" list="datalist" style="width: 20px; height: 200px; -webkit-appearance: slider-vertical; writing-mode: bt-lr;">
-        </p>
-        <br>
-
-        <br /><br />
-        <hr />
-        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
+    
 </body>
 </html>

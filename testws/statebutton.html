@@ -8,6 +8,56 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+</head>
+
+<body>
+   <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <br>
+        <h1>VSCP button widget demo</h1>
+        <p>
+            On this page we have a canvas background which can be any picture and on top of it we have three
+            StateButton widgets. The upper button change it's state by itself when it is clicked. All of
+            the buttons send <b>CLASS1.CONTROL, Type=5/TurnOn</b> event when they are inactive and
+            <b>CLASS1.CONTROL, Type=6/TurnOff event</b>. As the upper button just toggles its state
+            it will alternate between the two events without waiting for any confirmation on if the device it
+            wants to control actually is turned on or off.
+        </p>
+        <p>
+            The lower two buttons on the other hand expect a reply with <b>CLASS1.INFORMATION, Type=3/On</b>
+            when they send the TurnOn event and <b>CLASS1.INFORMATION, Type=4/Off</b> when they send
+            the TurnOff events to change there state. If the reply is not received the button will not change it's
+            state.
+        </p>
+        <p>
+            You can use the <a href="event.html" target="new">event.html</a> demo to send the expected replies and also
+            see the events sent.
+        </p>
+
+        <p>
+            If you have the <a href="http://www.vscp.org/docs/vscpd/doku.php?id=level2_driver_simulation">simulation driver</a> installed with the default variables it has it's decision matrix programmed
+            to respond to TurnOn/TurnOff events from the two lower buttons so they will get the expected replies and appear
+            to work as the upper buttons. The difference is important though as the lower two buttons really tell the outcome
+            of the command sent.
+        </p>
+
+        <canvas id="myCanvas" width="670px" height="800px">
+            Your browser does not support HTML5 Canvas.
+        </canvas>
+
+        <br /><br />
+        <hr />
+        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+    </div>
+
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
 
@@ -28,7 +78,7 @@
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP widget library, dependend on the VSCP websocket base library and jCanvas -->
-    <script type="text/javascript" src="../js/vscpWidgets.js"></script>
+    <script type="text/javascript" src="../js/vscpwidgets.js"></script>
     <!-- jCanvas is a jQuery plugin that makes the HTML5 canvas easy to work with. -->
     <script type="text/javascript" src="../js/jcanvas.min.js"></script>
 
@@ -83,7 +133,8 @@
 
                             onSuccess: function( conn ) {
 
-                                // The user interface (buttons) make only sense in case that the event communication is ready
+                                // The user interface (buttons) make only sense
+                                // in case that the event communication is ready
                                 buttonKitchen.setEnabled( true );
                                 buttonStudyRoom.setEnabled( true );
                                 buttonLivingRoom.setEnabled( true );
@@ -110,7 +161,7 @@
                 // Show background image
                 var backgroundImage = new vscp.widget.Image({
                     canvasName: "#myCanvas",
-                    url: "../images/Karnvillan_plan1_800.jpg"
+                    url: "../images/kvarnvillan_plan1_800.jpg"
                 });
 
                 // Create button in the kitchen
@@ -167,53 +218,5 @@
 
     </script>
 
-</head>
-
-<body>
-   <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
-            </div>
-            <div id="menu">
-            </div>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <h1>VSCP button widget demo</h1>
-        <p>
-            On this page we have a canvas background which can be any picture and on top of it we have three
-            StateButton widgets. The upper button change it's state by itself when it is clicked. All of
-            the buttons send <b>CLASS1.CONTROL, Type=5/TurnOn</b> event when they are inactive and
-            <b>CLASS1.CONTROL, Type=6/TurnOff event</b>. As the upper button just toggles its state
-            it will alternate between the two events without waiting for any confirmation on if the device it
-            wants to control actually is turned on or off.
-        </p>
-        <p>
-            The lower two buttons on the other hand expect a reply with <b>CLASS1.INFORMATION, Type=3/On</b>
-            when they send the TurnOn event and <b>CLASS1.INFORMATION, Type=4/Off</b> when they send
-            the TurnOff events to change there state. If the reply is not received the button will not change it's
-            state.
-        </p>
-        <p>
-            You can use the <a href="event.html" target="new">event.html</a> demo to send the expected replies and also
-            see the events sent.
-        </p>
-
-        <p>
-            If you have the <a href="http://www.vscp.org/docs/vscpd/doku.php?id=level2_driver_simulation">simulation driver</a> installed with the default variables it has it's decision matrix programmed
-            to respond to TurnOn/TurnOff events from the two lower buttons so they will get the expected replies and appear
-            to work as the upper buttons. The difference is important though as the lower two buttons really tell the outcome
-            of the command sent.
-        </p>
-
-        <canvas id="myCanvas" width="670px" height="800px">
-            Your browser does not support HTML5 Canvas.
-        </canvas>
-
-        <br /><br />
-        <hr />
-        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
 </body>
 </html>

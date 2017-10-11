@@ -8,6 +8,92 @@
     <META HTTP-EQUIV="Pragma" CONTENT="no-cache">
     <META HTTP-EQUIV="Expires" CONTENT="-1">
 
+</head>
+
+<body>
+   <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <br>
+        <h1>VSCP remote variables</h1>
+        <p>
+            The VSCP Dameon have variables that can be defined/written/read/manipulated by external devices.
+            For example can a temperature value be stores in a node and in that way be persistent over time,
+            Another possibility is that a variable holds the mean value for a temperature over time or a state of
+            something. Remote variables are a very powerful tool.
+        </p>
+        <p>
+            The vscp websocket library makes handling variables from Javascript very easy. You just tell which
+            variable you are interested in and then you will get info when this variable has changed.
+        </p>
+        <p>
+            In this demo we just monitor the boolean variable <b>demovariable</b> and show information when
+            it's value has changed. You can add a variable, either in code as we do here, or by adding it in the
+            VSCP daemon administrative interface or adding it in the REST or the TCP/IP interfaces.
+        </p>
+        <p>
+            There is also another way to add it. You can add it to the <b>variable.xml</b> file and restart the
+            VSCP daemon. Info on how to add variabes here is in the file that comes with the distribution.
+        </p>
+        <p>
+            There are also <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles#stock_variables">stock variables</a>
+            defined which hold system and similar information. You can read all about variables
+            <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles">here.</a>
+        </p>
+        <p>
+            You can also create the variable ("DEMOVARIABLE") by clicking this button
+        </p>
+        <div id="ui">
+            <p>
+            <input type="button" class="btn btn-primary" value="Create variable" onclick="createVariable();" disabled />
+            </p>
+            <p>
+            Variables is created if they are written to but is non existing so all this button does is to write
+            the value <b>true</b> to the variable with name <i>demovariable</i>.
+            </p>
+            <p>
+            <input type="button" class="btn btn-primary" value="Set variable value to 'true' (writeVariable)" onclick="setVariableTrue()" disabled />
+            <input type="button" class="btn btn-primary" value="Set variable value to 'false' (writeVariable)" onclick="setVariableFalse()" disabled />
+            <input type="button" class="btn btn-primary" value="Reset variable" onclick="resetVariable()" disabled />
+            </p>
+            <p>
+            <input type="button" class="btn btn-primary" value="Remove variable" onclick="removeVariable()" disabled />
+            <input type="button" class="btn btn-primary" value="Get variable length" onclick="lengthVariable()" disabled />
+            <input type="button" class="btn btn-primary" value="Get date/time for last change" onclick="lastchangeVariable()" disabled />
+            </p>
+            <p>
+            <input type="button" class="btn btn-primary" value="List all variables" onclick="listVariable()" disabled />
+            Optional <a href="http://marvin.cs.uidaho.edu/Handouts/regex.html">regular expression</a> to select variables:  <input id="myRegExp" type="text">
+            </p>
+            <p>
+            <input type="button" class="btn btn-primary" value="Save variables" onclick="saveVariable()" disabled />
+            </p>
+            <p>
+            Now when you have the <i>"demovariable"</i> variable defined you can start to monitor the variables value by clicking this button.
+            </p>
+            <input id="btnMonitor" type="button" class="btn btn-primary" value="Start to monitor variable" onclick="monitorVariable(!bMonitorActive)" />
+        </div>
+        <br />
+        <pre><div id="mystatus"> </div></pre>
+        <br />
+
+        <div>
+            <h3>Variables</h3>
+            <table id="myVariables" class="table table-striped"></table>
+        </div>
+
+        <br /><br />
+        <hr>
+        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+    </div>
+
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
 
@@ -366,89 +452,5 @@
 
     </script>
 
-</head>
-
-<body>
-   <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
-            </div>
-            <div id="menu">
-            </div>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <h1>VSCP remote variables</h1>
-        <p>
-            The VSCP Dameon have variables that can be defined/written/read/manipulated by external devices.
-            For example can a temperature value be stores in a node and in that way be persistent over time,
-            Another possibility is that a variable holds the mean value for a temperature over time or a state of
-            something. Remote variables are a very powerful tool.
-        </p>
-        <p>
-            The vscp websocket library makes handling variables from Javascript very easy. You just tell which
-            variable you are interested in and then you will get info when this variable has changed.
-        </p>
-        <p>
-            In this demo we just monitor the boolean variable <b>demovariable</b> and show information when
-            it's value has changed. You can add a variable, either in code as we do here, or by adding it in the
-            VSCP daemon administrative interface or adding it in the REST or the TCP/IP interfaces.
-        </p>
-        <p>
-            There is also another way to add it. You can add it to the <b>variable.xml</b> file and restart the
-            VSCP daemon. Info on how to add variabes here is in the file that comes with the distribution.
-        </p>
-        <p>
-            There are also <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles#stock_variables">stock variables</a>
-            defined which hold system and similar information. You can read all about variables
-            <a href="http://www.vscp.org/docs/vscpd/doku.php?id=decision_matrix_varaibles">here.</a>
-        </p>
-        <p>
-            You can also create the variable ("DEMOVARIABLE") by clicking this button
-        </p>
-        <div id="ui">
-            <p>
-            <input type="button" class="btn btn-primary" value="Create variable" onclick="createVariable();" disabled />
-            </p>
-            <p>
-            Variables is created if they are written to but is non existing so all this button does is to write
-            the value <b>true</b> to the variable with name <i>demovariable</i>.
-            </p>
-            <p>
-            <input type="button" class="btn btn-primary" value="Set variable value to 'true' (writeVariable)" onclick="setVariableTrue()" disabled />
-            <input type="button" class="btn btn-primary" value="Set variable value to 'false' (writeVariable)" onclick="setVariableFalse()" disabled />
-            <input type="button" class="btn btn-primary" value="Reset variable" onclick="resetVariable()" disabled />
-            </p>
-            <p>
-            <input type="button" class="btn btn-primary" value="Remove variable" onclick="removeVariable()" disabled />
-            <input type="button" class="btn btn-primary" value="Get variable length" onclick="lengthVariable()" disabled />
-            <input type="button" class="btn btn-primary" value="Get date/time for last change" onclick="lastchangeVariable()" disabled />
-            </p>
-            <p>
-            <input type="button" class="btn btn-primary" value="List all variables" onclick="listVariable()" disabled />
-            Optional <a href="http://marvin.cs.uidaho.edu/Handouts/regex.html">regular expression</a> to select variables:  <input id="myRegExp" type="text">
-            </p>
-            <p>
-            <input type="button" class="btn btn-primary" value="Save variables" onclick="saveVariable()" disabled />
-            </p>
-            <p>
-            Now when you have the <i>"demovariable"</i> variable defined you can start to monitor the variables value by clicking this button.
-            </p>
-            <input id="btnMonitor" type="button" class="btn btn-primary" value="Start to monitor variable" onclick="monitorVariable(!bMonitorActive)" />
-        </div>
-        <br />
-        <pre><div id="mystatus"> </div></pre>
-        <br />
-
-        <div>
-            <h3>Variables</h3>
-            <table id="myVariables" class="table table-striped"></table>
-        </div>
-
-        <br /><br />
-        <hr>
-        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
 </body>
 </html>

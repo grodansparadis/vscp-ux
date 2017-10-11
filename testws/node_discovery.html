@@ -8,6 +8,40 @@
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
+
+
+</head>
+
+<body>
+   <nav class="navbar navbar-inverse">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <br>
+        <h1>Passive node discovery</h1>
+        <p>
+            This demo waits for <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_9_0x09_node_heartbeat">CLASS1.INFORMATION, Type=9/Heartbeats</a> and if the heartbeat has not been seen yet it is
+            added to the list. You can send one from the tcp/ip interface with <br />
+            <p><pre> send 0,20,9,0,,0,"-",0,0,0</pre></p>
+            or you can use the event send list in the <a href="event.html" target="new" >event.html</a> demo.
+        </p>
+        <div id="id3">Wait...</div>
+        <div id="nodeCount">0</div>
+        <select id="nodeList" class="select">
+            <option>Nodes</option>
+        </select>
+
+        <br /><br />
+        <hr />
+        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+    </div>
+
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
 
@@ -130,35 +164,5 @@
 
     </script>
 
-</head>
-
-<body>
-   <nav class="navbar navbar-inverse">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
-            </div>
-            <div id="menu">
-            </div>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <h1>Passive node discovery</h1>
-        <p>
-            This demo waits for <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_9_0x09_node_heartbeat">CLASS1.INFORMATION, Type=9/Heartbeats</a> and if the heartbeat has not been seen yet it is
-            added to the list. You can send one from the tcp/ip interface with <br />
-            <p><pre> send 0,20,9,0,,0,"-",0,0,0</pre></p>
-            or you can use the event send list in the <a href="event.html" target="new" >event.html</a> demo.
-        </p>
-        <div id="id3">Wait...</div>
-        <div id="nodeCount">0</div>
-        <select id="nodeList" class="select">
-            <option>Nodes</option>
-        </select>
-
-        <br /><br />
-        <hr />
-        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
 </body>
 </html>
