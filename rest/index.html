@@ -45,9 +45,6 @@
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
-
-
-
 </head>
 
 <body>
@@ -74,8 +71,9 @@
         <p>
             Open a session (Open REST session) and possible define a server (set Server) before you start, to work with the other available menu items.
         </p>
+        <br>
         <p>
-            Open the console log window of your browser to see status from this demo as it use log functionality for info about what is done under the hood.
+            <b>Tip</b> Open the console log window of your browser to see status from this demo as it use log functionality for info about what is done under the hood.
             <p>
                 <hr>
                 <p id="host">Host: </p>
@@ -118,6 +116,7 @@
     <script type="text/javascript" src="menu.js"></script>
 
     <script type="text/javascript">
+    
         var VscpSessionKey = ""; // Session key
         var VscpServer = "http://127.0.0.1:8884"; // Host
         var VscpEventCount = 0; // Events in inqueue
@@ -126,7 +125,6 @@
         // both are "priority,class,type,guid"
         var txtVscpFilter = "0x0000,0x14,0x09,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00";
         var txtVscpMask = "0x0000,0xffff,0xffff,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00";
-
 
         (function() {
             $(document).ready(function() {
@@ -184,12 +182,19 @@
                         $("#sessionkey").html("<b>Sessionkey</b>: <font size='2' color='red'>" +
                             response.vscpsession + "</font>");
                     }
+                    else {
+                        $("#sessionkey").html("<font size='2' color='red'><b>Failed to connect</b>: " +
+                            error + " status:" + xhr.status + "</font>");
+                    }
 
                 },
                 error: function(xhr, status, error) {
-                    console.log("Error:" + error + " Status:" + xhr.status);
-                    $("#sessionkey").html("<font size='2' color='red'><b>Faild to connect</b>: " +
-                        error + " status:" + xhr.status + "</font>");
+                    console.log(error + " Status:" + xhr.status);
+                    $("#sessionkey").html("<font size='2' color='red'><b>Failed to connect (AJAX)</b>: " +
+                        "Code = " + response.code +
+                        "Message = " + response.message +
+                        "Description = " + response.description +
+                        "</font>");
                 }
             });
         };
@@ -284,6 +289,7 @@
         var printEventData = function(event) {
             var eventtxt = "<b>Event</b>: <b>Head</b>:" +
                 event.head +
+                " <b>DateTime</b>:" + event.datetime +
                 " <b>Timestamp</b>:" + event.timestamp +
                 " <b>Obid</b>:" + event.obid +
                 " <b>Class</b>:" + event.vscpclass +
@@ -315,6 +321,7 @@
                     cache: true,
                     dataType: 'jsonp',
                     success: function(response) {
+
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -358,6 +365,7 @@
                     cache: true,
                     dataType: 'jsonp',
                     success: function(response) {
+
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -579,17 +587,26 @@
                 var txtValue =
                     window.prompt("Send CLASS2.MEASUREMENT_FLOAT. Type=6 (temperature) i degrees Celsius:", "23.98");
 
+                var now = new Date();
+                var now_utc = new Date( now.getUTCFullYear(),
+                                            now.getUTCMonth(),
+                                            now.getUTCDate(),
+                                            now.getUTCHours(),
+                                            now.getUTCMinutes(),
+                                            now.getUTCSeconds(),
+                                            now.getMilliseconds() );
 
                 $.ajax({
                     url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
                         '&format=jsonp&op=measurement&value=' + txtValue +
-                        '&guid=""' + // GUID (use GUID of interface)
-                        '&type=6' + // Temperature
-                        '&level=2' + // Level II
-                        '&sensoridx=2' + // Sensor number 2
-                        '&unit=1' + // Unit = 1 Degrees Celsius
-                        '&zone=22' + // Zone = 22
-                        '&subzone=33', // Sub Zone = 33
+                        '&datetime=' + now_utc.toISOString() +
+                        '&guid=""' +        // GUID (use GUID of interface)
+                        '&type=6' +         // Temperature
+                        '&level=2' +        // Level II
+                        '&sensoridx=2' +    // Sensor number 2
+                        '&unit=1' +         // Unit = 1 Degrees Celsius
+                        '&zone=22' +        // Zone = 22
+                        '&subzone=33',      // Sub Zone = 33
                     type: "GET",
                     jsonpCallback: 'handler',
                     cache: true,

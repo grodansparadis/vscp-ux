@@ -45,7 +45,7 @@ navBarMenu.content = [
         url: "../index.html"
     },
     {
-        title: "General VSCP functionality",
+        title: "General REST functionality",
         url: "#",
         dropDown: [
             {
