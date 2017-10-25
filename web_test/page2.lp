@@ -1,5 +1,5 @@
-<? mg.write("HTTP/1.0 200 OK") ?>
-<? mg.write("Content-Type: text/html") ?>
+<? vscp.write("HTTP/1.0 200 OK") ?>
+<? vscp.write("Content-Type: text/html") ?>
 
 <html><body>
 
@@ -12,32 +12,32 @@ The following features are available:
   -- functions defubed in one Lua tag should still be available in the next one
   function print_if_available(tab, name)
     if tab then
-      mg.write("<li>" .. name .. "</li>\n")
+      vscp.write("<li>" .. name .. "</li>\n")
     end
   end
 
   function recurse(tab)
-    mg.write("<ul>\n")
+    vscp.write("<ul>\n")
     for k,v in pairs(tab) do
       if type(v) == "table" then
-        mg.write("<li>" .. tostring(k) .. ":</li>\n")
+        vscp.write("<li>" .. tostring(k) .. ":</li>\n")
         recurse(v)
       else
-        mg.write("<li>" .. tostring(k) .. " = " .. tostring(v) .. "</li>\n")
+        vscp.write("<li>" .. tostring(k) .. " = " .. tostring(v) .. "</li>\n")
       end
     end
-    mg.write("</ul>\n")
+    vscp.write("</ul>\n")
   end
 ?>
 <?
   -- Print Lua version and available libraries
-  mg.write("<li>" .. _VERSION .. " with the following standard libraries</li>\n")
-  mg.write("<ul>")
+  vscp.write("<li>" .. _VERSION .. " with the following standard libraries</li>\n")
+  vscp.write("<ul>")
   libs = {"string", "math", "table", "io", "os", "bit32", "utf8", "package", "coroutine", "debug"};
   for _,n in ipairs(libs) do
     print_if_available(_G[n], n);
   end
-  mg.write("</ul>\n")
+  vscp.write("</ul>\n")
   print_if_available(sqlite3, "sqlite3 binding")
   print_if_available(lfs,"lua file system")
 
@@ -51,21 +51,21 @@ The following features are available:
 
 ?>
 </ul></p>
-<p> Today is <? mg.write(os.date("%A")) ?>
+<p> Today is <? vscp.write(os.date("%A")) ?>
 
 <p>
 <?
-  -- for k,v in pairs(_G) do mg.write(k, '\n') end
+  -- for k,v in pairs(_G) do vscp.write(k, '\n') end
 
   if lfs then
-    mg.write("Files in " .. lfs.currentdir())
-    mg.write("\n<ul>\n")
+    vscp.write("Files in " .. lfs.currentdir())
+    vscp.write("\n<ul>\n")
     for f in lfs.dir(".") do
-      mg.write("<li>" .. f .. "</li>\n")
+      vscp.write("<li>" .. f .. "</li>\n")
       local at = lfs.attributes(f);
       recurse(at)
     end
-    mg.write("</ul>\n")
+    vscp.write("</ul>\n")
   end
 ?>
 </p>

@@ -1,19 +1,19 @@
-mg.write("HTTP/1.1 200 OK\r\n")
-mg.write("Connection: close\r\n")
-mg.write("Content-Type: text/html; charset=utf-8\r\n")
-mg.write("\r\n")
+vscp.write("HTTP/1.1 200 OK\r\n")
+vscp.write("Connection: close\r\n")
+vscp.write("Content-Type: text/html; charset=utf-8\r\n")
+vscp.write("\r\n")
 
 t = os.time()
 
-if not mg.request_info.query_string then
+if not vscp.request_info.query_string then
   cnt = 1000
 else
-  cnt = tonumber(mg.get_var(mg.request_info.query_string, "cnt"))
+  cnt = tonumber(vscp.get_var(vscp.request_info.query_string, "cnt"))
 end
 
 cnt = 100*math.floor(cnt/100)
 
-mg.write([[
+vscp.write([[
 <html>
   <head>
     <title>]] .. cnt .. [[ images</title>
@@ -31,7 +31,7 @@ mg.write([[
 ]])
 for s=0,(cnt/100)-1 do
 local ts = (tostring(t) .. tostring(s))
-mg.write([[
+vscp.write([[
       <h2>page ]]..s..[[</h2>
       <table>
         <tr>
@@ -47,7 +47,7 @@ mg.write([[
           <td><img src="imagetest/09.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/10.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/11.png?ts=]]..ts..[["></td>
@@ -61,7 +61,7 @@ mg.write([[
           <td><img src="imagetest/19.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/20.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/21.png?ts=]]..ts..[["></td>
@@ -75,7 +75,7 @@ mg.write([[
           <td><img src="imagetest/29.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/20.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/21.png?ts=]]..ts..[["></td>
@@ -89,7 +89,7 @@ mg.write([[
           <td><img src="imagetest/29.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/30.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/31.png?ts=]]..ts..[["></td>
@@ -103,7 +103,7 @@ mg.write([[
           <td><img src="imagetest/39.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/40.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/41.png?ts=]]..ts..[["></td>
@@ -117,7 +117,7 @@ mg.write([[
           <td><img src="imagetest/49.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/50.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/51.png?ts=]]..ts..[["></td>
@@ -131,7 +131,7 @@ mg.write([[
           <td><img src="imagetest/59.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/60.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/61.png?ts=]]..ts..[["></td>
@@ -145,7 +145,7 @@ mg.write([[
           <td><img src="imagetest/69.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/70.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/71.png?ts=]]..ts..[["></td>
@@ -159,7 +159,7 @@ mg.write([[
           <td><img src="imagetest/79.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/80.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/81.png?ts=]]..ts..[["></td>
@@ -173,7 +173,7 @@ mg.write([[
           <td><img src="imagetest/89.png?ts=]]..ts..[["></td>
         </tr>
 ]])
-mg.write([[
+vscp.write([[
         <tr>
           <td><img src="imagetest/90.png?ts=]]..ts..[["></td>
           <td><img src="imagetest/91.png?ts=]]..ts..[["></td>
@@ -189,7 +189,7 @@ mg.write([[
       </table>
 ]])
 end
-mg.write([[
+vscp.write([[
     </p>
     <p id="timing">
       Test case: all images are displayed.

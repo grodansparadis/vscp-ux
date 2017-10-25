@@ -8,20 +8,20 @@ function trace(text)
 end
 
 function iswebsocket()
-  return mg.lua_type == "websocket"
+  return vscp.lua_type == "websocket"
   --return pcall(function()
-  --  if (string.upper(mg.request_info.http_headers.Upgrade)~="WEBSOCKET") then error("") end
+  --  if (string.upper(vscp.request_info.http_headers.Upgrade)~="WEBSOCKET") then error("") end
   --end)
 end
 
-trace("called with Lua type " .. tostring(mg.lua_type))
+trace("called with Lua type " .. tostring(vscp.lua_type))
 
 if not iswebsocket() then
   trace("no websocket")
-  mg.write("HTTP/1.0 403 Forbidden\r\n")
-  mg.write("Connection: close\r\n")
-  mg.write("\r\n")
-  mg.write("forbidden")
+  vscp.write("HTTP/1.0 403 Forbidden\r\n")
+  vscp.write("Connection: close\r\n")
+  vscp.write("\r\n")
+  vscp.write("forbidden")
   return
 end
 
@@ -63,14 +63,14 @@ end
 -- Callback for "Websocket ready"
 function ready(tab)
   trace("ready[" .. who(tab) .. "]: " .. ser(tab))
-  mg.write(tab.client, "text", "Websocket ready")
-  mg.write(tab.client, 1, "-->h 180");
-  mg.write(tab.client, "-->m 180");
+  vscp.write(tab.client, "text", "Websocket ready")
+  vscp.write(tab.client, 1, "-->h 180");
+  vscp.write(tab.client, "-->m 180");
   senddata()
   if timerID == "timeout" then
-    mg.set_timeout("timer()", 1)
+    vscp.set_timeout("timer()", 1)
   elseif timerID == "interval" then
-    mg.set_interval("timer()", 1)
+    vscp.set_interval("timer()", 1)
   end
   return true -- return true to keep the connection open
 end
@@ -85,7 +85,7 @@ end
 -- Callback for "Websocket is closing"
 function close(tab)
     trace("close[" .. who(tab) .. "]: " .. ser(tab))
-    mg.write("text", "end")
+    vscp.write("text", "end")
     allConnections[tab.client] = nil
 end
 
@@ -93,11 +93,11 @@ function senddata()
     local date = os.date('*t');
     local hand = (date.hour%12)*60+date.min;
 
-    mg.write("text", string.format("%u:%02u:%02u", date.hour, date.min, date.sec));
+    vscp.write("text", string.format("%u:%02u:%02u", date.hour, date.min, date.sec));
 
     if (hand ~= lasthand) then
-        mg.write(1, string.format("-->h %u", hand*360/(12*60)));
-        mg.write(   string.format("-->m %u", date.min*360/60));
+        vscp.write(1, string.format("-->h %u", hand*360/(12*60)));
+        vscp.write(   string.format("-->m %u", date.min*360/60));
         lasthand = hand;
     end
 
@@ -110,9 +110,8 @@ function timer()
     trace("timer")
     senddata()
     if timerID == "timeout" then
-        mg.set_timeout("timer()", 1)
+        vscp.set_timeout("timer()", 1)
     else
         return true -- return true to keep an interval timer running
     end
 end
-

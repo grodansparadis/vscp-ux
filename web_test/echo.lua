@@ -1,9 +1,9 @@
 
-if mg.lua_type ~= "websocket" then
-  mg.write("HTTP/1.0 403 Forbidden\r\n")
-  mg.write("Connection: close\r\n")
-  mg.write("\r\n")
-  mg.write("forbidden")
+if vscp.lua_type ~= "websocket" then
+  vscp.write("HTTP/1.0 403 Forbidden\r\n")
+  vscp.write("Connection: close\r\n")
+  vscp.write("\r\n")
+  vscp.write("forbidden")
   return
 end
 
@@ -30,7 +30,7 @@ end
 
 -- Callback for "Websocket received data"
 function data(tab)
-    mg.write(1, tab.data);
+    vscp.write(1, tab.data);
     return true -- return true to keep the connection open
 end
 
@@ -38,4 +38,3 @@ end
 function close(tab)
     allConnections[tab.client] = nil
 end
-
