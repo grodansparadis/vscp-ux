@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <!--
 	//
-	// VSCP JavaScript websocket library
+	// VSCP rest interface test
 	// Copyright (C) 2012-2017 Ake Hedman, Grodans Paradis AB
 	// <akhe@grodansparadis.com>
 	//
@@ -49,7 +49,7 @@
 
 <body>
 
-    <nav class="navbar navbar-inverse">
+    <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html">
@@ -100,8 +100,6 @@
     <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
     <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
-    <!-- VSCP settings -->
-    <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
     <!-- VSCP websocket base library -->
@@ -116,7 +114,7 @@
     <script type="text/javascript" src="menu.js"></script>
 
     <script type="text/javascript">
-    
+
         var VscpSessionKey = ""; // Session key
         var VscpServer = "http://127.0.0.1:8884"; // Host
         var VscpEventCount = 0; // Events in inqueue
