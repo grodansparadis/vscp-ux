@@ -1,5 +1,5 @@
 // Menu definition
-// Copyright (c) 2016 Ake Hedman
+// Copyright (c) 2017 Ake Hedman, Grodans Paradis AB
 // <akhe@paradiseofthefrog.com>
 //
 // Licence:
@@ -56,7 +56,7 @@ navBarMenu.content = [
                 title: "Test VSCP server...",
                 url: "javascript:doTestConnect();"
             },
-   
+
         ]
     },
     {

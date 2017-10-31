@@ -13,10 +13,10 @@
 
     <!-- Tether -->
     <script type="text/javascript" src="../js/tether/1.3.3/js/tether.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
     <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- Bootstrap dialogs -->
@@ -39,6 +39,8 @@
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP admin library -->
@@ -48,7 +50,7 @@
 
     <!-- Menu styles -->
     <link rel="stylesheet" type="text/css" href="css/menu.css">
-    
+
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
@@ -59,10 +61,10 @@
     <script type="text/javascript">
 
         var curSelectedVariable;    // Current selected variable
-        var table = null;  
+        var table = null;
         var gindexes;               // Curret selected row(s)
         var editorValue;            // ace editor for value
-        var editorNote;             // ace editor for notes 
+        var editorNote;             // ace editor for notes
 
         // VSCP websocket connection
         var vscpConn = null;
@@ -72,7 +74,7 @@
         //
         // Wait until the whole website is loaded
         $( document ).ready( function() {
-                
+
             // Show navigation bar menu
             navBarMenu.show( "menu", navBarMenu.content );
 
@@ -99,11 +101,11 @@
                 if ( null != localStorage.getItem("vscp-authdomain") ) {
                     settings.authdomain = localStorage.getItem("vscp-authdomain");
                 }
-            } 
+            }
             else {
                 // No Web Storage support.
                 vscp.admin.setStatus( settings.url, false );
-            }   
+            }
 
             table = $('#userTable').DataTable( {
                 select: 'single',
@@ -122,15 +124,15 @@
                     { title: "User id", sort: true },
                     { title: "Username" },
                     { title: "Password", visible: false, searchable: false  },
-                    { title: "Full Name" },                    
+                    { title: "Full Name" },
                     { title: "Filter", visible: false, searchable: false  },
                     { title: "Mask", visible: false, searchable: false  },
                     { title: "Rights", visible: false, searchable: false  },
                     { title: "Allowed Remotes", visible: false, searchable: false  },
-                    { title: "Allowed Events", visible: false, searchable: false  },                    
-                    { title: "Note" },                
+                    { title: "Allowed Events", visible: false, searchable: false  },
+                    { title: "Note" },
                 ],
-                
+
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -138,43 +140,43 @@
             //
 
             table.on( 'select', function ( e, dt, type, indexes ) {
-                
+
                 if ( type === 'row' ) {
 
                     gindexes = indexes;
-                    var row = table.rows( indexes ).data(); 
-                    var data = row[0]; 
+                    var row = table.rows( indexes ).data();
+                    var data = row[0];
 
                     curSelectedVariable = data;
-                    
+
                     showFullInfo( data );
                 }
-                
+
             });
 
-            
+
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // deselect row
             //
 
-            table.on( 'deselect', function ( e, dt, type, indexes ) 
+            table.on( 'deselect', function ( e, dt, type, indexes )
             {
                 if ( type === 'row' ) {
-                    $('#userdata').html("");                    
+                    $('#userdata').html("");
                 }
             });
- 
+
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Double click row
             //
-            
-            $('#userTable tbody').on( 'dblclick', 'tr', function () 
-            {              
-                editUser();              
+
+            $('#userTable tbody').on( 'dblclick', 'tr', function ()
+            {
+                editUser();
             });
 
-        
+
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Credential handling
             //
@@ -182,7 +184,7 @@
             if ( typeof( Storage ) !== "undefined" ) {
 
                 // Server
-                if ( null != localStorage.getItem("vscp-url") ) {                    
+                if ( null != localStorage.getItem("vscp-url") ) {
                     settings.url = localStorage.getItem("vscp-url");
                 }
 
@@ -200,7 +202,7 @@
                 if ( null != localStorage.getItem("vscp-token") ) {
                     settings.token = localStorage.getItem("vscp-token");
                 }
-            } 
+            }
             else {
                 // No Web Storage support.
                 //setConnectInfo( settings.url, false );
@@ -218,6 +220,7 @@
                 userName: settings.user,
                 password: settings.password,
                 authdomain: settings.authdomain,
+                vscpkey: settings.vscpkey,
 
                 onSuccess: function( conn ) {
 
@@ -230,7 +233,7 @@
                                 // Show conect status
                                 vscp.admin.setStatus( vscpConn.url, true );
 
-                                fetchUsers(); 
+                                fetchUsers();
                             }
                             else {
                                 // Warn user
@@ -270,7 +273,7 @@
                                 type: BootstrapDialog.TYPE_WARNING,
                                 message: 'Connection error.'
                             });
-                            
+
                             // Enable the user interface
                             ui.enable();
                         },
@@ -288,7 +291,7 @@
                     }, 2000);*/
                 }
 
-            });       
+            });
 
         }); // onLoad
 
@@ -348,49 +351,49 @@
 
             // Clear extended data
             $('#userdata').html("");
-            
+
             // Clear table
             table.clear().draw();
 
             // Fetch users
-            vscp.user.fetchUsers( 
+            vscp.user.fetchUsers(
 
                 // Success
                 function() {
 
                     var idx = 0;
-                    vscp.user.userinfo.forEach( function( u ) { 
+                    vscp.user.userinfo.forEach( function( u ) {
 
                         //alert( u[vscp.user.records.NOTE] );
                         table.row.add( [
                                     idx++,
                                     u[vscp.user.records.ID],
                                     u[vscp.user.records.NAME],
-                                    u[vscp.user.records.PASSWORD], 
+                                    u[vscp.user.records.PASSWORD],
                                     u[vscp.user.records.FULLNAME],
                                     u[vscp.user.records.FILTER],
                                     u[vscp.user.records.MASK],
                                     u[vscp.user.records.RIGHTS],
                                     u[vscp.user.records.REMOTES],
-                                    u[vscp.user.records.EVENTS],                                     
-                                    vscp.b64DecodeUnicode(u[vscp.user.records.NOTE]) 
-                                ] ).draw( false ); 
+                                    u[vscp.user.records.EVENTS],
+                                    vscp.b64DecodeUnicode(u[vscp.user.records.NOTE])
+                                ] ).draw( false );
 
-                    });    
+                    });
 
                     // Enable the user interface
-                    ui.enable();      
+                    ui.enable();
 
                     waitingDialog.hide();
                 },
                 // Error
                 function() {
-                                    
+
                     // Enable the user interface
                     ui.enable();
 
                     waitingDialog.hide();
-                                    
+
                     // Warn user
                     BootstrapDialog.alert({
                         title: 'ERROR',
@@ -398,16 +401,16 @@
                         message: 'Unable to  get users.'
                     });
                 }
-            );     
+            );
         }
 
-        
+
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // deleteUser
         //
 
-        function deleteUser() 
+        function deleteUser()
         {
             var table = $('#userTable').DataTable();
             var data = table.rows('.selected').data();
@@ -428,15 +431,15 @@
                 BootstrapDialog.alert({
                     title: 'WARNING',
                     type: BootstrapDialog.TYPE_WARNING,
-                    message: "Can\'t remove internal users" 
+                    message: "Can\'t remove internal users"
                 });
                 return;
             }
 
 
-            BootstrapDialog.confirm( { 
+            BootstrapDialog.confirm( {
                 title: 'WARNING',
-                message: 'Are you sure that the user \'' + name + '\' with userid = ' + userid + ' should be deleted?', 
+                message: 'Are you sure that the user \'' + name + '\' with userid = ' + userid + ' should be deleted?',
                 type: BootstrapDialog.TYPE_WARNING,
                 callback: function( result ) {
                     if ( result ) {
@@ -460,7 +463,7 @@
                                 BootstrapDialog.alert({
                                     type: BootstrapDialog.TYPE_WARNING,
                                     message: 'Failed to save variable!'
-                                });                                
+                                });
                                 ui.enable();
                             }
 
@@ -477,7 +480,7 @@
         // Show the edit dialog
         //
 
-        function editUser() 
+        function editUser()
         {
             var table = $('#userTable').DataTable();
             var data = table.rows('.selected').data();
@@ -493,14 +496,14 @@
 
             editDialog( data[0] );
         }
-        
+
         ///////////////////////////////////////////////////////////////////////////////////////////
         // editDialog
         //
         // Show modal to edit variable
         //
 
-        function editDialog( data ) 
+        function editDialog( data )
         {
             // Can not change stock variables
             if ( parseInt( data[ 1 ] ) <= 0  ) {
@@ -522,7 +525,7 @@
 
             // Can not change username
             $("#dlgedit_username").prop("readonly", true);
-            
+
             $('#dlgedit_ordinal').val( data[ 0 ] );
             $('#dlgedit_username').val( data[ 2 ] );
             $('#dlgedit_password1').val( data[ 3 ] );
@@ -546,11 +549,11 @@
         // Save results from edit dialog
         //
 
-        var saveEditResult = function() 
+        var saveEditResult = function()
         {
 
             if ( $("#pw1grp").hasClass("has-error") ) {
-                
+
                 BootstrapDialog.alert({
                         title: 'ERROR',
                         type: BootstrapDialog.TYPE_DANGER,
@@ -576,27 +579,27 @@
                         $('#dlgedit_rights').val() + ";" +
                         $('#dlgedit_remotes').val() + ";" +
                         $('#dlgedit_events').val() + ";" +
-                        vscp.b64EncodeUnicode( $('#dlgedit_note').val() );           
+                        vscp.b64EncodeUnicode( $('#dlgedit_note').val() );
 
-            vscpConn.writeVar({ 
+            vscpConn.writeVar({
 
                 name: "vscp.user." + $('#dlgedit_ordinal').val(),
                 value: user,
                 type: vscp.constants.varTypes.STRING.toString(),
 
                 onSuccess: function( conn ) {
-                    
+
                     vscpConn.readVar({
 
                         name: "vscp.user." + $('#dlgedit_ordinal').val(),
 
-                        onSuccess: function( conn, options ) {  
+                        onSuccess: function( conn, options ) {
 
                             // Add to array
-                            var items = options.value.split(";"); 
+                            var items = options.value.split(";");
                             var row_exist;
                             if ( ( row_exist = isUserInTable( items[1] ) ) < 0 ) {
-                                
+
                                 BootstrapDialog.alert({
                                     title: 'ERROR',
                                     type: BootstrapDialog.TYPE_DANGER,
@@ -605,12 +608,12 @@
 
                             }
                             else {
-                                
+
                                 // Replace data of row
                                 // userid;name;password;fullname;filter;mask;rights;remotes;events;note
                                 table.cell( row_exist, 1).data( items[0] );     // Userid
                                 table.cell( row_exist, 2).data( items[1] );     // Username
-                                table.cell( row_exist, 3).data( items[2] );     // Password 
+                                table.cell( row_exist, 3).data( items[2] );     // Password
                                 table.cell( row_exist, 4).data( items[3] );     // Full Name
 
                                 table.cell( row_exist, 5).data( items[4] );     // Filter
@@ -620,11 +623,11 @@
                                 table.cell( row_exist, 9).data( items[8] );     // Allowed EVENTS
                                 table.cell( row_exist, 10).data( vscp.b64DecodeUnicode( items[9] ) );    // Note
 
-                                var row = table.rows( gindexes ).data(); 
-                                var data = row[0]; 
+                                var row = table.rows( gindexes ).data();
+                                var data = row[0];
 
                                 curSelectedVariable = data;
-                    
+
                                 showFullInfo( data );
                             }
 
@@ -645,7 +648,7 @@
                 },
 
                 onError: function( conn ) {
-                    
+
                     BootstrapDialog.alert({
                         title: 'ERROR',
                         type: BootstrapDialog.TYPE_DANGER,
@@ -655,7 +658,7 @@
                     $('#dlgEditUser').modal('hide');
                     ui.enable();
                 }
-            });                 
+            });
 
         };
 
@@ -665,10 +668,10 @@
         // Duplicate selected user
         //
 
-        function duplicateUser() 
+        function duplicateUser()
         {
             var table = $('#userTable').DataTable();
-            var row = table.rows('.selected').data();            
+            var row = table.rows('.selected').data();
 
             if ( undefined == row[0] ) {
                 BootstrapDialog.alert({
@@ -680,12 +683,12 @@
             }
 
             var data = row[0];
-            
-            $('#editdlg_header').html("Duplicate existing VSCP system user");  
+
+            $('#editdlg_header').html("Duplicate existing VSCP system user");
 
             // Can change username
-            $("#dlgedit_username").prop("readonly", false);          
-            
+            $("#dlgedit_username").prop("readonly", false);
+
             $('#dlgedit_ordinal').val("-1");
             $('#dlgedit_username').val(data[2]+"_new");
             $('#dlgedit_password1').val(data[3]);
@@ -706,13 +709,13 @@
         // addUser
         //
 
-        function addUser() 
+        function addUser()
         {
-            $('#editdlg_header').html("Add new VSCP system user");  
+            $('#editdlg_header').html("Add new VSCP system user");
 
             // Can change username
-            $("#dlgedit_username").prop("readonly", false);           
-            
+            $("#dlgedit_username").prop("readonly", false);
+
             $('#dlgedit_ordinal').val("-1");
             $('#dlgedit_username').val("");
             $('#dlgedit_password1').val("");
@@ -728,7 +731,7 @@
             addDialog();
         }
 
-        
+
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // addDialog
@@ -736,21 +739,21 @@
         // Show modal for adding data
         //
 
-        function addDialog() 
-        { 
+        function addDialog()
+        {
             $('#dlgEditUser').modal();
         };
 
-        
+
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // isUserInTable
         //
 
         function isUserInTable( name ) {
-            
+
             for ( i=0; i<table.rows().count(); i++ ) {
-                
+
                 if ( name.toLowerCase() == $('#userTable').dataTable({bRetrieve: true}).fnGetData(i)[2].toLowerCase()  ) {
                     return i;
                 }
@@ -769,7 +772,7 @@
         var saveAddResult = function() {
 
             if ( 0 == $('#dlgedit_username').val().length ) {
-                
+
                 BootstrapDialog.alert({
                         title: 'ERROR',
                         type: BootstrapDialog.TYPE_DANGER,
@@ -780,7 +783,7 @@
             }
 
             if ( $("#pw1grp").hasClass("has-error") || $("#pw2grp").hasClass("has-error") ) {
-                
+
                 BootstrapDialog.alert({
                         title: 'ERROR',
                         type: BootstrapDialog.TYPE_DANGER,
@@ -798,16 +801,16 @@
                         $('#dlgedit_rights').val() + ";" +
                         $('#dlgedit_remotes').val() + ";" +
                         $('#dlgedit_events').val() + ";" +
-                        vscp.b64EncodeUnicode( $('#dlgedit_note').val() );           
+                        vscp.b64EncodeUnicode( $('#dlgedit_note').val() );
 
-            vscpConn.writeVar({ 
+            vscpConn.writeVar({
 
                 name: "vscp.user.add",
                 value: user,
                 type: vscp.constants.varTypes.STRING.toString(),
 
                 onSuccess: function( conn ) {
-                    
+
                     fetchUsers();
 
                     $('#dlgEditUser').modal('hide');
@@ -816,7 +819,7 @@
                 },
 
                 onError: function( conn ) {
-                    
+
                     BootstrapDialog.alert({
                         title: 'ERROR',
                         type: BootstrapDialog.TYPE_DANGER,
@@ -835,8 +838,8 @@
         // Show modal for setting filter
         //
 
-        function filterDialog( filter ) 
-        { 
+        function filterDialog( filter )
+        {
             items = filter.split(',');
 
             $('#dlgfilter_vscppriority').val(items[0]);
@@ -872,8 +875,8 @@
         // Show modal for setting mask
         //
 
-        function maskDialog( filter ) 
-        { 
+        function maskDialog( filter )
+        {
             items = filter.split(',');
 
             $('#dlgmask_vscppriority').val(items[0]);
@@ -900,7 +903,7 @@
                             $('#dlgmask_vscpclass').val() + ',' +
                             $('#dlgmask_vscptype').val() + ',' +
                             maskguid;
-            $(dlgedit_mask).val( mask );                            
+            $(dlgedit_mask).val( mask );
         };
 
         //////////////////////////////////////////////////////////////////////////////////////////
@@ -913,11 +916,11 @@
             if ( $('#dlgedit_password1').val() != $('#dlgedit_password2').val() ) {
                 $("#pw1grp").addClass("has-error has-feedback");
                 $("#pw2grp").addClass("has-error has-feedback");
-            } 
+            }
             else {
                 $("#pw1grp").removeClass("has-error");
                 $("#pw2grp").removeClass("has-error");
-            }  
+            }
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -926,8 +929,8 @@
         // Show modal for setting of user rights
         //
 
-        function rightsDialog( rights ) 
-        { 
+        function rightsDialog( rights )
+        {
             items = rights.split('/');
 
             // ************************
@@ -1455,7 +1458,7 @@
 
             $('#dlgedit_rights').val(
                 byte[0].toString() + "/" +
-                byte[1].toString() + "/" + 
+                byte[1].toString() + "/" +
                 byte[2].toString() + "/" +
                 byte[3].toString() + "/" +
                 byte[4].toString() + "/" +
@@ -1471,8 +1474,8 @@
         // Show modal for setting of user allowed remotes
         //
 
-        function remotesDialog( remotes ) 
-        { 
+        function remotesDialog( remotes )
+        {
             // Empty listbox
             $('#selRemotes').empty();
 
@@ -1480,10 +1483,10 @@
             items = remotes.split('/');
             $.each(items, function(key, value) {
                 value = value.trim();
-                if ( 0 == value.length ) value = "*";   
+                if ( 0 == value.length ) value = "*";
                 $('#selRemotes')
                     .append($('<option>', { value : key })
-                    .text(value)); 
+                    .text(value));
                 });
 
             // mark the first option as selected
@@ -1496,7 +1499,7 @@
         // addRemote
         //
 
-        function addRemote( key ) 
+        function addRemote( key )
         {
             var remote = prompt("Enter remote IP", "*");
 
@@ -1518,7 +1521,7 @@
                 });
             }
 
-            
+
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1543,7 +1546,7 @@
             $('#selRemotes option').each( function ( index ) {
                 remotes += $(this).text();
                 if ( index != (count-1) ) remotes += "/";
-            }); 
+            });
 
             if ( 0 == remotes.length ) {
                 remotes = "*";
@@ -1559,18 +1562,18 @@
         // Show modal for setting of user allowed events
         //
 
-        function eventsDialog( events ) 
-        { 
+        function eventsDialog( events )
+        {
             // Empty listbox
             $('#selEvents').empty();
 
             // Fill with remotes
             items = events.split('/');
             $.each(items, function(key, value) {
-                value = value.trim();   
+                value = value.trim();
                 $('#selEvents')
                     .append($('<option>', { value : key })
-                    .text(value)); 
+                    .text(value));
             });
 
             // mark the first option as selected
@@ -1583,7 +1586,7 @@
         // addEvent
         //
 
-        function addEvent( key ) 
+        function addEvent( key )
         {
             var event = prompt("Enter event on the form class:type", "*:*");
 
@@ -1605,7 +1608,7 @@
                 });
             }
 
-            
+
         };
 
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -1630,7 +1633,7 @@
             $('#selEvents option').each( function ( index ) {
                 events += $(this).text();
                 if ( index != (count-1) ) events += "/";
-            }); 
+            });
 
             if ( 0 == events.length ) {
                 events = "*:*";
@@ -1649,19 +1652,19 @@
     <!--                              Modal to edit variable                                   -->
     <!-- **************************************************************************************-->
     <div id="dlgEditUser" class="modal fade" role="dialog">
-        
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="editdlg_header" class="modal-title">Edit VSCP user</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
                         <input type="hidden" class="form-control" id="dlgedit_ordinal"  >
@@ -1691,8 +1694,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Filter</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Filter</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_filter">
                                 <div class="input-group-btn">
                                     <button type="button" onclick="filterDialog( $('#dlgedit_filter').val() );" class="btn btn-success btn-sm">Set filter</button>
@@ -1702,8 +1705,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Mask</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Mask</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_mask">
                                 <div class="input-group-btn">
                                     <button type="button" onclick="maskDialog( $('#dlgedit_mask').val() );" class="btn btn-success btn-sm">Set mask</button>
@@ -1713,8 +1716,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Rights</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Rights</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_rights">
                                 <div class="input-group-btn">
                                     <button type="button" onclick="rightsDialog( $('#dlgedit_rights').val() );" class="btn btn-success btn-sm">Set rights</button>
@@ -1724,8 +1727,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Remotes</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Remotes</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_remotes">
                                 <div class="input-group-btn">
                                     <button type="button" onclick="remotesDialog( $('#dlgedit_remotes').val() );" class="btn btn-success btn-sm">Set remotes</button>
@@ -1735,8 +1738,8 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Events</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> Events</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_events">
                                 <div class="input-group-btn">
                                     <button type="button" onclick="eventsDialog( $('#dlgedit_events').val() );" class="btn btn-success btn-sm">Set events</button>
@@ -1744,17 +1747,17 @@
                             </div>
                             <span class="help-block">Set events this user can send ("*" is all).</span>
                         </div>
-                     
+
                         <div class="form-group">
                             <label for="note"><span class="glyphicon glyphicon-asterisk"></span> note</label>
                             <textarea class="form-control" rows="6" id="dlgedit_note" placeholder="Enter value"></textarea>
                             <span class="help-block">Enter an optional description for the user. Presented as HTML.</span>
                         </div>
-                        
+
                     </form>
                 </div>
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" onclick="saveEditResult()">Save</button>                  
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-lg" onclick="saveEditResult()">Save</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -1768,28 +1771,28 @@
     <!--                              Modal to edit filter                                   -->
     <!-- **************************************************************************************-->
     <div id="dlgFilter" class="modal fade" role="dialog">
-        
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="filterdlg_header" class="modal-title">Edit VSCP user filter</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
                         <div class="form-group">
-                            <label for="priority"><span class="glyphicon glyphicon-asterisk"></span> priority</label>                    
-                            <div class="input-group">                                
+                            <label for="priority"><span class="glyphicon glyphicon-asterisk"></span> priority</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgfilter_vscppriority">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle" 
-                                                data-toggle="dropdown" aria-haspopup="true" 
+                                    <button type="button" class="btn btn-success dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">priority <span class="caret"></span></button>
                                     <ul id="dlgfilter_prioritydd" class="dropdown-menu dropdown-menu-right">
                                         <li>Very Very High (0)</li>
@@ -1831,17 +1834,17 @@
                             <input type="text" class="form-control" id="dlgfilter_vscpguid"  >
                             <span class="help-block">Set to all zeros if user should see events from all devices and interfaces. Set to
                                 'FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:FF:00:00 if user should just see events from a specific interface.
-                                Then enter the interface GUID in the corresponding GUID filter. 
-                                You can enter a single '-' for a filter with all zeros.                           
+                                Then enter the interface GUID in the corresponding GUID filter.
+                                You can enter a single '-' for a filter with all zeros.
                             </span>
                         </div>
 
-                        
-                        
+
+
                     </form>
                 </div>
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveFilterResult()">Save</button>                  
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveFilterResult()">Save</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -1850,31 +1853,31 @@
     </div>
 
 
-    
+
 
     <!-- **************************************************************************************-->
     <!--                              Modal to edit mask                                   -->
     <!-- **************************************************************************************-->
     <div id="dlgMask" class="modal fade" role="dialog">
-        
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="filterdlg_header" class="modal-title">Edit VSCP user mask</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
                         <div class="form-group">
-                            <label for="priority"><span class="glyphicon glyphicon-asterisk"></span> priority</label>                    
-                            <div class="input-group">                                
-                                <input readonly type="text" class="form-control" aria-label="..." id="dlgmask_vscppriority">                                
+                            <label for="priority"><span class="glyphicon glyphicon-asterisk"></span> priority</label>
+                            <div class="input-group">
+                                <input readonly type="text" class="form-control" aria-label="..." id="dlgmask_vscppriority">
                             </div>
                             <span class="help-block">Set priority (0 (high)-7 (low)).</span>
                         </div>
@@ -1882,7 +1885,7 @@
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> VSCP Class</label>
                             <input type="text" class="form-control" id="dlgmask_vscpclass"  >
-                            <span class="help-block">Normally you set a Level I or Level II VSCP class here that 
+                            <span class="help-block">Normally you set a Level I or Level II VSCP class here that
                                  the user is allowed to receive. In that case set the corresponding mask to all ones,
                                  or 0xffff. Data can be enetered as a deciaml integer or a hexadecimal integer (preced number with '0x'
                                  in the öater case).
@@ -1892,7 +1895,7 @@
                         <div class="form-group">
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> VSCP Type</label>
                             <input type="text" class="form-control" id="dlgmask_vscptype"  >
-                            <span class="help-block">Normally you set a Level I or Level II VSCP type here that 
+                            <span class="help-block">Normally you set a Level I or Level II VSCP type here that
                                  the user is allowed to receive. In that case set the correspnding mask to all ones,
                                  or 0xffff. Data can be enetered as a deciaml integer or a hexadecimal integer (preced number with '0x'
                                   in the later case).
@@ -1903,18 +1906,18 @@
                             <label for="name"><span class="glyphicon glyphicon-asterisk"></span> GUID</label>
                             <input type="text" class="form-control" id="dlgmask_vscpguid"  >
                             <span class="help-block">Set the GUID filter here. If you enter a specific GUID and set all
-                                byte of the mask GUID to FF (all ones) events will only be received form that device. 
+                                byte of the mask GUID to FF (all ones) events will only be received form that device.
                                 The GUID should always be give as hex bytes without the preceding '0x'. You can enter a single '-'
-                                for a filter with all zeros.                           
+                                for a filter with all zeros.
                             </span>
                         </div>
 
-                        
-                        
+
+
                     </form>
                 </div>
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveMaskResult()">Save</button>                  
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveMaskResult()">Save</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -1927,19 +1930,19 @@
     <!--                              Modal to edit rights                                     -->
     <!-- **************************************************************************************-->
     <div id="dlgRights" class="modal fade" role="dialog">
-        
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="filterdlg_header" class="modal-title">Edit VSCP user rights</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
                         <div class="form-group">
@@ -2037,11 +2040,11 @@
                              <label><input type="checkbox" name="byte7" id="byte7_1" class="form-control-xs" value="2"> <span id="bt7_1">Bit 1</span></label><br>
                              <label><input type="checkbox" name="byte7" id="byte7_0" class="form-control-xs" value="1"> <span id="bt7_0">Bit 0</span></label><br>
                         </div>
- 
+
                     </form>
                 </div>
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveRightsResult()">Save</button>                  
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveRightsResult()">Save</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -2054,41 +2057,41 @@
     <!--                              Modal to edit remotes                                     -->
     <!-- **************************************************************************************-->
     <div id="dlgRemotes" class="modal fade" role="dialog">
-        
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="remotesdlg_header" class="modal-title">Edit VSCP user allowed remotes</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
                         <div class="form-group">
-                            <label for="remotes"><span class="glyphicon glyphicon-asterisk"></span> allowed remotes</label>                    
-                            <div class="input-group">                             
+                            <label for="remotes"><span class="glyphicon glyphicon-asterisk"></span> allowed remotes</label>
+                            <div class="input-group">
                                 <select  class="form-control" size="10" id="selRemotes">
                                 </select>
                             </div>
                             <br>
                             <button type="button" class="btn btn-error" onclick="addRemote(1)">add </button>
                             <button type="button" class="btn btn-error" onclick="deleteRemote()">delete </button>
-                                  
-                            <span class="help-block">The allowed remotes is a list of IPv4 and/or IPv6 addresses that this user is allowed to 
+
+                            <span class="help-block">The allowed remotes is a list of IPv4 and/or IPv6 addresses that this user is allowed to
                                 login from. A single asterisk tells that the user can log in from anywhere. Wild cards are allowed so that
                                 192.168.1.* means a user can login from network 192.168.1.0 </span>
                         </div>
 
- 
+
                     </form>
                 </div>
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveRemotesResult()">Save</button>                  
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveRemotesResult()">Save</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -2100,42 +2103,42 @@
     <!--                              Modal to edit events                                     -->
     <!-- **************************************************************************************-->
     <div id="dlgEvents" class="modal fade" role="dialog">
-        
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 id="eventdlg_header" class="modal-title">Edit VSCP user allowed events</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
                         <div class="form-group">
-                            <label for="events"><span class="glyphicon glyphicon-asterisk"></span> allowed events</label>                    
-                            <div class="input-group">                             
+                            <label for="events"><span class="glyphicon glyphicon-asterisk"></span> allowed events</label>
+                            <div class="input-group">
                                 <select  class="form-control" size="10" id="selEvents">
                                 </select>
                             </div>
                             <br>
                             <button type="button" class="btn btn-error" onclick="addEvent(1)">add </button>
                             <button type="button" class="btn btn-error" onclick="deleteEvent()">delete </button>
-                                  
-                            <span class="help-block">The allowed events is a list of VSCP events this user is allowed to send. 
+
+                            <span class="help-block">The allowed events is a list of VSCP events this user is allowed to send.
                                 Events should be entered as 'class:type' and wildcards are available. For instance '10:*' means the
-                                user can send all CLASS1.MEASUREMENT events and in the same manner '*:*' means the user can send all events.  
+                                user can send all CLASS1.MEASUREMENT events and in the same manner '*:*' means the user can send all events.
                             </span>
                         </div>
 
- 
+
                     </form>
                 </div>
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveEventsResult()">Save</button>                  
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveEventsResult()">Save</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -2164,13 +2167,13 @@
     <div class="container-fluid">
         <h1>VSCP system users</h1>
 
-        <div class="container-fluid">            
+        <div class="container-fluid">
             <div class="row">
-                
+
             </div>
-            <div class="row">                
+            <div class="row">
                 <div class="col-sm-2">
-                    
+
                     <div class="input-group col-sm-8">
                         <button type="button" class="btn btn-primary col-sm-12" onclick="fetchUsers();">
                             <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch users
@@ -2185,7 +2188,7 @@
                         </button>
                     </div>
                     </p>
-                    
+
                     <p>
                     <div class="input-group col-sm-8">
                         <button type="button" class="btn btn-success col-sm-12" onclick="addUser();">
@@ -2209,42 +2212,42 @@
                         </button>
                     </div>
                     </p>
-       
+
                 </div>
-                
+
                 <div class="col-sm-9">
                     <table id="userTable"  class="table table-striped table-bordered table-hover display compact nowrap" cellspacing="50" width="100%"></table>
                 </div>
                 <div class="col-sm-1"></div>
             </div>
 
-            
+
             <div class="row">
-                <div class="col-sm-2"> </div>                
+                <div class="col-sm-2"> </div>
                 <div class="col-sm-9" >
                     <p>
                         <div id="userdata"/>
-                    </p> 
-                </div>         
+                    </p>
+                </div>
                 <div class="col-sm-1"></div>
             </div>
 
             <br>
             <div class="row">
-                <div class="col-sm-2"></div>                
-                <div class="col-sm-9"></div>         
+                <div class="col-sm-2"></div>
+                <div class="col-sm-9"></div>
                 <div class="col-sm-1"></div>
-            </div>     
+            </div>
 
         </div>
-        
+
     </div>
-    
+
     <!-- <div id="copyright-info" /> -->
 
     <footer>
         <div id="status-footer"/>
     </footer>
-    
+
 </body>
 </html>

@@ -13,10 +13,10 @@
 
     <!-- Tether -->
     <script type="text/javascript" src="../js/tether/1.3.3/js/tether.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
     <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- Bootstrap dialogs -->
@@ -43,6 +43,8 @@
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP admin library -->
@@ -52,7 +54,7 @@
 
     <!-- Menu styles -->
     <link rel="stylesheet" type="text/css" href="css/menu.css">
-    
+
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
@@ -64,10 +66,10 @@
 
         var selected_type = 0;      // type that should be shown. 0 == all
         var selected_level = 0;     // level that should be shown. 0 == all
-        var table = null;  
+        var table = null;
         var gindexes;               // Curret selected row(s)
         var editorValue;            // ace editor for value
-        var editorNote;             // ace editor for notes 
+        var editorNote;             // ace editor for notes
 
         // VSCP websocket connection
         var vscpConn = null;
@@ -90,7 +92,7 @@
                     }
                 }
             });
-                
+
             // Show navigation bar menu
             navBarMenu.show( "menu", navBarMenu.content );
 
@@ -116,11 +118,11 @@
                 if ( null != localStorage.getItem("vscp-authdomain") ) {
                     settings.authdomain = localStorage.getItem("vscp-authdomain");
                 }
-            } 
+            }
             else {
                 // No Web Storage support.
                 vscp.admin.setStatus( settings.url, false );
-            }   
+            }
 
             table = $('#logTable').DataTable( {
                 "select": 'single',
@@ -137,15 +139,15 @@
                 ],
                 columns: [
                     { title: "Date", sort: true, searchable: false },
-                    { title: "Type", visible: true, searchable: false  },                    
+                    { title: "Type", visible: true, searchable: false  },
                     { title: "Debug level", visible: true, searchable: false },
-                    { title: "Message", visible: true, searchable: true  },               
+                    { title: "Message", visible: true, searchable: true  },
                 ],
-                
+
             });
 
 
-        
+
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Credential handling
             //
@@ -153,7 +155,7 @@
             if ( typeof( Storage ) !== "undefined" ) {
 
                 // Server
-                if ( null != localStorage.getItem("vscp-url") ) {                    
+                if ( null != localStorage.getItem("vscp-url") ) {
                     settings.url = localStorage.getItem("vscp-url");
                 }
 
@@ -171,7 +173,7 @@
                 if ( null != localStorage.getItem("vscp-token") ) {
                     settings.token = localStorage.getItem("vscp-token");
                 }
-            } 
+            }
             else {
                 // No Web Storage support.
                 //setConnectInfo( settings.url, false );
@@ -189,6 +191,7 @@
                 userName: settings.user,
                 password: settings.password,
                 authdomain: settings.authdomain,
+                vscpkey: settings.vscpkey,
 
                 onSuccess: function( conn ) {
 
@@ -202,7 +205,7 @@
                                 // Show conect status
                                 vscp.admin.setStatus( vscpConn.url, true );
 
-                                fetchLog(); 
+                                fetchLog();
                             }
                             else {
                                 // Warn user
@@ -242,7 +245,7 @@
                                 type: BootstrapDialog.TYPE_WARNING,
                                 message: 'Connection error.'
                             });
-                            
+
                             // Enable the user interface
                             ui.enable();
                         },
@@ -260,7 +263,7 @@
                     }, 2000);*/
                 }
 
-            });       
+            });
 
         }); // onLoad
 
@@ -284,7 +287,7 @@
         // getSymbolicType
         //
 
-        function getSymbolicType( type ) 
+        function getSymbolicType( type )
         {
             if ( 0 == type ) {
                 return "General";
@@ -307,7 +310,7 @@
         // getSymbolicLevel
         //
 
-        function getSymbolicLevel( type ) 
+        function getSymbolicLevel( type )
         {
             if ( 0 == type ) {
                 return "None";
@@ -327,7 +330,7 @@
         // fetchLog
         //
 
-        function fetchLog() 
+        function fetchLog()
         {
             waitingDialog.show('Fetching log data rows...', {dialogSize: 'xm', progressType: 'warning'});
 
@@ -393,7 +396,7 @@
                         BootstrapDialog.alert({
                             type: BootstrapDialog.TYPE_WARNING,
                             message: 'Failed to save variable!'
-                        });                                
+                        });
                         ui.enable();
                         waitingDialog.hide();
                     }
@@ -402,10 +405,10 @@
 
             }
             else {
-                readLog();   
+                readLog();
             }
 
-               
+
         }
 
         function readLog()
@@ -415,17 +418,17 @@
                 name: "vscp.log.database.search",
                 type: vscp.constants.varTypes.SQL,
 
-                onSuccess: function( conn, msg ) {            
+                onSuccess: function( conn, msg ) {
                     ui.enable();
-                   
+
                     msg.value.split(";").forEach( function ( item ) {
                         if ( 0 != item.length ) {
                         var logrow = item.split(",");
-                        table.row.add( [ 
-                                    logrow[2].substring(0,10) + " " + logrow[2].substring(11), // date 
+                        table.row.add( [
+                                    logrow[2].substring(0,10) + " " + logrow[2].substring(11), // date
                                     getSymbolicType( logrow[1] ),       // type
                                     getSymbolicLevel( logrow[3] ),      // Debug level
-                                    vscp.b64DecodeUnicode( logrow[4] )  // Message 
+                                    vscp.b64DecodeUnicode( logrow[4] )  // Message
                                 ] ).draw( false );
                         }
                     });
@@ -466,15 +469,15 @@
     <div class="container-fluid">
         <h1>VSCP daemon log</h1>
 
-        <div class="container-fluid"> 
+        <div class="container-fluid">
 
             <div class="row">
-                
+
             </div>
 
-            <div class="row">                
+            <div class="row">
                 <div class="col-sm-3">
-                    
+
                     <div class="input-group col-sm-8">
                         <button type="button" class="btn btn-primary col-sm-12" onclick="fetchLog();">
                             <span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> Fetch log
@@ -482,7 +485,7 @@
                         <span class="help-block">Will fetch the last 500 records without extra filter setting below.</span>
                     </div>
                     </p>
-   
+
                     <div class="input-group col-sm-8" id="datepicker-container">
                         <label><span class="glyphicon glyphicon-asterisk"></span>Date range</label>
                         <div class="input-daterange input-group" id="datepicker">
@@ -494,12 +497,12 @@
                     </div>
 
                     <div class="input-group col-sm-8">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control input-sm" aria-label="..." id="filter_type">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle input-sm" 
-                                                data-toggle="dropdown" aria-haspopup="true" 
+                                    <button type="button" class="btn btn-success dropdown-toggle input-sm"
+                                                data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">set <span class="caret"></span></button>
                                     <ul id="filter_typedd" class="dropdown-menu dropdown-menu-right">
                                         <li><a href="javascript:$('#filter_type').val('All');selected_type=0;">All</a></li>
@@ -514,12 +517,12 @@
                     </div>
 
                     <div class="input-group col-sm-8">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> level</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> level</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control input-sm" aria-label="..." id="filter_level">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle input-sm" 
-                                                data-toggle="dropdown" aria-haspopup="true" 
+                                    <button type="button" class="btn btn-success dropdown-toggle input-sm"
+                                                data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">set <span class="caret"></span></button>
                                     <ul id="filter_leveldd" class="dropdown-menu dropdown-menu-right">
                                         <li><a href="javascript:$('#filter_level').val('All');selected_level=0;">All</a></li>
@@ -532,12 +535,12 @@
                     </div>
 
                     <div class="input-group col-sm-8">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> limit</label>                                                    
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> limit</label>
                             <input type="text" class="form-control input-sm" aria-label="..." id="filter_limit" value="500">
                     </div>
 
-               </div>     
-                
+               </div>
+
                 <div class="col-sm-8">
                     <p class="bg-info">
                     <span class="active" id="sqlheader"><strong>Filter:</strong> Active</span>
@@ -546,39 +549,39 @@
                 <div class="col-sm-1"></div>
 
                 <div class="row">
-                    <div class="col-sm-3"> </div>                
+                    <div class="col-sm-3"> </div>
                     <div class="col-sm-8" >
-                            <table id="logTable"  class="table table-striped table-bordered table-hover display compact nowrap" cellspacing="50" width="100%"></table> 
-                    </div>         
+                            <table id="logTable"  class="table table-striped table-bordered table-hover display compact nowrap" cellspacing="50" width="100%"></table>
+                    </div>
                     <div class="col-sm-1"></div>
                 </div>
-            
+
                 <div class="row">
-                    <div class="col-sm-3"> </div>                
+                    <div class="col-sm-3"> </div>
                     <div class="col-sm-8" >
                     <p>
                         <div id="userdata"/>
-                    </p> 
-                    </div>         
+                    </p>
+                    </div>
                     <div class="col-sm-1"></div>
                 </div>
 
                 <br>
                 <div class="row">
-                    <div class="col-sm-3"></div>                
-                    <div class="col-sm-8"></div>         
+                    <div class="col-sm-3"></div>
+                    <div class="col-sm-8"></div>
                     <div class="col-sm-1"></div>
-                </div>     
+                </div>
 
             </div>
-        
+
         </div>
-    
+
     <!-- <div id="copyright-info" /> -->
 
     <footer>
         <div id="status-footer"/>
     </footer>
-    
+
 </body>
 </html>

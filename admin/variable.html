@@ -9,14 +9,14 @@
     <meta http-equiv="Expires" content="-1" />
 
     <!-- JQuery -->
-    <script type="text/javascript" src="../js/jquery/3.1.1/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery/3.2.1/jquery-3.2.1.min.js"></script>
 
     <!-- Tether -->
     <script type="text/javascript" src="../js/tether/1.3.3/js/tether.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css"> 
+    <link rel="stylesheet" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
     <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- Bootstrap dialogs -->
@@ -33,12 +33,14 @@
     <script src="../js/ace/src-noconflict/ace.js" type="text/javascript" charset="utf-8"></script>
 
     <!-- Favorite icon -->
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="../favicon.ico">
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP admin library -->
@@ -48,21 +50,21 @@
 
     <!-- Menu styles -->
     <link rel="stylesheet" type="text/css" href="css/menu.css">
-    
+
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navBar.js"></script>
     <!-- Navigation bar menu structure -->
-    <script type="text/javascript" src="js/menu.js"></script>
+    <script type="text/javascript" src="./js/menu.js"></script>
 
     <link rel="stylesheet" type="text/css" href="css/vscp-admin.css">
 
     <script type="text/javascript">
 
         var curSelectedVariable;    // Current selected variable
-        var table = null;  
+        var table = null;
         var gindexes;               // Curret selected row(s)
         var editorValue;            // ace editor for value
-        var editorNote;             // ace editor for notes 
+        var editorNote;             // ace editor for notes
 
         // VSCP websocket connection
         var vscpConn = null;
@@ -74,15 +76,16 @@
         $( document ).ready( function() {
 
             // Fill types into dropdown
-            vscp.constants.arrTypeNames.forEach( function(u) {
+            vscp.constants.varTypeNames.forEach( function( u ) {
+
                 // Add to edit type drop down
                 $("#dlgedit_typedd").append("<li><a href=\"javascript:$('#dlgedit_type').val('"
                                                     + u + "');\">" + u + "</a></li>");
                 // Add to add type drop down
                 $("#dlgadd_typedd").append("<li><a href=\"javascript:$('#dlgadd_type').val('"
-                                                    + u + "');\">" + u + "</a></li>");                                                    
+                                                    + u + "');\">" + u + "</a></li>");
             });
-                
+
             // Show navigation bar menu
             navBarMenu.show( "menu", navBarMenu.content );
 
@@ -98,7 +101,7 @@
                     editor.resize()
                 }
             }); */
-           
+
 
             // Value editor
             editorValue = ace.edit("editorValue");
@@ -128,7 +131,7 @@
                                 BootstrapDialog.alert({
                                     type: BootstrapDialog.TYPE_WARNING,
                                     message: 'Failed to save variable!'
-                                });                                
+                                });
                                 ui.enable();
                             }
 
@@ -157,14 +160,14 @@
                                 editorValue.setValue( msg.value );
                                 editorValue.clearSelection();
                                 editorValue.selection.moveTo(0, 0);
-                                editorValue.getSession().setMode("ace/mode/" + 
+                                editorValue.getSession().setMode("ace/mode/" +
                                 vscp.getEditorModeFromType( msg.type ));
                                 editorValue.$blockScrolling = Infinity;
 
                                 editorNote.setValue( msg.note );
                                 editorNote.clearSelection();
                                 editorNote.selection.moveTo(0, 0);
-                        
+
                                 ui.enable();
                             },
 
@@ -196,7 +199,7 @@
                     name: 'Decrease size for editor window',
                     bindKey: {win: 'Ctrl-,',  mac: 'Command-,'},
                     exec: function( editorValue ) {
-                        $('#editorValue').height( "100px");                     
+                        $('#editorValue').height( "100px");
                         editorValue.resize(true);
                     },
                     readOnly: true // false if this command should not apply in readOnly mode
@@ -236,7 +239,7 @@
                             name:           curSelectedVariable[0],
                             value:          editorValue.getSession().getValue(),
                             note:           editorNote.getSession().getValue(),
-                            type:           curSelectedVariable[6], 
+                            type:           curSelectedVariable[6],
                             accessrights:   curSelectedVariable[4],
                             persistency:    curSelectedVariable[2],
 
@@ -283,7 +286,7 @@
             );
 
             //editorNote.setTheme("ace/theme/iplastic");
-            editorNote.setTheme("ace/theme/solarized_light"); 
+            editorNote.setTheme("ace/theme/solarized_light");
             editorNote.getSession().setMode("ace/mode/html");
             editorNote.$blockScrolling = Infinity;
             editorNote.setReadOnly(false);  // false to make it editable
@@ -303,6 +306,7 @@
             vscp.admin.setStatus( "<b>Server:</b> no server selected.", false );
 
             if ( typeof( Storage ) !== "undefined" ) {
+
                 // Server
                 if ( null != localStorage.getItem("vscp-url") ) {
                     settings.url = localStorage.getItem("vscp-url");
@@ -322,11 +326,12 @@
                 if ( null != localStorage.getItem("vscp-authdomain") ) {
                     settings.authdomain = localStorage.getItem("vscp-authdomain");
                 }
-            } 
+
+            }
             else {
                 // No Web Storage support.
                 vscp.admin.setStatus( settings.url, false );
-            }   
+            }
 
             table = $('#variableTable').DataTable( {
                 select: 'single',
@@ -339,7 +344,7 @@
                 },
                 buttons: [
                     'colvis','copy', 'csv','excel', 'pdf','print'
-                ],             
+                ],
                 columns: [
                     { title: "Name" },
                     { title: "Type" },
@@ -357,9 +362,9 @@
                         defaultContent: '<span id="rowedit" class="glyphicon glyphicon-edit"> </span> <span id="rowdelete" class="glyphicon glyphicon-remove"> </span>',
                         orderable: false
                     },
-                    */                
+                    */
                 ],
-                
+
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -367,13 +372,13 @@
             //
 
             table.on( 'select', function ( e, dt, type, indexes ) {
-                
+
                 if ( type === 'row' ) {
 
                     console.log('select');
                     gindexes = indexes;
                     var row = table.rows( indexes ).data(); //.pluck( 'id' );
-                    var data = row[0]; 
+                    var data = row[0];
 
                     curSelectedVariable = data;
 
@@ -386,13 +391,13 @@
                             editorValue.setValue( msg.value );
                             editorValue.clearSelection();
                             editorValue.selection.moveTo(0, 0);
-                            editorValue.getSession().setMode("ace/mode/" + 
+                            editorValue.getSession().setMode("ace/mode/" +
                                                                 vscp.getEditorModeFromType( msg.type ));
 
                             editorNote.setValue( msg.note );
                             editorNote.clearSelection();
                             editorNote.selection.moveTo(0, 0);
-                        
+
                             ui.enable();
                         },
 
@@ -403,7 +408,7 @@
                         }
                     });
                 }
-                
+
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
@@ -417,11 +422,11 @@
                     editorNote.setValue( "" );
                 }
             });
- 
+
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Double click row
             //
-            
+
             $('#variableTable tbody').on( 'dblclick', 'tr', function () {
 
                 //$(this).parents('tr') .addClass('selected');
@@ -437,13 +442,13 @@
                             editorValue.setValue( msg.value );
                             editorValue.clearSelection();
                             editorValue.selection.moveTo(0, 0);
-                            editorValue.getSession().setMode("ace/mode/" + 
+                            editorValue.getSession().setMode("ace/mode/" +
                                                                 vscp.getEditorModeFromType( msg.type ));
 
                             editorNote.setValue( msg.note );
                             editorNote.clearSelection();
                             editorNote.selection.moveTo(0, 0);
-                        
+
                             ui.enable();
 
                             editVariable();
@@ -455,18 +460,18 @@
                             ui.enable();
                         }
                 });
-                            
+
             });
 
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Single click row
             //
-            
+
             /*$('#variableTable tbody').on( 'click', 'tr', function () {
                 //console.log("Single click");
             });*/
 
-            
+
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // rowedit click
             //
@@ -486,7 +491,7 @@
                 //$(this).addClass('selected');
                 alert( 'Delete ' + data[0]  );
             });*/
-        
+
             ///////////////////////////////////////////////////////////////////////////////////////////////
             // Credential handling
             //
@@ -494,7 +499,7 @@
             if ( typeof( Storage ) !== "undefined" ) {
 
                 // Server
-                if ( null != localStorage.getItem("vscp-url") ) {                    
+                if ( null != localStorage.getItem("vscp-url") ) {
                     settings.url = localStorage.getItem("vscp-url");
                 }
 
@@ -512,7 +517,7 @@
                 if ( null != localStorage.getItem("vscp-token") ) {
                     settings.token = localStorage.getItem("vscp-token");
                 }
-            } 
+            }
             else {
                 // No Web Storage support.
                 //setConnectInfo( settings.url, false );
@@ -530,7 +535,7 @@
                 userName: settings.user,
                 password: settings.password,
                 authdomain: settings.authdomain,
-
+                vscpkey: settings.vscpkey,
                 onSuccess: function( conn ) {
 
                     // Start receiving VSCP events
@@ -541,7 +546,7 @@
                             // Show conect status
                             vscp.admin.setStatus( vscpConn.url, true );
 
-                            fetchUsers();                       
+                            fetchUsers();
                         },
 
                         onError: function( conn ) {
@@ -571,7 +576,7 @@
                                 type: BootstrapDialog.TYPE_WARNING,
                                 message: 'Connection error.'
                             });
-                            
+
                             // Enable the user interface
                             ui.enable();
                         },
@@ -589,7 +594,7 @@
                     }, 2000);*/
                 }
 
-            });       
+            });
 
         }); // onLoad
 
@@ -617,7 +622,7 @@
 
             waitingDialog.show('Fetching users and variables...', {dialogSize: 'xm', progressType: 'warning'});
             //$('#myPleaseWait').modal('show');
-            
+
             // Fetch users
             vscp.user.fetchUsers( function() {
 
@@ -632,10 +637,10 @@
 
                     // Load variables
                     fetchVariables();
-                                    
+
                 },
                 function() {
-                                    
+
                     // Enable the user interface
                     ui.enable();
 
@@ -646,7 +651,7 @@
                         message: 'Unable to  get users.'
                     });
                 }
-            );     
+            );
         }
 
         ///////////////////////////////////////////////////////////////////////////////////////////
@@ -663,30 +668,30 @@
             var localregex = $("#myRegExp").val();
 
             // Clear table
-            table.clear().draw();                
+            table.clear().draw();
 
             vscpConn.listVar({
 
                 regex: $("#myRegExp").val(),
 
                 onVariable: function( conn, variable ) {
-                        
+
                     table.row.add( [
-                                variable.name.toLowerCase(), 
-                                vscp.getVarTypeName( variable.type ), 
-                                variable.persistency ? "true" : "false", 
-                                vscp.user.getUserFromId( variable.userid ), 
-                                variable.accessright.toString(16), 
+                                variable.name.toLowerCase(),
+                                vscp.getVarTypeName( variable.type ),
+                                variable.persistency ? "true" : "false",
+                                vscp.user.getUserFromId( variable.userid ),
+                                variable.accessright.toString(16),
                                 variable.lastchange.substring(0,10) + " " + variable.lastchange.substring(11),
                                 variable.type,
                                 variable.userid
-                            ] ).draw( false );  
+                            ] ).draw( false );
 
                 },
 
                 onSuccess: function( conn ) {
 
-                    ui.enable();                    
+                    ui.enable();
                     waitingDialog.hide();
 
                     // Select first row
@@ -707,7 +712,7 @@
         // deleteVariable
         //
 
-        function deleteVariable() 
+        function deleteVariable()
         {
             var table = $('#variableTable').DataTable();
             var data = table.rows('.selected').data();
@@ -733,9 +738,9 @@
             }
 
 
-            BootstrapDialog.confirm( { 
+            BootstrapDialog.confirm( {
                 title: 'WARNING',
-                message: 'Are you sure that the variable \'' + name + '\' should be deleted?', 
+                message: 'Are you sure that the variable \'' + name + '\' should be deleted?',
                 type: BootstrapDialog.TYPE_WARNING, // <-- Default value is BootstrapDialog.TYPE_PRIMARY
                 callback: function( result ) {
                     if ( result ) {
@@ -767,7 +772,7 @@
             });
         };
 
-        
+
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // editVariable
@@ -775,7 +780,7 @@
         // Show the edit dialog
         //
 
-        function editVariable() 
+        function editVariable()
         {
             var table = $('#variableTable').DataTable();
             var data = table.rows('.selected').data();
@@ -791,14 +796,14 @@
 
             editDialog( data[0] );
         }
-        
+
         ///////////////////////////////////////////////////////////////////////////////////////////
         // editDialog
         //
         // Show modal to edit variable
         //
 
-        function editDialog( data ) 
+        function editDialog( data )
         {
             // Can not change stock variables
             if ( data[ 0 ].startsWith("vscp.")  ) {
@@ -821,7 +826,7 @@
 
             $('#dlgedit_value').val( evmain.getValue() );
             $('#dlgedit_note').val( enmain.getValue() );
- 
+
             $('#dlgEditVariable').modal();
         };
 
@@ -847,7 +852,7 @@
                 name:           curSelectedVariable[0],
                 value:          $('#dlgedit_value').val(),
                 note:           $('#dlgedit_note').val(),
-                type:           vscp.getVarTypeNumerical( $('#dlgedit_type').val() ).toString(), 
+                type:           vscp.getVarTypeNumerical( $('#dlgedit_type').val() ).toString(),
                 accessrights:   parseInt( $('#dlgedit_permission').val(), 16).toString(),
                 persistency:    $('#dlgedit_persistent').is(":checked") ? "true" : "false",
 
@@ -865,15 +870,15 @@
                             if ( ( row_exist = isVariableInTable( msg.name ) ) < 0 ) {
                                 // Add new row to table
                                 table.row.add( [
-                                    msg.name.toLowerCase(), 
-                                    vscp.getVarTypeName( msg.type ), 
-                                    msg.persistency ? "true" : "false", 
-                                    vscp.user.getUserFromId( msg.userid ), 
-                                    msg.accessright.toString(16), 
+                                    msg.name.toLowerCase(),
+                                    vscp.getVarTypeName( msg.type ),
+                                    msg.persistency ? "true" : "false",
+                                    vscp.user.getUserFromId( msg.userid ),
+                                    msg.accessright.toString(16),
                                     msg.lastchange,
                                     msg.type,
                                     msg.userid
-                                ] ).draw( false );  
+                                ] ).draw( false );
                             }
                             else {
                                 // Update row data
@@ -884,7 +889,7 @@
                                 table.cell( row_exist, 6).data( msg.type );
                                 table.cell( row_exist, 7).data( msg.userid );
                             }
-                        
+
                             ui.enable();
 
                         },
@@ -916,11 +921,11 @@
         // Duplicate selected variable
         //
 
-        function duplicateVariable() 
+        function duplicateVariable()
         {
             var table = $('#variableTable').DataTable();
             //var data = $('#variableTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
-            var row = table.rows('.selected').data();            
+            var row = table.rows('.selected').data();
 
             if ( undefined == row[0] ) {
                 BootstrapDialog.alert({
@@ -932,8 +937,8 @@
             }
 
             var data = row[0];
-            
-            $('#dlgadd_name').val( data[0] + "_new" );                        
+
+            $('#dlgadd_name').val( data[0] + "_new" );
             $('#dlgadd_type').val( data[1] );
             if ( data[2] == "true" ) {
                 $('#dlgadd_persistent').prop('checked', true );
@@ -949,7 +954,7 @@
 
             $('#dlgadd_value').val( evmain.getValue() );
             $('#dlgadd_note').val( enmain.getValue() );
- 
+
             $('#dlgAddVariable').modal();
 
         };
@@ -958,18 +963,18 @@
         // addVariable
         //
 
-        function addVariable() 
+        function addVariable()
         {
             var table = $('#variableTable').DataTable();
 
             //var data = table.rows('.selected').data();
             var data = $('#variableTable').dataTable({bRetrieve: true}).fnGetData(0)[0];
-            
+
 
             addDialog();
         }
 
-        
+
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // addDialog
@@ -977,7 +982,7 @@
         // Show modal for adding data
         //
 
-        function addDialog() 
+        function addDialog()
         {
             $('#dlgadd_owner').val( vscpConn.userName );
             $('#dlgadd_permission').val( '744' );
@@ -988,21 +993,21 @@
 
             $('#dlgadd_value').val( "" );
             $('#dlgadd_note').val( "" );
- 
+
             $('#dlgAddVariable').modal();
 
         };
 
-        
+
 
         ///////////////////////////////////////////////////////////////////////////////////////////
         // isVariableInTable
         //
 
         function isVariableInTable( name ) {
-            
+
             for ( i=0; i<table.rows().count(); i++ ) {
-                
+
                 if ( name.toLowerCase() == $('#variableTable').dataTable({bRetrieve: true}).fnGetData(i)[0]  ) {
                     return i;
                 }
@@ -1036,13 +1041,13 @@
                 name:           $('#dlgadd_name').val(),
                 value:          $('#dlgadd_value').val(),
                 note:           $('#dlgadd_note').val(),
-                type:           vscp.getVarTypeNumerical( $('#dlgadd_type').val() ).toString(), 
+                type:           vscp.getVarTypeNumerical( $('#dlgadd_type').val() ).toString(),
                 user:           $('#dlgadd_user').val(),
                 accessrights:   accessrights.toString(),
                 persistency:    $('#dlgadd_persistent').is(":checked") ? "true" : "false",
 
                 onSuccess: function( conn ) {
-                    
+
                     // Read back the variable
                     vscpConn.readVar({
 
@@ -1055,21 +1060,21 @@
                             if ( ( row_exist = isVariableInTable( msg.name ) ) < 0 ) {
                                 // Add new row to table
                                 table.row.add( [
-                                    msg.name.toLowerCase(), 
-                                    vscp.getVarTypeName( msg.type ), 
-                                    msg.persistency ? "true" : "false", 
-                                    vscp.user.getUserFromId( msg.userid ), 
-                                    msg.accessright.toString(16), 
+                                    msg.name.toLowerCase(),
+                                    vscp.getVarTypeName( msg.type ),
+                                    msg.persistency ? "true" : "false",
+                                    vscp.user.getUserFromId( msg.userid ),
+                                    msg.accessright.toString(16),
                                     msg.lastchange,
                                     msg.type,
                                     msg.userid
-                                ] ).draw( false );  
+                                ] ).draw( false );
                             }
                             else {
                                 // Update row data
 
                             }
-                        
+
                             ui.enable();
 
                         },
@@ -1104,19 +1109,19 @@
     <!--                              Modal to edit variable                                   -->
     <!-- **************************************************************************************-->
     <div id="dlgEditVariable" class="modal fade" role="dialog">
-        
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Edit VSCP remote variable</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
                         <div class="form-group">
@@ -1126,12 +1131,12 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_type">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle" 
-                                                data-toggle="dropdown" aria-haspopup="true" 
+                                    <button type="button" class="btn btn-success dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">types <span class="caret"></span></button>
                                     <ul id="dlgedit_typedd" class="dropdown-menu dropdown-menu-right">
                                     </ul>
@@ -1146,15 +1151,15 @@
                             <input type="text" class="form-control" id="dlgedit_persistent" readonly >
                             <span class="help-block">Variable persistance. Can not be changed.</span>
                         </div>
-                        
+
                         <div class="form-group">
-                            <label for="owner"><span class="glyphicon glyphicon-asterisk"></span> owner</label>                    
-                            <div class="input-group">                                
+                            <label for="owner"><span class="glyphicon glyphicon-asterisk"></span> owner</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgedit_owner">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle" 
+                                    <button type="button" class="btn btn-success dropdown-toggle"
                                                 id="dlgedit_userbtn"
-                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">users <span class="caret"></span></button>
                                     <ul id="dlgedit_userdd" class="dropdown-menu dropdown-menu-right">
                                     </ul>
@@ -1162,7 +1167,7 @@
                             </div>
                             <span class="help-block">Owner of variable is logged in user. Can not be changed.</span>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="permission"><span class="glyphicon glyphicon-asterisk"></span> permission</label>
                             <input type="text" class="form-control" id="dlgedit_permission" placeholder="Enter permissions">
@@ -1180,11 +1185,11 @@
                             <textarea class="form-control" rows="6" id="dlgedit_note" placeholder="Enter value"></textarea>
                             <span class="help-block">Enter an optional description for the variable. Presented as HTML. May be easier to edit in the mainscreen editor</span>
                         </div>
-                        
+
                     </form>
                 </div>
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveEditResult()">Save</button>                  
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveEditResult()">Save</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -1198,19 +1203,19 @@
     <!--                              Modal to add variable                                   -->
     <!-- **************************************************************************************-->
     <div id="dlgAddVariable" class="modal fade" role="dialog">
-        
+
         <div class="modal-dialog">
 
             <!-- Modal content-->
             <div class="modal-content">
-                
+
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal">&times;</button>
                     <h4 class="modal-title">Add VSCP remote variable</h4>
                 </div>
 
                 <div class="modal-body">
-   
+
                     <form role="form">
 
                         <div class="form-group">
@@ -1220,21 +1225,21 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>                    
-                            <div class="input-group">                                
+                            <label for="dlgtype"><span class="glyphicon glyphicon-asterisk"></span> type</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgadd_type">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle" 
-                                                data-toggle="dropdown" aria-haspopup="true" 
+                                    <button type="button" class="btn btn-success dropdown-toggle"
+                                                data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">types <span class="caret"></span></button>
                                     <ul id="dlgadd_typedd" class="dropdown-menu dropdown-menu-right">
                                     </ul>
                                 </div>
                             </div>
                             <span class="help-block">Set variable type.</span>
-                        </div>    
+                        </div>
 
-                        <div class="form-group">    
+                        <div class="form-group">
                             <div class="checkbox">
                                 <label><input type="checkbox" id="dlgadd_persistent" value="true" checked ><b>Persistent</b></label>
                                 <span class="help-block">Persistent variables are saved in a database, non persistent variables are saved in memory.</span>
@@ -1242,13 +1247,13 @@
                         </div>
 
                         <div class="form-group">
-                            <label for="owner"><span class="glyphicon glyphicon-asterisk"></span> owner</label>                    
-                            <div class="input-group">                                
+                            <label for="owner"><span class="glyphicon glyphicon-asterisk"></span> owner</label>
+                            <div class="input-group">
                                 <input readonly type="text" class="form-control" aria-label="..." id="dlgadd_owner">
                                 <div class="input-group-btn">
-                                    <button type="button" class="btn btn-success dropdown-toggle" 
+                                    <button type="button" class="btn btn-success dropdown-toggle"
                                                 id="dlgadd_userbtn"
-                                                data-toggle="dropdown" aria-haspopup="true" 
+                                                data-toggle="dropdown" aria-haspopup="true"
                                                 aria-expanded="false">users <span class="caret"></span></button>
                                     <ul id="dlgadd_userdd" class="dropdown-menu dropdown-menu-right">
                                     </ul>
@@ -1256,7 +1261,7 @@
                             </div>
                             <span class="help-block">Set the owner of this variable.</span>
                         </div>
-                        
+
                         <div class="form-group">
                             <label for="permission"><span class="glyphicon glyphicon-asterisk"></span> permission</label>
                             <input type="text" class="form-control" id="dlgadd_permission" placeholder="Enter permissions">
@@ -1274,11 +1279,11 @@
                             <textarea class="form-control" rows="6" id="dlgadd_note" placeholder="Enter note"></textarea>
                             <span class="help-block">Enter an optional description for the variable. Presented as HTML. May be easier to edit in the mainscreen editor</span>
                         </div>
-                        
+
                     </form>
                 </div>
-                <div class="modal-footer">  
-                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveAddResult()">Add</button>                  
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-success btn-lg" data-dismiss="modal" onclick="saveAddResult()">Add</button>
                     <button type="button" class="btn btn-primary btn-lg" data-dismiss="modal">Cancel</button>
                 </div>
             </div>
@@ -1295,7 +1300,8 @@
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="index.html">
-                <img src="../images/logo/vscp_new.png" class="img-thumbnail" width="120" alt="vscp logo" /></a>
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png"
+                    class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
             <div id="menu">
             </div>
@@ -1306,22 +1312,23 @@
     <!--                                                    Table-area                                                        -->
     <!-- **********************************************************************************************************************-->
     <div class="container-fluid">
+        <br>
         <h1>VSCP remote variables</h1>
 
-        <div class="container-fluid">            
+        <div class="container-fluid">
             <div class="row">
-                
+
             </div>
-            <div class="row">                
+            <div class="row">
                 <div class="col-sm-2">
-                    
+
                     <div class="input-group">
                         <label for="basic-url">Select variables</label>
                     </div>
 
-                    <div class="input-group"> 
+                    <div class="input-group">
                         <span class="input-group-addon" id="basic-addon1">:</span>
-                        <input id="myRegExp" type="text" class="form-control" placeholder="regexp" aria-describedby="basic-addon1" >         
+                        <input id="myRegExp" type="text" class="form-control" placeholder="regexp" aria-describedby="basic-addon1" >
                     </div>
                     <p>
                     <div class="input-group col-sm-8">
@@ -1338,7 +1345,7 @@
                         </button>
                     </div>
                     </p>
-                    
+
                     <p>
                     <div class="input-group col-sm-8">
                         <button type="button" class="btn btn-success col-sm-12" onclick="addVariable();">
@@ -1364,16 +1371,16 @@
                     </p>
 
                     <p>
-                    <!--  TODO    
+                    <!--  TODO
                     <div class="input-group col-sm-8">
                         <button type="button" class="btn btn-success col-sm-12" onclick="showTable();">
                             <span class="glyphicon glyphicon-cloud-upload" aria-hidden="true"></span> Import variables
                         </button>
                     </div>
                     </p>
-                    -->        
+                    -->
                 </div>
-                
+
                 <div class="col-sm-9">
                     <table id="variableTable"  class="table table-striped table-bordered table-hover display compact nowrap" cellspacing="50" width="100%"></table>
                 </div>
@@ -1381,40 +1388,40 @@
             </div>
 
             <div class="row">
-                <div class="col-sm-2"><b>Shortcut keys</b><br><b>ctrl+'S'</b> - Save variable<br><b>ctrl+'R'</b> - Read variable<br><b>ctrl+'.'</b> - Increase size<br><b>ctrl+','</b> - Decreas size<br></div>                
+                <div class="col-sm-2"><b>Shortcut keys</b><br><b>ctrl+'S'</b> - Save variable<br><b>ctrl+'R'</b> - Read variable<br><b>ctrl+'.'</b> - Increase size<br><b>ctrl+','</b> - Decreas size<br></div>
                 <div class="col-sm-9">
                     <b>Value:</b>
                     <div class="ace-holder">
                         <div id="divval" class="ace-editor">
                             <div id="editorValue"></div>
                         </div>
-                    </div>     
-                </div>         
+                    </div>
+                </div>
                 <div class="col-sm-1"></div>
             </div>
             <br>
             <div class="row">
-                <div class="col-sm-2"></div>                
+                <div class="col-sm-2"></div>
                 <div class="col-sm-9">
                     <b>Note:</b>
                     <div class="ace-holder">
                         <div class="ace-editor">
                             <div id="editorNote"></div>
                         </div>
-                    </div>        
-                </div>         
+                    </div>
+                </div>
                 <div class="col-sm-1"></div>
-            </div>     
+            </div>
 
         </div>
-        
+
     </div>
-    
+
     <!-- <div id="copyright-info" /> -->
 
     <footer>
         <div id="status-footer"/>
     </footer>
-    
+
 </body>
 </html>
