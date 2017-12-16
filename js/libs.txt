@@ -16,6 +16,7 @@ d3                  4.11.0      https://d3js.org/
 flot                0.8.3       http://www.flotcharts.org/
 sjcl                            http://bitwiseshiftleft.github.io/sjcl/doc/sjcl.cipher.aes.html
 popper              1.12.5      https://github.com/FezVrasta/popper.js
+canvas-gauges       2.1.4       https://github.com/Mikhus/canvas-gauges
 
 icons
 =====
