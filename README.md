@@ -1,6 +1,6 @@
 <h1>VSCP & Friends - HTML5 UX components</h1>
 
-<img src="http://vscp.org/images/logo.jpg" >
+<img src="http://vscp.org/images/logo.png" >
 
 This is the VSCP HTML5 user interface component framework which 
 can be used to create nice and responsible user interfaces experiences.
