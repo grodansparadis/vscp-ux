@@ -1378,7 +1378,7 @@ vscp.getVarTypeName = function(n) {
     } else {
         return "Unknown variable type";
     }
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.getVarTypeName
@@ -1448,7 +1448,7 @@ vscp.getVarTypeNumerical = function(str) {
     } else if ("filter" == str.toLowerCase()) {
         return vscp.constants.varTypes.FILTER;
     }
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.getEditorModeFromType
@@ -1520,10 +1520,7 @@ vscp.getEditorModeFromType = function(n) {
     } else {
         return "text";
     }
-}
-
-
-
+};
 
 
 /* ---------------------------------------------------------------------- */
@@ -1538,14 +1535,14 @@ vscp.b64EncodeUnicode = function(str) {
     return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
         return String.fromCharCode('0x' + p1);
     }));
-}
+};
 
 // Base64 unicode safe decode
 vscp.b64DecodeUnicode = function(str) {
     return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
-}
+};
 
 
 ///////////////////////////////////////////////////////////////////////////////
@@ -1575,7 +1572,7 @@ vscp.isBase64Type = function(type) {
     }
 
     return false;
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.decodeValueIfBase64
@@ -1590,7 +1587,7 @@ vscp.decodeValueIfBase64 = function(type, value) {
     } else {
         return value;
     }
-}
+};
 
 ///////////////////////////////////////////////////////////////////////////////
 // vscp.encodeValueIfBase64
@@ -1605,7 +1602,7 @@ vscp.encodeValueIfBase64 = function(type, value) {
     } else {
         return value;
     }
-}
+};
 
 /**
  * VSCP event.
@@ -1780,7 +1777,7 @@ vscp.Event.prototype.getPriority = function() {
  */
 vscp.Event.prototype.setHardCodedAddr = function() {
     this.vscpHead |= 0x0010;
-}
+};
 
 /**
  * Is the node id of the event sender hard coded or not?
@@ -1802,7 +1799,7 @@ vscp.Event.prototype.isHardCodedAddr = function() {
  */
 vscp.Event.prototype.setDoNotCalcCRC = function() {
     this.vscpHead |= 0x0008;
-}
+};
 
 /**
  * Is CRC calculated or not?
@@ -1843,7 +1840,7 @@ vscp.utility.readValue = function(input) {
         txtvalue = txtvalue.substring(pos + 2);
         return parseInt(txtvalue, 16);
     }
-}
+};
 
 
 /**
