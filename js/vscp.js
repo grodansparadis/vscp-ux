@@ -1707,13 +1707,11 @@ vscp.Event = function(options) {
             this.vscpTimeStamp = options.vscpTimeStamp;
         }
 
-        if ("string" === typeof options.vscpTimeStamp) {
+        if ("string" === typeof options.vscpDateTime) {
             // Time in UTC for events but conversion
             // is done in send routine
             this.vscpDateTime  = new Date(options.vscpDateTime);
-        }
-
-        if ("date" === typeof options.vscpTimeStamp) {
+        } else if (true === (options.vscpDateTime instanceof Date)) {
             // Time should be local
             this.vscpDateTime = options.vscpDateTime;
         }
@@ -1723,7 +1721,7 @@ vscp.Event = function(options) {
         }
 
         if (("string" === typeof options.vscpData) ||
-            (options.vscpData instanceof Array)) {
+            (true === (options.vscpData instanceof Array))) {
             this.vscpData = options.vscpData;
         }
     }
