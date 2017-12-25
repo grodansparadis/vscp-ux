@@ -2052,17 +2052,17 @@ vscp.Connection = function() {
     /** User rights from authentication AUTH1
      * @member {array}
      */
-    this.userRights = new Array;
+    this.userRights = [];
 
     /** User allowed remotes from authentication AUTH1
      * @member {array}
      */
-    this.userRemotes = new Array;
+    this.userRemotes = [];
 
     /** User allowed events from authentication AUTH1
      * @member {array}
      */
-    this.userEvents = new Array;
+    this.userEvents = [];
 
     /** User note from authentication AUTH1
      * @member {string}
