@@ -103,7 +103,8 @@
     </div>
 
     <!-- JQuery -->
-    <script type="text/javascript" src="../js/jquery/2.2.1/jquery-2.2.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery/3.2.1/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-migrate/3.0.1/jquery-migrate-3.0.1.js"></script>
 
     <!-- Bootstrap -->
     <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -124,108 +125,105 @@
 
     <script type="text/javascript">
 
-        (function() {
+        // VSCP websocket connection
+        var vscpConn = null;
 
-            // VSCP websocket connection
-            var vscpConn = null;
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
 
-            // Wait until the whole website is loaded
-            $( document ).ready( function() {
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
 
-                // Show navigation bar menu
-                navBarMenu.show( "menu", navBarMenu.content );
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
 
-                // Create a VSCP websocket
-                vscpConn = new vscp.Connection();
+            // Connect to VSCP server
+            vscpConn.connect({
 
-                // Connect to VSCP server
-                vscpConn.connect({
+                url: settings.url,
+                userName: settings.user,
+                password: settings.password,
+                vscpkey: settings.vscpkey,
+                authdomain: settings.authdomain,
 
-                    url: settings.url,
-                    userName: settings.user,
-                    password: settings.password,
-                    vscpkey: settings.vscpkey,
-                    authdomain: settings.authdomain,
+                onSuccess: function( conn ) {
 
-                    onSuccess: function( conn ) {
+                    // Set filter for CLASS1.INFORMATION
+                    vscpConn.setFilter({
+                        filterClass: vscp.constants.classes.VSCP_CLASS1_INFORMATION,
+                        maskClass: 0xffff,
+                        filterType: vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED,
+                        maskType: 0xffff
+                    });
 
-                        // Set filter for CLASS1.INFORMATION
-                        vscpConn.setFilter({
-                            filterClass: vscp.constants.classes.VSCP_CLASS1_INFORMATION,
-                            maskClass: 0xffff,
-                            filterType: vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED,
-                            maskType: 0xffff
-                        });
+                    // Start receiving VSCP events
+                    vscpConn.start({
 
-                        // Start receiving VSCP events
-                        vscpConn.start({
+                        onSuccess: function( conn ) {
 
-                            onSuccess: function( conn ) {
+                            vscpConn.addEventListener( eventListener );
 
-                                vscpConn.addEventListener( eventListener );
+                        },
 
-                            },
+                        onError: function( conn ) {
+                            alert("Couldn't start receiving events.");
+                        }
 
-                            onError: function( conn ) {
-                                alert("Couldn't start receiving events.");
-                            }
+                    });
 
-                        });
+                },
 
-                    },
+                onError: function( conn ) {
+                    alert("Couldn't establish a connection.");
+                }
 
-                    onError: function( conn ) {
-                        alert("Couldn't establish a connection.");
-                    }
+            });
+        });
 
-                });
+        var eventListener = function( conn, evt ) {
+
+            var index   = 0;
+            var bFound  = false;
+
+            if ( "undefined" === typeof evt ) {
+                return;
+            }
+
+            if ( false === ( evt instanceof vscp.Event ) ) {
+                return;
+            }
+
+            if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
+                 ( vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED === evt.vscpType ) &&
+                 ( zone === evt.vscpData[ 1 ] ) &&
+                 ( subZone === evt.vscpData[ 2 ] ) ) {
+
+                $( "#sliderCtrl1" ).val( evt.vscpData[ 0 ] );
+                $( "#sliderText1" ).html( evt.vscpData[ 0 ] );
+                $( "#sliderCtrl2" ).val( evt.vscpData[ 0 ] );
+            }
+
+        };
+
+        var zone = 1;
+        var subZone = 20;
+
+        function sliderChange( newValue )
+        {
+            $( "#sliderText1" ).html( newValue );
+
+            vscpConn.sendEvent({
+
+                event: new vscp.Event({
+                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_CONTROL,
+                    vscpType:       vscp.constants.types.VSCP_TYPE_CONTROL_DIM_LAMPS,
+                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
+                    vscpData:       [ newValue, zone, subZone ]
+                }),
+
             });
 
-            var eventListener = function( conn, evt ) {
-
-                var index   = 0;
-                var bFound  = false;
-
-                if ( "undefined" === typeof evt ) {
-                    return;
-                }
-
-                if ( false === ( evt instanceof vscp.Event ) ) {
-                    return;
-                }
-
-                if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
-                     ( vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED === evt.vscpType ) &&
-                     ( zone === evt.vscpData[ 1 ] ) &&
-                     ( subZone === evt.vscpData[ 2 ] ) ) {
-
-                    $( "#sliderCtrl1" ).val( evt.vscpData[ 0 ] );
-                    $( "#sliderText1" ).html( evt.vscpData[ 0 ] );
-                    $( "#sliderCtrl2" ).val( evt.vscpData[ 0 ] );
-                }
-
-            };
-
-            var zone = 1;
-            var subZone = 20;
-
-            function sliderChange( newValue )
-            {
-                $( "#sliderText1" ).html( newValue );
-
-                vscpConn.sendEvent({
-
-                    event: new vscp.Event({
-                        vscpClass:      vscp.constants.classes.VSCP_CLASS1_CONTROL,
-                        vscpType:       vscp.constants.types.VSCP_TYPE_CONTROL_DIM_LAMPS,
-                        vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                        vscpData:       [ newValue, zone, subZone ]
-                    }),
-
-                });
-
-            }
-        })();
+        }
 
     </script>
 
