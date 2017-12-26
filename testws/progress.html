@@ -17,6 +17,86 @@
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
     
+    <style>
+        /* Progress 1 */
+        /* Firefox - value portion of progress progress1 */
+        progress#progress1::-moz-progress-bar {
+            background-color: red;
+            -moz-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* Chrome, Safari - value portion of progress bar */
+        progress#progress1::-webkit-progress-value {
+            background-color: red;
+            -webkit-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* All other attributes */
+        progress#progress1 {
+            background-color: #F0F0F0;
+            border: solid #808080 2px;
+            border-radius: 5px;
+            -moz-box-shadow: 3px 3px 3px #C0C0C0;
+            -webkit-box-shadow: 3px 3px 3px #C0C0C0;
+            box-shadow: 3px 3px 3px #C0C0C0;
+            padding: 3px;
+            width: 250px;
+            height: 20px;
+        }
+
+        /* Progress 2 */
+        /* Firefox - value portion of progress progress1 */
+        progress#progress2::-moz-progress-bar {
+            background-color: blue;
+            -moz-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* Chrome, Safari - value portion of progress bar */
+        progress#progress2::-webkit-progress-value {
+            background-color: blue;
+            -webkit-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* All other attributes */
+        progress#progress2 {
+            background-color: #F0F0F0;
+            border: solid #808080 2px;
+            border-radius: 5px;
+            -moz-box-shadow: 3px 3px 3px #C0C0C0;
+            -webkit-box-shadow: 3px 3px 3px #C0C0C0;
+            box-shadow: 3px 3px 3px #C0C0C0;
+            padding: 3px;
+            width: 250px;
+            height: 20px;
+        }
+
+        /* Progress 3 */
+        /* Firefox - value portion of progress progress1 */
+        progress#progress3::-moz-progress-bar {
+            background-color: green;
+            -moz-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* Chrome, Safari - value portion of progress bar */
+        progress#progress3::-webkit-progress-value {
+            background-color: green;
+            -webkit-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* All other attributes */
+        progress#progress3 {
+            background-color: #F0F0F0;
+            border: solid #808080 2px;
+            border-radius: 5px;
+            -moz-box-shadow: 3px 3px 3px #C0C0C0;
+            -webkit-box-shadow: 3px 3px 3px #C0C0C0;
+            box-shadow: 3px 3px 3px #C0C0C0;
+            padding: 3px;
+            width: 250px;
+            height: 20px;
+        }
+    </style>
+    
 </head>
 
 <body>
@@ -39,13 +119,11 @@
         </p>
         <p>
             You can update the slider by sending
-            <p>
-            <pre>send 0,20,40,0,0,"-",90,1,20</pre>
-            </p>
         </p>
+        <pre>send 0,20,40,0,0,"-",90,1,20</pre>
         <p>
             Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
-            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b>there to
+            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b> there to
             set the slider value to either 0,10,50 or 100.
         </p>
         <div>
@@ -88,86 +166,6 @@
     <script type="text/javascript" src="../js/navbar.js"></script>
     <!-- Navigation bar menu structure -->
     <script type="text/javascript" src="menu.js"></script>
-
-    <style>
-        // Progress 1
-        /* Firefox - value portion of progress progress1 */
-        progress#progress1::-moz-progress-bar {
-            background-color: red;
-            -moz-box-shadow: 1px 1px 1px #333333;
-        }
-
-        /* Chrome, Safari - value portion of progress bar */
-        progress#progress1::-webkit-progress-value {
-            background-color: red;
-            -webkit-box-shadow: 1px 1px 1px #333333;
-        }
-
-        /* All other attributes */
-        progress#progress1 {
-            background-color: #F0F0F0;
-            border: solid #808080 2px;
-            border-radius: 5px;
-            -moz-box-shadow: 3px 3px 3px #C0C0C0;
-            -webkit-box-shadow: 3px 3px 3px #C0C0C0;
-            box-shadow: 3px 3px 3px #C0C0C0;
-            padding: 3px;
-            width: 250px;
-            height: 20px;
-        }
-
-        // Progress 2
-        /* Firefox - value portion of progress progress1 */
-        progress#progress2::-moz-progress-bar {
-            background-color: blue;
-            -moz-box-shadow: 1px 1px 1px #333333;
-        }
-
-        /* Chrome, Safari - value portion of progress bar */
-        progress#progress2::-webkit-progress-value {
-            background-color: blue;
-            -webkit-box-shadow: 1px 1px 1px #333333;
-        }
-
-        /* All other attributes */
-        progress#progress2 {
-            background-color: #F0F0F0;
-            border: solid #808080 2px;
-            border-radius: 5px;
-            -moz-box-shadow: 3px 3px 3px #C0C0C0;
-            -webkit-box-shadow: 3px 3px 3px #C0C0C0;
-            box-shadow: 3px 3px 3px #C0C0C0;
-            padding: 3px;
-            width: 250px;
-            height: 20px;
-        }
-
-        // Progress 3
-        /* Firefox - value portion of progress progress1 */
-        progress#progress3::-moz-progress-bar {
-            background-color: green;
-            -moz-box-shadow: 1px 1px 1px #333333;
-        }
-
-        /* Chrome, Safari - value portion of progress bar */
-        progress#progress3::-webkit-progress-value {
-            background-color: green;
-            -webkit-box-shadow: 1px 1px 1px #333333;
-        }
-
-        /* All other attributes */
-        progress#progress3 {
-            background-color: #F0F0F0;
-            border: solid #808080 2px;
-            border-radius: 5px;
-            -moz-box-shadow: 3px 3px 3px #C0C0C0;
-            -webkit-box-shadow: 3px 3px 3px #C0C0C0;
-            box-shadow: 3px 3px 3px #C0C0C0;
-            padding: 3px;
-            width: 250px;
-            height: 20px;
-        }
-    </style>
 
     <script type="text/javascript" >
 

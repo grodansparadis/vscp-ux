@@ -51,9 +51,7 @@
         <p>
             You can update the slider by sending
         </p>
-        <p>
-            <pre>send 0,20,40,0,0,-,90,1,20</pre>
-        </p>
+        <pre>send 0,20,40,0,0,-,90,1,20</pre>
         <p>
             Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
             also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b> there to
@@ -67,7 +65,6 @@
             The VSCP_TYPE_CONTROL_BIG_CHANGE_LEVEL, VSCP_TYPE_INFORMATION_BIG_ LEVEL_CHANGED events can be used if you need ranges
             other than 0-100
         </p>
-        <p>
         <div>
             <datalist id="datalist">
                 <option>0</option>
@@ -94,8 +91,7 @@
             </datalist>
             <input id="sliderCtrl1" style="width: 600px;" type="range" min="0" max="100" value="0" step="5" list="datalist" onchange="sliderChange( this.value )" />
             <span id="sliderText1">0</span>
-        <div>
-        </p>
+        </div>
         <p>
             <input id="sliderCtrl2" type="range" min="0" max="100" value="0" step="5" name="grade" orient="vertical" list="datalist" style="width: 20px; height: 200px; -webkit-appearance: slider-vertical; writing-mode: bt-lr;">
         </p>

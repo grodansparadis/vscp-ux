@@ -342,19 +342,19 @@
         <div id="ui">
             <p>
                 Two mechanism are provided to discover VSCP nodes the communication bus.
-                <ul>
-                    <li>
-                        Send a broadcast message to all nodes (who is there event) and wait for node responses.<br />
-                        <input type="submit" class="btn btn-default" value="Who is there?" onclick="whoIsThere()" disabled />
-                    </li>
-                    <li>
-                        Probe for nodes in a defined range.<br />
-                        <input type="submit" class="btn btn-default" value="Start scanning" onclick="scan()" disabled />
-                        from: <input id="scanFrom" type="text" class="btn btn-default" value="1" disabled />
-                        to: <input id="scanTo" type="text" class="btn btn-default" value="255" disabled />
-                    </li>
-                </ul>
             </p>
+            <ul>
+                <li>
+                    Send a broadcast message to all nodes (who is there event) and wait for node responses.<br />
+                    <input type="submit" class="btn btn-default" value="Who is there?" onclick="whoIsThere()" disabled />
+                </li>
+                <li>
+                    Probe for nodes in a defined range.<br />
+                    <input type="submit" class="btn btn-default" value="Start scanning" onclick="scan()" disabled />
+                    from: <input id="scanFrom" type="text" class="btn btn-default" value="1" disabled />
+                    to: <input id="scanTo" type="text" class="btn btn-default" value="255" disabled />
+                </li>
+            </ul>
         </div>
         <table id="output" class="table table-striped">
             <thead>

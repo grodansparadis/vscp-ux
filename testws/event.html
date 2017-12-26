@@ -56,22 +56,22 @@
                 and will confirm an on state when it is received. The same is true for
                 <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off">CLASS1.INFORMATION, Type=3/OFF</a> which is a
                 validation for <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a> event. That is<br />
-                <ul>
-                    <li>
-                        A button is pressed and send <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_5_0x05_turnon">CLASS1.CONTROL, Type=5/TurnOn</a> event.
-                    </li>
-                    <li>
-                        To visually indicate that the TurnOn event has been handled by a remote node
-                        the button waits for a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_3_0x03_on">CLASS1.INFORMATION, Type=3/ON</a> and when received it changes the
-                        state of the button.
-                    </li>
-                    <li>
-                        The same is true when the button is on and is pressed which sends
-                        <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a> event and waits for
-                        <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off"> CLASS1.INFORMATION, Type=3/OFF</a>
-                    </li>
-                </ul>
             </p>
+            <ul>
+                <li>
+                    A button is pressed and send <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_5_0x05_turnon">CLASS1.CONTROL, Type=5/TurnOn</a> event.
+                </li>
+                <li>
+                    To visually indicate that the TurnOn event has been handled by a remote node
+                    the button waits for a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_3_0x03_on">CLASS1.INFORMATION, Type=3/ON</a> and when received it changes the
+                    state of the button.
+                </li>
+                <li>
+                    The same is true when the button is on and is pressed which sends
+                    <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a> event and waits for
+                    <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off"> CLASS1.INFORMATION, Type=3/OFF</a>
+                </li>
+            </ul>
             <p>The righmost button (yellow) in the <a href="statebutton.html">button widget demo</a> will change state when the below buttons are pressed.</p>
             <p>
                 <input type="submit" class="btn btn-warning" value="Send ON Event (Zone=1, SubZone=12)" onclick="vscpOnEvent()" disabled />
