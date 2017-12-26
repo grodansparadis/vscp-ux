@@ -49,7 +49,7 @@ var vscp = vscp || {};
  */
 vscp._createNS( "vscp.user" );
 
-vscp.user.userinfo = new Array;     // User array
+vscp.user.userinfo = [];	// User array
 
 /** VSCP user record ordinals
  *       "userid;name;password;fullname;filter;mask;rights;remotes;events;note"

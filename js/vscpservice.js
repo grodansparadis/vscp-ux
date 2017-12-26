@@ -626,6 +626,7 @@ vscp.service.Container.prototype.read = function( options )
 
     var onError     = null;
     var elements    = null;
+    var index       = 0;
 
     if ( "undefined" !== typeof options ) {
 
