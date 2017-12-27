@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="-1" />
 
     <!-- JQuery -->
-    <script type="text/javascript" src="../js/jquery/3.1.1/jquery-3.1.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery/3.2.1/jquery-3.2.1.min.js"></script>
 
     <!-- Bootstrap -->
     <link rel="stylesheet" type="text/css" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
@@ -23,12 +23,14 @@
     <script type="text/javascript" src="../js/bootstrap3-dialog/1.34.6/js/bootstrap-dialog.min.js"></script>
     
     <!-- Favorite icon -->
-    <link rel="icon" href="favicon.ico">
+    <link rel="icon" href="../favicon.ico">
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
     <!-- VSCP hash calculation -->
     <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP websocket bases library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
     <!-- VSCP admin library -->
@@ -135,7 +137,8 @@
                 url: settings.url,
                 userName: settings.user,
                 password: settings.password,
-                authdomain: settings.authdomain,                                                                
+                authdomain: settings.authdomain,
+                vscpkey: settings.vscpkey,
 
                 onSuccess: function( conn ) {
                     vscp.admin.setStatus( settings.url, true );
@@ -180,7 +183,8 @@
                     url: settings.url,
                     userName: settings.user,
                     password: settings.password,
-                    authdomain: settings.authdomain, 
+                    authdomain: settings.authdomain,
+                    vscpkey: settings.vscpkey,
 
                     onSuccess: function( conn ) {
                         //$( "#output" ).append( "<br /><br />Connection establishment successful." );
@@ -278,7 +282,7 @@
     </div>
 
     <div>
-            <img class="logo" src="../images/logo/vscp_new_v2.png" width="400" />
+            <img class="logo" src="../images/logo/vscp_new.png" width="400px" alt="VSCP logo" />
     </div>
     
     <!--
