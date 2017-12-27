@@ -1,6 +1,6 @@
 <h1>VSCP & Friends - HTML5 UX components</h1>
 
-<img src="http://vscp.org/images/logo.png" >
+<img src="http://vscp.org/images/logo.png" width="200px" alt="VSCP logo">
 
 This is the VSCP HTML5 user interface component framework which 
 can be used to create nice and responsible user interfaces experiences.
@@ -12,8 +12,7 @@ If you want to know more about the <a href="http://www.vscp.org">VSCP project</a
 
 Copyright C 2012-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>. <akhe@grodansparadis.com> 
 
-This is the user interface project for VSCP & Friends. It consist of two parts. A HTML5 based websocket 
-interface and HTML5 pages.
+This is the user interface project for VSCP & Friends. It consist of two parts. A HTML5 based websocket interface and HTML5 pages.
 
 Released under the <a href="http://opensource.org/licenses/MIT">MIT License</a>
 
@@ -23,15 +22,12 @@ On a standard system install this full source tree at /srv/vscp/web (programdata
 or other folder set in <b>&lt;webrootpath&gt;...&lt;/webrootpath&gt;</b> directive under the 
 <b>&lt;websrver&gt;</b> tag in the vscpd.conf file of the VSCP daemon.
 
-If you just want the VSCP websocket javascript code you find it in the lib folder as <b>vscpwslib.js</b>  You 
-should probably compress this javascript file for a production system. There are plenty of them around 
-<a href="http://javascriptcompressor.com">this</a> is one of them.
+If you just want the VSCP websocket javascript code you find it in the 'js' folder as <b>vscp.js</b>.
+You should probably compress this javascript file for a production system. There are plenty of them around <a href="http://javascriptcompressor.com">this</a> is one of them.
 
-<h4>testing</h4>
+<h4>Testing</h4>
 
-VSCP websocket test code is in the subfolder testws the index.html file in the route will take you to it 
-and give some further instructions. The folder contains a few demos on how to use the VSCP widgets and
-demonstrates the SCP daemon websocket interface.
+VSCP websocket test code is in the subfolder testws the index.html file in the route will take you to it and give some further instructions. The folder contains a few demos on how to use the VSCP widgets and demonstrates the SCP daemon websocket interface.
 
 In the configuration file this is set as
 
@@ -49,7 +45,7 @@ Remember to restart the daemon if you change the configuration file.
 
 To test that everything is working enter
 
-<b>http://localhost:8080/testws/index.html</b>
+<b>http://localhost:8884/testws/index.html</b>
 
 and you should get the start page which takes you true the rest of the demo..
 
@@ -69,8 +65,7 @@ Some useful commands for the vanilla test window
 
 send head,class,type,obid,time-stamp,GUID,data1,data2,data3....
 
-
-   <br><br>
-    <hr>
-    Copyright &copy; 2012-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
+<br><br>
+<hr>
+Copyright &copy; 2012-2016 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+</div>
