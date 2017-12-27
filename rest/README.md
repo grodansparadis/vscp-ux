@@ -1,6 +1,6 @@
 <h1>VSCP & Friends</h1>
 
-<img src="http://vscp.org/images/vscp_logo.jpg" width="200px" alt="VSCP logo">
+<img src="http://vscp.org/images/logo.png" width="200px" alt="VSCP logo">
 
 <p>
     This is a sample that shows how to use Javascript to interface the REST interface of the 
