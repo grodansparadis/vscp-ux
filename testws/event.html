@@ -1,14 +1,22 @@
 ﻿<!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VSCP event demos</title>
 
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
-
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/custom.css">
+    
+    <!-- Favorite icon -->
+    <link rel="icon" href="../favicon.ico">
+    
 </head>
 
 <body>
@@ -22,7 +30,6 @@
         </div>
     </nav>
     <div class="container-fluid">
-        <br>
         <h1>VSCP websocket event demos</h1>
         <p>The following demos show how to send and receive VSCP events over websocket.</p>
 
@@ -49,22 +56,22 @@
                 and will confirm an on state when it is received. The same is true for
                 <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off">CLASS1.INFORMATION, Type=3/OFF</a> which is a
                 validation for <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a> event. That is<br />
-                <ul>
-                    <li>
-                        A button is pressed and send <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_5_0x05_turnon">CLASS1.CONTROL, Type=5/TurnOn</a> event.
-                    </li>
-                    <li>
-                        To visually indicate that the TurnOn event has been handled by a remote node
-                        the button waits for a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_3_0x03_on">CLASS1.INFORMATION, Type=3/ON</a> and when received it changes the
-                        state of the button.
-                    </li>
-                    <li>
-                        The same is true when the button is on and is pressed which sends
-                        <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a> event and waits for
-                        <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off"> CLASS1.INFORMATION, Type=3/OFF</a>
-                    </li>
-                </ul>
             </p>
+            <ul>
+                <li>
+                    A button is pressed and send <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_5_0x05_turnon">CLASS1.CONTROL, Type=5/TurnOn</a> event.
+                </li>
+                <li>
+                    To visually indicate that the TurnOn event has been handled by a remote node
+                    the button waits for a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_3_0x03_on">CLASS1.INFORMATION, Type=3/ON</a> and when received it changes the
+                    state of the button.
+                </li>
+                <li>
+                    The same is true when the button is on and is pressed which sends
+                    <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a> event and waits for
+                    <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off"> CLASS1.INFORMATION, Type=3/OFF</a>
+                </li>
+            </ul>
             <p>The righmost button (yellow) in the <a href="statebutton.html">button widget demo</a> will change state when the below buttons are pressed.</p>
             <p>
                 <input type="submit" class="btn btn-warning" value="Send ON Event (Zone=1, SubZone=12)" onclick="vscpOnEvent()" disabled />
@@ -149,15 +156,11 @@
     </div>
 
     <!-- JQuery -->
-    <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="../js/jquery/3.2.1/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-migrate/3.0.1/jquery-migrate-3.0.1.js"></script>
 
     <!-- Bootstrap -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script type="text/javascript" src="../js/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
-    <!-- Favorite icon -->
-    <link rel="icon" href="../favicon.ico">
+    <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>

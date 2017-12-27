@@ -98,7 +98,7 @@
 				$dialog.find('.progress-bar').addClass('progress-bar-' + settings.progressType);
 			}
                        if(settings.rtl){
-                       	      $dialog.find('.progress-bar').css('float','right').end().attr('dir','rtl')
+                       	      $dialog.find('.progress-bar').css('float','right').end().attr('dir','rtl');
                        }
 			// Generate header tag
 			$headerTag = $('<h' + settings.headerSize + ' />');
@@ -196,22 +196,22 @@
 					if(current<0){
 						container.html(old[0]);
 					}else{
-					      var indx=(current+1>=old.length)?0:current+1	
+					      var indx=(current+1>=old.length)?0:current+1;
 					       container.html(old[indx]);	
 						
 					}
-				}
+				};
 				
 			}
 		
 			if(typeof messages ==="function"){
 				if(timeout<timer){
 				        setTimeout(function(){
-					     messages.call($dialog,$dialog.find('.modal-header>h'+config.headerSize))
-				        },timeout)
+					     messages.call($dialog,$dialog.find('.modal-header>h'+config.headerSize));
+				        },timeout);
 			        }
 				var job= setInterval(function(){
-					messages.call($dialog,$dialog.find('.modal-header>h'+config.headerSize))
+					messages.call($dialog,$dialog.find('.modal-header>h'+config.headerSize));
 				},timer);
 				cache.animate.push(job);
 				return job;

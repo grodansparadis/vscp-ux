@@ -1,13 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VSCP &amp; Friends</title>
+    
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="js/bootstrap/3.3.7/css/bootstrap.min.css">
+    
+    <!-- Favorite icon -->
+    <link rel="icon" href="favicon.ico">
+    
 </head>
 <body>
     <div class="container-fluid">
         <p>
-        <img src="images/logo/vscp_new.png" class="img-responsive" width="200px" alt="VSCP logo" />
+            <img src="images/logo/vscp_new.png" class="img-responsive" width="200px" alt="VSCP logo" />
         </p>
 
         <hr />
@@ -35,13 +44,14 @@
             </div>
             <div class="panel-body">
                 <p>
-            To test the websocket interface of the VSCP daemon you first edit the <b>settings.js</b>
-            file which after installation is located in the <b><i>js subfolder</i></b> of the web root filesystem
-            which normally is at <u>/srv/vscp/web</u> on a linux system and at <u>C:\Programdata\VSCP\web</u> on a windows system.
-        </p>
-        <p>
-            The default content in this file is:
-            <b><pre>
+                    To test the websocket interface of the VSCP daemon you first edit the <b>settings.js</b>
+                    file which after installation is located in the <b><i>js subfolder</i></b> of the web root filesystem
+                    which normally is at <u>/srv/vscp/web</u> on a linux system and at <u>C:\Programdata\VSCP\web</u> on a windows system.
+                </p>
+                <p>
+                    The default content in this file is:
+                </p>
+                <b><pre><code>
     var settings = {
 
         user: "admin",
@@ -50,23 +60,23 @@
         passwordHash: "d50c3180375c27927c22e42a379c3f67", // Hash on "user:authdomain:password"
         url: "ws://192.168.1.8:8080" // Non SSL (to be able to use from remote machine)
 
-    };</pre></b>
-            which is the default admin credentials for
-            <p>
-            <ul>
-                <li><b>Username: <i>admin</i></b></li>
-                <li><b>Password: <i>secret</i></b></li>
-                <li><b>Domain:   <i>mydomain.com</i></b></li>
-            </ul>
-            </p>
-            <p>
-                needless to say you should change login settings as soon as you use your system more seriously.
-            </p>
-            <p>
-                The last part in the <b>settings.js</b> file to change is the url for your server.
-                The default for the websocket samples is to use a non-ssl connection (unsecure). If you want to use ssl you should use
-                <b>"wss://"</b> as prefix instead of <b>"ws://"</b>
-            </p>
+    };</code></pre></b>
+                <p>
+                    which is the default admin credentials for
+                </p>
+                <ul>
+                    <li><b>Username: <i>admin</i></b></li>
+                    <li><b>Password: <i>secret</i></b></li>
+                    <li><b>Domain:   <i>mydomain.com</i></b></li>
+                </ul>
+                <p>
+                    needless to say you should change login settings as soon as you use your system more seriously.
+                </p>
+                <p>
+                    The last part in the <b>settings.js</b> file to change is the url for your server.
+                    The default for the websocket samples is to use a non-ssl connection (unsecure). If you want to use ssl you should use
+                    <b>"wss://"</b> as prefix instead of <b>"ws://"</b>
+                </p>
             </div>
         </div>
 
@@ -76,9 +86,9 @@
             </div>
             <div class="panel-body">
                 When you have edited and saved this information you should verify that the <a href="testws/testauth.html">websocket
-            login test script</a> works. Nothing else will work if this part does not work.  Follow the output messages and if the
-            connection is established successful, everything
-            is fine, otherwise something is bad with your login informations.
+                login test script</a> works. Nothing else will work if this part does not work.  Follow the output messages and if the
+                connection is established successful, everything
+                is fine, otherwise something is bad with your login informations.
             </div>
         </div>
 
@@ -88,7 +98,7 @@
             </div>
             <div class="panel-body">
                 OK login works, click the demo button and start exploring
-                <input type="button" class="btn btn-warning" value="GO TO DEMO" onclick="window.location.href='testws/index.html';" enabled />
+                <input type="button" class="btn btn-warning" value="GO TO DEMO" onclick="window.location.href='testws/index.html';" />
             </div>
         </div>
 
@@ -102,19 +112,15 @@ content. You find it <a href="https://github.com/grodansparadis/vscp-ux">here</a
     </div>
 
     <!-- JQuery -->
-    <script type="text/javascript" src="js/jquery/2.2.1/jquery-2.2.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery/3.2.1/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="js/jquery-migrate/3.0.1/jquery-migrate-3.0.1.js"></script>
 
     <!-- Bootstrap -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="js/bootstrap/3.3.7/css/bootstrap.min.css">
     <script type="text/javascript" src="js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- VSCP UX version -->
     <script type="text/javascript" src="js/vscp.js"></script>
     <script type="text/javascript" src="js/version.js"></script>
-
-    <!-- Favorite icon -->
-    <link rel="icon" href="favicon.ico">
 
     <script type="text/javascript">
         (function() {

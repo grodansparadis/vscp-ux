@@ -1,15 +1,22 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VSCP HTML5 lm-sensors example</title>
 
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
-
-
+    <!-- Bootstrap -->
+    <link rel="stylesheet" type="text/css" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/custom.css">
+    
+    <!-- Favorite icon -->
+    <link rel="icon" href="../favicon.ico">
+    
 </head>
 
 <body>
@@ -23,24 +30,21 @@
         </div>
     </nav>
     <div class="container-fluid">
-        <br>
         <h1>VSCP HTML5 lm-sensors example</h1>
         <p>
             This example is described in the <a href="http://www.vscp.org/wiki/doku.php/howto/driver_level2_lmsensors" target="new">wiki</a> and need
             the lmsensor driver to be configured for it to work.
         </p>
-        <p>
-            <table class="table table-bordered">
-                <tr>
-                    <td>Temperature for CPU Core 0</td>
-                    <td><span id="cpu0">?</span></td>
-                </tr>
-                <tr>
-                    <td>Temperature for CPU Core 1</td>
-                    <td><span id="cpu1">?</span></td>
-                </tr>
-            </table>
-        </p>
+        <table class="table table-bordered">
+            <tr>
+                <td>Temperature for CPU Core 0</td>
+                <td><span id="cpu0">?</span></td>
+            </tr>
+            <tr>
+                <td>Temperature for CPU Core 1</td>
+                <td><span id="cpu1">?</span></td>
+            </tr>
+        </table>
 
         <br /><br />
         <hr />
@@ -49,15 +53,11 @@
     </div>
 
     <!-- JQuery -->
-    <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
+    <script type="text/javascript" src="../js/jquery/3.2.1/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-migrate/3.0.1/jquery-migrate-3.0.1.js"></script>
 
     <!-- Bootstrap -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script type="text/javascript" src="../js/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
-    <!-- Favorite icon -->
-    <link rel="icon" href="../favicon.ico">
+    <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>

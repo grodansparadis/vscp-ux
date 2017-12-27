@@ -1,95 +1,24 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VSCP HTML5 progress bar</title>
 
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
 
-
-
-</head>
-
-<body>
-   <nav class="navbar navbar-default">
-        <div class="container-fluid">
-            <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
-            </div>
-            <div id="menu">
-            </div>
-        </div>
-    </nav>
-    <div class="container-fluid">
-        <br>
-        <h1>VSCP HTML5 progress bar</h1>
-        <p>
-            This is just the standard HTML5 progress bar with some extra styling. It is connected to the <b>vscp.Connection</b>
-            and configured to write the value to the progress bars from the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.CONTROL,
-                Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>
-            event.
-        </p>
-        <p>
-            You can update the slider by sending
-            <p>
-            <pre>send 0,20,40,0,0,"-",90,1,20</pre>
-            </p>
-        </p>
-        <p>
-            Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
-            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b>there to
-            set the slider value to either 0,10,50 or 100.
-        </p>
-        <div>
-            <progress id="bar" max="100" >33%</progress>
-            <br /><br /><br />
-
-            <progress id="progress1" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
-            <br /><br /><br />
-        </div>
-
-        <div>
-            <progress id="progress2" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
-        </div>
-
-        <div>
-            <progress id="progress3" style="width: 600px; height: 30px;" value="90" max="100"  >33%</progress>
-        </div>
-
-        <br /><br />
-        <hr />
-        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
-
-    <!-- JQuery -->
-    <script type="text/javascript" src="../js/jquery/1.11.3/jquery-1.11.3.min.js"></script>
-
     <!-- Bootstrap -->
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="../js/bootstrap/3.3.5/css/bootstrap.min.css">
-    <script type="text/javascript" src="../js/bootstrap/3.3.5/js/bootstrap.min.js"></script>
-
+    <link rel="stylesheet" type="text/css" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" type="text/css" href="../css/custom.css">
+    
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-
-    <!-- VSCP settings -->
-    <script type="text/javascript" src="../js/settings.js"></script>
-    <!-- VSCP hash calculation -->
-    <script type="text/javascript" src="../js/md5.js"></script>
-    <!-- VSCP encryption/decryption -->
-    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
-    <!-- VSCP websocket base library -->
-    <script type="text/javascript" src="../js/vscp.js"></script>
-
-    <!-- Boostrap navigation bar helper functions -->
-    <script type="text/javascript" src="../js/navbar.js"></script>
-    <!-- Navigation bar menu structure -->
-    <script type="text/javascript" src="menu.js"></script>
-
+    
     <style>
-        // Progress 1
+        /* Progress 1 */
         /* Firefox - value portion of progress progress1 */
         progress#progress1::-moz-progress-bar {
             background-color: red;
@@ -115,7 +44,7 @@
             height: 20px;
         }
 
-        // Progress 2
+        /* Progress 2 */
         /* Firefox - value portion of progress progress1 */
         progress#progress2::-moz-progress-bar {
             background-color: blue;
@@ -141,7 +70,7 @@
             height: 20px;
         }
 
-        // Progress 3
+        /* Progress 3 */
         /* Firefox - value portion of progress progress1 */
         progress#progress3::-moz-progress-bar {
             background-color: green;
@@ -167,6 +96,77 @@
             height: 20px;
         }
     </style>
+    
+</head>
+
+<body>
+   <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <h1>VSCP HTML5 progress bar</h1>
+        <p>
+            This is just the standard HTML5 progress bar with some extra styling. It is connected to the <b>vscp.Connection</b>
+            and configured to write the value to the progress bars from the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.CONTROL,
+                Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>
+            event.
+        </p>
+        <p>
+            You can update the slider by sending
+        </p>
+        <pre>send 0,20,40,0,0,"-",90,1,20</pre>
+        <p>
+            Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
+            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b> there to
+            set the slider value to either 0,10,50 or 100.
+        </p>
+        <div>
+            <progress id="bar" max="100" >33%</progress>
+            <br /><br /><br />
+
+            <progress id="progress1" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
+            <br /><br /><br />
+        </div>
+
+        <div>
+            <progress id="progress2" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
+        </div>
+
+        <div>
+            <progress id="progress3" style="width: 600px; height: 30px;" value="90" max="100"  >33%</progress>
+        </div>
+
+        <br /><br />
+        <hr />
+        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+    </div>
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="../js/jquery/3.2.1/jquery-3.2.1.min.js"></script>
+    <script type="text/javascript" src="../js/jquery-migrate/3.0.1/jquery-migrate-3.0.1.js"></script>
+
+    <!-- Bootstrap -->
+    <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="../js/settings.js"></script>
+    <!-- VSCP hash calculation -->
+    <script type="text/javascript" src="../js/md5.js"></script>
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
+    <!-- VSCP websocket base library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script type="text/javascript" src="../js/navbar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script type="text/javascript" src="menu.js"></script>
 
     <script type="text/javascript" >
 
