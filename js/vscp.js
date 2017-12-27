@@ -3184,7 +3184,6 @@ vscp.Connection.prototype.setFilter = function(options) {
     var onSuccess = null;
     var onError = null;
     var cmdData = "";
-    var index = 0;
     var filterPriority = 0;
     var filterClass = 0;
     var filterType = 0;
@@ -3296,11 +3295,11 @@ vscp.Connection.prototype.setFilter = function(options) {
  *
  * @param {object} options                      - Options
  * @param {string} options.name                 - Variable name
- * @param {number} options.type                 - Variable type
+ * @param {number} [options.type]               - Variable type (default: string)
  * @param {number} options.accessrights         - Variable value
  * @param {boolean} options.persistency         - Variable is persistent (true) or not (false)
  * @param {string} options.value                - Variable Value
- * @param {string} options.note                 - Variable note (optional)
+ * @param {string} [options.note]               - Variable note (optional)
  * @param {function} [options.onSuccess]        - Function which is called on a successful operation
  * @param {function} [options.onError]          - Function which is called on a failed operation
  */
@@ -3324,9 +3323,8 @@ vscp.Connection.prototype.createVar = function(options) {
         return;
     }
 
-    if ("number" !== typeof options.type) {
-        console.error(vscp.utility.getTime() + " Option 'type' is missing. ");
-        return;
+    if ("number" === typeof options.type) {
+        type = options.type;
     }
 
     if ("number" === typeof options.accessrights) {
@@ -3379,11 +3377,11 @@ vscp.Connection.prototype.createVar = function(options) {
     this._sendCommand({
         command: "CVAR",
         data: options.name + ";" +
-            options.type + ";" +
+            type + ";" +
             accessrights + ";" +
             ( persistency ? 1 : 0 ) + ";" +
-            vscp.encodeValueIfBase64(options.type, value) + ";" +
-            vscp.b64EncodeUnicode(options.note),
+            vscp.encodeValueIfBase64(type, value) + ";" +
+            vscp.b64EncodeUnicode(note),
         onSuccess: onSuccess,
         onError: onError
     });
@@ -3651,6 +3649,8 @@ vscp.Connection.prototype.lastChangeVar = function(options) {
  * List all VSCP server variables.
  *
  * @param {object} options                  - Options
+ * @param {string} [options.regex]          - Regular expression to filter variables
+ * @param {function} options.onVariable     - Function which is called per variable
  * @param {function} [options.onSuccess]    - Function which is called on a successful operation
  * @param {function} [options.onError]      - Function which is called on a failed operation
  */
@@ -3665,7 +3665,7 @@ vscp.Connection.prototype.listVar = function(options) {
         return;
     }
 
-    if ("string" !== typeof options.regex) {
+    if ("string" === typeof options.regex) {
         regex = options.regex;
     }
 
@@ -3686,7 +3686,7 @@ vscp.Connection.prototype.listVar = function(options) {
 
     this._sendCommand({
         command: "LSTVAR",
-        data: options.regex,
+        data: regex,
         onSuccess: onSuccess,
         onError: onError
     });
