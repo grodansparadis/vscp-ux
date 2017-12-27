@@ -1274,7 +1274,9 @@ vscp.constants.varTypes = {
     FILTER: 503 //  Base64 encoded Filter data data.
 };
 
-// Use to fill dtop down boxes and similar
+/** VSCP variable type names as string. Use to fill drop down boxes and similar.
+ * @const
+ */
 vscp.constants.varTypeNames = [
     "Unassigned", // Unassigned variable
     "String", // String value (Base64 encoded)
@@ -1308,12 +1310,10 @@ vscp.constants.varTypeNames = [
     "Filter"  // Filter for channel
 ];
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp.getVarTypeName
-//
-// Return variable type description/name from numerical code
-//
-
+/** Get variable type name as string by numerical code.
+ * @param {number} n    - Numerical code
+ * @return {string} Variable type name
+ */
 vscp.getVarTypeName = function(n) {
     if (vscp.constants.varTypes.UNASSIGNED == n) {
         return "unassigned";
@@ -1380,12 +1380,10 @@ vscp.getVarTypeName = function(n) {
     }
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp.getVarTypeName
-//
-// Return variable type from textual representation
-//
-
+/** Get numerical code of variable type from string.
+ * @param {string} str  - Variable type name
+ * @return {number} Variable type numerical code
+ */
 vscp.getVarTypeNumerical = function(str) {
     if ("unassigned" === str.toLowerCase()) {
         return vscp.constants.varTypes.UNASSIGNED;
@@ -1450,12 +1448,10 @@ vscp.getVarTypeNumerical = function(str) {
     }
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp.getEditorModeFromType
-//
-// Return ace editor formation mode string  from numerical vriable type code
-//
-
+/** Get ace editor formation mode string from numerical variable type code.
+ * @param {number} n    - Variable type numerical code
+ * @return {string} Ace editro formation mode string
+ */
 vscp.getEditorModeFromType = function(n) {
     if (vscp.constants.varTypes.UNASSIGNED == n) {
         return "text";
@@ -1530,27 +1526,30 @@ vscp.getEditorModeFromType = function(n) {
 // on a Unicode string will cause a Character Out Of Range exception if a character
 // exceeds the range of a 8-bit ASCII-encoded character.
 
-// Base64 unicode safe encode
+/** Encode base64 unicode safe.
+ * @param {string} str  - Unicode string
+ * @return {string} Base64
+ */
 vscp.b64EncodeUnicode = function(str) {
     return btoa(encodeURIComponent(str).replace(/%([0-9A-F]{2})/g, function(match, p1) {
         return String.fromCharCode('0x' + p1);
     }));
 };
 
-// Base64 unicode safe decode
+/** Decode base64 unicode safe.
+ * @param {string} str  - Base64
+ * @return {string} Unicode string
+ */
 vscp.b64DecodeUnicode = function(str) {
     return decodeURIComponent(Array.prototype.map.call(atob(str), function(c) {
         return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
     }).join(''));
 };
 
-
-///////////////////////////////////////////////////////////////////////////////
-// vscp.isBase64Type
-//
-// Return true if a type is a type that is stored BASE64 ecoded
-//
-
+/** Determine whether the given variable type is a type stored base64 encoded or not.
+ * @param {number} type - Variable type numerical code
+ * @return {bool} Stored base64 encoded (true) or not (false).
+ */
 vscp.isBase64Type = function(type) {
     switch (Number(type)) {
         case vscp.constants.varTypes.STRING:
@@ -1574,13 +1573,11 @@ vscp.isBase64Type = function(type) {
     return false;
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp.decodeValueIfBase64
-//
-// Return decoded value if type is BASE64 encoded type
-// else return original value.
-//
-
+/** Decode the value if its base64 encoded.
+ * @param {number} type     - Variable type numerical code
+ * @param {string} value    - Value
+ * @return {string} Decoded value if type is base64 encoded type otherwise original value.
+ */
 vscp.decodeValueIfBase64 = function(type, value) {
     if (vscp.isBase64Type(type)) {
         return vscp.b64DecodeUnicode(value);
@@ -1589,13 +1586,11 @@ vscp.decodeValueIfBase64 = function(type, value) {
     }
 };
 
-///////////////////////////////////////////////////////////////////////////////
-// vscp.encodeValueIfBase64
-//
-// Return encoded value if type is type that should be BASE64 encoded
-// else return original value.
-//
-
+/** Encode the value if its stored in base64.
+ * @param {number} type     - Variable type numerical code
+ * @param {string} value    - Value
+ * @return {string} Encoded value if type is base64 encoded type otherwise original value.
+ */
 vscp.encodeValueIfBase64 = function(type, value) {
     if (vscp.isBase64Type(type)) {
         return vscp.b64EncodeUnicode(value);
@@ -1822,13 +1817,10 @@ vscp.Event.prototype.isDoNotCalcCRC = function() {
  */
 vscp._createNS("vscp.utility");
 
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-// readValue
-//
-// Read a hex or decimal value and return as an integer
-//
-
+/** Read a hex or decimal value and return as an integer.
+ * @param {string} input    - Hex or decimal value as string
+ * @return {number} Value
+ */
 vscp.utility.readValue = function(input) {
     var txtvalue = input.toLowerCase();
     var pos = txtvalue.indexOf("0x");
@@ -1839,7 +1831,6 @@ vscp.utility.readValue = function(input) {
         return parseInt(txtvalue, 16);
     }
 };
-
 
 /**
  * Utility function which returns the current time in the following format: hh:mm:ss.us
