@@ -550,7 +550,8 @@ vscp.rest.Client = function(config) {
             }
         })
         // Catch VSCP daemon response with event and convert it to vscp.Event objects
-        .then(function(data) {
+        .then(
+        function(data) {
             var defer = $.Deferred();
             var index = 0;
             var eventList = [];
@@ -937,7 +938,7 @@ vscp.rest.Client = function(config) {
             }],
             type: 'GET',
             onSuccess: function(data) {
-                console.info(vscp.utility.getTime() + " Variable created.");
+                console.info(vscp.utility.getTime() + " Variable created: " + JSON.stringify(data.response));
 
                 if ("function" === typeof options.onSuccess) {
                     options.onSuccess(data);
@@ -951,6 +952,93 @@ vscp.rest.Client = function(config) {
                 }
             }.bind(this)
         });
+    };
+
+    /**
+     * Read a value from a VSCP server variable.
+     *
+     * @param {object}      options             - Options
+     * @param {string}      options.name        - Variable name
+     * @param {function}    [options.onSuccess] - Function which is called on a successful operation
+     * @param {function}    [options.onError]   - Function which is called on a failed operation
+     * 
+     * @return {object} jquery promise (deferred object)
+     */
+    this.readVar = function(options) {
+
+        if ("undefined" === typeof options) {
+            console.error(vscp.utility.getTime() + " Options are missing.");
+            return this._abort("Options are missing.");
+        }
+
+        if (0 === this.sessionKey.length) {
+            console.error(vscp.utility.getTime() + " No session opened.");
+            return this._abort("No session opened.", options.onError);
+        }
+    
+        if ("string" !== typeof options.name) {
+            console.error(vscp.utility.getTime() + " Option 'name' is missing.");
+            return this._abort("Option 'name' is missing.", options.onError);
+        }
+
+        console.info(vscp.utility.getTime() + " Read variable (" + this.sessionKey + ")");
+
+        return this._makeRequest({
+            path: '',
+            parameter: [{
+                name: 'vscpsession',
+                value: this.sessionKey
+            }, {
+                name: 'format',
+                value: 'jsonp'
+            }, {
+                name: 'op',
+                value: 'readvar'
+            }, {
+                name: 'variable',
+                value: options.name
+            }],
+            type: 'GET',
+            onSuccess: function(data) {
+                console.info(vscp.utility.getTime() + " Variable read: " + JSON.stringify(data.response));
+            },
+            onError: function(data) {
+                console.error(vscp.utility.getTime() + " Failed to read variable: " + JSON.stringify(data.serverError));
+            }
+        })
+        // Catch VSCP daemon response and convert base64 encoded stuff back to string and other things
+        .then(
+            function(data) {
+                var defer = $.Deferred();
+
+                if (null !== data.response) {
+                    data.response.vartype = vscp.getVarTypeNumerical(data.response.vartype);
+                    data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartype, data.response.varvalue);
+                    data.response.varnote = vscp.b64DecodeUnicode(data.response.varnote);
+                }
+
+                if ("function" === typeof options.onSuccess) {
+                    options.onSuccess(data);
+                }
+
+                return defer.resolve(data);
+            }.bind(this),
+            function(data) {
+                var defer = $.Deferred();
+
+                if (null !== data.response) {
+                    data.response.vartype = vscp.getVarTypeNumerical(data.response.vartype);
+                    data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartype, data.response.varvalue);
+                    data.response.varnote = vscp.b64DecodeUnicode(data.response.varnote);
+                }
+
+                if ("function" === typeof options.onError) {
+                    options.onError(data);
+                }
+
+                return defer.reject(data);
+            }.bind(this)
+        );
     };
 
 }

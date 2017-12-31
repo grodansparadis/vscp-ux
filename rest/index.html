@@ -640,54 +640,50 @@
 
         var do_readVariable = function() {
 
-            if (vscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
                 var txtVariableName = window.prompt("Name of variable to read:", "test");
 
-                $.ajax({
-                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
-                        '&format=jsonp&op=readvar&variable=' + txtVariableName,
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.readVar({
+                    name: txtVariableName
+                })
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                     do_readVariable");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
-                        console.log("Variable name = " + response.varname);
-                        console.log("Variable type = " + response.vartype);
-                        console.log("Variable type code = " + response.vartypecode);
-                        console.log("Variable percistence = " + response.varpersistence);
-                        console.log("Variable user = " + response.varuser);
-                        console.log("Variable access-rights = " + response.varaccessright);
-                        console.log("Variable last-change = " + response.varlastchange);
-                        console.log("Variable value = " + response.varvalue);
-                        console.log("Variable note = " + response.varnote);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
+                        console.log("Info = " + data.response.info);
+                        console.log("Variable name = " + data.response.varname);
+                        console.log("Variable type = " + data.response.vartype);
+                        console.log("Variable type code = " + data.response.vartypecode);
+                        console.log("Variable percistence = " + data.response.varpersistence);
+                        console.log("Variable user = " + data.response.varuser);
+                        console.log("Variable access-rights = " + data.response.varaccessright);
+                        console.log("Variable last-change = " + data.response.varlastchange);
+                        console.log("Variable value = " + data.response.varvalue);
+                        console.log("Variable note = " + data.response.varnote);
 
-                        if (response.success) {
-                            $("#log").html(response.varname + " = " + response.varvalue +
-                                "<br>Type = " + response.vartype +
-                                "<br>Typecode = " + response.vartypecode +
-                                "<br>Peristence = " + response.varpersistence +
-                                "<br>User = " + response.varuser +
-                                "<br>Access-rights = " + response.varaccessright.toString(16) +
-                                "<br>Last-change = " + response.varlastchange +
-                                "<br>Note = " + response.varnote);
-                        } else {
-                            $("#log").html("Unable to read variable");
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("do_readVariable:" + error + " Status:" + status);
+                        $("#log").html(data.response.varname + " = " + data.response.varvalue +
+                                "<br>Type = " + data.response.vartype +
+                                "<br>Typecode = " + data.response.vartypecode +
+                                "<br>Peristence = " + data.response.varpersistence +
+                                "<br>User = " + data.response.varuser +
+                                "<br>Access-rights = " + data.response.varaccessright +
+                                "<br>Last-change = " + data.response.varlastchange +
+                                "<br>Note = " + data.response.varnote);
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to read variable</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to read variable</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#log").html("<font size='2' color='red'><b>Failed to read variable</b>: Unknown error </font>");
                     }
                 });
             } else {
