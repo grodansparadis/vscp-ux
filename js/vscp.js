@@ -3443,7 +3443,7 @@ vscp.Connection.prototype.readVar = function(options) {
  * @param {object} options                  - Options
  * @param {string} options.name             - Variable name
  * @param {string} options.value            - Variable value
- * @param {string} options.type             - Variable type
+ * @param {number} options.type             - Variable type
  * @param {function} [options.onSuccess]    - Function which is called on a successful operation
  * @param {function} [options.onError]      - Function which is called on a failed operation
  */

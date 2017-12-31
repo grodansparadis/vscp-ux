@@ -1012,8 +1012,7 @@ vscp.rest.Client = function(config) {
                 var defer = $.Deferred();
 
                 if (null !== data.response) {
-                    data.response.vartype = vscp.getVarTypeNumerical(data.response.vartype);
-                    data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartype, data.response.varvalue);
+                    data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartypecode, data.response.varvalue);
                     data.response.varnote = vscp.b64DecodeUnicode(data.response.varnote);
                 }
 
@@ -1027,8 +1026,7 @@ vscp.rest.Client = function(config) {
                 var defer = $.Deferred();
 
                 if (null !== data.response) {
-                    data.response.vartype = vscp.getVarTypeNumerical(data.response.vartype);
-                    data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartype, data.response.varvalue);
+                    data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartypecode, data.response.varvalue);
                     data.response.varnote = vscp.b64DecodeUnicode(data.response.varnote);
                 }
 
@@ -1041,4 +1039,91 @@ vscp.rest.Client = function(config) {
         );
     };
 
+    /**
+     * Write a value to a VSCP server variable.
+     *
+     * @param {object} options                  - Options
+     * @param {string} options.name             - Variable name
+     * @param {string} options.value            - Variable value
+     * @param {number} options.type             - Variable type
+     * @param {function} [options.onSuccess]    - Function which is called on a successful operation
+     * @param {function} [options.onError]      - Function which is called on a failed operation
+     * 
+     * @return {object} jquery promise (deferred object)
+     */
+    this.writeVar = function(options) {
+
+        var value = "";
+
+        if ("undefined" === typeof options) {
+            console.error(vscp.utility.getTime() + " Options are missing.");
+            return this._abort("Options are missing.");
+        }
+
+        if (0 === this.sessionKey.length) {
+            console.error(vscp.utility.getTime() + " No session opened.");
+            return this._abort("No session opened.", options.onError);
+        }
+    
+        if ("string" !== typeof options.name) {
+            console.error(vscp.utility.getTime() + " Option 'name' is missing.");
+            return this._abort("Option 'name' is missing.", options.onError);
+        }
+    
+        if ("string" !== typeof options.value) {
+            value = options.value;
+        }
+        else if ("number" !== typeof options.value) {
+            value = options.value.toString();
+        }
+        else if ("boolean" !== typeof options.value) {
+            value = (options.value ? "true" : "false");
+        }
+        else {
+            console.error(vscp.utility.getTime() + " Option 'value' is missing.");
+            return this._abort("Option 'value' is missing.", options.onError);
+        }
+    
+        if ("number" !== typeof options.type) {
+            console.error(vscp.utility.getTime() + " Option type is missing.");
+            return this._abort("Option type is missing.", options.onError);
+        }
+
+        console.info(vscp.utility.getTime() + " Write variable (" + this.sessionKey + ")");
+
+        return this._makeRequest({
+            path: '',
+            parameter: [{
+                name: 'vscpsession',
+                value: this.sessionKey
+            }, {
+                name: 'format',
+                value: 'jsonp'
+            }, {
+                name: 'op',
+                value: 'writevar'
+            }, {
+                name: 'variable',
+                value: options.name
+            }, {
+                name: 'value',
+                value: vscp.encodeValueIfBase64(options.type, value)
+            }],
+            type: 'GET',
+            onSuccess: function(data) {
+                console.info(vscp.utility.getTime() + " Variable written: " + JSON.stringify(data.response));
+
+                if ("function" === typeof options.onSuccess) {
+                    options.onSuccess(data);
+                }
+            }.bind(this),
+            onError: function(data) {
+                console.error(vscp.utility.getTime() + " Failed to write variable: " + JSON.stringify(data.serverError));
+
+                if ("function" === typeof options.onError) {
+                    options.onError(data);
+                }
+            }.bind(this)
+        });
+    };
 }

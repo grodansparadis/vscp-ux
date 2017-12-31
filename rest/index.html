@@ -85,7 +85,7 @@
     <script type="text/javascript">
 
         var vscpSessionKey = ""; // Session key
-        var vscpServer = "http://127.0.0.1:8884"; // Host
+        var vscpServer = "http://hal9000.fritz.box:8884"; // Host
 
         var vscpRestClient = null;
 
@@ -590,7 +590,7 @@
                 if (null == txtVariableType) return;
                 var txtVariableValue = window.prompt("Value:", "This is a new string");
                 if (null == txtVariableValue) return;
-                var txtVariableNote = window.prompt("Note:", "A base64 encoded note about this variable.");
+                var txtVariableNote = window.prompt("Note:", "Just a note about this variable.");
                 if (null == txtVariableNote) return;
                 var txtVariableAccessRight = window.prompt("Access-rights:", "777");
                 if (null == txtVariableAccessRight) return;
@@ -616,15 +616,15 @@
                         console.log("Message = " + data.response.message);
                         console.log("Description = " + data.response.description);
 
-                        $("#events").html("OK Variable written.");
+                        $("#log").html("OK Variable written.");
                 })
                 .fail(function(data) {
                     if (null !== data.clientError) {
-                        $("#events").html("<font size='2' color='red'><b>Failed to create variable</b>: " + data.clientError + "</font>");
+                        $("#log").html("<font size='2' color='red'><b>Failed to create variable</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
-                        $("#events").html("<font size='2' color='red'><b>Failed to create variable</b>: " + JSON.stringify(data.serverError) + "</font>");
+                        $("#log").html("<font size='2' color='red'><b>Failed to create variable</b>: " + JSON.stringify(data.serverError) + "</font>");
                     } else {
-                        $("#events").html("<font size='2' color='red'><b>Failed to create variable</b>: Unknown error </font>");
+                        $("#log").html("<font size='2' color='red'><b>Failed to create variable</b>: Unknown error </font>");
                     }
                 });
             } else {
@@ -657,7 +657,6 @@
                         console.log("Code = " + data.response.code);
                         console.log("Message = " + data.response.message);
                         console.log("Description = " + data.response.description);
-                        console.log("Info = " + data.response.info);
                         console.log("Variable name = " + data.response.varname);
                         console.log("Variable type = " + data.response.vartype);
                         console.log("Variable type code = " + data.response.vartypecode);
@@ -699,38 +698,38 @@
 
         var do_writeVariable = function() {
 
-            if (vscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
                 var txtVariableName = window.prompt("Name of variable to write:", "test");
-                var txtVariableValue = window.prompt("New value (BASE64 encoded for string types):", "");
+                var txtVariableType = window.prompt("Type:", "string");
+                if (null == txtVariableType) return;
+                var txtVariableValue = window.prompt("New value:", "");
 
-                $.ajax({
-                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
-                        '&format=jsonp&op=writevar&variable=' + txtVariableName +
-                        '&value=' + encodeURIComponent(txtVariableValue),
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.writeVar({
+                    name: txtVariableName,
+                    type: vscp.getVarTypeNumerical(txtVariableType),
+                    value: txtVariableValue
+                })
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                     do_writeVariable");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
 
-                        if (response.success) {
-                            $("#events").html("OK Variable written");
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        $("#log").html("OK Variable written.");
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to write variable</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to write variable</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#log").html("<font size='2' color='red'><b>Failed to write variable</b>: Unknown error </font>");
                     }
                 });
             } else {
