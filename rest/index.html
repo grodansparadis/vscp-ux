@@ -1,40 +1,4 @@
 <!DOCTYPE html>
-<!--
-	//
-	// VSCP rest interface test
-	// Copyright (C) 2012-2017 Ake Hedman, Grodans Paradis AB
-	// <akhe@grodansparadis.com>
-	//
-	// Licence:
-	// The MIT License (MIT)
-	// [OSI Approved License]
-	//
-	// The MIT License (MIT)
-	//
-	// Copyright (c) 2012-2017 Paradise of the Frog/Grodans Paradis AB
-	//
-	// Permission is hereby granted, free of charge, to any person obtaining a copy
-	// of this software and associated documentation files (the "Software"), to deal
-	// in the Software without restriction, including without limitation the rights
-	// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-	// copies of the Software, and to permit persons to whom the Software is
-	// furnished to do so, subject to the following conditions:
-	//
-	// The above copyright notice and this permission notice shall be included in
-	// all copies or substantial portions of the Software.
-	//
-	// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-	// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-	// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-	// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-	// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-	// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
-	// THE SOFTWARE.
-	//
-	// Alternative licenses for VSCP & Friends may be arranged by contacting
-	// Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
-	//
--->
 <html lang="en">
 
 <head>
@@ -111,6 +75,7 @@
     <script type="text/javascript" src="../js/md5.js"></script>
     <!-- VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscp.js"></script>
+    <script type="text/javascript" src="../js/vscprest.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navbar.js"></script>
@@ -119,14 +84,10 @@
 
     <script type="text/javascript">
 
-        var VscpSessionKey = ""; // Session key
-        var VscpServer = "http://127.0.0.1:8884"; // Host
-        var VscpEventCount = 0; // Events in inqueue
-        var txtSendEvent = "0,10,6,0,0,-,138,0,255"; // Event sent by send event
-        // Filter/Mask to filter just to receive heart beats CLASS1.INFORMATION, Type=9 Node heartbeat
-        // both are "priority,class,type,guid"
-        var txtVscpFilter = "0x0000,0x14,0x09,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00";
-        var txtVscpMask = "0x0000,0xffff,0xffff,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00";
+        var vscpSessionKey = ""; // Session key
+        var vscpServer = "http://127.0.0.1:8884"; // Host
+
+        var vscpRestClient = null;
 
         (function() {
             $(document).ready(function() {
@@ -135,21 +96,18 @@
                 navBarMenu.show("menu", navBarMenu.content);
 
                 // Show current server settings
-                $("#host").html("<b>Host</b>: " + VscpServer);
+                $("#host").html("<b>Host</b>: " + vscpServer);
 
             });
         })();
-
 
         ///////////////////////////////////////////////////////////////////////
         // do_setServer
         //
 
         var do_setServer = function() {
-            VscpServer = window.prompt("Enter URL for server:", "http://127.0.0.1:8884");
-            84
-            88
-            $("#host").html("<b>Host</b>: " + VscpServer);
+            vscpServer = window.prompt("Enter URL for server:", "http://127.0.0.1:8884");
+            $("#host").html("<b>Host</b>: " + vscpServer);
         }
 
         ///////////////////////////////////////////////////////////////////////
@@ -158,47 +116,29 @@
 
         var do_open = function() {
 
-            $.ajax({
-                url: VscpServer + "/vscp/rest?vscpuser=" + settings.user + "&vscpsecret=" +
-                    settings.password + "&format=jsonp&op=1",
-                type: "GET",
-                jsonpCallback: 'handler',
-                cache: true,
-                dataType: 'jsonp',
-                success: function(response) {
-                    // response will be a JavaScript
-                    // array of objects
-                    console.log("-----------------------------------------------------------");
-                    console.log("                         do_open");
-                    console.log("-----------------------------------------------------------");
-                    console.log("Success = " + response.success);
-                    console.log("Code = " + response.code);
-                    console.log("Message = " + response.message);
-                    console.log("Description = " + response.description);
-                    console.log("Sessionkey = " + response.vscpsession);
-                    console.log("nEvents = " + response.nEvents);
+            vscpRestClient = new vscp.rest.Client({
+                baseUrl: vscpServer
+            });
 
-                    if (response.success) {
-                        console.log("Session key assigned to global object " + typeof(response.success));
-                        VscpSessionKey = response.vscpsession;
-                        $("#sessionkey").html("<b>Sessionkey</b>: <font size='2' color='red'>" +
-                            response.vscpsession + "</font>");
-                    }
-                    else {
-                        $("#sessionkey").html("<font size='2' color='red'><b>Failed to connect</b>: " +
-                            error + " status:" + xhr.status + "</font>");
-                    }
-
-                },
-                error: function(xhr, status, error) {
-                    console.log(error + " Status:" + xhr.status);
-                    $("#sessionkey").html("<font size='2' color='red'><b>Failed to connect (AJAX)</b>: " +
-                        "Code = " + response.code +
-                        "Message = " + response.message +
-                        "Description = " + response.description +
-                        "</font>");
+            vscpRestClient.openSession({
+                user: settings.user,
+                password: settings.password
+            })
+            .done(function(data) {
+                vscpSessionKey = data.response.vscpsession;
+                $("#sessionkey").html("<b>Sessionkey</b>: <font size='2' color='red'>" + data.response.vscpsession + "</font>");
+            })
+            .fail(function(data) {
+                if (null !== data.clientError) {
+                    $("#sessionkey").html("<font size='2' color='red'><b>Failed to open</b>: " + data.clientError + "</font>");
+                } else if (null !== data.serverError) {
+                    $("#sessionkey").html("<font size='2' color='red'><b>Failed to open</b>: " + JSON.stringify(data.serverError) + "</font>");
+                } else {
+                    $("#sessionkey").html("<font size='2' color='red'><b>Failed to open</b>: Unknown error </font>");
                 }
             });
+
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -207,40 +147,37 @@
 
         var do_close = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=2',
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.closeSession()
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                         do_close");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
 
-                        if (response.success) {
-                            console.log("Sessionkey cleared");
-                            VscpSessionKey = "";
-                            $("#sessionkey").html("<b>Sessionkey</b>: ");
-                            $("#nevents").html(" ");
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        $("#sessionkey").html("<b>Sessionkey</b>: ");
+                        $("#nevents").html(" ");
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#sessionkey").html("<font size='2' color='red'><b>Failed to close</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#sessionkey").html("<font size='2' color='red'><b>Failed to close</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#sessionkey").html("<font size='2' color='red'><b>Failed to close</b>: Unknown error </font>");
                     }
                 });
             } else {
                 alert("Interface is not open!");
             }
+
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -249,39 +186,37 @@
 
         var do_status = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=status',
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.getStatus()
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                         do_status");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Number of events = " + response.nEvents);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
+                        console.log("Number of events = " + data.response.nEvents);
 
-                        if (response.success) {
-                            VscpEventCount = response.nEvents;
-                            $("#nevents").html("<b>Number of events in queue</b>: " + response.nEvents);
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        $("#nevents").html("<b>Number of events in queue</b>: " + data.response.nEvents);
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#nevents").html("<font size='2' color='red'><b>Failed to get status</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#nevents").html("<font size='2' color='red'><b>Failed to get status</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#nevents").html("<font size='2' color='red'><b>Failed to get status</b>: Unknown error </font>");
                     }
                 });
             } else {
                 alert("Interface is not open!");
             }
+            
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -291,15 +226,15 @@
         var printEventData = function(event) {
             var eventtxt = "<b>Event</b>: <b>Head</b>:" +
                 event.head +
-                " <b>DateTime</b>:" + event.datetime +
-                " <b>Timestamp</b>:" + event.timestamp +
-                " <b>Obid</b>:" + event.obid +
-                " <b>Class</b>:" + event.vscpclass +
-                " <b>Type</b>:" + event.vscptype +
-                " <b>SizeData</b>:" + event.sizedata + " <b>Data</b>: ";
-            if (0 != event.sizedata) {
-                for (var i = 0; i < event.sizedata; i++) {
-                    eventtxt += event.data[i] + " ";
+                " <b>DateTime</b>:" + event.vscpDateTime +
+                " <b>Timestamp</b>:" + event.vscpTimeStamp +
+                " <b>Obid</b>:" + event.vscpObId +
+                " <b>Class</b>:" + event.vscpClass +
+                " <b>Type</b>:" + event.vscpType +
+                " <b>SizeData</b>:" + event.vscpData.length + " <b>Data</b>: ";
+            if (0 !== event.vscpData.length) {
+                for (var i = 0; i < event.vscpData.length; i++) {
+                    eventtxt += event.vscpData[i] + " ";
                 }
             } else {
                 eventtxt += "none";
@@ -314,42 +249,42 @@
 
         var do_readEventOne = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=readevent&count=1',
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
-
+                vscpRestClient.readEvent()
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                         do_readEventOne");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
-                        console.log("Count = " + response.count);
-                        console.log("Filtered = " + response.filtered);
-                        console.log("Errors = " + response.errors);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
+                        console.log("Info = " + data.response.info);
+                        console.log("Count = " + data.response.count);
+                        console.log("Filtered = " + data.response.filtered);
+                        console.log("Errors = " + data.response.errors);
 
-                        if (response.success && (1 == response.count)) {
-                            $("#events").html(printEventData(response.event[0]));
+                        if (1 === data.response.count) {
+                            $("#events").html(printEventData(data.response.event[0]));
                         }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to read event</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to read event</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#events").html("<font size='2' color='red'><b>Failed to read event</b>: Unknown error </font>");
                     }
                 });
             } else {
                 alert("Interface is not open!");
             }
+
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -358,52 +293,51 @@
 
         var do_readEventAll = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey + '&format=jsonp&op=readevent&count=10000',
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
-
+                vscpRestClient.readEvent({
+                    count: 10000
+                })
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                         do_readEventAll");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
-                        console.log("Count = " + response.count);
-                        console.log("Filtered = " + response.filtered);
-                        console.log("Errors = " + response.errors);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
+                        console.log("Info = " + data.response.info);
+                        console.log("Count = " + data.response.count);
+                        console.log("Filtered = " + data.response.filtered);
+                        console.log("Errors = " + data.response.errors);
 
-                        if (response.success) {
-                            if (response.count > 0) {
-                                var eventtxt = "";
-                                for (var i = 0; i < response.count; i++) {
-                                    eventtxt += printEventData(response.event[i]) + "<br>";
-                                }
-                                $("#events").html(eventtxt);
-                            } else {
-                                $("#events").html(" ");
-                                $("#nevents").html("It looks like there is no events to read.");
-                            };
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        if (0 < data.response.count) {
+                            var eventtxt = "";
+                            for (var i = 0; i < data.response.count; i++) {
+                                eventtxt += printEventData(data.response.event[i]) + "<br>";
+                            }
+                            $("#events").html(eventtxt);
+                        } else {
+                            $("#events").html(" ");
+                            $("#nevents").html("It looks like there is no event to read.");
+                        };
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to read event</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to read event</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#events").html("<font size='2' color='red'><b>Failed to read event</b>: Unknown error </font>");
                     }
                 });
             } else {
                 alert("Interface is not open!");
             }
 
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -412,40 +346,43 @@
 
         var do_sendEvent = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
-                        '&format=jsonp&op=sendevent&vscpevent=' + txtSendEvent,
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.sendEvent({
+                    event: new vscp.Event({
+                        vscpClass:      vscp.constants.classes.VSCP_CLASS1_INFORMATION,
+                        vscpType:       vscp.constants.types.VSCP_TYPE_INFORMATION_NODE_HEARTBEAT,
+                        vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
+                        vscpData:       [ 138, 0, 255 ]
+                    })
+                })
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                         do_sendEvent");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
 
-                        if (response.success) {
-                            $("#events").html("event sent");
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        $("#events").html("Event sent.");
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to send</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to send</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#events").html("<font size='2' color='red'><b>Failed to send</b>: Unknown error </font>");
                     }
                 });
             } else {
                 alert("Interface is not open!");
             }
-
+            
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -454,41 +391,43 @@
 
         var do_setFilter = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
-                        '&format=jsonp&op=setfilter&vscpfilter=' + txtVscpFilter +
-                        '&vscpmask=' + txtVscpMask,
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.setFilter({
+                    filterPriority: 0x0000,
+                    filterClass: 0x0014,
+                    filterType: 0x0009,
+                    maskPriority: 0x0000,
+                    maskClass: 0xffff,
+                    maskType: 0xffff
+                })
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                         do_setFilter");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
 
-                        if (response.success) {
-                            $("#events").html("Mask set");
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        $("#events").html("Filter set.");
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to set filter</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to set filter</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#events").html("<font size='2' color='red'><b>Failed to set filter</b>: Unknown error </font>");
                     }
                 });
             } else {
                 alert("Interface is not open!");
             }
 
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -497,43 +436,43 @@
 
         var do_clrFilter = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
-                        '&format=jsonp&op=setfilter&vscpfilter=' +
-                        "0,0,0,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00" +
-                        '&vscpmask=' +
-                        "0,0,0,00:00:00:00:00:00:00:00:00:00:00:00:00:00:00:00",
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.setFilter({
+                    filterPriority: 0x0000,
+                    filterClass: 0x0000,
+                    filterType: 0x0000,
+                    maskPriority: 0x0000,
+                    maskClass: 0x0000,
+                    maskType: 0x0000
+                })
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                         do_clrFilter");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
 
-                        if (response.success) {
-                            $("#events").html("Mask set");
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        $("#events").html("Filter cleared.");
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to clear filter</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to clear filter</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#events").html("<font size='2' color='red'><b>Failed to clear filter</b>: Unknown error </font>");
                     }
                 });
             } else {
                 alert("Interface is not open!");
             }
 
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -542,10 +481,10 @@
 
         var do_clrQueue = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (vscpSessionKey.length > 0) {
 
                 $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
+                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
                         '&format=jsonp&op=clearqueue',
                     type: "GET",
                     jsonpCallback: 'handler',
@@ -561,10 +500,9 @@
                         console.log("Code = " + response.code);
                         console.log("Message = " + response.message);
                         console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
 
                         if (response.success) {
-                            $("#events").html("Mask set");
+                            $("#events").html("Queue cleared.");
                         }
 
                     },
@@ -576,6 +514,7 @@
                 alert("Interface is not open!");
             }
 
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -584,7 +523,7 @@
 
         var do_sendMeasurement = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (vscpSessionKey.length > 0) {
 
                 var txtValue =
                     window.prompt("Send CLASS2.MEASUREMENT_FLOAT. Type=6 (temperature) i degrees Celsius:", "23.98");
@@ -599,7 +538,7 @@
                                             now.getMilliseconds() );
 
                 $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
+                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
                         '&format=jsonp&op=measurement&value=' + txtValue +
                         '&datetime=' + now_utc.toISOString() +
                         '&guid=""' +        // GUID (use GUID of interface)
@@ -624,7 +563,6 @@
                         console.log("Code = " + response.code);
                         console.log("Message = " + response.message);
                         console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
 
                         if (response.success) {
                             $("#events").html("OK Variable written");
@@ -639,6 +577,7 @@
                 alert("Interface is not open!");
             }
 
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -647,7 +586,7 @@
 
         var do_createVariable = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (vscpSessionKey.length > 0) {
 
                 var txtVariableName = window.prompt("Name of variable to create:", "test");
                 if (null == txtVariableName) return;
@@ -690,7 +629,7 @@
 
 
                 $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
+                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
                         '&format=jsonp&op=createvar&variable=' + txtVariableName +
                         '&value=' + txtVariableValue +
                         '&type=' + txtVariableType +
@@ -726,6 +665,7 @@
                 alert("Interface is not open!");
             }
 
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -734,12 +674,12 @@
 
         var do_readVariable = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (vscpSessionKey.length > 0) {
 
                 var txtVariableName = window.prompt("Name of variable to read:", "test");
 
                 $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
+                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
                         '&format=jsonp&op=readvar&variable=' + txtVariableName,
                     type: "GET",
                     jsonpCallback: 'handler',
@@ -788,6 +728,7 @@
                 alert("Interface is not open!");
             }
 
+            return;
         };
 
         ///////////////////////////////////////////////////////////////////////
@@ -796,13 +737,13 @@
 
         var do_writeVariable = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (vscpSessionKey.length > 0) {
 
                 var txtVariableName = window.prompt("Name of variable to write:", "test");
                 var txtVariableValue = window.prompt("New value (BASE64 encoded for string types):", "");
 
                 $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
+                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
                         '&format=jsonp&op=writevar&variable=' + txtVariableName +
                         '&value=' + encodeURIComponent(txtVariableValue),
                     type: "GET",
@@ -834,9 +775,8 @@
                 alert("Interface is not open!");
             }
 
+            return;
         };
-
-
 
         ///////////////////////////////////////////////////////////////////////
         // do_deleteVariable
@@ -844,13 +784,13 @@
 
         var do_deleteVariable = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (vscpSessionKey.length > 0) {
 
                 var txtVariableName = window.prompt("Name of variable to delete:", "test");
                 if (null == txtVariableName) return;
 
                 $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
+                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
                         '&format=jsonp&op=deletevar&variable=' + txtVariableName,
                     type: "GET",
                     jsonpCallback: 'handler',
@@ -881,9 +821,8 @@
                 alert("Interface is not open!");
             }
 
+            return;
         };
-
-
 
         ///////////////////////////////////////////////////////////////////////
         // printVariableData
@@ -908,15 +847,13 @@
             return vartxt;
         }
 
-
-
         ///////////////////////////////////////////////////////////////////////
         // do_listVariables
         //
 
         var do_listVariables = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (vscpSessionKey.length > 0) {
 
                 $("#events").html("");
 
@@ -924,7 +861,7 @@
                 if (null == txtRegEx) txtRegEx = "(.*)";
 
                 $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
+                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
                         '&format=jsonp&op=listvar&listlong=false&regex=' + encodeURIComponent(txtRegEx),
                     type: "GET",
                     jsonpCallback: 'handler',
@@ -966,6 +903,7 @@
                 alert("Interface is not open!");
             }
 
+            return;
         };
 
 
@@ -975,7 +913,7 @@
 
         var do_listVariablesValue = function() {
 
-            if (VscpSessionKey.length > 0) {
+            if (vscpSessionKey.length > 0) {
 
                 $("#events").html("");
 
@@ -983,7 +921,7 @@
                 if (null == txtRegEx) txtRegEx = "(.*)";
 
                 $.ajax({
-                    url: VscpServer + '/vscp/rest?vscpsession=' + VscpSessionKey +
+                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
                         '&format=jsonp&op=listvar&listlong=true&regex=' + encodeURIComponent(txtRegEx),
                     type: "GET",
                     jsonpCallback: 'handler',
@@ -1025,33 +963,8 @@
                 alert("Interface is not open!");
             }
 
+            return;
         };
-
-
-        /*
-        	function getQueryParams(qs) {
-
-        		qs = qs.split('+').join(' ');
-
-        		var params = {},
-        			tokens,
-        			re = /[?&]?([^=]+)=([^&]*)/g;
-
-        		while ( tokens = re.exec( qs ) ) {
-        			params[ decodeURIComponent( tokens[ 1 ] ) ] = decodeURIComponent( tokens[ 2 ] );
-        		}
-
-        		return params;
-        	}
-
-        	var query = getQueryParams( document.location.search );
-
-        	if ( query.host.length > 0 ) {
-        		VscpServer = query.host;
-        		txtVscpFilter = query.filter;
-        		txtVscpMask = query.mask;
-        	}
-        */
     </script>
 
 </body>

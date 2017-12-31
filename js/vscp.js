@@ -1642,7 +1642,7 @@ vscp.Event = function(options) {
      */
     this.vscpTimeStamp = 0;
 
-    /** date/time for package in us
+    /** Date/Time for package
      * @member {date}
      */
     this.vscpDateTime = new Date();
@@ -1807,6 +1807,51 @@ vscp.Event.prototype.isDoNotCalcCRC = function() {
     }
 
     return result;
+};
+
+/**
+ * Get event as string.
+ * @return {string} Event as string
+ */
+vscp.Event.prototype.getText = function() {
+    var index = 0;
+    var str = '';
+
+    str += this.vscpHead.toString() + ",";
+    str += this.vscpClass.toString() + ",";
+    str += this.vscpType.toString() + ",";
+    str += this.vscpObId.toString() + ",";
+    str += this.vscpDateTime.toISOString() + ",";
+    str += this.vscpTimeStamp.toString() + ",";
+    str += this.vscpGuid;
+
+    if (this.vscpData instanceof Array) {
+
+        if (0 < this.vscpData.length) {
+            str += ",";
+        }
+
+        for (index = 0; index < this.vscpData.length; ++index) {
+            str += this.vscpData[index].toString();
+
+            if ((this.vscpData.length - 1) > index) {
+                str += ",";
+            }
+        }
+
+    } else if ("string" === typeof this.vscpData) {
+
+        if (0 < this.vscpData.length) {
+            str += ",";
+        }
+
+        str += this.vscpData;
+    } else {
+
+        console.error(vscp.utility.getTime() + " Invalid VSCP event data.");
+    }
+
+    return str;
 };
 
 /* ---------------------------------------------------------------------- */
@@ -3092,7 +3137,6 @@ vscp.Connection.prototype.sendEvent = function(options) {
     var cmdData = "";
     var onSuccess = null;
     var onError = null;
-    var index = 0;
 
     if (this.states.AUTHENTICATED !== this.state) {
         console.error(vscp.utility.getTime() + " Connection is not authenticated.");
@@ -3122,40 +3166,7 @@ vscp.Connection.prototype.sendEvent = function(options) {
         onError = options.onError;
     }
 
-    cmdData += options.event.vscpHead.toString() + ",";
-    cmdData += options.event.vscpClass.toString() + ",";
-    cmdData += options.event.vscpType.toString() + ",";
-    cmdData += options.event.vscpObId.toString() + ",";
-    cmdData += options.event.vscpDateTime.toISOString() + ",";
-    cmdData += options.event.vscpTimeStamp.toString() + ",";
-    cmdData += vscp.utility.guidToStr(options.event.vscpGuid);
-
-    if (options.event.vscpData instanceof Array) {
-
-        if (0 < options.event.vscpData.length) {
-            cmdData += ",";
-        }
-
-        for (index = 0; index < options.event.vscpData.length; ++index) {
-            cmdData += options.event.vscpData[index].toString();
-
-            if ((options.event.vscpData.length - 1) > index) {
-                cmdData += ",";
-            }
-        }
-
-    } else if ("string" === typeof options.event.vscpData) {
-
-        if (0 < options.event.vscpData.length) {
-            cmdData += ",";
-        }
-
-        cmdData += options.event.vscpData;
-    } else {
-
-        console.error(vscp.utility.getTime() + " Invalid VSCP event data.");
-        return;
-    }
+    cmdData = options.event.getText();
 
     this._sendEvent({
         data: cmdData,
@@ -3167,17 +3178,17 @@ vscp.Connection.prototype.sendEvent = function(options) {
 /**
  * Set a filter in the VSCP server for VSCP events.
  *
- * @param {object} options                      - Options
- * @param {number} options.filterPriority       - Priority filter
- * @param {number} options.filterClass          - Class filter
- * @param {number} options.filterType           - Type filter
- * @param {number[]|string} options.filterGuid  - GUID filter
- * @param {number} options.maskPriority         - Priority mask
- * @param {number} options.maskClass            - Class mask
- * @param {number} options.maskType             - Type mask
- * @param {number[]|string} options.maskGuid    - GUID mask
- * @param {function} [options.onSuccess]        - Function which is called on a successful operation
- * @param {function} [options.onError]          - Function which is called on a failed operation
+ * @param {object} options                          - Options
+ * @param {number} [options.filterPriority]         - Priority filter
+ * @param {number} [options.filterClass]            - Class filter
+ * @param {number} [options.filterType]             - Type filter
+ * @param {number[]|string} [options.filterGuid]    - GUID filter
+ * @param {number} [options.maskPriority]           - Priority mask
+ * @param {number} [options.maskClass]              - Class mask
+ * @param {number} [options.maskType]               - Type mask
+ * @param {number[]|string} [options.maskGuid]      - GUID mask
+ * @param {function} [options.onSuccess]            - Function which is called on a successful operation
+ * @param {function} [options.onError]              - Function which is called on a failed operation
  */
 vscp.Connection.prototype.setFilter = function(options) {
 
@@ -3199,7 +3210,7 @@ vscp.Connection.prototype.setFilter = function(options) {
     }
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
@@ -3217,7 +3228,7 @@ vscp.Connection.prototype.setFilter = function(options) {
 
     if (options.filterGuid instanceof Array) {
         if (16 !== options.filterGuid.length) {
-            console.error(vscp.utility.getTime() + " GUID filter length is invalid. ");
+            console.error(vscp.utility.getTime() + " GUID filter length is invalid.");
             return;
         }
 
@@ -3227,7 +3238,7 @@ vscp.Connection.prototype.setFilter = function(options) {
         filterGuid = vscp.utility.strToGuid(options.filterGuid);
 
         if (16 !== filterGuid.length) {
-            console.error(vscp.utility.getTime() + " GUID filter is invalid. ");
+            console.error(vscp.utility.getTime() + " GUID filter is invalid.");
             return;
         }
     }
@@ -3246,7 +3257,7 @@ vscp.Connection.prototype.setFilter = function(options) {
 
     if (options.maskGuid instanceof Array) {
         if (16 !== options.maskGuid.length) {
-            console.error(vscp.utility.getTime() + " GUID mask length is invalid. ");
+            console.error(vscp.utility.getTime() + " GUID mask length is invalid.");
             return;
         }
 
@@ -3256,7 +3267,7 @@ vscp.Connection.prototype.setFilter = function(options) {
         maskGuid = vscp.utility.strToGuid(options.maskGuid);
 
         if (16 !== maskGuid.length) {
-            console.error(vscp.utility.getTime() + " GUID mask is invalid. ");
+            console.error(vscp.utility.getTime() + " GUID mask is invalid.");
             return;
         }
     }
