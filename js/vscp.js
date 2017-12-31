@@ -2906,7 +2906,7 @@ vscp.Connection.prototype.connect = function(options) {
     }
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
@@ -3028,7 +3028,7 @@ vscp.Connection.prototype.start = function(options) {
     }
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
@@ -3066,7 +3066,7 @@ vscp.Connection.prototype.stop = function(options) {
     }
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
@@ -3104,7 +3104,7 @@ vscp.Connection.prototype.clearQueue = function(options) {
     }
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
@@ -3144,17 +3144,17 @@ vscp.Connection.prototype.sendEvent = function(options) {
     }
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
     if ("undefined" === typeof options.event) {
-        console.error(vscp.utility.getTime() + " VSCP event is missing. ");
+        console.error(vscp.utility.getTime() + " VSCP event is missing.");
         return;
     }
 
     if (false === options.event instanceof vscp.Event) {
-        console.error(vscp.utility.getTime() + " Event is invalid. ");
+        console.error(vscp.utility.getTime() + " Event is invalid.");
         return;
     }
 
@@ -3307,7 +3307,7 @@ vscp.Connection.prototype.setFilter = function(options) {
  * @param {object} options                      - Options
  * @param {string} options.name                 - Variable name
  * @param {number} [options.type]               - Variable type (default: string)
- * @param {number} options.accessrights         - Variable value
+ * @param {number} [options.accessrights]       - Variable value (default: 744)
  * @param {boolean} options.persistency         - Variable is persistent (true) or not (false)
  * @param {string} options.value                - Variable Value
  * @param {string} [options.note]               - Variable note (optional)
@@ -3318,19 +3318,19 @@ vscp.Connection.prototype.createVar = function(options) {
 
     var onSuccess = null;
     var onError = null;
-    var type = vscp.constants.varTypes.STRING; // default type is string
-    var accessrights = 744;     // default access rights
-    var persistency = false;    // Not persistent
-    var note = "";              // No note
+    var type = vscp.constants.varTypes.STRING;  // Default type is string
+    var accessrights = 744;                     // Default access rights
+    var persistency = false;                    // Not persistent
+    var note = "";                              // No note
     var value = "";
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options is missing. ");
+        console.error(vscp.utility.getTime() + " Options is missing.");
         return;
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Option 'name' is missing. ");
+        console.error(vscp.utility.getTime() + " Option 'name' is missing.");
         return;
     }
 
@@ -3355,7 +3355,7 @@ vscp.Connection.prototype.createVar = function(options) {
         persistency = options.persistency;
     }
     else {
-        console.error(vscp.utility.getTime() + " Option 'persistency' is missing. ");
+        console.error(vscp.utility.getTime() + " Option 'persistency' is missing.");
         return;
     }
 
@@ -3369,7 +3369,7 @@ vscp.Connection.prototype.createVar = function(options) {
         value = (options.value ? "true" : "false");
     }
     else {
-        console.error(vscp.utility.getTime() + " Option 'value' is missing. ");
+        console.error(vscp.utility.getTime() + " Option 'value' is missing.");
         return;
     }
 
@@ -3412,12 +3412,12 @@ vscp.Connection.prototype.readVar = function(options) {
     var onError = null;
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Variable name is missing. ");
+        console.error(vscp.utility.getTime() + " Variable name is missing.");
         return;
     }
 
@@ -3454,12 +3454,12 @@ vscp.Connection.prototype.writeVar = function(options) {
     var value = "";
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options is missing. ");
+        console.error(vscp.utility.getTime() + " Options is missing.");
         return;
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Option name is missing. ");
+        console.error(vscp.utility.getTime() + " Option name is missing.");
         return;
     }
 
@@ -3473,12 +3473,12 @@ vscp.Connection.prototype.writeVar = function(options) {
         value = (options.value ? "true" : "false");
     }
     else {
-        console.error(vscp.utility.getTime() + " Option 'value' is missing. ");
+        console.error(vscp.utility.getTime() + " Option 'value' is missing.");
         return;
     }
 
     if ("number" !== typeof options.type) {
-        console.error(vscp.utility.getTime() + " Option type is missing. ");
+        console.error(vscp.utility.getTime() + " Option type is missing.");
         return;
     }
 
@@ -3514,12 +3514,12 @@ vscp.Connection.prototype.resetVar = function(options) {
     var onError = null;
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Variable name is missing. ");
+        console.error(vscp.utility.getTime() + " Variable name is missing.");
         return;
     }
 
@@ -3553,12 +3553,12 @@ vscp.Connection.prototype.removeVar = function(options) {
     var onError = null;
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Variable name is missing. ");
+        console.error(vscp.utility.getTime() + " Variable name is missing.");
         return;
     }
 
@@ -3592,12 +3592,12 @@ vscp.Connection.prototype.lengthVar = function(options) {
     var onError = null;
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Variable name is missing. ");
+        console.error(vscp.utility.getTime() + " Variable name is missing.");
         return;
     }
 
@@ -3631,12 +3631,12 @@ vscp.Connection.prototype.lastChangeVar = function(options) {
     var onError = null;
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Variable name is missing. ");
+        console.error(vscp.utility.getTime() + " Variable name is missing.");
         return;
     }
 
@@ -3672,7 +3672,7 @@ vscp.Connection.prototype.listVar = function(options) {
     var regex = null;
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
@@ -3681,7 +3681,7 @@ vscp.Connection.prototype.listVar = function(options) {
     }
 
     if ("function" !== typeof options.onVariable) {
-        console.error(vscp.utility.getTime() + " onVariable is missing. ");
+        console.error(vscp.utility.getTime() + " onVariable is missing.");
         return;
     }
 
@@ -3725,17 +3725,17 @@ vscp.Connection.prototype.readTable = function(options) {
     var data = "";
 
     if ("undefined" === typeof options) {
-        console.error(vscp.utility.getTime() + " Options are missing. ");
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
 
     if ("string" !== typeof options.name) {
-        console.error(vscp.utility.getTime() + " Table name is missing. ");
+        console.error(vscp.utility.getTime() + " Table name is missing.");
         return;
     }
 
     if ("function" !== typeof options.onTableRow) {
-        console.error(vscp.utility.getTime() + " onTableRow function is missing. ");
+        console.error(vscp.utility.getTime() + " onTableRow function is missing.");
         return;
     }
 

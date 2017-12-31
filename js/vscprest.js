@@ -451,6 +451,11 @@ vscp.rest.Client = function(config) {
             return this._abort("Options are missing.");
         }
 
+        if (0 === this.sessionKey.length) {
+            console.error(vscp.utility.getTime() + " No session opened.");
+            return this._abort("No session opened.", options.onError);
+        }
+
         if (false === options.event instanceof vscp.Event) {
             console.error(vscp.utility.getTime() + " Event is missing.");
             return this._abort("Event is missing.", options.onError);
@@ -648,6 +653,11 @@ vscp.rest.Client = function(config) {
             console.error(vscp.utility.getTime() + " Options are missing.");
             return this._abort("Options are missing.");
         }
+
+        if (0 === this.sessionKey.length) {
+            console.error(vscp.utility.getTime() + " No session opened.");
+            return this._abort("No session opened.", options.onError);
+        }
     
         if ("number" === typeof options.filterPriority) {
             filterPriority = options.filterPriority;
@@ -749,6 +759,192 @@ vscp.rest.Client = function(config) {
             }.bind(this),
             onError: function(data) {
                 console.error(vscp.utility.getTime() + " Failed to set filter: " + JSON.stringify(data.serverError));
+
+                if ("function" === typeof options.onError) {
+                    options.onError(data);
+                }
+            }.bind(this)
+        });
+    };
+
+    /** Clear the VSCP event queue on the server side.
+     *
+     * @param {object}      [options]           - Options
+     * @param {function}    [options.onSuccess] - Callback, which is called for successful request.
+     * @param {function}    [options.onError]   - Callback, which is called for failed request.
+     * 
+     * @return {object} jquery promise (deferred object)
+     */
+    this.clearQueue = function(options) {
+
+        if (0 === this.sessionKey.length) {
+            console.error(vscp.utility.getTime() + " No session opened.");
+            if ("undefined" === typeof options) {
+                return this._abort("No session opened.");
+            } else {
+                return this._abort("No session opened.", options.onError);
+            }
+        }
+
+        console.info(vscp.utility.getTime() + " Clear queue (" + this.sessionKey + ")");
+
+        return this._makeRequest({
+            path: '',
+            parameter: [{
+                name: 'vscpsession',
+                value: this.sessionKey
+            }, {
+                name: 'format',
+                value: 'jsonp'
+            }, {
+                name: 'op',
+                value: 'clearqueue'
+            }],
+            type: 'GET',
+            onSuccess: function(data) {
+                console.info(vscp.utility.getTime() + " Clear queue successful: " + JSON.stringify(data.response));
+
+                if ("undefined" !== typeof options) {
+                    if ("function" === typeof options.onSuccess) {
+                        options.onSuccess(data);
+                    }
+                }
+            }.bind(this),
+            onError: function(data) {
+                console.error(vscp.utility.getTime() + " Failed to clear queue: " + JSON.stringify(data.serverError));
+
+                if ("undefined" !== typeof options) {
+                    if ("function" === typeof options.onError) {
+                        options.onError(data);
+                    }
+                }
+            }.bind(this)
+        });
+    };
+
+    /**
+     * Create a a VSCP remote variable.
+     *
+     * @param {object}      options                 - Options
+     * @param {string}      options.name            - Variable name
+     * @param {number}      [options.type]          - Variable type (default: string)
+     * @param {number}      [options.accessrights]  - Variable value (default: 744)
+     * @param {boolean}     options.persistency     - Variable is persistent (true) or not (false)
+     * @param {string}      options.value           - Variable Value
+     * @param {string}      [options.note]          - Variable note (optional)
+     * @param {function}    [options.onSuccess]     - Function which is called on a successful operation
+     * @param {function}    [options.onError]       - Function which is called on a failed operation
+     * 
+     * @return {object} jquery promise (deferred object)
+     */
+    this.createVar = function(options) {
+
+        var type = vscp.constants.varTypes.STRING;  // Default type is string
+        var accessrights = 744;                     // Default access rights
+        var persistency = false;                    // Not persistent
+        var note = "";                              // No note
+        var value = "";
+
+        if ("undefined" === typeof options) {
+            console.error(vscp.utility.getTime() + " Options are missing.");
+            return this._abort("Options are missing.");
+        }
+
+        if (0 === this.sessionKey.length) {
+            console.error(vscp.utility.getTime() + " No session opened.");
+            return this._abort("No session opened.", options.onError);
+        }
+    
+        if ("string" !== typeof options.name) {
+            console.error(vscp.utility.getTime() + " Option 'name' is missing.");
+            return this._abort("Option 'name' is missing.", options.onError);
+        }
+    
+        if ("number" === typeof options.type) {
+            type = options.type;
+        }
+    
+        if ("number" === typeof options.accessrights) {
+            accessrights = options.accessrights;
+        }
+    
+        if ("string" === typeof options.persistency) {
+    
+            if ('false' === options.persistency.toLowerCase()) {
+                persistency = false;
+            }
+            else {
+                persistency = true;
+            }
+        }
+        else if ("boolean" === typeof options.persistency) {
+            persistency = options.persistency;
+        }
+        else {
+            console.error(vscp.utility.getTime() + " Option 'persistency' is missing.");
+            return this._abort("Option 'persistency' is missing.", options.onError);
+        }
+    
+        if ("string" !== typeof options.value) {
+            value = options.value;
+        }
+        else if ("number" !== typeof options.value) {
+            value = options.value.toString();
+        }
+        else if ("boolean" !== typeof options.value) {
+            value = (options.value ? "true" : "false");
+        }
+        else {
+            console.error(vscp.utility.getTime() + " Option 'value' is missing.");
+            return this._abort("Option 'value' is missing.", options.onError);
+        }
+    
+        if ("string" === typeof options.note) {
+            note = options.note;
+        }
+
+        console.info(vscp.utility.getTime() + " Create variable (" + this.sessionKey + ")");
+
+        return this._makeRequest({
+            path: '',
+            parameter: [{
+                name: 'vscpsession',
+                value: this.sessionKey
+            }, {
+                name: 'format',
+                value: 'jsonp'
+            }, {
+                name: 'op',
+                value: 'createvar'
+            }, {
+                name: 'variable',
+                value: options.name
+            }, {
+                name: 'type',
+                value: type
+            }, {
+                name: 'accessright',
+                value: accessrights
+            }, {
+                name: 'persistent',
+                value: persistency
+            }, {
+                name: 'value',
+                value: vscp.encodeValueIfBase64(type, value)
+            }, {
+                name: 'note',
+                value: vscp.b64EncodeUnicode(note)
+            }],
+            type: 'GET',
+            onSuccess: function(data) {
+                console.info(vscp.utility.getTime() + " Variable created.");
+
+                if ("function" === typeof options.onSuccess) {
+                    options.onSuccess(data);
+                }
+            }.bind(this),
+            onError: function(data) {
+                console.error(vscp.utility.getTime() + " Failed to create variable: " + JSON.stringify(data.serverError));
 
                 if ("function" === typeof options.onError) {
                     options.onError(data);

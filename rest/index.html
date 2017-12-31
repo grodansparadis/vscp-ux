@@ -481,33 +481,29 @@
 
         var do_clrQueue = function() {
 
-            if (vscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $.ajax({
-                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
-                        '&format=jsonp&op=clearqueue',
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.clearQueue()
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                         do_clrQueue");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
 
-                        if (response.success) {
-                            $("#events").html("Queue cleared.");
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        $("#events").html("Queue cleared.");
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to clear queue</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to clear queue</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#events").html("<font size='2' color='red'><b>Failed to clear queue</b>: Unknown error </font>");
                     }
                 });
             } else {
@@ -586,7 +582,7 @@
 
         var do_createVariable = function() {
 
-            if (vscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
                 var txtVariableName = window.prompt("Name of variable to create:", "test");
                 if (null == txtVariableName) return;
@@ -601,64 +597,34 @@
                 var txtVariablePersistent = window.prompt("Persistent (true/false):", "false");
                 if (null == txtVariablePersistent) return;
 
-                // The value should be base64 encoded for 'string-types'
-                if ((txtVariableType.toUpperCase() == "STRING") ||
-                    (txtVariableType == "1") ||
-                    (txtVariableType.toUpperCase() == "BLOB") ||
-                    (txtVariableType == "16") ||
-                    (txtVariableType.toUpperCase() == "MIME") ||
-                    (txtVariableType == "100") ||
-                    (txtVariableType.toUpperCase() == "HTML") ||
-                    (txtVariableType == "101") ||
-                    (txtVariableType.toUpperCase() == "JAVASCRIPT") ||
-                    (txtVariableType == "102") ||
-                    (txtVariableType.toUpperCase() == "JSON") ||
-                    (txtVariableType == "103") ||
-                    (txtVariableType.toUpperCase() == "XML") ||
-                    (txtVariableType == "104") ||
-                    (txtVariableType.toUpperCase() == "SQL") ||
-                    (txtVariableType == "105") ||
-                    (txtVariableType.toUpperCase() == "LUA") ||
-                    (txtVariableType == "201") ||
-                    (txtVariableType.toUpperCase() == "LUARES") ||
-                    (txtVariableType == "202") ||
-                    (txtVariableType.toUpperCase() == "UXTYPE1") ||
-                    (txtVariableType == "300")) {
-                    txtVariableValue = vscp.b64EncodeUnicode(txtVariableValue);
-                }
-
-
-                $.ajax({
-                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
-                        '&format=jsonp&op=createvar&variable=' + txtVariableName +
-                        '&value=' + txtVariableValue +
-                        '&type=' + txtVariableType +
-                        '&note=' + vscp.b64EncodeUnicode(txtVariableNote) +
-                        '&accessright=' + txtVariableAccessRight +
-                        '&persistent=' + txtVariablePersistent,
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.createVar({
+                    name: txtVariableName,
+                    type: vscp.getVarTypeNumerical(txtVariableType),
+                    accessrights: txtVariableAccessRight,
+                    persistency: txtVariablePersistent,
+                    value: txtVariableValue,
+                    note: txtVariableNote
+                })
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                     do_createVariable");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
 
-                        if (response.success) {
-                            $("#events").html("OK Variable written");
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        $("#events").html("OK Variable written.");
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to create variable</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#events").html("<font size='2' color='red'><b>Failed to create variable</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#events").html("<font size='2' color='red'><b>Failed to create variable</b>: Unknown error </font>");
                     }
                 });
             } else {
