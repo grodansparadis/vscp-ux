@@ -745,37 +745,33 @@
 
         var do_deleteVariable = function() {
 
-            if (vscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
                 var txtVariableName = window.prompt("Name of variable to delete:", "test");
-                if (null == txtVariableName) return;
 
-                $.ajax({
-                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
-                        '&format=jsonp&op=deletevar&variable=' + txtVariableName,
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
+                vscpRestClient.removeVar({
+                    name: txtVariableName
+                })
+                .done(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
                         console.log("                     do_deleteVariable");
                         console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
+                        console.log("Success = " + data.response.success);
+                        console.log("Code = " + data.response.code);
+                        console.log("Message = " + data.response.message);
+                        console.log("Description = " + data.response.description);
 
-                        if (response.success) {
-                            $("#events").html("OK Variable deleted");
-                        }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("Close:" + error + " Status:" + status);
+                        $("#log").html("OK Variable deleted.");
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to delete variable</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to delete variable</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#log").html("<font size='2' color='red'><b>Failed to delete variable</b>: Unknown error </font>");
                     }
                 });
             } else {
