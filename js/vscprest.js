@@ -1,4 +1,4 @@
-// VSCP register abstraction model javascript library
+// VSCP REST API javascript library
 // Copyright (c) 2017 Andreas Merkle
 // <vscp@blue-andi.de>
 //
