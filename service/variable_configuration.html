@@ -243,7 +243,16 @@
             var index = 0;
 
             // Get new value
-            var value = $( '#' + id ).val()
+            var value = $( '#' + id ).val();
+
+            // Get variable type
+            var type = 0;
+            for( index = 0; index < variables.length; ++index ) {
+                if ( name === variables[ index ].name ) {
+                    type = parseInt(variables[ index ].type);
+                    break;
+                }
+            }
 
             // Disable user interface
             ui.disable();
@@ -252,6 +261,7 @@
             vscpConn.writeVar({
                 name: name,
                 value: value,
+                type: type,
                 onSuccess: function( conn, options ) {
 
                     // Find variable and set the value

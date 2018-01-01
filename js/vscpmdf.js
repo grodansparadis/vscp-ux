@@ -33,6 +33,7 @@
 //
 
 /*jshint bitwise: false */
+/* eslint-env jquery */
 
 /* Create the root namespace and making sure we're not overwriting it */
 var vscp = vscp || {};
