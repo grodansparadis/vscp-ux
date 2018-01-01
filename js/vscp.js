@@ -1521,7 +1521,7 @@ vscp.getEditorModeFromType = function(n) {
 
 /* ---------------------------------------------------------------------- */
 
-
+// https://developer.mozilla.org/en-US/docs/Web/API/WindowBase64/Base64_encoding_and_decoding#The_Unicode_Problem
 // Since DOMStrings are 16-bit-encoded strings, in most browsers calling window.btoa
 // on a Unicode string will cause a Character Out Of Range exception if a character
 // exceeds the range of a 8-bit ASCII-encoded character.
@@ -1581,9 +1581,9 @@ vscp.isBase64Type = function(type) {
 vscp.decodeValueIfBase64 = function(type, value) {
     if (vscp.isBase64Type(type)) {
         return vscp.b64DecodeUnicode(value);
-    } else {
-        return value;
     }
+
+    return value;
 };
 
 /** Encode the value if its stored in base64.
@@ -1594,9 +1594,9 @@ vscp.decodeValueIfBase64 = function(type, value) {
 vscp.encodeValueIfBase64 = function(type, value) {
     if (vscp.isBase64Type(type)) {
         return vscp.b64EncodeUnicode(value);
-    } else {
-        return value;
     }
+
+    return value;
 };
 
 /**
@@ -3669,7 +3669,7 @@ vscp.Connection.prototype.listVar = function(options) {
 
     var onSuccess = null;
     var onError = null;
-    var regex = null;
+    var regex = "";
 
     if ("undefined" === typeof options) {
         console.error(vscp.utility.getTime() + " Options are missing.");

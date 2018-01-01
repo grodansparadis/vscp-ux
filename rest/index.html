@@ -785,7 +785,7 @@
         // printVariableData
         //
 
-        var printVariableData = function(variable, bLong) {
+        var printVariableData = function(variable) {
 
             var vartxt = "<b>Variable</b>: <b>Name</b>:" + variable.varname +
                 " <b>Type</b>:" + variable.vartype +
@@ -795,10 +795,12 @@
                 " <b>Access-rights</b>:" + variable.varaccessright +
                 " <b>Last-change</b>:" + variable.varlastchange;
 
-            if (true === bLong) {
+            if ("string" === typeof variable.varvalue) {
                 vartxt += "<br><b>Value</b>:" + variable.varvalue;
+            }
+
+            if ("string" === typeof variable.varnote) {
                 vartxt += "<br><b>Note</b>:" + variable.varnote;
-                vartxt += "<br>-----------------------------------------------------------------------------";
             }
 
             return vartxt;
@@ -810,50 +812,51 @@
 
         var do_listVariables = function() {
 
-            if (vscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $("#events").html("");
+                $("#log").html("");
 
                 var txtRegEx = window.prompt("Regular expression (leave blank to select all):", "");
                 if (null == txtRegEx) txtRegEx = "(.*)";
 
-                $.ajax({
-                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
-                        '&format=jsonp&op=listvar&listlong=false&regex=' + encodeURIComponent(txtRegEx),
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
-                        // response will be a JavaScript
-                        // array of objects
-                        console.log("-----------------------------------------------------------");
-                        console.log("                     do_listVariables");
-                        console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
-                        console.log("Count = " + response.count);
-                        console.log("Errors = " + response.errors);
+                vscpRestClient.listVar({
+                    listLong: false,
+                    regex: txtRegEx
+                })
+                .done(function(data) {
+                    var eventtxt = "";
+                    var index = 0;
 
-                        if (response.success) {
-                            if (response.count > 0) {
-                                var eventtxt = "";
-                                for (var i = 0; i < response.count; i++) {
-                                    eventtxt += printVariableData(response.variable[i], false) + "<br>";
-                                }
-                                $("#events").html(eventtxt);
-                            } else {
-                                $("#events").html(" ");
-                                $("#nevents").html("It looks like there is no variables to read.");
-                            };
+                    // response will be a JavaScript
+                    // array of objects
+                    console.log("-----------------------------------------------------------");
+                    console.log("                     do_listVariables");
+                    console.log("-----------------------------------------------------------");
+                    console.log("Success = " + data.response.success);
+                    console.log("Code = " + data.response.code);
+                    console.log("Message = " + data.response.message);
+                    console.log("Description = " + data.response.description);
+                    console.log("Info = " + data.response.info);
+                    console.log("Count = " + data.response.count);
+                    console.log("Errors = " + data.response.errors);
+
+                    if (0 < data.response.count) {
+                        for (index = 0; index < data.response.count; ++index) {
+                            eventtxt += printVariableData(data.response.variable[index]) + "<br>";
                         }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("do_listVariables:" + error + " Status:" + status);
+                        $("#log").html(eventtxt);
+                    } else {
+                        $("#log").html(" ");
+                        $("#nevents").html("It looks like there is no variables to read.");
+                    };
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to list variables</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to list variables</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#log").html("<font size='2' color='red'><b>Failed to list variables</b>: Unknown error </font>");
                     }
                 });
             } else {
@@ -870,50 +873,52 @@
 
         var do_listVariablesValue = function() {
 
-            if (vscpSessionKey.length > 0) {
+            if (null !== vscpRestClient) {
 
-                $("#events").html("");
+                $("#log").html("");
 
                 var txtRegEx = window.prompt("Regular expression (leave blank to select all):", "");
                 if (null == txtRegEx) txtRegEx = "(.*)";
 
-                $.ajax({
-                    url: vscpServer + '/vscp/rest?vscpsession=' + vscpSessionKey +
-                        '&format=jsonp&op=listvar&listlong=true&regex=' + encodeURIComponent(txtRegEx),
-                    type: "GET",
-                    jsonpCallback: 'handler',
-                    cache: true,
-                    dataType: 'jsonp',
-                    success: function(response) {
-                        // response will be a JavaScript
-                        // array of objects
-                        console.log("-----------------------------------------------------------");
-                        console.log("                     do_listVariables");
-                        console.log("-----------------------------------------------------------");
-                        console.log("Success = " + response.success);
-                        console.log("Code = " + response.code);
-                        console.log("Message = " + response.message);
-                        console.log("Description = " + response.description);
-                        console.log("Info = " + response.info);
-                        console.log("Count = " + response.count);
-                        console.log("Errors = " + response.errors);
+                vscpRestClient.listVar({
+                    listLong: true,
+                    regex: txtRegEx
+                })
+                .done(function(data) {
+                    var eventtxt = "";
+                    var index = 0;
 
-                        if (response.success) {
-                            if (response.count > 0) {
-                                var eventtxt = "";
-                                for (var i = 0; i < response.count; i++) {
-                                    eventtxt += printVariableData(response.variable[i], true) + "<br>";
-                                }
-                                $("#events").html(eventtxt);
-                            } else {
-                                $("#events").html(" ");
-                                $("#nevents").html("It looks like there is no variables to read.");
-                            };
+                    // response will be a JavaScript
+                    // array of objects
+                    console.log("-----------------------------------------------------------");
+                    console.log("                     do_listVariablesValue");
+                    console.log("-----------------------------------------------------------");
+                    console.log("Success = " + data.response.success);
+                    console.log("Code = " + data.response.code);
+                    console.log("Message = " + data.response.message);
+                    console.log("Description = " + data.response.description);
+                    console.log("Info = " + data.response.info);
+                    console.log("Count = " + data.response.count);
+                    console.log("Errors = " + data.response.errors);
+
+                    if (0 < data.response.count) {
+                        for (index = 0; index < data.response.count; ++index) {
+                            eventtxt += printVariableData(data.response.variable[index]) + "<br>";
+                            eventtxt += "-----------------------------------------------------------------------------<br>";
                         }
-
-                    },
-                    error: function(xhr, status, error) {
-                        console.log("do_listVariables:" + error + " Status:" + status);
+                        $("#log").html(eventtxt);
+                    } else {
+                        $("#log").html(" ");
+                        $("#nevents").html("It looks like there is no variables to read.");
+                    };
+                })
+                .fail(function(data) {
+                    if (null !== data.clientError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to list variables</b>: " + data.clientError + "</font>");
+                    } else if (null !== data.serverError) {
+                        $("#log").html("<font size='2' color='red'><b>Failed to list variables</b>: " + JSON.stringify(data.serverError) + "</font>");
+                    } else {
+                        $("#log").html("<font size='2' color='red'><b>Failed to list variables</b>: Unknown error </font>");
                     }
                 });
             } else {
