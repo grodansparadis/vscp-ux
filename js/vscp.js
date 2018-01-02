@@ -2838,7 +2838,7 @@ vscp.Connection = function() {
             );
         }
     }, {
-        event: "GT",
+        event: "TBL_GET",
         onSuccess: function(conn, parameter) {
             console.info(vscp.utility.getTime() + " Table successfully read.");
             conn.signalSuccess(
@@ -3878,7 +3878,7 @@ vscp.Connection.prototype.readTable = function(options) {
     }
 
     this._sendCommand({
-        command: "GT",
+        command: "TBL_GET",
         data: data,
         onSuccess: onSuccess,
         onError: onError

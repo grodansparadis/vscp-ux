@@ -70,7 +70,9 @@
     <script type="text/javascript" src="../js/md5.js"></script>
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
-
+    <!-- VSCP websocket base library -->
+    <script type="text/javascript" src="../js/vscp.js"></script>
+    
     <!-- JavaScript library for manipulating documents based on data -->
     <script src="../js/d3/3.5.17/d3.min.js"></script>
     <script src="../js/epoch/0.8.4/epoch.min.js"></script>
@@ -83,14 +85,10 @@
 
     <script type="text/javascript">
 
-        // Wait until the whole website is loaded
-        $( document ).ready( function() {
-            // Show navigation bar menu
-            navBarMenu.show( "menu", navBarMenu.content );
-        });
-
         var bData = false;
+
         var lineChart;
+
         // The data array
         var lineChartData = [
             {
@@ -101,59 +99,111 @@
             }
         ];
 
-        var upDateChart = function () {
+        var count = 0;
+        var max = 0;
+
+        // VSCP websocket connection
+        var vscpConn = null;
+
+        // Wait until the whole website is loaded
+        $( document ).ready( function() {
+
+            // Show navigation bar menu
+            navBarMenu.show( "menu", navBarMenu.content );
+
+            // Create a VSCP websocket
+            vscpConn = new vscp.Connection();
+
+            // Connect to VSCP server
+            vscpConn.connect({
+
+                url: settings.url,
+                userName: settings.user,
+                password: settings.password,
+                vscpkey: settings.vscpkey,
+                authdomain: settings.authdomain,
+
+                onSuccess: function( conn ) {
+
+                },
+
+                onError: function( conn ) {
+                    alert("Couldn't establish a connection.");
+                }
+            });
+        });
+
+        function upDateChart() {
 
             var start = new Date();
             var end = new Date();
 
             start.setTime( Date.parse( document.getElementById("_datefrom").value ) );
             end.setTime( Date.parse( document.getElementById("_dateto").value ) );
-            vscptableCtrl.getTableData( start, end );
+
+            if (null !== vscpConn) {
+
+                vscpConn.readTable({
+                    name: "officetemp",
+                    begin: start,
+                    end: end,
+                    onTableRow: dataUpdate,
+                    onSuccess: function(data) {
+                        max = data.count;
+                        count = 0;
+
+                        bData = true;
+
+                        try {
+                            $( "lineChart" ).empty();
+                            delete lineChart;
+
+                            // delete all rows in table if any
+                            if( table.rows.length > 0 ) {
+                                while ( table.rows.length ) {
+                                    table.deleteRow(0);
+                                }
+                            }
+
+                            if( lineChartData[0].values.length > 0 ) {
+                                while ( lineChartData[0].values.length ) {
+                                    lineChartData[0].values.deleteRow(0);
+                                }
+                            }
+
+                        } catch(e) {
+                            console.log(e);
+                        }
+
+                        var statistics = document.getElementById("stat");
+                        statistics.innerHTML = "<b>Fetched</b> " +
+                                                    tabledata[3] + " <b>records of total</b>  " +
+                                                tabledata[4] + " " +
+                                                "<br />Total data interval in table is <b>From:</b> " + tabledata[5] +
+                                                " <b>To:</b> " + tabledata[6];
+                    },
+                    onError: function() {
+                        alert("Failed to read table.");
+                    }
+                });
+            }
         };
 
-        var dataUpdate = function( tabledata ) {
+        function dataUpdate( date, value ) {
 
             var table = document.getElementById("mymeasurementTable");
             var row = table.insertRow(table.rows.length);
 
-            if ( ( "+" == tabledata[0] ) &&
-                    ( "GT" == tabledata[1] ) &&
-                    ( "START" == tabledata[2] ) ) {
-                bData = true;
+            var d = new Date();
+                d.setTime( Date.parse( tabledata[3] ) );
+                var data = { time: d.getTime(), y: tabledata[4] };
+                lineChartData[0].values.push( data )
 
-                try {
-                    $( "lineChart" ).empty();
-                    delete lineChart;
-
-                    // delete all rows in table if any
-                    if( table.rows.length > 0 ) {
-                        while ( table.rows.length ) {
-                            table.deleteRow(0);
-                        }
-                    }
-
-                    if( lineChartData[0].values.length > 0 ) {
-                        while ( lineChartData[0].values.length ) {
-                            lineChartData[0].values.deleteRow(0);
-                        }
-                    }
-
-                } catch(e) {
-                    console.log(e);
-                }
-
-                console.log( tabledata );
-                var statistics = document.getElementById("stat");
-                statistics.innerHTML = "<b>Fetched</b> " +
-                                            tabledata[3] + " <b>records of total</b>  " +
-                                        tabledata[4] + " " +
-                                        "<br />Total data interval in table is <b>From:</b> " + tabledata[5] +
-                                        " <b>To:</b> " + tabledata[6];
-
-            }
-            else if ( ( "+" == tabledata[0] ) &&
-                        ( "GT" == tabledata[1] ) &&
-                        ( "END" == tabledata[2] ) ) {
+                // Add row to table
+                var cell1 = row.insertCell(0);
+                cell1.innerHTML = "Date = " + d.toLocaleString() + " Value = " + tabledata[4];
+            
+            if (max <= (count + 1)) {
                 bData = false;
                 lineChart = $('#lineChart').epoch({
                     type: 'time.line',
@@ -163,29 +213,9 @@
                     axes: ['left', 'right', 'bottom']
                 });
             }
-            else if ( bData && ( "+" == tabledata[0] ) &&
-                    ( "GT" == tabledata[1] ) ) {
-                var d = new Date();
-                d.setTime( Date.parse( tabledata[3] ) );
-                var data = { time: d.getTime(), y: tabledata[4] };
-                lineChartData[0].values.push( data )
 
-                // Add row to table
-                var cell1 = row.insertCell(0);
-                cell1.innerHTML = "Date = " + d.toLocaleString() + " Value = " + tabledata[4]
-
-            }
-
+            ++count;
         }
-
-        var vscptableCtrl = new vscpws_Table( settings.user,
-                                                settings.password,
-                                                settings.url,
-                                                settings.vscpkey,
-                                                settings.authdomain,
-                                                "officetemp",
-                                                0,
-                                                dataUpdate );
 
     </script>
 
