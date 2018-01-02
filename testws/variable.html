@@ -104,7 +104,6 @@
 
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/3.2.1/jquery-3.2.1.min.js"></script>
-    <script type="text/javascript" src="../js/jquery-migrate/3.0.1/jquery-migrate-3.0.1.js"></script>
 
     <!-- Bootstrap -->
     <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -148,20 +147,8 @@
 
                     onSuccess: function( conn ) {
 
-                        // Start receiving VSCP events
-                        vscpConn.start({
-
-                            onSuccess: function( conn ) {
-                                // Enable the user interface
-                                ui.enable();
-                            },
-
-                            onError: function( conn ) {
-                                alert("Couldn't start receiving events.");
-                            }
-
-                        });
-
+                        // Enable the user interface
+                        ui.enable();
                     },
 
                     onError: function( conn ) {
