@@ -2494,6 +2494,379 @@ vscp.Connection = function() {
 
     };
 
+    /** VSCP websocket command responses and unsolicited messages
+     * @member {object}
+     */
+    this.webSocketMessages = [{
+        event: "AUTH0",
+        onSuccess: function(conn, parameter) {
+            var cmd = conn.getPendingCommand("CHALLENGE");
+    
+            if (null !== cmd) {
+    
+                console.info(vscp.utility.getTime() + " Security challenge received.");
+    
+                conn._sendCommand({
+                    command: "AUTH",
+                    data: vscp.utility.getWebSocketAuthHash(conn.userName,
+                                                            conn.password,
+                                                            conn.vscpkey,
+                                                            parameter[2] // iv
+                        ),
+                    onSuccess: null,
+                    onError: null
+                });
+            }
+    
+            return;
+        },
+        onError: function(conn, parameter) {
+            var cmd = conn.getPendingCommand("FUNCTION_CONNECT");
+    
+            console.error(vscp.utility.getTime() + " Authentication initiation aborted.");
+    
+            if (null !== cmd) {
+                conn.signalConnError();
+                conn.socket.close();
+            } else {
+                console.error(vscp.utility.getTime() + " AUTH0 negative reply received, but no challenge is pending!?");
+            }
+    
+            return;
+        }
+    }, {
+        event: "AUTH",
+        onSuccess: function(conn, parameter) {
+            var cmd = conn.getPendingCommand("CHALLENGE");
+    
+            if (null !== cmd) {
+    
+                console.info(vscp.utility.getTime() + " Security challenge received.");
+    
+                conn._sendCommand({
+                    command: "AUTH",
+                    data: vscp.utility.getWebSocketAuthHash(conn.userName,
+                                                            conn.password,
+                                                            conn.vscpkey,
+                                                            parameter[2] // iv
+                        ),
+                    onSuccess: null,
+                    onError: null
+                });
+            }
+            return;
+        },
+        onError: null
+    }, {
+        event: "AUTH1",
+        onSuccess: function(conn, parameter) {
+            var cmd = conn.getPendingCommand("AUTH");
+    
+            if (null !== cmd) {
+                console.info(vscp.utility.getTime() + " Authentication successful.");
+    
+                if (conn.states.CONNECTED === conn.state) {
+                    conn.state = conn.states.AUTHENTICATED;
+                    conn.signalSuccess("FUNCTION_CONNECT");
+                }
+    
+                // Save authenticated user info
+                conn.userId = parseInt(parameter[2]);
+                conn.userFullname = parameter[3];
+                conn.userRights = parameter[4].split("/");
+                conn.userRemotes = parameter[5];
+                conn.userEvents = parameter[6];
+                conn.userNote = parameter[7];
+            }
+        },
+        onError: function(conn, parameter) {
+            var cmd = conn.getPendingCommand("FUNCTION_CONNECT");
+    
+            console.error(vscp.utility.getTime() + " Authentication failed.");
+    
+            if (null !== cmd) {
+                conn.signalConnError();
+                conn.socket.close();
+            } else {
+                console.error(vscp.utility.getTime() + " AUTH1 negative reply received, but no challenge is pending!?");
+            }
+        }
+    }, {
+        event: "OPEN",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Receiving events started.");
+            conn.substate = conn.substates.OPEN;
+            conn.signalSuccess(parameter[1]);
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Receiving events couldn't be started.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "CLOSE",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Receiving events stopped.");
+            conn.substate = conn.substates.CLOSE;
+            conn.signalSuccess(parameter[1]);
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Receiving events couldn't be stopped.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "CLRQ",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " VSCP event queue cleared.");
+            conn.signalSuccess(parameter[1]);
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " VSCP event queue couldn't be cleared.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "EVENT",
+        onSuccess: function(conn, parameter) {
+            //console.info( vscp.utility.getTime() + " VSCP event successful sent." );
+            conn.signalSuccess(parameter[1]);
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Failed to send VSCP event.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "SF",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Filter successfully set.");
+            conn.signalSuccess(parameter[1]);
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Filter couldn't bet set.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "RVAR",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Variable " + parameter[2] + " (" + parameter[4] + ") successful read.");
+            conn.signalSuccess(
+                parameter[1], {
+                    // name;type;userid;accessright,bPersistent;userid;rights;lastchanged;value;note
+                    name: parameter[2], // Variable name
+                    type: parseInt(parameter[3]), // Variable type
+                    userid: parseInt(parameter[4]), // Variable user
+                    accessright: parseInt(parameter[5]), // Variable access
+                    persistency: ("false" === parameter[6]) ? false : true, // Variable persistency
+                    lastchange: parameter[7], // Variable lastchange
+                    value: vscp.decodeValueIfBase64(parseInt(parameter[3]), parameter[8]), // Variable value
+                    note: vscp.b64DecodeUnicode(parameter[9]) // Variable note
+                }
+            );
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Variable couldn't be read.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "WVAR",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Variable successfully written.");
+            conn.signalSuccess(
+                parameter[1], {
+                    name: parameter[2], // Variable name
+                    type: parseInt(parameter[3]), // Variable type
+                    value: parameter[4] // Variable value
+                }
+            );
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Variable couldn't be written.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "CVAR",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Variable successfully created.");
+            conn.signalSuccess(parameter[1]);
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Variable couldn't be created.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "RSTVAR",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Variable successfully reset.");
+            conn.signalSuccess(
+                parameter[1], {
+                    name: parameter[2], // Variable name
+                    type: parameter[3], // Variable type
+                    value: parameter[4] // Variable value
+                }
+            );
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Variable couldn't be reset.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "DELVAR",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Variable successfully removed.");
+            conn.signalSuccess(
+                parameter[1], {
+                    name: parameter[2] // Variable name
+                }
+            );
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Variable couldn't be removed.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "LENVAR",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Variable length successfully read.");
+            conn.signalSuccess(
+                parameter[1], {
+                    name: parameter[2], // Variable name
+                    length: parseInt(parameter[3]) // Variable length
+                }
+            );
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Variable length couldn't be read.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "LCVAR",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Variable last change successfully read.");
+            conn.signalSuccess(
+                parameter[1], {
+                    name: parameter[2], // Variable name
+                    lastChange: parameter[3] // Variable last changed
+                }
+            );
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Variable last change couldn't be read.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "LSTVAR",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Variable successfully listed.");
+            conn.signalSuccess(parameter[1]);
+            conn.signalVariable({
+                // +;LSTVAR;ordinal;count;name;type;userid;accessrights;persistance;last_change
+                idx: parseInt(parameter[2]), // Ordinal
+                count: parseInt(parameter[3]), // Total # variables
+                name: parameter[4], // Variable name
+                type: parameter[5], // Variable type
+                userid: parseInt(parameter[6]), // Variable user
+                accessright: parseInt(parameter[7]), // Variable access rights
+                persistency: ("false" === parameter[8]) ? false : true, // Variable persistency
+                lastchange: parameter[9], // Variable date
+            });
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Variables couldn't be listed.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "GT",
+        onSuccess: function(conn, parameter) {
+            console.info(vscp.utility.getTime() + " Table successfully read.");
+            conn.signalSuccess(
+                parameter[1], {
+                    count: parseInt(parameter[2]) // Number of rows that will follow via TR
+                }
+            );
+        },
+        onError: function(conn, parameter) {
+            console.error(vscp.utility.getTime() + " Table couldn't be read.");
+            conn.signalError(
+                parameter[1], {
+                    id: parseInt(parameter[2]), // Error code
+                    str: parameter[3] // Error string
+                }
+            );
+        }
+    }, {
+        event: "TR",
+        onSuccess: function(conn, parameter) {
+            conn.signalTableRow({
+                date: parameter[2], // Date and time
+                value: parameter[3] // Value
+            });
+        },
+        onError: null
+    }];
+
     return this;
 };
 
@@ -2535,7 +2908,6 @@ vscp.Connection.prototype.onWebSocketClose = function() {
 vscp.Connection.prototype.onWebSocketMessage = function(msg) {
 
     var msgItems = msg.data.split(";"); /* Data is separated by ; */
-    var cmd = null;
     var eventItems = [];
     var evt = null;
     var offset = 0;
@@ -2548,308 +2920,38 @@ vscp.Connection.prototype.onWebSocketMessage = function(msg) {
      */
     if (false === this.signalMessage(msg)) {
 
-        if ("+" === msgItems[0]) {
+        // Command response?
+        if (("+" === msgItems[0]) || 
+            ("-" === msgItems[0])) {
 
-            if ("AUTH0" === msgItems[1]) {
-
-                cmd = this.getPendingCommand("CHALLENGE");
-
-                if (null !== cmd) {
-
-                    console.info(vscp.utility.getTime() + " Security challenge received.");
-
-                    this._sendCommand({
-                        command: "AUTH",
-                        data: vscp.utility.getWebSocketAuthHash( this.userName,
-                                                                 this.password,
-                                                                 this.vscpkey,
-                                                                 msgItems[2] // iv
-                            ),
-                        onSuccess: null,
-                        onError: null
-                    });
-                }
-            } else if ("AUTH1" === msgItems[1]) {
-
-                cmd = this.getPendingCommand("AUTH");
-
-                if (null !== cmd) {
-                    console.info(vscp.utility.getTime() + " Authentication successful.");
-
-                    if (this.states.CONNECTED === this.state) {
-                        this.state = this.states.AUTHENTICATED;
-                        this.signalSuccess("FUNCTION_CONNECT");
-                    }
-
-                    // Save authenticated user info
-                    this.userId = parseInt(msgItems[2]);
-                    this.userFullname = msgItems[3];
-                    this.userRights = msgItems[4].split("/");
-                    this.userRemotes = msgItems[5];
-                    this.userEvents = msgItems[6];
-                    this.userNote = msgItems[7];
-
-                }
-            } else if ("OPEN" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Receiving events started.");
-                this.substate = this.substates.OPEN;
-                this.signalSuccess(msgItems[1]);
-            } else if ("CLOSE" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Receiving events stopped.");
-                this.substate = this.substates.CLOSE;
-                this.signalSuccess(msgItems[1]);
-            } else if ("CLRQ" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " VSCP event queue cleared.");
-                this.signalSuccess(msgItems[1]);
-            } else if ("EVENT" === msgItems[1]) {
-                //console.info( vscp.utility.getTime() + " VSCP event successful sent." );
-                this.signalSuccess(msgItems[1]);
-            } else if ("SF" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Filter successfully set.");
-                this.signalSuccess(msgItems[1]);
-            } else if ("RVAR" === msgItems[1]) {
-                console.info(vscp.utility.getTime() +
-                    " Variable " +
-                    msgItems[2] +
-                    " (" + msgItems[4] +
-                    ") successful read.");
-                this.signalSuccess(
-                    msgItems[1], {
-                        // name;type;userid;accessright,bPersistent;userid;rights;lastchanged;value;note
-                        name: msgItems[2], // Variable name
-                        type: parseInt(msgItems[3]), // Variable type
-                        userid: parseInt(msgItems[4]), // Variable user
-                        accessright: parseInt(msgItems[5]), // Variable access
-                        persistency: ("false" === msgItems[6]) ? false : true, // Variable persistency
-                        lastchange: msgItems[7], // Variable lastchange
-                        value: vscp.decodeValueIfBase64(parseInt(msgItems[3]), msgItems[8]), // Variable value
-                        note: vscp.b64DecodeUnicode(msgItems[9]) // Variable note
-                    }
-                );
-            } else if ("WVAR" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Variable successfully written.");
-                this.signalSuccess(
-                    msgItems[1], {
-                        name: msgItems[2], // Variable name
-                        type: parseInt(msgItems[3]), // Variable type
-                        value: msgItems[4] // Variable value
-                    }
-                );
-            } else if ("CVAR" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Variable successfully created.");
-                this.signalSuccess(msgItems[1]);
-            } else if ("RSTVAR" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Variable successfully reset.");
-                this.signalSuccess(
-                    msgItems[1], {
-                        name: msgItems[2], // Variable name
-                        type: msgItems[3], // Variable type
-                        value: msgItems[4] // Variable value
-                    }
-                );
-            } else if ("DELVAR" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Variable successfully removed.");
-                this.signalSuccess(
-                    msgItems[1], {
-                        name: msgItems[2] // Variable name
-                    }
-                );
-            } else if ("LENVAR" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Variable length successfully read.");
-                this.signalSuccess(
-                    msgItems[1], {
-                        name: msgItems[2], // Variable name
-                        length: parseInt(msgItems[3]) // Variable length
-                    }
-                );
-            } else if ("LCVAR" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Variable last change successfully read.");
-                this.signalSuccess(
-                    msgItems[1], {
-                        name: msgItems[2], // Variable name
-                        lastChange: msgItems[3] // Variable last changed
-                    }
-                );
-            } else if ("LSTVAR" === msgItems[1]) {
-                console.info(vscp.utility.getTime() + " Variable successfully listed.");
-                this.signalSuccess(msgItems[1]);
-                this.signalVariable({
-                    // +;LSTVAR;ordinal;name;type;userid;accessrights;persistance;last_change
-                    idx: parseInt(msgItems[2]), // Ordinal
-                    count: parseInt(msgItems[3]), // Total # variables
-                    name: msgItems[4], // Variable name
-                    type: msgItems[5], // Variable type
-                    userid: parseInt(msgItems[6]), // Variable user
-                    accessright: parseInt(msgItems[7]), // Variable access rights
-                    persistency: ("false" === msgItems[8]) ? false : true, // Variable persistency
-                    lastchange: msgItems[9], // Variable date
-                });
-            } else if (("GT" === msgItems[1]) || ("GETTABLE" === msgItems[1])) {
-                console.info(vscp.utility.getTime() + " Table successfully read.");
-                this.signalSuccess(
-                    msgItems[1], {
-                        count: parseInt(msgItems[2]) // Number of rows that will follow via TR
-                    }
-                );
-            } else if ("TR" === msgItems[1]) {
-                this.signalTableRow({
-                    date: msgItems[2], // Date and time
-                    value: msgItems[3] // Value
-                });
-            } else {
-                console.debug("Unknown message: " + msg.data);
-                this.signalSuccess(msgItems[1]);
+            // Find response parser
+            index = 0;
+            while(this.webSocketMessages[index].event !== msgItems[1]) {
+                ++index;
             }
-        } else if ("-" === msgItems[0]) {
-
-            if ("AUTH0" === msgItems[1]) {
-
-                console.error(vscp.utility.getTime() + " Authentication initiation aborted.");
-
-                cmd = this.getPendingCommand("FUNCTION_CONNECT");
-
-                if (null !== cmd) {
-                    this.signalConnError();
-                    this.socket.close();
+        
+            // Found?
+            if (this.webSocketMessages.length > index) {
+        
+                // Positive response?
+                if ("+" === msgItems[0]) {
+                    if ("function" === typeof this.webSocketMessages[index].onSuccess) {
+                        this.webSocketMessages[index].onSuccess(this, msgItems);
+                    }
+                } else if ("-" === msgItems[0]) {
+                    // Negative response
+                    if ("function" === typeof this.webSocketMessages[index].onError) {
+                        this.webSocketMessages[index].onError(this, msgItems);
+                    }
                 } else {
-                    console.error(vscp.utility.getTime() + " AUTH0 negative reply received, but no challenge is pending!?");
+                    // Unknown response
+                    console.error(vscp.utility.getTime() + " Command response status unknown: " + msgItems[0]);
                 }
-            } else if ("AUTH1" === msgItems[1]) {
-
-                console.error(vscp.utility.getTime() + " Authentication failed.");
-
-                cmd = this.getPendingCommand("FUNCTION_CONNECT");
-
-                if (null !== cmd) {
-                    this.signalConnError();
-                    this.socket.close();
-                } else {
-                    console.error(vscp.utility.getTime() + " AUTH1 negative reply received, but no challenge is pending!?");
-                }
-            } else if ("OPEN" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Receiving events couldn't be started.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("CLOSE" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Receiving events couldn't be stopped.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("CLRQ" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " VSCP event queue couldn't be cleared.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("EVENT" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Failed to send VSCP event.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("SF" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Filter couldn't bet set.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("RVAR" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Variable couldn't be read.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("WVAR" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Variable couldn't be written.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("CVAR" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Variable couldn't be created.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("RSTVAR" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Variable couldn't be reset.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("DELVAR" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Variable couldn't be removed.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("LENVAR" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Variable length couldn't be read.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("LCVAR" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Variable last change couldn't be read.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("LSTVAR" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Variables couldn't be listed.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
-            } else if ("GT" === msgItems[1]) {
-                console.error(vscp.utility.getTime() + " Table couldn't be read.");
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
             } else {
-                console.error("Unknown message: " + msg.data);
-                this.signalError(
-                    msgItems[1], {
-                        id: parseInt(msgItems[2]), // Error code
-                        str: msgItems[3] // Error string
-                    }
-                );
+                console.error(vscp.utility.getTime() + " Response unknown: " + msgItems[1]);
             }
-        /* Incoming event */
+            
         } else if ("E" === msgItems[0]) {
-
             eventItems = msgItems[1].split(",");
 
             evt = new vscp.Event();
@@ -2882,6 +2984,8 @@ vscp.Connection.prototype.onWebSocketMessage = function(msg) {
             this.signalEvent(evt);
         }
     }
+
+    return;
 };
 
 /**
@@ -3744,9 +3848,15 @@ vscp.Connection.prototype.readTable = function(options) {
     if ("string" === typeof options.begin) {
         rowBegin = options.begin;
     }
+    else if (true === (options.begin instanceof Date)) {
+        rowBegin = options.begin.toISOString()
+    }
 
     if ("string" === typeof options.end) {
         rowEnd = options.end;
+    }
+    else if (true === (options.end instanceof Date)) {
+        rowEnd = options.begin.toISOString()
     }
 
     if ("function" === typeof options.onSuccess) {
@@ -3763,6 +3873,8 @@ vscp.Connection.prototype.readTable = function(options) {
         (null !== rowEnd)) {
 
         data += ";" + rowBegin + ";" + rowEnd;
+    } else {
+        data += ";;";
     }
 
     this._sendCommand({
