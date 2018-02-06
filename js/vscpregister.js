@@ -8,7 +8,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2017 Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2018 Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ var vscp = vscp || {};
  * VSCP register access functions
  * @namespace vscp.register
  */
-vscp._createNS( "vscp.register" );
+vscp._createNS("vscp.register");
 
 /** VSCP response timeout in ms
  * @type {number}
@@ -107,163 +107,160 @@ vscp.register.constants = {
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.read = function( options ) 
-{
+vscp.register.read = function(options) {
 
-    var page            = 0;
-    var count           = 1;
-    var onError         = null;
-    var eventData       = [];
-    var eventListener   = null;
-    var timerHandle     = null;
-    var responseData    = [];
+    var page = 0;
+    var count = 1;
+    var onError = null;
+    var eventData = [];
+    var eventListener = null;
+    var timerHandle = null;
+    var responseData = [];
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.offset ) {
-        console.error( vscp.utility.getTime() + " Register page offset is missing." );
+    if ("number" !== typeof options.offset) {
+        console.error(vscp.utility.getTime() + " Register page offset is missing.");
         return;
     }
 
-    if ( "number" === typeof options.offset ) {
+    if ("number" === typeof options.offset) {
         page = options.page;
     }
 
-    if ( "number" === typeof options.count ) {
-        if ( ( 0   > options.count ) ||
-             ( 256 < options.count ) ) {
-            console.error( vscp.utility.getTime() + " Invalid offset." );
+    if ("number" === typeof options.count) {
+        if ((0 > options.count) ||
+            (256 < options.count)) {
+            console.error(vscp.utility.getTime() + " Invalid offset.");
             return;
         }
 
-        if ( 256 === options.count ) {
+        if (256 === options.count) {
             count = 0;
-        }
-        else {
+        } else {
             count = options.count;
         }
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
     // Event listener to catch all CLASS1.PROTOCOL extended register read responses
-    eventListener = function( conn, evt ) {
+    eventListener = function(conn, evt) {
 
-        var index   = 0;
-        var data    = [];
+        var index = 0;
+        var data = [];
 
-        if ( "undefined" === typeof evt ) {
+        if ("undefined" === typeof evt) {
             return;
         }
 
-        if ( false === ( evt instanceof vscp.Event ) ) {
+        if (false === (evt instanceof vscp.Event)) {
             return;
         }
 
         // Only CLASS1.PROTOCOL events are interesting
-        if ( vscp.constants.classes.VSCP_CLASS1_PROTOCOL !== evt.vscpClass ) {
+        if (vscp.constants.classes.VSCP_CLASS1_PROTOCOL !== evt.vscpClass) {
             return;
         }
 
         // Especially the extended register read/write responses
-        if ( vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE !== evt.vscpType ) {
+        if (vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE !== evt.vscpType) {
             return;
         }
 
         // Clear timer
-        clearTimeout( timerHandle );
-        
+        clearTimeout(timerHandle);
+
         // More data received, than requested?
-        if ( ( evt.vscpData.length - 4 ) > count ) {
-            
-            console.error( vscp.utility.getTime() + " More data received, than requested." );
-            
-            if ( null !== onError ) {
+        if ((evt.vscpData.length - 4) > count) {
+
+            console.error(vscp.utility.getTime() + " More data received, than requested.");
+
+            if (null !== onError) {
                 onError();
             }
-        }
-        else {
-        
+        } else {
+
             // Calculate how many bytes are left
-            count = count - ( evt.vscpData.length - 4 );
-        
+            count = count - (evt.vscpData.length - 4);
+
             /* Store response data with index. The index is necessary to sort the responses later.
              * Without sorting the data could be in a wrong order.
              */
             responseData.push({
-                index: evt.vscpData[ 0 ],
-                data: evt.vscpData.slice( 4 )
+                index: evt.vscpData[0],
+                data: evt.vscpData.slice(4)
             });
-            
+
             // Is register read finished?
-            if ( 0 === count ) {
-            
+            if (0 === count) {
+
                 // Order all responses
-                responseData.sort( function(a, b) {
+                responseData.sort(function(a, b) {
                     return a.index - b.index;
                 });
-                
+
                 // Create one single data container from all responses
-                for( index = 0; index < responseData.length; ++index ) {
-                    data = data.concat( responseData[ index ].data );
+                for (index = 0; index < responseData.length; ++index) {
+                    data = data.concat(responseData[index].data);
                 }
-            
+
                 // Finished
-                options.connection.removeEventListener( eventListener );
-                options.onSuccess( data );
+                options.connection.removeEventListener(eventListener);
+                options.onSuccess(data);
             }
         }
     };
 
-    console.info( vscp.utility.getTime() + " Read " + count + " registers at page " + page + " and offset " + options.offset + " from node " + options.nodeId + "." );
+    console.info(vscp.utility.getTime() + " Read " + count + " registers at page " + page + " and offset " + options.offset + " from node " + options.nodeId + ".");
 
     eventData = [
-        options.nodeId,         // Node address
-        (page >> 8) & 0x00FF,   // MSB of page where the register is located.
-        (page >> 0) & 0x00FF,   // LSB of page where the register is located.
-        options.offset,         // Register to read (offset into page).
-        count                   // Number of registers to read.
+        options.nodeId, // Node address
+        (page >> 8) & 0x00FF, // MSB of page where the register is located.
+        (page >> 0) & 0x00FF, // LSB of page where the register is located.
+        options.offset, // Register to read (offset into page).
+        count // Number of registers to read.
     ];
 
     options.connection.sendEvent({
 
         event: new vscp.Event({
-            vscpClass:      vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
-            vscpType:       vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ,
-            vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-            vscpData:       eventData
+            vscpClass: vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
+            vscpType: vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_READ,
+            vscpPriority: vscp.constants.priorities.PRIORITY_3_NORMAL,
+            vscpData: eventData
         }),
 
-        onSuccess: function( conn ) {
-            options.connection.addEventListener( eventListener );
+        onSuccess: function(conn) {
+            options.connection.addEventListener(eventListener);
 
             timerHandle = setTimeout(
                 function() {
-                    console.info( vscp.utility.getTime() + " Read register timeout." );
+                    console.info(vscp.utility.getTime() + " Read register timeout.");
 
-                    options.connection.removeEventListener( eventListener );
+                    options.connection.removeEventListener(eventListener);
 
-                    if ( null !== onError ) {
+                    if (null !== onError) {
                         onError();
                     }
                 },
@@ -271,10 +268,10 @@ vscp.register.read = function( options )
             );
         },
 
-        onError: function( conn ) {
-            console.error( vscp.utility.getTime() + " Reading register failed." );
+        onError: function(conn) {
+            console.error(vscp.utility.getTime() + " Reading register failed.");
 
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -293,102 +290,100 @@ vscp.register.read = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.write = function( options ) 
-{
+vscp.register.write = function(options) {
 
-    var page            = 0;
-    var count           = 0;
-    var onError         = null;
-    var eventData       = [];
-    var eventListener   = null;
-    var timerHandle     = null;
-    var index           = 0;
-    var dataIndex       = 0;
+    var page = 0;
+    var count = 0;
+    var onError = null;
+    var eventData = [];
+    var eventListener = null;
+    var timerHandle = null;
+    var index = 0;
+    var dataIndex = 0;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.offset ) {
-        console.error( vscp.utility.getTime() + " Register page offset is missing." );
+    if ("number" !== typeof options.offset) {
+        console.error(vscp.utility.getTime() + " Register page offset is missing.");
         return;
     }
 
-    if ( "number" === typeof options.offset ) {
+    if ("number" === typeof options.offset) {
         page = options.page;
     }
 
-    if ( false === ( options.data instanceof Array ) ) {
-        console.error( vscp.utility.getTime() + " Data is missing." );
+    if (false === (options.data instanceof Array)) {
+        console.error(vscp.utility.getTime() + " Data is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
     // Event listener to catch all CLASS1.PROTOCOL extended register write responses
-    eventListener = function( conn, evt ) {
+    eventListener = function(conn, evt) {
 
-        if ( "undefined" === typeof evt ) {
+        if ("undefined" === typeof evt) {
             return;
         }
 
-        if ( false === ( evt instanceof vscp.Event ) ) {
+        if (false === (evt instanceof vscp.Event)) {
             return;
         }
 
         // Only CLASS1.PROTOCOL events are interesting
-        if ( vscp.constants.classes.VSCP_CLASS1_PROTOCOL !== evt.vscpClass ) {
+        if (vscp.constants.classes.VSCP_CLASS1_PROTOCOL !== evt.vscpClass) {
             return;
         }
 
         // Especially the extended register read/write responses
-        if ( vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE !== evt.vscpType ) {
+        if (vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_RESPONSE !== evt.vscpType) {
             return;
         }
 
         // Clear timer
-        clearTimeout( timerHandle );
+        clearTimeout(timerHandle);
         timerHandle = null;
 
         // Is register write finished?
-        if ( 0 === count ) {
-            options.connection.removeEventListener( eventListener );
+        if (0 === count) {
+            options.connection.removeEventListener(eventListener);
             options.onSuccess();
-        }
-        else {
-            console.info( vscp.utility.getTime() + " Write register at page " + page + " and offset " + ( options.offset + dataIndex ) + " to node " + options.nodeId + "." );
+        } else {
+            console.info(vscp.utility.getTime() + " Write register at page " + page + " and offset " + (options.offset + dataIndex) + " to node " + options.nodeId + ".");
 
             eventData = [
-                options.nodeId,             // Node address
-                (page >> 8) & 0x00FF,       // MSB of page where the register is located.
-                (page >> 0) & 0x00FF,       // LSB of page where the register is located.
-                options.offset + dataIndex  // Register to read (offset into page).
+                options.nodeId, // Node address
+                (page >> 8) & 0x00FF, // MSB of page where the register is located.
+                (page >> 0) & 0x00FF, // LSB of page where the register is located.
+                options.offset + dataIndex // Register to read (offset into page).
             ];
 
-            for( index = 0; index < 4; ++index ) {
-                eventData.push( options.data[ dataIndex ] );
+            for (index = 0; index < 4; ++index) {
+                eventData.push(options.data[dataIndex]);
                 dataIndex++;
                 --count;
 
-                if ( 0 === count ) {
+                if (0 === count) {
                     break;
                 }
             }
@@ -396,21 +391,21 @@ vscp.register.write = function( options )
             options.connection.sendEvent({
 
                 event: new vscp.Event({
-                    vscpClass:      vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
-                    vscpType:       vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE,
-                    vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-                    vscpData:       eventData
+                    vscpClass: vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
+                    vscpType: vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE,
+                    vscpPriority: vscp.constants.priorities.PRIORITY_3_NORMAL,
+                    vscpData: eventData
                 }),
 
-                onSuccess: function( conn ) {
+                onSuccess: function(conn) {
 
                     timerHandle = setTimeout(
                         function() {
-                            console.info( vscp.utility.getTime() + " Write register timeout." );
+                            console.info(vscp.utility.getTime() + " Write register timeout.");
 
-                            options.connection.removeEventListener( eventListener );
+                            options.connection.removeEventListener(eventListener);
 
-                            if ( null !== onError ) {
+                            if (null !== onError) {
                                 onError();
                             }
                         },
@@ -418,12 +413,12 @@ vscp.register.write = function( options )
                     );
                 },
 
-                onError: function( conn ) {
-                    console.error( vscp.utility.getTime() + " Writing register failed." );
+                onError: function(conn) {
+                    console.error(vscp.utility.getTime() + " Writing register failed.");
 
-                    options.connection.removeEventListener( eventListener );
+                    options.connection.removeEventListener(eventListener);
 
-                    if ( null !== onError ) {
+                    if (null !== onError) {
                         onError();
                     }
                 }
@@ -433,21 +428,21 @@ vscp.register.write = function( options )
 
     count = options.data.length;
 
-    console.info( vscp.utility.getTime() + " Write register at page " + page + " and offset " + options.offset + " to node " + options.nodeId + "." );
+    console.info(vscp.utility.getTime() + " Write register at page " + page + " and offset " + options.offset + " to node " + options.nodeId + ".");
 
     eventData = [
-        options.nodeId,         // Node address
-        (page >> 8) & 0x00FF,   // MSB of page where the register is located.
-        (page >> 0) & 0x00FF,   // LSB of page where the register is located.
-        options.offset          // Register to read (offset into page).
+        options.nodeId, // Node address
+        (page >> 8) & 0x00FF, // MSB of page where the register is located.
+        (page >> 0) & 0x00FF, // LSB of page where the register is located.
+        options.offset // Register to read (offset into page).
     ];
 
-    for( index = 0; index < 4; ++index ) {
-        eventData.push( options.data[ dataIndex ] );
+    for (index = 0; index < 4; ++index) {
+        eventData.push(options.data[dataIndex]);
         dataIndex++;
         --count;
 
-        if ( 0 === count ) {
+        if (0 === count) {
             break;
         }
     }
@@ -455,22 +450,22 @@ vscp.register.write = function( options )
     options.connection.sendEvent({
 
         event: new vscp.Event({
-            vscpClass:      vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
-            vscpType:       vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE,
-            vscpPriority:   vscp.constants.priorities.PRIORITY_3_NORMAL,
-            vscpData:       eventData
+            vscpClass: vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
+            vscpType: vscp.constants.types.VSCP_TYPE_PROTOCOL_EXTENDED_PAGE_WRITE,
+            vscpPriority: vscp.constants.priorities.PRIORITY_3_NORMAL,
+            vscpData: eventData
         }),
 
-        onSuccess: function( conn ) {
-            options.connection.addEventListener( eventListener );
+        onSuccess: function(conn) {
+            options.connection.addEventListener(eventListener);
 
             timerHandle = setTimeout(
                 function() {
-                    console.info( vscp.utility.getTime() + " Write register timeout." );
+                    console.info(vscp.utility.getTime() + " Write register timeout.");
 
-                    options.connection.removeEventListener( eventListener );
+                    options.connection.removeEventListener(eventListener);
 
-                    if ( null !== onError ) {
+                    if (null !== onError) {
                         onError();
                     }
                 },
@@ -478,10 +473,10 @@ vscp.register.write = function( options )
             );
         },
 
-        onError: function( conn ) {
-            console.error( vscp.utility.getTime() + " Writing register failed." );
+        onError: function(conn) {
+            console.error(vscp.utility.getTime() + " Writing register failed.");
 
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -502,66 +497,65 @@ vscp.register.write = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.writeBits = function( options ) 
-{
+vscp.register.writeBits = function(options) {
 
-    var page    = 0;
+    var page = 0;
     var onError = null;
-    var index   = 0;
-    var width   = 1;
-    var value   = 0;
-    var mask    = 0;
+    var index = 0;
+    var width = 1;
+    var value = 0;
+    var mask = 0;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.offset ) {
-        console.error( vscp.utility.getTime() + " Register page offset is missing." );
+    if ("number" !== typeof options.offset) {
+        console.error(vscp.utility.getTime() + " Register page offset is missing.");
         return;
     }
 
-    if ( "number" === typeof options.offset ) {
+    if ("number" === typeof options.offset) {
         page = options.page;
     }
 
-    if ( "number" !== typeof options.pos ) {
-        console.error( vscp.utility.getTime() + " Bit position is missing." );
+    if ("number" !== typeof options.pos) {
+        console.error(vscp.utility.getTime() + " Bit position is missing.");
         return;
     }
 
-    if ( "number" === typeof options.width ) {
+    if ("number" === typeof options.width) {
         width = options.width;
     }
 
-    if ( "number" !== typeof options.value ) {
-        console.error( vscp.utility.getTime() + " Value is missing." );
+    if ("number" !== typeof options.value) {
+        console.error(vscp.utility.getTime() + " Value is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
     // Read register value
     vscp.register.read({
-    
+
         connection: options.connection,
 
         nodeId: options.nodeId,
@@ -572,17 +566,17 @@ vscp.register.writeBits = function( options )
 
         count: 1,
 
-        onSuccess: function( data ) {
-            value = data[ 0 ];
+        onSuccess: function(data) {
+            value = data[0];
 
             // Change the bits of the read register value
             mask = 1 << options.pos;
-            for( index = 0; index < width; ++index ) {
+            for (index = 0; index < width; ++index) {
 
                 // Clear bit?
-                if ( 0 === ( options.value & ( 1 << index ) ) ) {
+                if (0 === (options.value & (1 << index))) {
 
-                    value = value & ( ~mask );
+                    value = value & (~mask);
                 }
                 // Set bit
                 else {
@@ -595,7 +589,7 @@ vscp.register.writeBits = function( options )
 
             // Write changed register value back
             vscp.register.write({
-            
+
                 connection: options.connection,
 
                 nodeId: options.nodeId,
@@ -605,31 +599,31 @@ vscp.register.writeBits = function( options )
                 offset: options.offset,
 
                 count: 1,
-                
-                data: [ value ],
+
+                data: [value],
 
                 onSuccess: function() {
 
                     options.onSuccess();
 
-                }.bind( this ),
+                }.bind(this),
 
                 onError: function() {
 
-                    if ( null !== onError ) {
+                    if (null !== onError) {
                         onError();
                     }
-                }.bind( this )
+                }.bind(this)
             });
 
-        }.bind( this ),
+        }.bind(this),
 
         onError: function() {
 
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
-        }.bind( this )
+        }.bind(this)
     });
 };
 
@@ -642,36 +636,35 @@ vscp.register.writeBits = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readAlarmStatus = function( options ) 
-{
+vscp.register.readAlarmStatus = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read alarm status from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read alarm status from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -686,12 +679,12 @@ vscp.register.readAlarmStatus = function( options )
 
         count: 1,
 
-        onSuccess: function( data ) {
-            options.onSuccess( data );
+        onSuccess: function(data) {
+            options.onSuccess(data);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -707,36 +700,35 @@ vscp.register.readAlarmStatus = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readVscpVersion = function( options ) 
-{
+vscp.register.readVscpVersion = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read VSCP version from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read VSCP version from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -751,15 +743,15 @@ vscp.register.readVscpVersion = function( options )
 
         count: 2,
 
-        onSuccess: function( data ) {
+        onSuccess: function(data) {
             options.onSuccess({
-                major: data[ 0 ],
-                minor: data[ 1 ]
+                major: data[0],
+                minor: data[1]
             });
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -775,36 +767,35 @@ vscp.register.readVscpVersion = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readNodeControlFlags = function( options ) 
-{
+vscp.register.readNodeControlFlags = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read node control flags from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read node control flags from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -819,12 +810,12 @@ vscp.register.readNodeControlFlags = function( options )
 
         count: 1,
 
-        onSuccess: function( data ) {
-            options.onSuccess( data );
+        onSuccess: function(data) {
+            options.onSuccess(data);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -840,36 +831,35 @@ vscp.register.readNodeControlFlags = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readUserId = function( options ) 
-{
+vscp.register.readUserId = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read user id from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read user id from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -884,21 +874,21 @@ vscp.register.readUserId = function( options )
 
         count: 5,
 
-        onSuccess: function( data ) {
+        onSuccess: function(data) {
 
-            var index   = 0;
-            var userId  = 0;
+            var index = 0;
+            var userId = 0;
 
-            for( index = 0; index < data.length; ++index ) {
+            for (index = 0; index < data.length; ++index) {
                 userId *= 256;
-                userId += data[ data.length - index - 1 ];
+                userId += data[data.length - index - 1];
             }
 
-            options.onSuccess( userId );
+            options.onSuccess(userId);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -914,36 +904,35 @@ vscp.register.readUserId = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readManufacturerDevId = function( options ) 
-{
+vscp.register.readManufacturerDevId = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read manufacturer device id from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read manufacturer device id from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -958,21 +947,21 @@ vscp.register.readManufacturerDevId = function( options )
 
         count: 4,
 
-        onSuccess: function( data ) {
+        onSuccess: function(data) {
 
-            var index               = 0;
-            var manufacturerDevId   = 0;
+            var index = 0;
+            var manufacturerDevId = 0;
 
-            for( index = 0; index < data.length; ++index ) {
+            for (index = 0; index < data.length; ++index) {
                 manufacturerDevId *= 256;
-                manufacturerDevId += data[ data.length - index - 1 ];
+                manufacturerDevId += data[data.length - index - 1];
             }
 
-            options.onSuccess( manufacturerDevId );
+            options.onSuccess(manufacturerDevId);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -988,36 +977,35 @@ vscp.register.readManufacturerDevId = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readManufacturerSubDevId = function( options ) 
-{
+vscp.register.readManufacturerSubDevId = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read manufacturer sub device id from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read manufacturer sub device id from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1032,21 +1020,21 @@ vscp.register.readManufacturerSubDevId = function( options )
 
         count: 4,
 
-        onSuccess: function( data ) {
+        onSuccess: function(data) {
 
-            var index                   = 0;
-            var manufacturerSubDevId    = 0;
+            var index = 0;
+            var manufacturerSubDevId = 0;
 
-            for( index = 0; index < data.length; ++index ) {
+            for (index = 0; index < data.length; ++index) {
                 manufacturerSubDevId *= 256;
-                manufacturerSubDevId += data[ data.length - index - 1 ];
+                manufacturerSubDevId += data[data.length - index - 1];
             }
 
-            options.onSuccess( manufacturerSubDevId );
+            options.onSuccess(manufacturerSubDevId);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -1062,36 +1050,35 @@ vscp.register.readManufacturerSubDevId = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readNicknameId = function( options ) 
-{
+vscp.register.readNicknameId = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read nickname id from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read nickname id from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1106,12 +1093,12 @@ vscp.register.readNicknameId = function( options )
 
         count: 1,
 
-        onSuccess: function( data ) {
-            options.onSuccess( data );
+        onSuccess: function(data) {
+            options.onSuccess(data);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -1127,36 +1114,35 @@ vscp.register.readNicknameId = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readSelectedPage = function( options ) 
-{
+vscp.register.readSelectedPage = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read selected page from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read selected page from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1171,21 +1157,21 @@ vscp.register.readSelectedPage = function( options )
 
         count: 2,
 
-        onSuccess: function( data ) {
+        onSuccess: function(data) {
 
-            var index   = 0;
-            var page    = 0;
+            var index = 0;
+            var page = 0;
 
-            for( index = 0; index < data.length; ++index ) {
+            for (index = 0; index < data.length; ++index) {
                 page *= 256;
-                page += data[ data.length - index - 1 ];
+                page += data[data.length - index - 1];
             }
 
-            options.onSuccess( page );
+            options.onSuccess(page);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -1201,36 +1187,35 @@ vscp.register.readSelectedPage = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readFirmwareVersion = function( options ) 
-{
+vscp.register.readFirmwareVersion = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read firmware version from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read firmware version from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1245,16 +1230,16 @@ vscp.register.readFirmwareVersion = function( options )
 
         count: 3,
 
-        onSuccess: function( data ) {
+        onSuccess: function(data) {
             options.onSuccess({
-                major: data[ 0 ],
-                minor: data[ 1 ],
-                subMinor: data[ 2 ]
+                major: data[0],
+                minor: data[1],
+                subMinor: data[2]
             });
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -1270,36 +1255,35 @@ vscp.register.readFirmwareVersion = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readBootloaderAlgorithm = function( options ) 
-{
+vscp.register.readBootloaderAlgorithm = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read bootloader algorithm from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read bootloader algorithm from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1314,12 +1298,12 @@ vscp.register.readBootloaderAlgorithm = function( options )
 
         count: 1,
 
-        onSuccess: function( data ) {
-            options.onSuccess( data );
+        onSuccess: function(data) {
+            options.onSuccess(data);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -1335,36 +1319,35 @@ vscp.register.readBootloaderAlgorithm = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readUsedPages = function( options ) 
-{
+vscp.register.readUsedPages = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read used pages from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read used pages from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1379,12 +1362,12 @@ vscp.register.readUsedPages = function( options )
 
         count: 1,
 
-        onSuccess: function( data ) {
-            options.onSuccess( data );
+        onSuccess: function(data) {
+            options.onSuccess(data);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -1400,36 +1383,35 @@ vscp.register.readUsedPages = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readStdDevFamCode = function( options ) 
-{
+vscp.register.readStdDevFamCode = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read standard device family code from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read standard device family code from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1444,20 +1426,20 @@ vscp.register.readStdDevFamCode = function( options )
 
         count: 4,
 
-        onSuccess: function( data ) {
-            var index               = 0;
-            var stdDevFamilyCode    = 0;
+        onSuccess: function(data) {
+            var index = 0;
+            var stdDevFamilyCode = 0;
 
-            for( index = 0; index < data.length; ++index ) {
+            for (index = 0; index < data.length; ++index) {
                 stdDevFamilyCode *= 256;
-                stdDevFamilyCode += data[ data.length - index - 1 ];
+                stdDevFamilyCode += data[data.length - index - 1];
             }
 
-            options.onSuccess( stdDevFamilyCode );
+            options.onSuccess(stdDevFamilyCode);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -1473,36 +1455,35 @@ vscp.register.readStdDevFamCode = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readStdDevType = function( options ) 
-{
+vscp.register.readStdDevType = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read standard device type from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read standard device type from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1517,20 +1498,20 @@ vscp.register.readStdDevType = function( options )
 
         count: 4,
 
-        onSuccess: function( data ) {
-            var index       = 0;
-            var stdDevType  = 0;
+        onSuccess: function(data) {
+            var index = 0;
+            var stdDevType = 0;
 
-            for( index = 0; index < data.length; ++index ) {
+            for (index = 0; index < data.length; ++index) {
                 stdDevType *= 256;
-                stdDevType += data[ data.length - index - 1 ];
+                stdDevType += data[data.length - index - 1];
             }
 
-            options.onSuccess( stdDevType );
+            options.onSuccess(stdDevType);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -1546,36 +1527,35 @@ vscp.register.readStdDevType = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readGUID = function( options ) 
-{
+vscp.register.readGUID = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read GUID from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read GUID from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1590,12 +1570,12 @@ vscp.register.readGUID = function( options )
 
         count: 16,
 
-        onSuccess: function( data ) {
-            options.onSuccess( data );
+        onSuccess: function(data) {
+            options.onSuccess(data);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }
@@ -1611,36 +1591,35 @@ vscp.register.readGUID = function( options )
  * @param {function} options.onSuccess          - Callback which is called on successful operation
  * @param {function} [options.onError]          - Callback which is called on failed operation
  */
-vscp.register.readMdfUrl = function( options ) 
-{
+vscp.register.readMdfUrl = function(options) {
 
     var onError = null;
 
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing. " );
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing. ");
         return;
     }
 
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
 
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
 
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess is missing." );
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess is missing.");
         return;
     }
 
-    if ( "function" === typeof options.onError ) {
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
 
-    console.info( vscp.utility.getTime() + " Read MDF URL from node " + options.nodeId );
+    console.info(vscp.utility.getTime() + " Read MDF URL from node " + options.nodeId);
 
     // Read register
     vscp.register.read({
@@ -1655,22 +1634,22 @@ vscp.register.readMdfUrl = function( options )
 
         count: 32,
 
-        onSuccess: function( data ) {
+        onSuccess: function(data) {
 
             var mdfUrl = "http://";
 
             // Remove all trailing zeros
-            while( 0 === data[ data.length - 1] ) {
+            while (0 === data[data.length - 1]) {
                 data.pop();
             }
 
-            mdfUrl += String.fromCharCode.apply( null, data );
+            mdfUrl += String.fromCharCode.apply(null, data);
 
-            options.onSuccess( mdfUrl );
+            options.onSuccess(mdfUrl);
         },
 
         onError: function() {
-            if ( null !== onError ) {
+            if (null !== onError) {
                 onError();
             }
         }

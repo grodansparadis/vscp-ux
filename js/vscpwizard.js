@@ -8,7 +8,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2017 Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2018 Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ var vscp = vscp || {};
 /** VSCP wizard functionality based on a MDF
  * @namespace vscp.wizard
  */
-vscp._createNS( "vscp.wizard" );
+vscp._createNS("vscp.wizard");
 
 /**
  * A message box.
@@ -52,44 +52,44 @@ vscp._createNS( "vscp.wizard" );
  * @param {object} options              - Options
  * @param {object} options.messageBox   - Messagebox as jquery xml object
  */
-vscp.wizard.MessageBox = function( options ) {
+vscp.wizard.MessageBox = function(options) {
 
     /**
      * Function input or output
      * @member {string}
      */
-    this.func           = "input";
+    this.func = "input";
     /**
      * Head
      * @member {string}
      */
-    this.head           = "";
+    this.head = "";
     /**
      * Description
      * @member {string}
      */
-    this.description    = "";
+    this.description = "";
     /**
      * Variable type
      * @member {string}
      */
-    this.variableType   = "";
+    this.variableType = "";
     /**
      * Variable name
      * @member {string}
      */
-    this.variableName   = "";
+    this.variableName = "";
     /**
      * Variable value
      * @member {string}
      */
-    this.variableValue  = "";
+    this.variableValue = "";
 
-    if ( "undefined" !== typeof options ) {
+    if ("undefined" !== typeof options) {
 
-        if ( "object" === typeof options.messageBox ) {
+        if ("object" === typeof options.messageBox) {
 
-            this.parse( options.messageBox );
+            this.parse(options.messageBox);
         }
     }
 };
@@ -99,33 +99,33 @@ vscp.wizard.MessageBox = function( options ) {
  *
  * @param {object} $messageBox - Messagebox as jquery xml object
  */
-vscp.wizard.MessageBox.prototype.parse = function( $messageBox ) {
+vscp.wizard.MessageBox.prototype.parse = function($messageBox) {
 
-    if ( "undefined" === typeof $messageBox ) {
+    if ("undefined" === typeof $messageBox) {
         return;
     }
 
-    if ( "undefined" !== typeof $messageBox.children( "function" ) ) {
-        this.func = $messageBox.children( "function" ).text();
+    if ("undefined" !== typeof $messageBox.children("function")) {
+        this.func = $messageBox.children("function").text();
     }
-    
-    if ( "undefined" !== typeof $messageBox.children( "head" ) ) {
-        this.head = $messageBox.children( "head" ).text();
+
+    if ("undefined" !== typeof $messageBox.children("head")) {
+        this.head = $messageBox.children("head").text();
     }
-    
-    if ( "undefined" !== typeof $messageBox.children( "description" ) ) {
-        this.description = $messageBox.children( "description" ).text();
+
+    if ("undefined" !== typeof $messageBox.children("description")) {
+        this.description = $messageBox.children("description").text();
     }
-    
-    if ( "undefined" !== typeof $messageBox.children( "variable" ) ) {
-    
-        if ( "undefined" !== typeof $messageBox.children( "variable" ).attr( "name" ) ) {
-            this.variableName = $messageBox.children( "variable" ).attr( "name" );
+
+    if ("undefined" !== typeof $messageBox.children("variable")) {
+
+        if ("undefined" !== typeof $messageBox.children("variable").attr("name")) {
+            this.variableName = $messageBox.children("variable").attr("name");
         }
-    
-        if ( "undefined" !== typeof $messageBox.children( "variable" ).attr( "type" ) ) {
-        
-            this.variableType = $messageBox.children( "variable" ).attr( "type" );
+
+        if ("undefined" !== typeof $messageBox.children("variable").attr("type")) {
+
+            this.variableType = $messageBox.children("variable").attr("type");
         }
     }
 
@@ -138,38 +138,38 @@ vscp.wizard.MessageBox.prototype.parse = function( $messageBox ) {
  * @param {object} options                  - Options
  * @param {object} options.writeBitInReg    - write-bit-in-reg as jquery xml object
  */
-vscp.wizard.WriteBitInReg = function( options ) {
+vscp.wizard.WriteBitInReg = function(options) {
 
     /** Bit position
      * @member {number}
      */
-    this.pos            = 0;
+    this.pos = 0;
     /** Register page
      * @member {number}
      */
-    this.page           = 0;
+    this.page = 0;
     /** Register offset
      * @member {number}
      */
-    this.offset         = 0;
+    this.offset = 0;
     /** Bit width
      * @member {number}
      */
-    this.width          = 1;
+    this.width = 1;
     /** Value of bit width
      * @member {number}
      */
-    this.value          = 0;
+    this.value = 0;
     /** Variable name
      * @member {string}
      */
-    this.variableName   = "";
+    this.variableName = "";
 
-    if ( "undefined" !== typeof options ) {
+    if ("undefined" !== typeof options) {
 
-        if ( "object" === typeof options.writeBitInReg ) {
+        if ("object" === typeof options.writeBitInReg) {
 
-            this.parse( options.writeBitInReg );
+            this.parse(options.writeBitInReg);
         }
     }
 };
@@ -179,45 +179,45 @@ vscp.wizard.WriteBitInReg = function( options ) {
  *
  * @param {object} writeBitInReg - write-bit-in-reg as jquery xml object
  */
-vscp.wizard.WriteBitInReg.prototype.parse = function( $writeBitInReg ) {
+vscp.wizard.WriteBitInReg.prototype.parse = function($writeBitInReg) {
 
-    if ( "undefined" === typeof $writeBitInReg ) {
+    if ("undefined" === typeof $writeBitInReg) {
         return;
     }
-    
-    if ( "undefined" !== typeof $writeBitInReg.attr( "pos" ) ) {
-        this.pos = parseInt( $writeBitInReg.attr( "pos" ) );
+
+    if ("undefined" !== typeof $writeBitInReg.attr("pos")) {
+        this.pos = parseInt($writeBitInReg.attr("pos"));
     }
 
-    if ( "undefined" !== typeof $writeBitInReg.attr( "page" ) ) {
-        this.page = parseInt( $writeBitInReg.attr( "page" ) );
+    if ("undefined" !== typeof $writeBitInReg.attr("page")) {
+        this.page = parseInt($writeBitInReg.attr("page"));
     }
-    
-    if ( "undefined" !== typeof $writeBitInReg.attr( "offset" ) ) {
-        this.offset = parseInt( $writeBitInReg.attr( "offset" ) );
+
+    if ("undefined" !== typeof $writeBitInReg.attr("offset")) {
+        this.offset = parseInt($writeBitInReg.attr("offset"));
     }
-    
-    if ( "undefined" !== typeof $writeBitInReg.attr( "width" ) ) {
-        this.width = parseInt( $writeBitInReg.attr( "width" ) );
+
+    if ("undefined" !== typeof $writeBitInReg.attr("width")) {
+        this.width = parseInt($writeBitInReg.attr("width"));
     }
-    
-    if ( "undefined" !== typeof $writeBitInReg.attr( "value" ) ) {
+
+    if ("undefined" !== typeof $writeBitInReg.attr("value")) {
 
         // Does the value contains a variable?
-        if ( "$" === $writeBitInReg.attr( "value" ).charAt( 0 ) ) {
-            this.variableName = $writeBitInReg.attr( "value" ).substring( 1 );
+        if ("$" === $writeBitInReg.attr("value").charAt(0)) {
+            this.variableName = $writeBitInReg.attr("value").substring(1);
         }
         // Does the value contains a boolean value?
-        else if ( "false" === $writeBitInReg.attr( "value" ) ) {
+        else if ("false" === $writeBitInReg.attr("value")) {
             this.value = 0;
         }
         // Does the value contains a boolean value?
-        else if ( "true" === $writeBitInReg.attr( "value" ) ) {
+        else if ("true" === $writeBitInReg.attr("value")) {
             this.value = 1;
         }
         // Value contains a number
         else {
-            this.value = parseInt( $writeBitInReg.attr( "value" ) );
+            this.value = parseInt($writeBitInReg.attr("value"));
         }
     }
 
@@ -230,34 +230,34 @@ vscp.wizard.WriteBitInReg.prototype.parse = function( $writeBitInReg ) {
  * @param {object} options                          - Options
  * @param {object} options.writeBitInAbstraction    - write-bit-in-abstraction as jquery xml object
  */
-vscp.wizard.WriteBitInAbstraction = function( options ) {
+vscp.wizard.WriteBitInAbstraction = function(options) {
 
     /** Abstract value id
      * @member {string}
      */
-    this.id             = "";
+    this.id = "";
     /** Bit position
      * @member {number}
      */
-    this.pos            = 0;
+    this.pos = 0;
     /** Bit width
      * @member {number}
      */
-    this.width          = 1;
+    this.width = 1;
     /** Value of bit width
      * @member {number}
      */
-    this.value          = 0;
+    this.value = 0;
     /** Variable name
      * @member {string}
      */
-    this.variableName   = "";
+    this.variableName = "";
 
-    if ( "undefined" !== typeof options ) {
+    if ("undefined" !== typeof options) {
 
-        if ( "object" === typeof options.writeBitInAbstraction ) {
+        if ("object" === typeof options.writeBitInAbstraction) {
 
-            this.parse( options.writeBitInAbstraction );
+            this.parse(options.writeBitInAbstraction);
         }
     }
 };
@@ -267,44 +267,44 @@ vscp.wizard.WriteBitInAbstraction = function( options ) {
  *
  * @param {object} $writeBitInAbstraction - write-bit-in-abstraction as jquery xml object
  */
-vscp.wizard.WriteBitInAbstraction.prototype.parse = function( $writeBitInAbstraction ) {
+vscp.wizard.WriteBitInAbstraction.prototype.parse = function($writeBitInAbstraction) {
 
-    if ( "undefined" === typeof $writeBitInAbstraction ) {
+    if ("undefined" === typeof $writeBitInAbstraction) {
         return;
     }
 
-    if ( "undefined" !== typeof $writeBitInAbstraction.attr( "id" ) ) {
-        this.id = $writeBitInAbstraction.attr( "id" );
+    if ("undefined" !== typeof $writeBitInAbstraction.attr("id")) {
+        this.id = $writeBitInAbstraction.attr("id");
     }
-    
-    if ( "undefined" !== typeof $writeBitInAbstraction.attr( "pos" ) ) {
-        this.pos = parseInt( $writeBitInAbstraction.attr( "pos" ) );
+
+    if ("undefined" !== typeof $writeBitInAbstraction.attr("pos")) {
+        this.pos = parseInt($writeBitInAbstraction.attr("pos"));
     }
-    
-    if ( "undefined" !== typeof $writeBitInAbstraction.attr( "width" ) ) {
-        this.width = parseInt( $writeBitInAbstraction.attr( "width" ) );
+
+    if ("undefined" !== typeof $writeBitInAbstraction.attr("width")) {
+        this.width = parseInt($writeBitInAbstraction.attr("width"));
     }
-    
-    if ( "undefined" !== typeof $writeBitInAbstraction.attr( "value" ) ) {
+
+    if ("undefined" !== typeof $writeBitInAbstraction.attr("value")) {
 
         // Does the value contains a variable?
-        if ( "$" === $writeBitInAbstraction.attr( "value" ).charAt( 0 ) ) {
-            this.variableName = $writeBitInAbstraction.attr( "value" ).substring( 1 );
+        if ("$" === $writeBitInAbstraction.attr("value").charAt(0)) {
+            this.variableName = $writeBitInAbstraction.attr("value").substring(1);
         }
         // Does the value contains a boolean value?
-        else if ( "false" === $writeBitInAbstraction.attr( "value" ) ) {
+        else if ("false" === $writeBitInAbstraction.attr("value")) {
             this.value = 0;
         }
         // Does the value contains a boolean value?
-        else if ( "true" === $writeBitInAbstraction.attr( "value" ) ) {
+        else if ("true" === $writeBitInAbstraction.attr("value")) {
             this.value = 1;
         }
         // Value contains a number
         else {
-            this.value = parseInt( $writeBitInAbstraction.attr( "value" ) );
+            this.value = parseInt($writeBitInAbstraction.attr("value"));
         }
     }
-    
+
 };
 
 /**
@@ -314,30 +314,30 @@ vscp.wizard.WriteBitInAbstraction.prototype.parse = function( $writeBitInAbstrac
  * @param {object} options                  - Options
  * @param {object} options.writeRegister    - write-register as jquery xml object
  */
-vscp.wizard.WriteRegister = function( options ) {
+vscp.wizard.WriteRegister = function(options) {
 
     /** Register page
      * @member {number}
      */
-    this.page           = 0;
+    this.page = 0;
     /** Register offset
      * @member {number}
      */
-    this.offset         = 0;
+    this.offset = 0;
     /** Register value
      * @member {number}
      */
-    this.value          = 0;
+    this.value = 0;
     /** Variable name
      * @member {string}
      */
-    this.variableName   = "";
+    this.variableName = "";
 
-    if ( "undefined" !== typeof options ) {
+    if ("undefined" !== typeof options) {
 
-        if ( "object" === typeof options.writeRegister ) {
+        if ("object" === typeof options.writeRegister) {
 
-            this.parse( options.writeRegister );
+            this.parse(options.writeRegister);
         }
     }
 };
@@ -347,29 +347,29 @@ vscp.wizard.WriteRegister = function( options ) {
  *
  * @param {object} $writeRegister - write-register as jquery xml object
  */
-vscp.wizard.WriteRegister.prototype.parse = function( $writeRegister ) {
+vscp.wizard.WriteRegister.prototype.parse = function($writeRegister) {
 
-    if ( "undefined" === typeof $writeRegister ) {
+    if ("undefined" === typeof $writeRegister) {
         return;
     }
-    
-    if ( "undefined" !== typeof $writeRegister.attr( "page" ) ) {
-        this.page = parseInt( $writeRegister.attr( "page" ) );
+
+    if ("undefined" !== typeof $writeRegister.attr("page")) {
+        this.page = parseInt($writeRegister.attr("page"));
     }
-    
-    if ( "undefined" !== typeof $writeRegister.attr( "offset" ) ) {
-        this.offset = parseInt( $writeRegister.attr( "offset" ) );
+
+    if ("undefined" !== typeof $writeRegister.attr("offset")) {
+        this.offset = parseInt($writeRegister.attr("offset"));
     }
-    
-    if ( "undefined" !== typeof $writeRegister.attr( "value" ) ) {
+
+    if ("undefined" !== typeof $writeRegister.attr("value")) {
 
         // Does the value contains a variable?
-        if ( "$" === $writeRegister.attr( "value" ).charAt( 0 ) ) {
-            this.variableName = $writeRegister.attr( "value" ).substring( 1 );
+        if ("$" === $writeRegister.attr("value").charAt(0)) {
+            this.variableName = $writeRegister.attr("value").substring(1);
         }
         // Value contains a number
         else {
-            this.value = parseInt( $writeRegister.attr( "value" ) );
+            this.value = parseInt($writeRegister.attr("value"));
         }
     }
 
@@ -382,26 +382,26 @@ vscp.wizard.WriteRegister.prototype.parse = function( $writeRegister ) {
  * @param {object} options                  - Options
  * @param {object} options.writeAbstraction - write-abstraction as jquery xml object
  */
-vscp.wizard.WriteAbstraction = function( options ) {
+vscp.wizard.WriteAbstraction = function(options) {
 
     /** Abstract value id
      * @member {string}
      */
-    this.id             = "";
+    this.id = "";
     /** Abstract value
      * @member {number}
      */
-    this.value          = 0;
+    this.value = 0;
     /** Variable name
      * @member {number}
      */
-    this.variableName   = "";
+    this.variableName = "";
 
-    if ( "undefined" !== typeof options ) {
+    if ("undefined" !== typeof options) {
 
-        if ( "object" === typeof options.writeAbstraction ) {
+        if ("object" === typeof options.writeAbstraction) {
 
-            this.parse( options.writeAbstraction );
+            this.parse(options.writeAbstraction);
         }
     }
 };
@@ -411,28 +411,28 @@ vscp.wizard.WriteAbstraction = function( options ) {
  *
  * @param {object} $writeAbstraction write-abstraction as jquery xml object
  */
-vscp.wizard.WriteAbstraction.prototype.parse = function( $writeAbstraction ) {
+vscp.wizard.WriteAbstraction.prototype.parse = function($writeAbstraction) {
 
-    if ( "undefined" === typeof $writeAbstraction ) {
+    if ("undefined" === typeof $writeAbstraction) {
         return;
     }
-    
-    if ( "undefined" !== typeof $writeAbstraction.attr( "id" ) ) {
-        this.id = $writeAbstraction.attr( "id" );
+
+    if ("undefined" !== typeof $writeAbstraction.attr("id")) {
+        this.id = $writeAbstraction.attr("id");
     }
-    
-    if ( "undefined" !== typeof $writeAbstraction.attr( "value" ) ) {
+
+    if ("undefined" !== typeof $writeAbstraction.attr("value")) {
 
         // Does the value contains a variable?
-        if ( "$" === $writeAbstraction.attr( "value" ).charAt( 0 ) ) {
-            this.variableName = $writeAbstraction.attr( "value" ).substring( 1 );
+        if ("$" === $writeAbstraction.attr("value").charAt(0)) {
+            this.variableName = $writeAbstraction.attr("value").substring(1);
         }
         // Value contains a number
         else {
-            this.value = parseInt( $writeAbstraction.attr( "value" ) );
+            this.value = parseInt($writeAbstraction.attr("value"));
         }
     }
-    
+
 };
 
 /**
@@ -443,20 +443,20 @@ vscp.wizard.WriteAbstraction.prototype.parse = function( $writeAbstraction ) {
  * @param {object} options.recipe   - Recipe as jquery xml object
  * @param {object} options.mdf      - MDF as jquery xml object
  */
-vscp.wizard.Recipe = function( options ) {
+vscp.wizard.Recipe = function(options) {
 
     /** Recipe name
      * @member {string}
      */
-    this.name                   = "";
+    this.name = "";
     /** Recipe description
      * @member {string}
      */
-    this.description            = "";
+    this.description = "";
     /** Bit access methods in registers
      * @member {vscp.wizard.WriteBitInReg[]}
      */
-    this.writeBitInRegs         = [];
+    this.writeBitInRegs = [];
     /** Bit access methods in abstract value
      * @member {vscp.wizard.WriteBitAbstractions[]}
      */
@@ -464,28 +464,28 @@ vscp.wizard.Recipe = function( options ) {
     /** Register access methods
      * @member {vscp.wizard.WriteRegister[]}
      */
-    this.writeRegisters         = [];
+    this.writeRegisters = [];
     /** Abstract access methods
      * @member {vscp.wizard.WriteAbstraction[]}
      */
-    this.writeAbstractions      = [];
+    this.writeAbstractions = [];
     /** Messageboxes
      * @member {vscp.wizard.MessageBox[]}
      */
-    this.messageBoxes           = [];
+    this.messageBoxes = [];
     /** MDF
      * @member {object}
      */
-    this.mdf                    = null;
+    this.mdf = null;
 
-    if ( "undefined" !== typeof options ) {
+    if ("undefined" !== typeof options) {
 
-        if ( "object" === typeof options.recipe ) {
+        if ("object" === typeof options.recipe) {
 
-            this.parse( options.recipe );
+            this.parse(options.recipe);
         }
 
-        if ( "object" ===  typeof options.mdf ) {
+        if ("object" === typeof options.mdf) {
 
             this.mdf = options.mdf;
         }
@@ -497,81 +497,81 @@ vscp.wizard.Recipe = function( options ) {
  *
  * @param {object} $recipe - Recipe as jquery xml object
  */
-vscp.wizard.Recipe.prototype.parse = function( $recipe ) {
+vscp.wizard.Recipe.prototype.parse = function($recipe) {
 
-    var writeBitInRegs          = this.writeBitInRegs;
-    var writeBitInReg           = null;
-    var writeBitInAbstractions  = this.writeBitInAbstractions;
-    var writeBitInAbstraction   = null;
-    var writeRegisters          = this.writeRegisters;
-    var writeRegister           = null;
-    var writeAbstractions       = this.writeAbstractions;
-    var writeAbstraction        = null;
-    var messageBoxes            = this.messageBoxes;
-    var messageBox              = null;
+    var writeBitInRegs = this.writeBitInRegs;
+    var writeBitInReg = null;
+    var writeBitInAbstractions = this.writeBitInAbstractions;
+    var writeBitInAbstraction = null;
+    var writeRegisters = this.writeRegisters;
+    var writeRegister = null;
+    var writeAbstractions = this.writeAbstractions;
+    var writeAbstraction = null;
+    var messageBoxes = this.messageBoxes;
+    var messageBox = null;
 
-    if ( "undefined" === typeof $recipe ) {
+    if ("undefined" === typeof $recipe) {
         return;
     }
 
-    if ( "undefined" !== typeof $recipe.children( "name" ) ) {
-        this.name = $recipe.children( "name" ).text();
+    if ("undefined" !== typeof $recipe.children("name")) {
+        this.name = $recipe.children("name").text();
     }
-    
-    if ( "undefined" !== typeof $recipe.children( "description" ) ) {
-        this.description = $recipe.children( "description" ).text();
+
+    if ("undefined" !== typeof $recipe.children("description")) {
+        this.description = $recipe.children("description").text();
     }
-    
-    $recipe.children( "write-bit-in-reg" ).each( function() {
-        
+
+    $recipe.children("write-bit-in-reg").each(function() {
+
         writeBitInReg = new vscp.wizard.WriteBitInReg({
-            writeBitInReg: $( this )
+            writeBitInReg: $(this)
         });
 
-        writeBitInRegs.push( writeBitInReg );
-        
+        writeBitInRegs.push(writeBitInReg);
+
     });
 
-    $recipe.children( "write-bit-in-abstraction" ).each( function() {
-        
+    $recipe.children("write-bit-in-abstraction").each(function() {
+
         writeBitInAbstraction = new vscp.wizard.WriteBitInAbstraction({
-            writeBitInAbstraction: $( this )
+            writeBitInAbstraction: $(this)
         });
 
-        writeBitInAbstractions.push( writeBitInAbstraction );
-        
+        writeBitInAbstractions.push(writeBitInAbstraction);
+
     });
 
-    $recipe.children( "write-register" ).each( function() {
-        
+    $recipe.children("write-register").each(function() {
+
         writeRegister = new vscp.wizard.WriteRegister({
-            writeRegister: $( this )
+            writeRegister: $(this)
         });
 
-        writeRegisters.push( writeRegister );
-        
+        writeRegisters.push(writeRegister);
+
     });
-    
-    $recipe.children( "write-abstraction" ).each( function() {
-        
+
+    $recipe.children("write-abstraction").each(function() {
+
         writeAbstraction = new vscp.wizard.WriteAbstraction({
-            writeAbstraction: $( this )
+            writeAbstraction: $(this)
         });
 
-        writeAbstractions.push( writeAbstraction );
-        
+        writeAbstractions.push(writeAbstraction);
+
     });
 
-    $recipe.children( "messagebox" ).each( function() {
-        
+    $recipe.children("messagebox").each(function() {
+
         messageBox = new vscp.wizard.MessageBox({
-            messageBox: $( this )
+            messageBox: $(this)
         });
 
-        messageBoxes.push( messageBox );
-        
+        messageBoxes.push(messageBox);
+
     });
-    
+
 };
 
 /**
@@ -581,48 +581,48 @@ vscp.wizard.Recipe.prototype.parse = function( $recipe ) {
  * @param {vscp.Connection} options.connection  - VSCP connection
  * @param {number] options.nodeId               - Node id
  */
-vscp.wizard.Recipe.prototype.write = function( options ) {
+vscp.wizard.Recipe.prototype.write = function(options) {
 
-    var writeBitInRegsCnt           = 0;
-    var writeBitInAbstractionsCnt   = 0;
-    var writeRegistersCnt           = 0;
-    var writeAbstractionsCnt        = 0;
-    var onError                     = null;
-    var messageBoxIndex             = 0;
-    var index                       = 0;
-    var onProgress                  = null;
-    var steps                       = 0;
-    var progress                    = 0;
+    var writeBitInRegsCnt = 0;
+    var writeBitInAbstractionsCnt = 0;
+    var writeRegistersCnt = 0;
+    var writeAbstractionsCnt = 0;
+    var onError = null;
+    var messageBoxIndex = 0;
+    var index = 0;
+    var onProgress = null;
+    var steps = 0;
+    var progress = 0;
 
-    var updateProgress = function( percent ) {
-        if ( null !== onProgress ) {
-            onProgress( percent );
+    var updateProgress = function(percent) {
+        if (null !== onProgress) {
+            onProgress(percent);
         }
     };
-    
+
     var process = function() {
 
-        progress += Math.floor( 100 / steps );
-        updateProgress( progress );
-    
-        if ( this.writeBitInRegs.length > writeBitInRegsCnt ) {
-            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write bit in register value." );
-            
+        progress += Math.floor(100 / steps);
+        updateProgress(progress);
+
+        if (this.writeBitInRegs.length > writeBitInRegsCnt) {
+            console.debug(vscp.utility.getTime() + " Recipe " + this.name + ": Write bit in register value.");
+
             vscp.writeRegister.writeBits({
 
                 connection: options.connection,
 
                 nodeId: options.nodeId,
 
-                page: this.writeBitInRegs[ writeBitInRegsCnt ].page,
+                page: this.writeBitInRegs[writeBitInRegsCnt].page,
 
-                offset: this.writeBitInRegs[ writeBitInRegsCnt ].offset,
+                offset: this.writeBitInRegs[writeBitInRegsCnt].offset,
 
-                pos: this.writeBitInRegs[ writeBitInRegsCnt ].pos,
+                pos: this.writeBitInRegs[writeBitInRegsCnt].pos,
 
-                width: this.writeBitInRegs[ writeBitInRegsCnt ].width,
+                width: this.writeBitInRegs[writeBitInRegsCnt].width,
 
-                value: this.writeBitInRegs[ writeBitInRegsCnt ].value,
+                value: this.writeBitInRegs[writeBitInRegsCnt].value,
 
                 onSuccess: process,
 
@@ -630,9 +630,8 @@ vscp.wizard.Recipe.prototype.write = function( options ) {
             });
 
             ++writeBitInRegsCnt;
-        }
-        else if ( this.writeBitInAbstractions.length > writeBitInAbstractionsCnt ) {
-            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write bit in abstract value." );
+        } else if (this.writeBitInAbstractions.length > writeBitInAbstractionsCnt) {
+            console.debug(vscp.utility.getTime() + " Recipe " + this.name + ": Write bit in abstract value.");
 
             vscp.mdf.writeAbstractBits({
 
@@ -642,13 +641,13 @@ vscp.wizard.Recipe.prototype.write = function( options ) {
 
                 mdf: this.mdf,
 
-                id: this.writeBitInAbstractions[ writeBitInAbstractionsCnt ].id,
+                id: this.writeBitInAbstractions[writeBitInAbstractionsCnt].id,
 
-                pos: this.writeBitInAbstractions[ writeBitInAbstractionsCnt ].pos,
+                pos: this.writeBitInAbstractions[writeBitInAbstractionsCnt].pos,
 
-                width: this.writeBitInAbstractions[ writeBitInAbstractionsCnt ].width,
+                width: this.writeBitInAbstractions[writeBitInAbstractionsCnt].width,
 
-                value: this.writeBitInAbstractions[ writeBitInAbstractionsCnt ].value,
+                value: this.writeBitInAbstractions[writeBitInAbstractionsCnt].value,
 
                 onSuccess: process,
 
@@ -657,9 +656,8 @@ vscp.wizard.Recipe.prototype.write = function( options ) {
             });
 
             ++writeBitInAbstractionsCnt;
-        }
-        else if ( this.writeRegisters.length > writeRegistersCnt ) {
-            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write register value." );
+        } else if (this.writeRegisters.length > writeRegistersCnt) {
+            console.debug(vscp.utility.getTime() + " Recipe " + this.name + ": Write register value.");
 
             vscp.register.write({
 
@@ -667,13 +665,13 @@ vscp.wizard.Recipe.prototype.write = function( options ) {
 
                 nodeId: options.nodeId,
 
-                page: this.writeRegisters[ writeRegistersCnt ].page,
+                page: this.writeRegisters[writeRegistersCnt].page,
 
-                offset: this.writeRegisters[ writeRegistersCnt ].offset,
+                offset: this.writeRegisters[writeRegistersCnt].offset,
 
                 count: 1,
-                
-                data: [ this.writeRegisters[ writeRegistersCnt ].value ],
+
+                data: [this.writeRegisters[writeRegistersCnt].value],
 
                 onSuccess: process,
 
@@ -682,9 +680,8 @@ vscp.wizard.Recipe.prototype.write = function( options ) {
             });
 
             ++writeRegistersCnt;
-        }
-        else if ( this.writeAbstractions.length > writeAbstractionsCnt ) {
-            console.debug( vscp.utility.getTime() + " Recipe " + this.name + ": Write abstract value." );
+        } else if (this.writeAbstractions.length > writeAbstractionsCnt) {
+            console.debug(vscp.utility.getTime() + " Recipe " + this.name + ": Write abstract value.");
 
             vscp.mdf.writeAbstractValue({
 
@@ -694,9 +691,9 @@ vscp.wizard.Recipe.prototype.write = function( options ) {
 
                 mdf: this.mdf,
 
-                id: this.writeAbstractions[ writeAbstractionsCnt ].id,
+                id: this.writeAbstractions[writeAbstractionsCnt].id,
 
-                value: this.writeAbstractions[ writeAbstractionsCnt ].value,
+                value: this.writeAbstractions[writeAbstractionsCnt].value,
 
                 onSuccess: process,
 
@@ -705,80 +702,79 @@ vscp.wizard.Recipe.prototype.write = function( options ) {
             });
 
             ++writeAbstractionsCnt;
-        }
-        else {
-            console.info( "Recipe written." );
+        } else {
+            console.info("Recipe written.");
 
             options.onSuccess();
         }
 
-    }.bind( this );
-    
-    if ( "undefined" === typeof options ) {
-        console.error( vscp.utility.getTime() + " Options are missing." );
+    }.bind(this);
+
+    if ("undefined" === typeof options) {
+        console.error(vscp.utility.getTime() + " Options are missing.");
         return;
     }
-    
-    if ( false === ( options.connection instanceof vscp.Connection ) ) {
-        console.error( vscp.utility.getTime() + " VSCP connection object is missing." );
+
+    if (false === (options.connection instanceof vscp.Connection)) {
+        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
         return;
     }
-    
-    if ( "number" !== typeof options.nodeId ) {
-        console.error( vscp.utility.getTime() + " Node id is missing." );
+
+    if ("number" !== typeof options.nodeId) {
+        console.error(vscp.utility.getTime() + " Node id is missing.");
         return;
     }
-    
-    if ( "function" === typeof options.onProgress ) {
+
+    if ("function" === typeof options.onProgress) {
         onProgress = options.onProgress;
     }
-    
-    if ( "function" !== typeof options.onSuccess ) {
-        console.error( vscp.utility.getTime() + " onSuccess callback is missing." );
+
+    if ("function" !== typeof options.onSuccess) {
+        console.error(vscp.utility.getTime() + " onSuccess callback is missing.");
         return;
     }
-    
-    if ( "function" === typeof options.onError ) {
+
+    if ("function" === typeof options.onError) {
         onError = options.onError;
     }
-    
+
     // Get all messagebox variables and set the variable value to the access method objects
-    for( messageBoxIndex = 0; messageBoxIndex < this.messageBoxes.length; ++messageBoxIndex ) {
+    for (messageBoxIndex = 0; messageBoxIndex < this.messageBoxes.length; ++messageBoxIndex) {
 
-        for( index = 0; index < this.writeBitInRegs.length; ++index ) {
-            if ( this.messageBoxes[ messageBoxIndex ].variableName === this.writeBitInRegs[ index ].variableName ) {
-                this.writeBitInRegs[ index ].value = this.messageBoxes[ messageBoxIndex ].variableValue;
-            }
-        }
-        
-        for( index = 0; index < this.writeBitInAbstractions.length; ++index ) {
-            if ( this.messageBoxes[ messageBoxIndex ].variableName === this.writeBitInAbstractions[ index ].variableName ) {
-                this.writeBitInAbstractions[ index ].value = this.messageBoxes[ messageBoxIndex ].variableValue;
+        for (index = 0; index < this.writeBitInRegs.length; ++index) {
+            if (this.messageBoxes[messageBoxIndex].variableName === this.writeBitInRegs[index].variableName) {
+                this.writeBitInRegs[index].value = this.messageBoxes[messageBoxIndex].variableValue;
             }
         }
 
-        for( index = 0; index < this.writeRegisters.length; ++index ) {
-            if ( this.messageBoxes[ messageBoxIndex ].variableName === this.writeRegisters[ index ].variableName ) {
-                this.writeRegisters[ index ].value = this.messageBoxes[ messageBoxIndex ].variableValue;
+        for (index = 0; index < this.writeBitInAbstractions.length; ++index) {
+            if (this.messageBoxes[messageBoxIndex].variableName === this.writeBitInAbstractions[index].variableName) {
+                this.writeBitInAbstractions[index].value = this.messageBoxes[messageBoxIndex].variableValue;
             }
         }
-        
-        for( index = 0; index < this.writeAbstractions.length; ++index ) {
-            if ( this.messageBoxes[ messageBoxIndex ].variableName === this.writeAbstractions[ index ].variableName ) {
-                this.writeAbstractions[ index ].value = this.messageBoxes[ messageBoxIndex ].variableValue;
+
+        for (index = 0; index < this.writeRegisters.length; ++index) {
+            if (this.messageBoxes[messageBoxIndex].variableName === this.writeRegisters[index].variableName) {
+                this.writeRegisters[index].value = this.messageBoxes[messageBoxIndex].variableValue;
+            }
+        }
+
+        for (index = 0; index < this.writeAbstractions.length; ++index) {
+            if (this.messageBoxes[messageBoxIndex].variableName === this.writeAbstractions[index].variableName) {
+                this.writeAbstractions[index].value = this.messageBoxes[messageBoxIndex].variableValue;
             }
         }
     }
-    
+
     // How many steps are necessary to write the whole recipe?
     steps += this.writeBitInRegs.length;
     steps += this.writeBitInAbstractions.length;
     steps += this.writeRegisters.length;
     steps += this.writeAbstractions.length;
     steps += 1;
-    
+
     // Start writing the recipe
-    console.info( vscp.utility.getTime() + " Writing recipe " + this.name + "." );
+    console.info(vscp.utility.getTime() + " Writing recipe " + this.name + ".");
     process();
 };
 
@@ -790,28 +786,27 @@ vscp.wizard.Recipe.prototype.write = function( options ) {
  *
  * @return {vscp.wizard.Recipe[]} Recipe array
  */
-vscp.wizard.getRecipes = function( options ) {
+vscp.wizard.getRecipes = function(options) {
 
     var recipes = [];
-    var recipe  = null;
+    var recipe = null;
 
-    if ( "object" !== typeof options.mdf ) {
-        console.error( vscp.utility.getTime() + " MDF object is missing." );
+    if ("object" !== typeof options.mdf) {
+        console.error(vscp.utility.getTime() + " MDF object is missing.");
         return recipes;
     }
-    
+
     // Get all recipes
-    options.mdf.find( "vscp > module > setup > recipe" ).each( function() {
-        
+    options.mdf.find("vscp > module > setup > recipe").each(function() {
+
         recipe = new vscp.wizard.Recipe({
-            recipe: $( this ),
+            recipe: $(this),
             mdf: options.mdf
         });
-        
-        recipes.push( recipe );
+
+        recipes.push(recipe);
 
     });
-    
+
     return recipes;
 };
-

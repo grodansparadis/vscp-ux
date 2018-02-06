@@ -1,50 +1,50 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>VSCP admin</title>
-    
+
     <!-- Don't cache the page -->
     <meta http-equiv="Pragma" content="no-cache" />
     <meta http-equiv="Expires" content="-1" />
-    
+
     <!-- JQuery -->
     <script type="text/javascript" src="../js/jquery/3.2.1/jquery-3.2.1.min.js"></script>
-    
+
     <!-- Bootstrap -->
     <link rel="stylesheet" type="text/css" href="../js/bootstrap/3.3.7/css/bootstrap.min.css">
     <link rel="stylesheet" type="text/css" href="../css/custom.css">
     <script type="text/javascript" src="../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    
+
     <!-- Favorite icon -->
     <link rel="icon" href="../favicon.ico">
-    
+
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navbar.js"></script>
     <!-- Navigation bar menu structure -->
     <script type="text/javascript" src="menu.js"></script>
 
     <script type="text/javascript">
-    
-       (function() {
+        (function() {
             // VSCP websocket connection
             var vscpConn = null;
 
             // Wait until the whole website is loaded
-            $( document ).ready( function() {
+            $(document).ready(function() {
 
                 // Show navigation bar menu
-                navBarMenu.show( "menu", navBarMenu.content );
+                navBarMenu.show("menu", navBarMenu.content);
             });
         })();
-
     </script>
-    
+
 </head>
+
 <body>
-   <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
@@ -59,9 +59,4 @@
         </p>
 
         <br /><br />
-        <hr>
-        Copyright &copy; 2015 <a href="mailto:vscp@blue-andi.de">Andreas Merkle</a><br>
-        Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    </div>
-</body>
-</html>
+        <hr> Copyright &copy; 2015 <a href="mailto:vscp@blue-andi.de">Andreas Merkle</a><br> Copyright &copy; 2000-2017 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>

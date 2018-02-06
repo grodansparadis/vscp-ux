@@ -1,6 +1,6 @@
 //
 // VSCP javascript websocket library
-// Copyright (C) 2012-2017 Ake Hedman, Grodans Paradis AB
+// Copyright (C) 2012-2018 Ake Hedman, Grodans Paradis AB
 // <akhe@grodansparadis.com>
 // Copyright (c) 2015 Andreas Merkle
 // <vscp@blue-andi.de>
@@ -11,7 +11,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2017 Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2018 Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -405,6 +405,8 @@ vscp.constants.types = {
     VSCP_TYPE_INFORMATION_DATE: 72,
     VSCP_TYPE_INFORMATION_TIME: 73,
     VSCP_TYPE_INFORMATION_WEEKDAY: 74,
+    VSCP_TYPE_INFORMATION_LOCK: 75,
+    VSCP_TYPE_INFORMATION_UNLOCK: 76,
 
     // class 30 (0x1E) -- CONTROL
     VSCP_TYPE_CONTROL_GENERAL: 0,
@@ -446,6 +448,8 @@ vscp.constants.types = {
     VSCP_TYPE_CONTROL_SHUTTER_PRESET: 39,
     VSCP_TYPE_CONTROL_ALL_LAMPS_ON: 40,
     VSCP_TYPE_CONTROL_ALL_LAMPS_OFF: 41,
+    VSCP_TYPE_CONTROL_LOCK: 42,
+    VSCP_TYPE_CONTROL_UNLOCK: 43,
 
     // class 40 (0x28) -- MULTIMEDIA
     VSCP_TYPE_MULTIMEDIA_GENERAL: 0,

@@ -8,7 +8,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2017 Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2018 Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -43,7 +43,7 @@ var vscp = vscp || {};
  * VSCP measurement stuff
  * @namespace vscp.measurement
  */
-vscp._createNS( "vscp.measurement" );
+vscp._createNS("vscp.measurement");
 
 /** VSCP response timeout in ms
  * @type {number}
@@ -54,7 +54,7 @@ vscp.measurement.timeout = 5000;
 /** Measurement specific constants
  * @namespace vscp.measurement.constants
  */
-vscp._createNS( "vscp.measurement.constants" );
+vscp._createNS("vscp.measurement.constants");
 
 /** VSCP units
  * @type {string[]}
@@ -66,117 +66,117 @@ vscp.measurement.constants.units = [
     // Count
     [],
     // Length/Distance
-    [ "Meter" ],
+    ["Meter"],
     // Mass
-    [ "Kilogram" ],
+    ["Kilogram"],
     // Time
-    [ "Millisecond", "Seconds" ],
+    ["Millisecond", "Seconds"],
     // Electrical Current
-    [ "Ampere" ],
+    ["Ampere"],
     // Temperature
-    [ "Kelvin", "Celsius", "Fahrenheit" ],
+    ["Kelvin", "Celsius", "Fahrenheit"],
     // Amount of substance
-    [ "Mole" ],
+    ["Mole"],
     // Luminous Intensity (Intensity of light)
-    [ "Candela" ],
+    ["Candela"],
     // Frequency
-    [ "Hertz" ],
+    ["Hertz"],
     // Radioactivity and other random events
-    [ "Becquerel" ],
+    ["Becquerel"],
     // Force
-    [ "Newton" ],
+    ["Newton"],
     // Pressure
-    [ "Pascal", "Bar", "Psi" ],
+    ["Pascal", "Bar", "Psi"],
     // Energy
-    [ "Joule" ],
+    ["Joule"],
     // Power
-    [ "Watt" ],
+    ["Watt"],
     // Electrical Charge
-    [ "Coulomb" ],
+    ["Coulomb"],
     // Electrical Potential (Voltage)
-    [ "Volt" ],
+    ["Volt"],
     // Electrical Capacitance
-    [ "Farad" ],
+    ["Farad"],
     // Electrical Resistance
-    [ "Ohm" ],
+    ["Ohm"],
     // Electrical Conductance
-    [ "Siemens" ],
+    ["Siemens"],
     // Magnetic Field Strength
-    [ "Ampere meters" ],
+    ["Ampere meters"],
     // Magnetic Flux
-    [ "Weber" ],
+    ["Weber"],
     // Magnetic Flux Density
-    [ "Tesla" ],
+    ["Tesla"],
     // Inductance
-    [ "Henry" ],
+    ["Henry"],
     // Luminous Flux
-    [ "Lumen" ],
+    ["Lumen"],
     // Illuminance
-    [ "Lux" ],
+    ["Lux"],
     // Radiation dose
-    [ "Gray", "Sievert" ],
+    ["Gray", "Sievert"],
     // Catalytic activity
-    [ "Katal" ],
+    ["Katal"],
     // Volume
-    [ "Cubic meter", "Liter" ],
+    ["Cubic meter", "Liter"],
     // Sound intensity
-    [ "Bel","Neper","dB" ],
+    ["Bel", "Neper", "dB"],
     // Angle
-    [ "Rad","Degree", "Arcminute", "Arcseconds" ],
+    ["Rad", "Degree", "Arcminute", "Arcseconds"],
     // Position
-    [ "Longitude", "Latitude" ],
+    ["Longitude", "Latitude"],
     // Speed
-    [ "Meters per second" ],
+    ["Meters per second"],
     // Acceleration
-    [ "Meters per second/second" ],
+    ["Meters per second/second"],
     // Tension
-    [ "N/m" ],
+    ["N/m"],
     // Damp/moist (Hygrometer reading)
-    [ "%" ],
+    ["%"],
     // Flow
-    [ "Cubic meters/second", "Liter/Second" ],
+    ["Cubic meters/second", "Liter/Second"],
     // Thermal resistance
-    [ "K/W" ],
+    ["K/W"],
     //  Refractive power
-    [ "Dioptre" ],
+    ["Dioptre"],
     // Dynamic viscosity
-    [ "Poiseuille" ],
+    ["Poiseuille"],
     // Sound impedance
-    [ "Rayal" ],
+    ["Rayal"],
     // Sound resistance
-    [ "Acoustic ohm" ],
+    ["Acoustic ohm"],
     // Electric elastance
-    [ "Darag" ],
+    ["Darag"],
     // Luminous energy
-    [ "Talbot" ],
+    ["Talbot"],
     // Luminance
-    [ "Nit" ],
+    ["Nit"],
     // Chemical concentration
-    [ "Molal" ],
+    ["Molal"],
     // Reserved
-    [ "Reserved" ],
+    ["Reserved"],
     // Dose equivalent
-    [ "Sievert" ],
+    ["Sievert"],
     // Reserved
-    [ "Reserved" ],
+    ["Reserved"],
     // Dew Point
-    [ "Levin", "Celsius", "Fahrenheit" ],
+    ["Levin", "Celsius", "Fahrenheit"],
     // Relative Level
-    [ "Relative" ],
+    ["Relative"],
     // Altitude
-    [ "Meter", "Feet", "Inches" ],
+    ["Meter", "Feet", "Inches"],
     // Area
-    [ "Square meter" ],
+    ["Square meter"],
     // Radiant intensity
-    [ "Watt per steradian" ],
+    ["Watt per steradian"],
     // Radiance
-    [ "Att per steradian per square metre" ],
+    ["Att per steradian per square metre"],
     // Irradiance, Exitance, Radiosity
-    [ "Watt per square metre" ],
+    ["Watt per square metre"],
     // Spectral radiance
-    [ "Watt per steradian per square metre per nm" ],
+    ["Watt per steradian per square metre per nm"],
     // Spectral irradiance
-    [ "Watt per square metre per nm" ]
+    ["Watt per square metre per nm"]
 ];
 
 /* ---------------------------------------------------------------------- */
@@ -189,8 +189,8 @@ vscp.measurement.constants.units = [
  *
  * @return {number} Rounded value
  */
-vscp.measurement.toFixed = function( value, precision ) {
-    var power = Math.pow( 10, precision || 0 );
+vscp.measurement.toFixed = function(value, precision) {
+    var power = Math.pow(10, precision || 0);
     return String((Math.round(value * power) / power).toFixed(precision));
 };
 
@@ -200,26 +200,26 @@ vscp.measurement.toFixed = function( value, precision ) {
  * @param {number[]} data - Byte array
  * @return {number} Float value
  */
-vscp.measurement.varInteger2Float = function( data ) {
-    var rval        = 0.0;
-    var bNegative   = false;
-    var i           = 0;
+vscp.measurement.varInteger2Float = function(data) {
+    var rval = 0.0;
+    var bNegative = false;
+    var i = 0;
 
-    if ( 0 !== ( data[ 0 ] & 0x80 ) ) {
+    if (0 !== (data[0] & 0x80)) {
         bNegative = true;
 
-        for ( i = 0; i < data.length; i++ ) {
-            data[ i ] = ~data[ i ] & 0xff;
+        for (i = 0; i < data.length; i++) {
+            data[i] = ~data[i] & 0xff;
         }
     }
 
-    for ( i = 0; i< data.length; i++ ) {
+    for (i = 0; i < data.length; i++) {
         rval = rval << 8;
-        rval += data[ i ];
+        rval += data[i];
     }
 
-    if ( true === bNegative ) {
-        rval = -1.0 * ( rval + 1 );
+    if (true === bNegative) {
+        rval = -1.0 * (rval + 1);
     }
 
     return rval;
@@ -231,8 +231,8 @@ vscp.measurement.varInteger2Float = function( data ) {
  * @param {number} data - Data
  * @return {number} Coding
  */
-vscp.measurement.getDataCoding = function( data ) {
-    return ( data >> 5 ) & 7;
+vscp.measurement.getDataCoding = function(data) {
+    return (data >> 5) & 7;
 };
 
 /**
@@ -241,8 +241,8 @@ vscp.measurement.getDataCoding = function( data ) {
  * @param {number} data - Data coding
  * @return {number} Unit
  */
-vscp.measurement.getUnitFromDataCoding = function( data ) {
-    return ( data >> 3 ) & 3;
+vscp.measurement.getUnitFromDataCoding = function(data) {
+    return (data >> 3) & 3;
 };
 
 /**
@@ -251,7 +251,7 @@ vscp.measurement.getUnitFromDataCoding = function( data ) {
  * @param {number} data - Data coding
  * @return {number} Sensor index
  */
-vscp.measurement.getSensorIndexFromDataCoding = function( data ) {
+vscp.measurement.getSensorIndexFromDataCoding = function(data) {
     return data & 7;
 };
 
@@ -261,66 +261,65 @@ vscp.measurement.getSensorIndexFromDataCoding = function( data ) {
  * @param {number[]} data - Data (event data array where first data byte is the data coding)
  * @return {number} Value as float
  */
-vscp.measurement.decodeClass10 = function( data ) {
-    var rval        = 0.0;
-    var newData     = [];
-    var sign        = 0;
-    var exp         = 0;
-    var mantissa    = 0;
-    var str         = "";
-    var i           = 0;
+vscp.measurement.decodeClass10 = function(data) {
+    var rval = 0.0;
+    var newData = [];
+    var sign = 0;
+    var exp = 0;
+    var mantissa = 0;
+    var str = "";
+    var i = 0;
 
-    switch ( vscp.measurement.getDataCoding( data[ 0 ] ) ){
+    switch (vscp.measurement.getDataCoding(data[0])) {
         case 0: // Bits
         case 1: // Bytes
         case 3: // Integer
             {
-                for ( i = 1 ;i < data.length; i++ ) {
-                    newData[ i - 1 ] = data[ i ];
+                for (i = 1; i < data.length; i++) {
+                    newData[i - 1] = data[i];
                 }
-                rval = vscp.measurement.varInteger2Float( newData );
+                rval = vscp.measurement.varInteger2Float(newData);
             }
             break;
 
         case 2: // String
             {
-                for ( i = 1 ;i < data.length; i++ ) {
-                    str +=  String.fromCharCode(data[ i ]);
+                for (i = 1; i < data.length; i++) {
+                    str += String.fromCharCode(data[i]);
                 }
                 rval = parseFloat(str);
             }
             break;
         case 4: // Normalized integer
             {
-                exp = data[ 1 ];
+                exp = data[1];
 
-                for ( i = 2; i < data.length; i++ ) {
-                    newData[ i - 2 ] = data[ i ];
+                for (i = 2; i < data.length; i++) {
+                    newData[i - 2] = data[i];
                 }
 
-                rval = vscp.measurement.varInteger2Float( newData );
+                rval = vscp.measurement.varInteger2Float(newData);
 
                 // Handle mantissa
-                if ( 0 !== ( exp & 0x80 ) ) {
+                if (0 !== (exp & 0x80)) {
                     exp &= 0x7f;
-                    rval = rval / Math.pow(10,exp);
-                }
-                else {
+                    rval = rval / Math.pow(10, exp);
+                } else {
                     exp &= 0x7f;
-                    rval = rval * Math.pow(10,exp);
+                    rval = rval * Math.pow(10, exp);
                 }
 
             }
             break;
         case 5: // Floating point
             {
-                if ( 5 === data.length ) {
-                    sign = data[1] & 0x80;  // Negative if != 0
+                if (5 === data.length) {
+                    sign = data[1] & 0x80; // Negative if != 0
                     exp = (data[1] & 0x7f) << 1 + (data[2] & 0x80) ? 1 : 0;
                     mantissa = (data[2] & 0x7f) << 16 + data[3] << 8 + data[4];
                     // sign * 2^exponent * mantissa
-                    rval = Math.pow(2,exp) * mantissa;
-                    if (sign) rval = -1*rval;
+                    rval = Math.pow(2, exp) * mantissa;
+                    if (sign) rval = -1 * rval;
                 }
             }
             break;
@@ -339,28 +338,28 @@ vscp.measurement.decodeClass10 = function( data ) {
  * @param {number}  data - Data
  * @return {number} Value as float
  */
-vscp.measurement.decodeClass60Number = function( data ) {
-    var rval        = 0;
-    var sign        = 0;
-    var exp         = 0;
-    var mantissa    = 0;
+vscp.measurement.decodeClass60Number = function(data) {
+    var rval = 0;
+    var sign = 0;
+    var exp = 0;
+    var mantissa = 0;
 
-    if ( 8 === data.length ) {
+    if (8 === data.length) {
 
-        sign = data[0] & 0x80;  // Negative if != 0
-        exp = (data[0] & 0x7f) << 4 + (data[1] & 0xf0)>>4;
+        sign = data[0] & 0x80; // Negative if != 0
+        exp = (data[0] & 0x7f) << 4 + (data[1] & 0xf0) >> 4;
         mantissa = (data[1] & 0x0f) << 48 +
-                    data[2] << 40 +
-                    data[3] << 32 +
-                    data[4] << 24 +
-                    data[5] << 16 +
-                    data[6] << 8 +
-                    data[7];
+            data[2] << 40 +
+            data[3] << 32 +
+            data[4] << 24 +
+            data[5] << 16 +
+            data[6] << 8 +
+            data[7];
 
         // sign * 2^exponent * mantissa
-        rval = Math.pow( 2, exp ) * mantissa;
+        rval = Math.pow(2, exp) * mantissa;
 
-        if ( 0 !== sign ) {
+        if (0 !== sign) {
             rval = -1 * rval;
         }
     }
@@ -374,22 +373,21 @@ vscp.measurement.decodeClass60Number = function( data ) {
  * @param {number} data - Data
  * @return {number} Value as float
  */
-vscp.measurement.decodeClass65Number = function( data ) {
-    var rval    = 0;
-    var exp     = data[ 3 ];
-    var i       = 0;
+vscp.measurement.decodeClass65Number = function(data) {
+    var rval = 0;
+    var exp = data[3];
+    var i = 0;
 
     for (i = 4; i < data.length; i++) {
         rval = rval << 8;
-        rval += data[ i ];
+        rval += data[i];
     }
 
     // Handle exponent
-    if ( 0 !== ( exp & 128) ) {
+    if (0 !== (exp & 128)) {
         exp &= 0x7f;
         rval = rval * Math.pow(10, (-1 * exp));
-    }
-    else {
+    } else {
         rval = rval * Math.pow(10, exp);
     }
 
@@ -402,9 +400,9 @@ vscp.measurement.decodeClass65Number = function( data ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertFahrenheitToKelvin = function( value ) {
-    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
-    var cTempVal = ( fTempVal - 32 ) * ( 5 / 9 ) + 273.15;
+vscp.measurement.convertFahrenheitToKelvin = function(value) {
+    var fTempVal = ("string" === typeof value) ? parseFloat(value) : value;
+    var cTempVal = (fTempVal - 32) * (5 / 9) + 273.15;
     return cTempVal;
 };
 
@@ -414,9 +412,9 @@ vscp.measurement.convertFahrenheitToKelvin = function( value ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertFahrenheitToCelsius = function( value ) {
-    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
-    var cTempVal = ( fTempVal - 32 ) * ( 5 / 9 );
+vscp.measurement.convertFahrenheitToCelsius = function(value) {
+    var fTempVal = ("string" === typeof value) ? parseFloat(value) : value;
+    var cTempVal = (fTempVal - 32) * (5 / 9);
     return cTempVal;
 };
 
@@ -426,9 +424,9 @@ vscp.measurement.convertFahrenheitToCelsius = function( value ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertCelsiusToFahrenheit = function( value ) {
-    var cTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
-    var fTempVal = ( cTempVal * ( 9 / 5 ) ) + 32;
+vscp.measurement.convertCelsiusToFahrenheit = function(value) {
+    var cTempVal = ("string" === typeof value) ? parseFloat(value) : value;
+    var fTempVal = (cTempVal * (9 / 5)) + 32;
     return fTempVal;
 };
 
@@ -438,8 +436,8 @@ vscp.measurement.convertCelsiusToFahrenheit = function( value ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertKelvinToCelsius = function( value ) {
-    var kTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
+vscp.measurement.convertKelvinToCelsius = function(value) {
+    var kTempVal = ("string" === typeof value) ? parseFloat(value) : value;
     var cTempVal = kTempVal - 273.15;
     return cTempVal;
 };
@@ -450,8 +448,8 @@ vscp.measurement.convertKelvinToCelsius = function( value ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertCelsiusToKelvin = function( value ) {
-    var kTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
+vscp.measurement.convertCelsiusToKelvin = function(value) {
+    var kTempVal = ("string" === typeof value) ? parseFloat(value) : value;
     var cTempVal = kTempVal + 273.15;
     return cTempVal;
 };
@@ -462,10 +460,10 @@ vscp.measurement.convertCelsiusToKelvin = function( value ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertKelvinToFahrenheit = function( value ) {
-    var kTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
+vscp.measurement.convertKelvinToFahrenheit = function(value) {
+    var kTempVal = ("string" === typeof value) ? parseFloat(value) : value;
     var cTempVal = kTempVal + 273.15;
-    return vscp.measurement.convertCelsiusToFahrenheit( cTempVal );
+    return vscp.measurement.convertCelsiusToFahrenheit(cTempVal);
 };
 
 /**
@@ -474,8 +472,8 @@ vscp.measurement.convertKelvinToFahrenheit = function( value ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertMeterToFeet = function( value ) {
-    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
+vscp.measurement.convertMeterToFeet = function(value) {
+    var fTempVal = ("string" === typeof value) ? parseFloat(value) : value;
     return fTempVal * 3.2808399;
 };
 
@@ -485,8 +483,8 @@ vscp.measurement.convertMeterToFeet = function( value ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertFeetToMeter = function( value ) {
-    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
+vscp.measurement.convertFeetToMeter = function(value) {
+    var fTempVal = ("string" === typeof value) ? parseFloat(value) : value;
     return fTempVal * 0.3048;
 };
 
@@ -496,8 +494,8 @@ vscp.measurement.convertFeetToMeter = function( value ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertMeterToInch = function( value ) {
-    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
+vscp.measurement.convertMeterToInch = function(value) {
+    var fTempVal = ("string" === typeof value) ? parseFloat(value) : value;
     return fTempVal * 3.2808399 * 12;
 };
 
@@ -507,8 +505,8 @@ vscp.measurement.convertMeterToInch = function( value ) {
  * @param {string|number} value - Value
  * @return {number} Converted value
  */
-vscp.measurement.convertInchToMeter = function( value ) {
-    var fTempVal = ( "string" === typeof value ) ? parseFloat( value ) : value;
+vscp.measurement.convertInchToMeter = function(value) {
+    var fTempVal = ("string" === typeof value) ? parseFloat(value) : value;
     return fTempVal * 0.3048 / 12;
 };
 
@@ -527,7 +525,7 @@ vscp.measurement.convertInchToMeter = function( value ) {
  * @param {number} options.filter.zone          - Zone
  * @param {number} options.filter.subZone       - Sub-zone
  */
-vscp.measurement.Decoder = function( options ) {
+vscp.measurement.Decoder = function(options) {
 
     /** VSCP connection
      * @member {Connection}
@@ -536,7 +534,7 @@ vscp.measurement.Decoder = function( options ) {
     /** Callback which will be called for every received value.
      * @member {function}
      */
-    this.onValue    = null;
+    this.onValue = null;
     /** Filter
      * @member {object}
      * @property {string} vscpGuid      - Node GUID string
@@ -547,25 +545,25 @@ vscp.measurement.Decoder = function( options ) {
      * @property {number} zone          - Zone
      * @property {number} subZone       - Sub-zone
      */
-    this.filter     = null;
+    this.filter = null;
 
-    if ( "undefined" !== typeof options ) {
+    if ("undefined" !== typeof options) {
 
-        if ( true === ( options.connection instanceof vscp.Connection ) ) {
+        if (true === (options.connection instanceof vscp.Connection)) {
             this.connection = options.connection;
         }
 
-        if ( "function" === typeof options.onValue ) {
+        if ("function" === typeof options.onValue) {
             this.onValue = options.onValue;
         }
 
-        if ( "object" === typeof options.filter ) {
+        if ("object" === typeof options.filter) {
             this.filter = options.filter;
         }
     }
 
-    if ( null !== this.connection ) {
-        this.connection.addEventListener( this.eventListener.bind( this ) );
+    if (null !== this.connection) {
+        this.connection.addEventListener(this.eventListener.bind(this));
     }
 };
 
@@ -576,100 +574,99 @@ vscp.measurement.Decoder = function( options ) {
  * @param {vscp.Connection} conn    - VSCP connection
  * @param {vscp.Event} evt          - VSCP event
  */
-vscp.measurement.Decoder.prototype.eventListener = function( conn, evt ) {
+vscp.measurement.Decoder.prototype.eventListener = function(conn, evt) {
 
     var sensorIndex = -1;
-    var value       = 0;
-    var unitId      = -1;
-    var unit        = "";
-    var zone        = 255;
-    var subZone     = 255;
-    var mimicData   = [];
-    var index       = 0;
+    var value = 0;
+    var unitId = -1;
+    var unit = "";
+    var zone = 255;
+    var subZone = 255;
+    var mimicData = [];
+    var index = 0;
 
-    if ( "undefined" === typeof evt ) {
+    if ("undefined" === typeof evt) {
         return;
     }
 
-    if ( false === ( evt instanceof vscp.Event ) ) {
+    if (false === (evt instanceof vscp.Event)) {
         return;
     }
 
     // Apply pre filter
-    if ( null !== this.filter ) {
+    if (null !== this.filter) {
 
-        if ( ( "undefined" !== typeof this.filter.vscpGuid ) &&
-             ( evt.vscpGuid.toLowerCase() !== this.filter.vscpGuid.toLowerCase() ) ) {
+        if (("undefined" !== typeof this.filter.vscpGuid) &&
+            (evt.vscpGuid.toLowerCase() !== this.filter.vscpGuid.toLowerCase())) {
             return;
         }
 
-        if ( ( "undefined" !== typeof this.filter.vscpClass ) &&
-             ( evt.vscpClass !== this.filter.vscpClass ) ) {
+        if (("undefined" !== typeof this.filter.vscpClass) &&
+            (evt.vscpClass !== this.filter.vscpClass)) {
             return;
         }
 
-        if ( ( "undefined" !== typeof this.filter.vscpType ) &&
-             ( evt.vscpType !== this.filter.vscpType ) ) {
+        if (("undefined" !== typeof this.filter.vscpType) &&
+            (evt.vscpType !== this.filter.vscpType)) {
             return;
         }
     }
 
     // Classes with data coding byte
-    if ( ( vscp.constants.classes.VSCP_CLASS1_MEASUREMENT === evt.vscpClass ) ||
-         ( vscp.constants.classes.VSCP_CLASS1_DATA === evt.vscpClass ) ) {
+    if ((vscp.constants.classes.VSCP_CLASS1_MEASUREMENT === evt.vscpClass) ||
+        (vscp.constants.classes.VSCP_CLASS1_DATA === evt.vscpClass)) {
 
-        sensorIndex = vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
-        value = vscp.measurement.decodeClass10( evt.vscpData );
-        unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
-        unit = vscp.measurement.constants.units[ evt.vscpType ][ unitId ];
+        sensorIndex = vscp.measurement.getSensorIndexFromDataCoding(evt.vscpData[0]);
+        value = vscp.measurement.decodeClass10(evt.vscpData);
+        unitId = vscp.measurement.getUnitFromDataCoding(evt.vscpData[0]);
+        unit = vscp.measurement.constants.units[evt.vscpType][unitId];
     }
     // Floating point
-    else if ( vscp.constants.classes.VSCP_CLASS1_MEASUREMENT64 === evt.vscpClass ) {
-        value = vscp.measurement.decodeClass60Number( evt.vscpData );
-        unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
-        unit = vscp.measurement.constants.units[ evt.vscpType ][ unitId ];
+    else if (vscp.constants.classes.VSCP_CLASS1_MEASUREMENT64 === evt.vscpClass) {
+        value = vscp.measurement.decodeClass60Number(evt.vscpData);
+        unitId = vscp.measurement.getUnitFromDataCoding(evt.vscpData[0]);
+        unit = vscp.measurement.constants.units[evt.vscpType][unitId];
     }
     // Measurement with zone information
-    else if ( ( vscp.constants.classes.VSCP_CLASS1_MEASUREZONE === evt.vscpClass ) ||
-              ( vscp.constants.classes.VSCP_CLASS1_SETVALUEZONE === evt.vscpClass ) ) {
+    else if ((vscp.constants.classes.VSCP_CLASS1_MEASUREZONE === evt.vscpClass) ||
+        (vscp.constants.classes.VSCP_CLASS1_SETVALUEZONE === evt.vscpClass)) {
 
-        mimicData.push( evt.vscpData[ 0 ] );
-        for( index = 3; index < evt.vscpData.length; ++index ) {
-            mimicData.push( evt.vscpData[ index ] );
+        mimicData.push(evt.vscpData[0]);
+        for (index = 3; index < evt.vscpData.length; ++index) {
+            mimicData.push(evt.vscpData[index]);
         }
 
-        sensorIndex = vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
-        value = vscp.measurement.decodeClass10( mimicData );
-        unitId = vscp.measurement.getUnitFromDataCoding( evt.vscpData[ 0 ] );
-        unit = vscp.measurement.constants.units[ evt.vscpType ][ unitId ];
-        zone = evt.vscpData[ 1 ];
-        subZone = evt.vscpData[ 2 ];
-    }
-    else {
+        sensorIndex = vscp.measurement.getSensorIndexFromDataCoding(evt.vscpData[0]);
+        value = vscp.measurement.decodeClass10(mimicData);
+        unitId = vscp.measurement.getUnitFromDataCoding(evt.vscpData[0]);
+        unit = vscp.measurement.constants.units[evt.vscpType][unitId];
+        zone = evt.vscpData[1];
+        subZone = evt.vscpData[2];
+    } else {
         return;
     }
 
     // Apply post filter
-    if ( null !== this.filter ) {
+    if (null !== this.filter) {
 
-        if ( ( "undefined" !== typeof this.filter.sensorIndex ) &&
-             ( sensorIndex !== this.filter.sensorIndex ) ) {
+        if (("undefined" !== typeof this.filter.sensorIndex) &&
+            (sensorIndex !== this.filter.sensorIndex)) {
             return;
         }
 
-        if ( ( "undefined" !== typeof this.filter.zone ) &&
-             ( zone !== this.filter.zone ) ) {
+        if (("undefined" !== typeof this.filter.zone) &&
+            (zone !== this.filter.zone)) {
             return;
         }
 
-        if ( ( "undefined" !== typeof this.filter.subZone ) &&
-             ( subZone !== this.filter.subZone ) ) {
+        if (("undefined" !== typeof this.filter.subZone) &&
+            (subZone !== this.filter.subZone)) {
             return;
         }
     }
 
     // Signal application
-    if ( null !== this.onValue ) {
+    if (null !== this.onValue) {
         this.onValue({
             sensorIndex: sensorIndex,
             value: value,

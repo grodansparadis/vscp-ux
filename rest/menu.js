@@ -8,7 +8,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2017 Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2018 Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -39,16 +39,14 @@ var navBarMenu = navBarMenu || {};
 
 /* ---------------------------------------------------------------------- */
 
-navBarMenu.content = [
-    {
+navBarMenu.content = [{
         title: "Home",
         url: "../index.html"
     },
     {
         title: "General REST functionality",
         url: "#",
-        dropDown: [
-            {
+        dropDown: [{
                 title: "Set Server",
                 url: "javascript:do_setServer();"
             },
@@ -101,8 +99,7 @@ navBarMenu.content = [
     {
         title: "Variables",
         url: "#",
-        dropDown: [
-            {
+        dropDown: [{
                 title: "Create variable",
                 url: "javascript:do_createVariable();"
             },
