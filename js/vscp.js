@@ -1789,8 +1789,6 @@ vscp.Event.prototype.isDumbNode = function() {
     return result;
 };
 
-This is a dumb node. No MDF, register, nothing.
-
 /**
  * Set the VSCP event priority.
  *
