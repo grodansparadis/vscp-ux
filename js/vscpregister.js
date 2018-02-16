@@ -1,5 +1,6 @@
 // VSCP register abstraction model javascript library
-// Copyright (c) 2015 Andreas Merkle
+//
+// Copyright (c) 2015, 2018 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
