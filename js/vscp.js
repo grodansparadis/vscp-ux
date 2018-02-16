@@ -1609,6 +1609,8 @@ vscp.encodeValueIfBase64 = function(type, value) {
  *
  * @param {object} options                              - Options
  * @param {number} options.vscpHead                     - Event head
+ * @param {boolean} options.guidIsIpV6Addr              - GUID is a IPv6 address
+ * @param {boolean} options.dumpNode                    - Node is a dump node
  * @param {number} options.vscpPriority                 - Priority
  * @param {boolean} options.vscpHardCoded               - Hard coded node id
  * @param {boolean} options.vscpCalcCRC                 - Calculate CRC
@@ -1667,26 +1669,42 @@ vscp.Event = function(options) {
             this.vscpHead = options.vscpHead;
         }
 
+        if ("boolean" === typeof options.guidIsIpV6Addr) {
+            if (false === options.guidIsIpV6Addr) {
+                this.vscpHead &= 0xefff;
+            } else {
+                this.vscpHead |= 0x8000;
+            }
+        }
+        
+        if ("boolean" === typeof options.dumpNode) {
+            if (false === options.dumpNode) {
+                this.vscpHead &= 0xbfff;
+            } else {
+                this.vscpHead |= 0x4000;
+            }
+        }
+        
         if ("number" === typeof options.vscpPriority) {
             if ((0 <= options.vscpPriority) && (7 >= options.vscpPriority)) {
-                this.vscpHead &= 0x1f;
+                this.vscpHead &= 0xff1f;
                 this.vscpHead |= (options.vscpPriority << 5);
             }
         }
 
         if ("boolean" === typeof options.vscpHardCoded) {
             if (false === options.vscpHardCoded) {
-                this.vscpHead &= 0xef;
+                this.vscpHead &= 0xffef;
             } else {
-                this.vscpHead |= 0x10;
+                this.vscpHead |= 0x0010;
             }
         }
 
         if ("boolean" === typeof options.vscpCalcCRC) {
             if (false === options.vscpCalcCRC) {
-                this.vscpHead &= 0xf7;
+                this.vscpHead &= 0xfff7;
             } else {
-                this.vscpHead |= 0x08;
+                this.vscpHead |= 0x0008;
             }
         }
 
@@ -1749,13 +1767,38 @@ vscp.Event.prototype.isIPV6Addr = function() {
 };
 
 /**
+ * Set dumb node. No MDF, registers, nothing.
+ */
+vscp.Event.prototype.setDumbNode = function() {
+    this.vscpHead |= 0x4000;
+};
+
+/**
+ * Is node a dump node or not?
+ * Dumb node means no MDF, registers, nothing.
+ *
+ * @return {boolean} If the node is a dumb node, it will return true, otherwise false.
+ */
+vscp.Event.prototype.isDumbNode = function() {
+    var result = false;
+
+    if (0 < (this.vscpHead & 0x4000)) {
+        result = true;
+    }
+
+    return result;
+};
+
+This is a dumb node. No MDF, register, nothing.
+
+/**
  * Set the VSCP event priority.
  *
  * @param {number} priority  -  Priority
  */
 vscp.Event.prototype.setPriority = function(priority) {
     if ((0 <= priority) && (7 >= priority)) {
-        this.vscpHead &= 0x1f;
+        this.vscpHead &= 0xff1f;
         this.vscpHead |= (priority << 5);
     }
 };
