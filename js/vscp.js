@@ -3005,7 +3005,14 @@ vscp.Connection.prototype.onWebSocketMessage = function(msg) {
             evt.vscpClass = parseInt( eventItems[1] );
             evt.vscpType = parseInt( eventItems[2] );
             evt.vscpObId = parseInt( eventItems[3] );
-            evt.vscpDateTime = new Date( eventItems[4] );
+            
+            if (0 < eventItems[4].length) {
+                evt.vscpDateTime = new Date( eventItems[4] );
+            }
+            else {
+                evt.vscpDateTime = new Date();
+            }
+            
             evt.vscpTimeStamp = parseInt(eventItems[5]);
             evt.vscpGuid = eventItems[6];
             evt.vscpData = [];
