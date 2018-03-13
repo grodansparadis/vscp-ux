@@ -584,6 +584,8 @@ vscp.service.Container.prototype.write = function(options) {
     this.connection.writeVar({
 
         name: this.name,
+        
+        type: vscp.constants.varTypes.STRING,
 
         value: container,
 
