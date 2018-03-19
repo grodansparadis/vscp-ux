@@ -44,8 +44,8 @@
 
     <script type="text/javascript">
 
-        var setTime = function( d ) {
-            var date = new Date(d*1000);
+        var getTime = function( unixtimestamp ) {
+            var date = new Date( unixtimestamp * 1000 );
             var date_year = date.getFullYear();
             var date_month = date.getMonth();
             var date_day = date.getDate();
@@ -54,17 +54,19 @@
             var date_second = date.getSeconds();
             return date_year + '-' + date_month + '-' + date_day + ' ' + date_hour + ':' + date_minute + ':' + date_second;
         }
-
+        
         var lineChartData = [{
             label: "Temperature",
-            values: [
-                {time: 1370044800, y: 20}, {time: 1370044801, y: 20}, {time: 1370044802, y: 19}, {time: 1370044803, y: 18},
-                {time: 1370044804, y: 17}, {time: 1370044805, y: 16}, {time: 1370044806, y: 15}, {time: 1370044807, y: 14},
-                {time: 1370044808, y: 13}, {time: 1370044809, y: 12}, {time: 1370044810, y: 11}, {time: 1370044811, y: 10},
-                {time: 1370044812, y: 9}, {time: 1370044813, y: 8}, {time: 1370044814, y: 7}, {time: 1370044815, y: 6},
-                {time: 1370044822, y: 4}, {time: 1370044844, y: 1}, {time: 1370044848, y: 0}, {time: 1370044899, y: -3},
-            ]
+            values: []
         }];
+        
+        // Push some sample data in
+        for(index = 0; index < 16; ++index) {
+            lineChartData[ 0 ].values.push({
+                time: getUnixTimestamp() - ( 16 - index ) * 2,
+                y: 16 - index
+            });
+        }
 
         // VSCP websocket connection
         var vscpConn = null;
@@ -128,9 +130,6 @@
             if ( ( vscp.constants.classes.VSCP_CLASS1_MEASUREMENT === evt.vscpClass ) &&
                  ( vscp.constants.types.VSCP_TYPE_MEASUREMENT_TEMPERATURE === evt.vscpType ) ) {
 
-                // This event is for us
-                console.log( "Codingbyte = " + evt.vscpData );
-
                 // We are only interested in sensor 2
                 var sensorindex =  vscp.measurement.getSensorIndexFromDataCoding( evt.vscpData[ 0 ] );
                 if ( 2 !== sensorindex ) {
@@ -155,9 +154,8 @@
                         break;
                 }
 
-                var d = new Date();
                 var data = [{
-                    time: d.getTime(),
+                    time: getUnixTimestamp(),
                     y: value
                 }];
                 lineBarChart1.push( data );
@@ -165,14 +163,11 @@
                 areaChartInstance1.push( data );
             }
         };
-
-        var formatdate = function(d) {
-            var now = new Date();
-            /*return now.getHours().toString() + ':' +
-                    now.getMinutes().toString() + ':' +
-                    now.getSeconds().toString(); */
-            return now.toTimeString();
-        };
+        
+        function getUnixTimestamp() {
+            var date = new Date();
+            return date.getTime() / 1000;
+        }
 
     </script>
 </head>
@@ -204,12 +199,8 @@
         <script>
           var lineBarChart1 = $('#lineBarChart1').epoch({
             type: 'time.bar',
-            ticks: { left: 5, bottom: 5, right: 5 },
-            /*tickFormats: { time: function(d) { return 'AAAA'; } },*/
-            tickFormats: {
-                bottom: function(d) { return formatdate(d); }
-            },
-
+            ticks: { time: 8, left: 5, right: 5 },
+            tickFormats: { bottom: function(d) { return getTime(d); } },
             data: lineChartData,
             axes: ['left', 'right', 'bottom']
           });
@@ -220,8 +211,8 @@
         <script>
           var lineBarChart2 = $('#lineBarChart2').epoch({
             type: 'time.line',
-            ticks: { left: 5, bottom: 5, right: 5 },
-            tickFormats: { bottom: function(d) { return new Date().toISOString() } },
+            ticks: { time: 8, left: 5, right: 5 },
+            tickFormats: { bottom: function(d) { return getTime(d); } },
             data: lineChartData,
             axes: ['left', 'right', 'bottom']
           });
@@ -232,8 +223,8 @@
         <script>
         var areaChartInstance1 = $('#lineAreaChart1').epoch({
             type: 'time.area',
-            ticks: { left: 5, bottom: 5, right: 5 },
-            tickFormats: { bottom: function(d) { return new Date().toISOString() } },
+            ticks: { time: 8, left: 5, right: 5 },
+            tickFormats: { bottom: function(d) { return getTime(d); } },
             data: lineChartData,
             axes: ['left', 'right', 'bottom']
         });
