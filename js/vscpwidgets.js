@@ -57,394 +57,6 @@ vscp.widget.timeout = 5000;
  * VSCP images
  * @namespace vscp.widget.images
  */
-/**
- * VSCP images of buttons
- * @namespace vscp.widget.images.button
- */
-vscp._createNS("vscp.widget.images.button");
-
-/** Base path of the button images
- * @type {string}
- * @const
- */
-vscp.widget.images.button.BASE_PATH = "../lib/widgets";
-
-/** Button images
- * @enum {object}
- */
-vscp.widget.images.button = [{
-        off: vscp.widget.images.button.BASE_PATH + "/button/pressoffg.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/pressong.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/pressoffo.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/pressono.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/jbb1.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/jbb1o.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/jbb2.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/jbb2o.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/jbg.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/jbgo.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/jbo.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/jboo.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/jbr.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/jbro.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/jbw.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/jbwo.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/jby.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/jbyo.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/jellyoff.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/jellyon.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/dualpushgrey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/dualpushgreymirror.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/klunkmirror.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/klunk.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/klunk2mirror.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/klunk2.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/klunk4mirror.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/klunk4.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/polywhiteH.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/polyblue.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/polywhiteV.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/polyredV.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/pressoffS.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/pressonS.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/pressoffSb.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/pressonSb.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/pressoffSg.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/pressonSg.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/pressoffSy.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/pressonSy.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/pushin.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/pushout.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/pushinw.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/pushoutw.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockerblackleft.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockerblack.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockerblueleft.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockerblue.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockergreyleft.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockergrey.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockerredleft.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockerred.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockersmooth.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothd.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBB.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBBd.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBBL.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBBLd.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBC.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBCd.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBG.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBGd.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBGR.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBGRd.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBW.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBWd.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBWR.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockersmoothBWRd.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/rockerwhiteleft.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/rockerwhite.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/sidb.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/sidbon.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/sidb.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/sidbongreen.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/sidb.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/sidbonblue.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/solinaOff.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/solinaOn.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led-orange-round-button-out.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led-orange-round-button-in.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led_circle_grey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led_circle_red.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led_circle_grey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led_circle_yellow_.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led_circle_grey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led-green.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led_circle_grey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led-green-button2.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led_circle_grey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led_circle_green.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led_circle_grey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led_circle_orange.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led_circle_grey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led_circle_purple.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led_circle_grey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led_circle_blue.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led-red-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led-red-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led_circle_green.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led-green.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/led-red-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/led_circle_green.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/poweroff.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/poweron.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/push-button-glossy-red.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/push-button-light-blue.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/push-button-glossy-red.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/push-button-yellow-glossy.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/push-button-yellow-glossy.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/push-button-light-blue.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/light_switch_off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/light_switch_on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/sw1.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/sw2.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/sw5.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/sw3.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/switch1.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/switch3.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/touchoy.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/touchy.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/touchow.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/touchw.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/touchoo.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/toucho.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn_led_rectangular_v_black.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn_led_rectangular_vh_black.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn-led_rounded_v_black.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn-led_rounded_vh_black.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn-led_rounded_v_grey.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn-led_rounded_vh_grey.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn_pressdown_off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn_pressdown_on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn_pressdown2_off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn_pressdown2_on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/red-rectangle-blank-button2-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/red-rectangle-blank-button-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/run-push-button-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/run-push-button-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn-silver-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn-silver-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/start.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/stop.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/switch-knob-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/switch-knob-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/SwtchOF1.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/SwtchON1.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/system-shut-down-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/system-shut-down-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/brami_Square_Black_Crystal_Button.off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/brami_Square_Black_Crystal_Button.on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btncpgreen-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btncpgreen-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btncpmag-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btncpmag-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/button-for-numbers-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/button-for-numbers-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/button-green-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/button-green-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/button-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/button-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/button-power-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/button-power-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn-grey-rounded-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn-grey-rounded-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn-grey-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn-grey-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/interruptor-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/interruptor-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/knife_switch_off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/knife_switch_on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/off-button.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/on-button.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn-modern-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn-modern-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/btn-oldstyle-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/btn-oldstyle-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/button/orange-button-off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/button/orange-button-on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/light/lightbulb1_off.png",
-        on: vscp.widget.images.button.BASE_PATH + "/light/lightbulb1_on.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/light/light_green.gif",
-        on: vscp.widget.images.button.BASE_PATH + "/light/light_red.gif"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/lightbulb/semi-matte-light-bulb-unlit-th.png",
-        on: vscp.widget.images.button.BASE_PATH + "/lightbulb/semi-matte-light-bulb-lit-th.png"
-    },
-    {
-        off: vscp.widget.images.button.BASE_PATH + "/lightbulb/lightbulb-white-th.png",
-        on: vscp.widget.images.button.BASE_PATH + "/lightbulb/lightbulb-th.png"
-    }
-];
 
 /**
  * VSCP images of thermometer
@@ -533,23 +145,25 @@ vscp.widget.Image = function(options) {
  *
  * @param {object} options                      - Options
  * @param {string} options.canvasName           - Name of the canvas, normally the canvas id
- * @param {number} options.type                 - Button type, see vscp.widget.images.button
+ * @param {number} options.offImageUrl          - URL to button which is in off state
+ * @param {number} options.onImageUrl           - URL to button which is in on state
  * @param {number} options.x                    - x position of the image in the canvas
  * @param {number} options.y                    - y position of the image in the canvas
- * @param {number} options.scale                - Scale factor applied to the button image
+ * @param {number} [options.scale]               - Scale factor applied to the button image
  * @param {vscp.Connection} options.connection  - VSCP connection, used for event communication
- * @param {boolean} options.bindToRemoteState   - Bind the button state to the remote state or not
- * @param {number} options.receiveZone          - Zone where state events will come from
- * @param {number} options.receiveSubZone       - Sub-zone where state events will come from
- * @param {number} options.transmitZone         - Zone where button event will be sent to
- * @param {number} options.transmitSubZone      - Sub-zone where button event will be sent to
- * @param {number} options.index                - Button index
- * @param {boolean} options.enable              - Enable or disable button
+ * @param {boolean} [options.bindToRemoteState] - Bind the button state to the remote state or not (default: false)
+ * @param {number} [options.receiveZone]        - Zone where state events will come from (default: 255)
+ * @param {number} [options.receiveSubZone]     - Sub-zone where state events will come from (default: 255)
+ * @param {number} [options.transmitZone]       - Zone where button event will be sent to (default: 255)
+ * @param {number} [options.transmitSubZone]    - Sub-zone where button event will be sent to (default: 255)
+ * @param {number} [options.index]              - Button index (instance number)  (default: 0)
+ * @param {boolean} [options.enable]            - Enable or disable button  (default: false)
  */
 vscp.widget.Button = function(options) {
 
     this.canvasName = "canvas"; // Name of the canvas
-    this.type = 0; // Button type, see images
+    this.offImageUrl = ""; // URL to button which is in off state
+    this.onImageUrl = ""; // URL to button which is in on state
     this.x = 0; // x-coordinate in the canvas
     this.y = 0; // y-coordinate in the canvas
     this.scale = 1; // Scale factor
@@ -567,63 +181,83 @@ vscp.widget.Button = function(options) {
     this.transmitSubZone = 255; // Sub-zone where button event will be sent to
     this._state = false; // Current button state
 
-    if ("undefined" !== typeof options) {
+    if ("undefined" === typeof(options)) {
+        console.error(vscp.utility.getTime() + " Options are missing.");
+        return null;
+    }
 
-        if ("string" === typeof options.canvasName) {
-            this.canvasName = options.canvasName;
-        }
+    if ("string" !== typeof options.canvasName) {
+        console.error(vscp.utility.getTime() + " Canvas name is missing.");
+        return null;
+    }
 
-        if ("number" === typeof options.type) {
-            if ((0 > options.type) || (vscp.widget.images.button.length <= options.type)) {
-                console.error(vscp.utility.getTime() + " Button type " + options.type + " unknown.");
-            } else {
-                this.type = options.type;
-            }
-        }
+    this.canvasName = options.canvasName;
 
-        if ("number" === typeof options.x) {
-            this.x = options.x;
-        }
+    if ("string" !== typeof options.offImageUrl) {
+        console.error(vscp.utility.getTime() + " Image URL for button in off state is missing.");
+        return null;
+    }
 
-        if ("number" === typeof options.y) {
-            this.y = options.y;
-        }
+    this.offImageUrl = options.offImageUrl;
 
-        if ("number" === typeof options.scale) {
-            this.scale = options.scale;
-        }
+    if ("string" !== typeof options.onImageUrl) {
+        console.error(vscp.utility.getTime() + " Image URL for button in on state is missing.");
+        return null;
+    }
 
-        if ("object" === typeof options.connection) {
-            this.connection = options.connection;
-        }
+    this.onImageUrl = options.onImageUrl;
 
-        if ("boolean" === typeof options.bindToRemoteState) {
-            this.bindToRemoteState = options.bindToRemoteState;
-        }
+    if ("number" !== typeof options.x) {
+        console.error(vscp.utility.getTime() + " Image x-coordinate is missing.");
+        return null;
+    }
 
-        if ("number" === typeof options.transmitZone) {
-            this.transmitZone = options.transmitZone;
-        }
+    this.x = options.x;
 
-        if ("number" === typeof options.transmitSubZone) {
-            this.transmitSubZone = options.transmitSubZone;
-        }
+    if ("number" !== typeof options.y) {
+        console.error(vscp.utility.getTime() + " Image y-coordinate is missing.");
+        return null;
+    }
 
-        if ("number" === typeof options.receiveZone) {
-            this.receiveZone = options.receiveZone;
-        }
+    this.y = options.y;
 
-        if ("number" === typeof options.receiveSubZone) {
-            this.receiveSubZone = options.receiveSubZone;
-        }
+    if ("number" === typeof options.scale) {
+        this.scale = options.scale;
+    }
 
-        if ("number" === typeof options.index) {
-            this.index = options.index;
-        }
+    if ("object" !== typeof options.connection) {
+        console.error(vscp.utility.getTime() + " VSCP connection is missing.");
+        return null;
+    }
 
-        if ("boolean" === typeof options.enable) {
-            this._isEnabled = options.enable;
-        }
+    this.connection = options.connection;
+
+    if ("boolean" === typeof options.bindToRemoteState) {
+        this.bindToRemoteState = options.bindToRemoteState;
+    }
+
+    if ("number" === typeof options.transmitZone) {
+        this.transmitZone = options.transmitZone;
+    }
+
+    if ("number" === typeof options.transmitSubZone) {
+        this.transmitSubZone = options.transmitSubZone;
+    }
+
+    if ("number" === typeof options.receiveZone) {
+        this.receiveZone = options.receiveZone;
+    }
+
+    if ("number" === typeof options.receiveSubZone) {
+        this.receiveSubZone = options.receiveSubZone;
+    }
+
+    if ("number" === typeof options.index) {
+        this.index = options.index;
+    }
+
+    if ("boolean" === typeof options.enable) {
+        this._isEnabled = options.enable;
     }
 
     // Event listener for VSCP events
@@ -740,7 +374,7 @@ vscp.widget.Button = function(options) {
     $(this.canvasName)
         .drawImage({
             name: this._idOff,
-            source: vscp.widget.images.button[this.type].off,
+            source: this.offImageUrl,
             layer: true,
             x: this.x,
             y: this.y,
@@ -750,7 +384,7 @@ vscp.widget.Button = function(options) {
         })
         .drawImage({
             name: this._idOn,
-            source: vscp.widget.images.button[this.type].on,
+            source: this.onImageUrl,
             layer: true,
             x: this.x,
             y: this.y,
