@@ -47,39 +47,6 @@ var vscp = vscp || {};
  */
 vscp._createNS("vscp.widget");
 
-/** VSCP response timeout in ms
- * @type {number}
- * @const
- */
-vscp.widget.timeout = 5000;
-
-/**
- * VSCP images
- * @namespace vscp.widget.images
- */
-
-/**
- * VSCP images of thermometer
- * @namespace vscp.widget.images.thermometer
- */
-vscp._createNS("vscp.widget.images.thermometer");
-
-/** Base path of the thermometer images
- * @type {string}
- * @const
- */
-vscp.widget.images.thermometer.BASE_PATH = "../lib/widgets/thermometer";
-
-/** Thermometer images
- * @enum {string}
- */
-vscp.widget.images.thermometer = [
-    vscp.widget.images.thermometer.BASE_PATH + "/thermometer1.png",
-    vscp.widget.images.thermometer.BASE_PATH + "/thermometer2.png",
-    vscp.widget.images.thermometer.BASE_PATH + "/thermometer3.jpg",
-    vscp.widget.images.thermometer.BASE_PATH + "/thermometer4.png"
-];
-
 /**
  * Generate a UUID.
  *
@@ -149,7 +116,7 @@ vscp.widget.Image = function(options) {
  * @param {number} options.onImageUrl           - URL to button which is in on state
  * @param {number} options.x                    - x position of the image in the canvas
  * @param {number} options.y                    - y position of the image in the canvas
- * @param {number} [options.scale]               - Scale factor applied to the button image
+ * @param {number} [options.scale]               - Scale factor applied to the button image (default: 1.0)
  * @param {vscp.Connection} options.connection  - VSCP connection, used for event communication
  * @param {boolean} [options.bindToRemoteState] - Bind the button state to the remote state or not (default: false)
  * @param {number} [options.receiveZone]        - Zone where state events will come from (default: 255)
@@ -467,22 +434,31 @@ vscp.widget.Button.prototype.setEnabled = function(value) {
  *
  * @param {object} options                      - Options
  * @param {string} options.canvasName           - Name of the canvas, normally the canvas id
- * @param {number} options.type                 - Thermometer type, see vscp.widget.images.thermometer
+ * @param {number} options.imageUrl             - URL to thermometer image
  * @param {number} options.x                    - x position of the image in the canvas
  * @param {number} options.y                    - y position of the image in the canvas
- * @param {number} options.scale                - Scale factor applied to the thermometer image
+ * @param {object} options.data                 - Thermometer data
+ * @param {number} options.data.maxT            - Max. temperature in degree celsius
+ * @param {number} options.data.minT            - Min. temperature in degree celsius
+ * @param {number} options.data.x               - x position of the lower left begin of the thermometer column in image
+ * @param {number} options.data.y               - y position of the lower left begin of the thermometer column in image
+ * @param {number} options.data.height          - Thermometer column height (only between numbers)
+ * @param {number} options.data.width           - Thermometer column width
+ * @param {number} options.data.yOffset         - Thermometer column height offset from the begin to the first number
+ * @param {string} options.data.color           - HTML color, e.g. '#8A0000'
+ * @param {number} [options.scale]              - Scale factor applied to the thermometer image (default: 1.0)
  * @param {vscp.Connection} options.connection  - VSCP connection, used for event communication
- * @param {number} options.receiveZone          - Zone where state events will come from
- * @param {number} options.receiveSubZone       - Sub-zone where state events will come from
- * @param {number} options.sensorIndex          - Sensor index
- * @param {number} options.vscpClass            - VSCP measurement class
- * @param {number} options.vscpType             - VSCP measurement type
- * @param {boolean} options.enable              - Enable or disable button
+ * @param {number} [options.receiveZone]        - Zone where state events will come from (default: 255)
+ * @param {number} [options.receiveSubZone]     - Sub-zone where state events will come from (default: 255)
+ * @param {number} [options.sensorIndex]        - Sensor index (default: 0)
+ * @param {number} [options.vscpClass]          - VSCP measurement class (default: CLASS1.MEASUREMENT)
+ * @param {number} [options.vscpType]           - VSCP measurement type (default: CLASS1.MEASUREMENT.TERMPERATURE)
+ * @param {boolean} [options.enable]            - Enable or disable thermometer (default: true)
  */
 vscp.widget.Thermometer = function(options) {
 
     this.canvasName = "canvas"; // Name of the canvas
-    this.type = 0; // Widget type, see images
+    this.imageUrl = ""; // URL to thermometer image
     this.x = 0; // x-coordinate in the canvas
     this.y = 0; // y-coordinate in the canvas
     this.scale = 1; // Scale factor
@@ -491,7 +467,7 @@ vscp.widget.Thermometer = function(options) {
     this._idDisabled = vscp.widget.generateUUID(); // Id used to identify the layer
     this._idData = vscp.widget.generateUUID(); // Id used to identify the layer
     this._temperature = 0; // Temperature
-
+        
     this.connection = null; // VSCP connection
     this.decoder = null; // VSCP measurement decoder
     this.sensorIndex = -1; // Sensor index (instance number)
@@ -500,59 +476,146 @@ vscp.widget.Thermometer = function(options) {
     this.receiveZone = 255; // Zone where state events will come from
     this.receiveSubZone = 255; // Sub-zone where state events will come from
 
-    if ("undefined" !== typeof options) {
+    // Thermometer data
+    this._data = {
+        maxT: 0,
+        minT: 0,
+        x: 0,
+        y: 0,
+        height: 0,
+        width: 0,
+        yOffset: 0,
+        color: ""
+    };
 
-        if ("string" === typeof options.canvasName) {
-            this.canvasName = options.canvasName;
-        }
+    if ("undefined" === typeof(options)) {
+        console.error(vscp.utility.getTime() + " Options are missing.");
+        return null;
+    }
 
-        if ("number" === typeof options.type) {
-            if ((0 > options.type) || (vscp.widget.images.thermometer.length <= options.type)) {
-                console.error(vscp.utility.getTime() + " Thermometer type " + options.type + " unknown.");
-            } else {
-                this.type = options.type;
-            }
-        }
+    if ("string" !== typeof options.canvasName) {
+        console.error(vscp.utility.getTime() + " Canvas name is missing.");
+        return null;
+    }
 
-        if ("number" === typeof options.x) {
-            this.x = options.x;
-        }
+    this.canvasName = options.canvasName;
 
-        if ("number" === typeof options.y) {
-            this.y = options.y;
-        }
+    if ("string" !== typeof options.imageUrl) {
+        console.error(vscp.utility.getTime() + " Image URL for thermometer is missing.");
+        return null;
+    }
 
-        if ("number" === typeof options.scale) {
-            this.scale = options.scale;
-        }
+    this.imageUrl = options.imageUrl;
 
-        if ("object" === typeof options.connection) {
-            this.connection = options.connection;
-        }
 
-        if ("number" === typeof options.receiveZone) {
-            this.receiveZone = options.receiveZone;
-        }
+    if ("number" !== typeof options.x) {
+        console.error(vscp.utility.getTime() + " Image x-coordinate is missing.");
+        return null;
+    }
 
-        if ("number" === typeof options.receiveSubZone) {
-            this.receiveSubZone = options.receiveSubZone;
-        }
+    this.x = options.x;
 
-        if ("number" === typeof options.sensorIndex) {
-            this.sensorIndex = options.sensorIndex;
-        }
+    if ("number" !== typeof options.y) {
+        console.error(vscp.utility.getTime() + " Image y-coordinate is missing.");
+        return null;
+    }
 
-        if ("number" === typeof options.vscpClass) {
-            this.vscpClass = options.vscpClass;
-        }
+    this.y = options.y;
 
-        if ("number" === typeof options.vscpType) {
-            this.vscpType = options.vscpType;
-        }
+    if ("object" !== typeof options.data) {
+        console.error(vscp.utility.getTime() + " Thermometer data is missing.");
+        return null;
+    }
 
-        if ("boolean" === typeof options.enable) {
-            this._isEnabled = options.enable;
-        }
+    if ("number" !== typeof options.data.maxT) {
+        console.error(vscp.utility.getTime() + " Thermometer max. temperature is missing.");
+        return null;
+    }
+
+    this._data.maxT = options.data.maxT;
+
+    if ("number" !== typeof options.data.minT) {
+        console.error(vscp.utility.getTime() + " Thermometer min. temperature is missing.");
+        return null;
+    }
+
+    this._data.minT = options.data.minT;
+
+    if ("number" !== typeof options.data.x) {
+        console.error(vscp.utility.getTime() + " Thermometer column x position is missing.");
+        return null;
+    }
+
+    this._data.x = options.data.x;
+
+    if ("number" !== typeof options.data.y) {
+        console.error(vscp.utility.getTime() + " Thermometer column y position is missing.");
+        return null;
+    }
+
+    this._data.y = options.data.y;
+
+    if ("number" !== typeof options.data.height) {
+        console.error(vscp.utility.getTime() + " Thermometer column height is missing.");
+        return null;
+    }
+
+    this._data.height = options.data.height;
+
+    if ("number" !== typeof options.data.width) {
+        console.error(vscp.utility.getTime() + " Thermometer column width is missing.");
+        return null;
+    }
+
+    this._data.width = options.data.width;
+
+    if ("number" !== typeof options.data.yOffset) {
+        console.error(vscp.utility.getTime() + " Thermometer column offset is missing.");
+        return null;
+    }
+
+    this._data.yOffset = options.data.yOffset;
+
+    if ("string" !== typeof options.data.color) {
+        console.error(vscp.utility.getTime() + " Thermometer column color is missing.");
+        return null;
+    }
+
+    this._data.color = options.data.color;
+
+    if ("number" === typeof options.scale) {
+        this.scale = options.scale;
+    }
+
+    if ("object" !== typeof options.connection) {
+        console.error(vscp.utility.getTime() + " VSCP connection is missing.");
+        return null;
+    }
+
+    this.connection = options.connection;
+
+    if ("number" === typeof options.receiveZone) {
+        this.receiveZone = options.receiveZone;
+    }
+
+    if ("number" === typeof options.receiveSubZone) {
+        this.receiveSubZone = options.receiveSubZone;
+    }
+
+    if ("number" === typeof options.sensorIndex) {
+        this.sensorIndex = options.sensorIndex;
+    }
+
+    if ("number" === typeof options.vscpClass) {
+        this.vscpClass = options.vscpClass;
+    }
+
+    if ("number" === typeof options.vscpType) {
+        this.vscpType = options.vscpType;
+    }
+
+    if ("boolean" === typeof options.enable) {
+        this._isEnabled = options.enable;
     }
 
     var onValue = function(measurement) {
@@ -611,7 +674,7 @@ vscp.widget.Thermometer = function(options) {
     $(this.canvasName)
         .drawImage({
             name: this._idThermometer,
-            source: vscp.widget.images.thermometer[this.type],
+            source: this.imageUrl,
             layer: true,
             x: this.x,
             y: this.y,
@@ -653,64 +716,25 @@ vscp.widget.Thermometer = function(options) {
 
                 var imageWidth = $(this.canvasName).getLayer(this._idThermometer).width * this.scale;
                 var imageHeight = $(this.canvasName).getLayer(this._idThermometer).height * this.scale;
-
-                var thermometerData = null;
-
-                if ((0 === this.type) ||
-                    (2 === this.type)) {
-                    thermometerData = {
-                        maxT: 35,
-                        minT: -25,
-                        x: 26,
-                        y: 191,
-                        height: 181,
-                        width: 7,
-                        yOffset: 5,
-                        color: '#8A0000'
-                    };
-                } else if (1 === this.type) {
-                    thermometerData = {
-                        maxT: 42,
-                        minT: -34,
-                        x: 36,
-                        y: 240,
-                        height: 231,
-                        width: 10,
-                        yOffset: 0,
-                        color: '#FF0000'
-                    };
-                } else if (3 === this.type) {
-                    thermometerData = {
-                        maxT: 55,
-                        minT: -20,
-                        x: 32,
-                        y: 161,
-                        height: 142,
-                        width: 8,
-                        yOffset: 2,
-                        color: '#FF0000'
-                    };
-                }
-
-                var maxDeltaT = thermometerData.maxT - thermometerData.minT;
-                var realX = thermometerData.x * this.scale;
-                var realY = thermometerData.y * this.scale;
-                var realHeight = thermometerData.height * this.scale;
-                var realWidth = thermometerData.width * this.scale;
-                var realYOffset = thermometerData.yOffset * this.scale;
+                var maxDeltaT = this._data.maxT - this._data.minT;
+                var realX = this._data.x * this.scale;
+                var realY = this._data.y * this.scale;
+                var realHeight = this._data.height * this.scale;
+                var realWidth = this._data.width * this.scale;
+                var realYOffset = this._data.yOffset * this.scale;
                 var temperature = this._temperature;
 
-                if (thermometerData.maxT < temperature) {
-                    temperature = thermometerData.maxT;
-                } else if (thermometerData.minT > this._temperature) {
-                    temperature = thermometerData.minT;
+                if (this._data.maxT < temperature) {
+                    temperature = this._data.maxT;
+                } else if (this._data.minT > this._temperature) {
+                    temperature = this._data.minT;
                 }
 
-                var t = (temperature - thermometerData.minT) * realHeight / maxDeltaT;
+                var t = (temperature - this._data.minT) * realHeight / maxDeltaT;
 
                 $(this.canvasName)
                     .drawRect({
-                        fillStyle: thermometerData.color,
+                        fillStyle: this._data.color,
                         x: (this.x - imageWidth / 2) + realX,
                         y: (this.y - imageHeight / 2) + realY,
                         width: realWidth,
