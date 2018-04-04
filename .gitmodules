@@ -1,0 +1,3 @@
+[submodule "js/vscp-js"]
+	path = js/vscp-js
+	url = https://github.com/grodansparadis/vscp-js.git
