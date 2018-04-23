@@ -2580,29 +2580,6 @@ vscp.Connection = function() {
             return;
         }
     }, {
-        event: "AUTH",
-        onSuccess: function(conn, parameter) {
-            var cmd = conn.getPendingCommand("CHALLENGE");
-    
-            if (null !== cmd) {
-    
-                console.info(vscp.utility.getTime() + " Security challenge received.");
-    
-                conn._sendCommand({
-                    command: "AUTH",
-                    data: vscp.utility.getWebSocketAuthHash(conn.userName,
-                                                            conn.password,
-                                                            conn.vscpkey,
-                                                            parameter[2] // iv
-                        ),
-                    onSuccess: null,
-                    onError: null
-                });
-            }
-            return;
-        },
-        onError: null
-    }, {
         event: "AUTH1",
         onSuccess: function(conn, parameter) {
             var cmd = conn.getPendingCommand("AUTH");
