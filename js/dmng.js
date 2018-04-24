@@ -1,6 +1,6 @@
 // VSCP decision matrix Next Generation
 //
-// Copyright (c) 2015, 2018 Andreas Merkle
+// Copyright (c) 2015-2018 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:

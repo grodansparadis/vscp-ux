@@ -68,12 +68,13 @@
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
-    <!-- VSCP hash calculation -->
-    <script type="text/javascript" src="../js/md5.js"></script>
+
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
-    <!-- VSCP websocket base library -->
-    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP common core library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <!-- VSCP websocket client library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscpws.js"></script>
     <!-- VSCP widget library, dependend on the VSCP websocket base library and jCanvas -->
     <script type="text/javascript" src="../js/vscpwidgets.js"></script>
     <!-- VSCP measurement functions, which are dependend on the VSCP websocket base library -->
@@ -89,8 +90,8 @@
     <script type="text/javascript" >
 
         (function() {
-            // VSCP websocket connection
-            var vscpConn = null;
+            // VSCP websocket client
+            var vscpClient = null;
 
             var thermometer1 = null;
             var thermometer2 = null;
@@ -104,10 +105,10 @@
                 navBarMenu.show( "menu", navBarMenu.content );
 
                 // Create a VSCP websocket
-                vscpConn = new vscp.Connection();
+                vscpClient = new vscp.ws.Client();
 
                 // Connect to VSCP server
-                vscpConn.connect({
+                vscpClient.connect({
 
                     url: settings.url,
                     userName: settings.user,
@@ -115,7 +116,7 @@
                     vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain,
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
 
                         // Initialize canvas
                         // Don't do this without a established connection, because
@@ -123,9 +124,9 @@
                         initCanvas();
 
                         // Start receiving VSCP events
-                        vscpConn.start({
+                        vscpClient.start({
 
-                            onSuccess: function( conn ) {
+                            onSuccess: function( client ) {
 
                                 // The user interface make only sense in case that the event communication is ready
                                 thermometer1.setEnabled( true );
@@ -134,7 +135,7 @@
                                 thermometer4.setEnabled( true );
                             },
 
-                            onError: function( conn ) {
+                            onError: function( client ) {
                                 alert("Couldn't start receiving events.");
                             }
 
@@ -142,7 +143,7 @@
 
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         alert("Couldn't establish a connection.");
                     }
 
@@ -153,7 +154,7 @@
             function initCanvas() {
 
                 thermometer1 = new vscp.widget.Thermometer({
-                    connection: vscpConn,           // VSCP connection object
+                    client: vscpClient,             // VSCP websocket client
                     canvasName: "#thermometer1",    // Canvas id
                     imageUrl: "../lib/widgets/thermometer/thermometer1.png",    // Thermometer image URL
                     data: {
@@ -174,7 +175,7 @@
                 });
 
                 thermometer2 = new vscp.widget.Thermometer({
-                    connection: vscpConn,           // VSCP connection object
+                    client: vscpClient,             // VSCP websocket client
                     canvasName: "#thermometer2",    // Canvas id
                     imageUrl: "../lib/widgets/thermometer/thermometer2.png",    // Thermometer image URL
                     data: {
@@ -195,7 +196,7 @@
                 });
 
                 thermometer3 = new vscp.widget.Thermometer({
-                    connection: vscpConn,           // VSCP connection object
+                    client: vscpClient,             // VSCP websocket client
                     canvasName: "#thermometer3",    // Canvas id
                     imageUrl: "../lib/widgets/thermometer/thermometer3.jpg",    // Thermometer image URL
                     data: {
@@ -216,7 +217,7 @@
                 });
 
                 thermometer4 = new vscp.widget.Thermometer({
-                    connection: vscpConn,           // VSCP connection object
+                    client: vscpClient,             // VSCP websocket client
                     canvasName: "#thermometer4",    // Canvas id
                     imageUrl: "../lib/widgets/thermometer/thermometer4.png",    // Thermometer image URL
                     data: {

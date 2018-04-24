@@ -1,6 +1,6 @@
 // VSCP service javascript library
 //
-// Copyright (c) 2015, 2018 Andreas Merkle
+// Copyright (c) 2015-2018 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -56,10 +56,10 @@ vscp.service.timeout = 5000;
  * Request a response from all nodes on the communication bus and returns
  * their GUID and MDF URL.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.service.whoIsThere = function(options) {
 
@@ -74,8 +74,8 @@ vscp.service.whoIsThere = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -89,7 +89,7 @@ vscp.service.whoIsThere = function(options) {
     }
 
     // Event listener to catch all CLASS1.PROTOCOL who is there responses
-    eventListener = function(conn, evt) {
+    eventListener = function(client, evt) {
 
         var index = 0;
         var seqId = 0;
@@ -131,7 +131,7 @@ vscp.service.whoIsThere = function(options) {
             function() {
                 var interfaceGuid = [];
 
-                options.connection.removeEventListener(eventListener);
+                options.client.removeEventListener(eventListener);
 
                 // Sort data array for GUID and sequence number
                 nodeData.sort(function(a, b) {
@@ -250,7 +250,7 @@ vscp.service.whoIsThere = function(options) {
         0xFF // All nodes shall respond
     ];
 
-    options.connection.sendEvent({
+    options.client.sendEvent({
 
         event: new vscp.Event({
             vscpClass: vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
@@ -259,14 +259,14 @@ vscp.service.whoIsThere = function(options) {
             vscpData: eventData
         }),
 
-        onSuccess: function(conn) {
-            options.connection.addEventListener(eventListener);
+        onSuccess: function(client) {
+            options.client.addEventListener(eventListener);
 
             timerHandle = setTimeout(
                 function() {
                     console.info(vscp.utility.getTime() + " Who is there timeout.");
 
-                    options.connection.removeEventListener(eventListener);
+                    options.client.removeEventListener(eventListener);
 
                     if (null !== onError) {
                         onError();
@@ -276,7 +276,7 @@ vscp.service.whoIsThere = function(options) {
             );
         },
 
-        onError: function(conn) {
+        onError: function(client) {
             console.error(vscp.utility.getTime() + " Who is there failed.");
 
             if (null !== onError) {
@@ -289,12 +289,12 @@ vscp.service.whoIsThere = function(options) {
 /**
  * Scan for nodes.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.begin                - Node id where to start scanning
- * @param {number} options.end                  - Node id where to stop scanning
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.begin            - Node id where to start scanning
+ * @param {number} options.end              - Node id where to stop scanning
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.service.scan = function(options) {
 
@@ -311,8 +311,8 @@ vscp.service.scan = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -336,7 +336,7 @@ vscp.service.scan = function(options) {
     }
 
     // Event listener to catch all CLASS1.PROTOCOL probe responses
-    eventListener = function(conn, evt) {
+    eventListener = function(client, evt) {
 
         if ("undefined" === typeof evt) {
             return;
@@ -362,7 +362,7 @@ vscp.service.scan = function(options) {
         // Store node GUID
         nodes.push(evt.vscpGuid);
 
-        options.connection.removeEventListener(eventListener);
+        options.client.removeEventListener(eventListener);
 
         if (options.end > currentNodeId) {
 
@@ -382,7 +382,7 @@ vscp.service.scan = function(options) {
 
     fnProbe = function(nodeId) {
 
-        options.connection.sendEvent({
+        options.client.sendEvent({
 
             event: new vscp.Event({
                 vscpClass: vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
@@ -391,14 +391,14 @@ vscp.service.scan = function(options) {
                 vscpData: [nodeId]
             }),
 
-            onSuccess: function(conn) {
+            onSuccess: function(client) {
 
-                options.connection.addEventListener(eventListener);
+                options.client.addEventListener(eventListener);
 
                 timerHandle = setTimeout(
                     function() {
 
-                        options.connection.removeEventListener(eventListener);
+                        options.client.removeEventListener(eventListener);
 
                         if (options.end === currentNodeId) {
 
@@ -420,7 +420,7 @@ vscp.service.scan = function(options) {
 
             },
 
-            onError: function(conn) {
+            onError: function(client) {
                 console.error(vscp.utility.getTime() + " Scan failed.");
 
                 if (null !== onError) {
@@ -442,16 +442,16 @@ vscp.service.scan = function(options) {
  * It supports one or more objects in a single variable!
  * @class
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {string} options.name                 - Container name
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {string} options.name             - Container name
  */
 vscp.service.Container = function(options) {
 
-    /** VSCP connection
-     * @member {vscp.Connection}
+    /** VSCP websocket client
+     * @member {vscp.ws.Client}
      */
-    this.connection = null;
+    this.client = null;
     /** Complete container name (prefix + user defined name)
      * @member {string}
      */
@@ -467,8 +467,8 @@ vscp.service.Container = function(options) {
 
     if ("undefined" !== typeof options) {
 
-        if (true === (options.connection instanceof vscp.Connection)) {
-            this.connection = options.connection;
+        if (true === (options.client instanceof vscp.ws.Client)) {
+            this.client = options.client;
         }
 
         if ("string" === typeof options.name) {
@@ -517,7 +517,7 @@ vscp.service.Container.prototype.create = function(options) {
     }
 
     // Store the container in a variable
-    this.connection.createVar({
+    this.client.createVar({
 
         name: this.name,
 
@@ -527,12 +527,12 @@ vscp.service.Container.prototype.create = function(options) {
 
         persistency: true,
 
-        onSuccess: function(conn, variable) {
+        onSuccess: function(client, variable) {
 
             options.onSuccess();
         },
 
-        onError: function(conn) {
+        onError: function(client) {
 
             if (null !== onError) {
                 onError();
@@ -581,7 +581,7 @@ vscp.service.Container.prototype.write = function(options) {
     }
 
     // Store the container in a variable
-    this.connection.writeVar({
+    this.client.writeVar({
 
         name: this.name,
         
@@ -589,12 +589,12 @@ vscp.service.Container.prototype.write = function(options) {
 
         value: container,
 
-        onSuccess: function(conn, variable) {
+        onSuccess: function(client, variable) {
 
             options.onSuccess();
         },
 
-        onError: function(conn) {
+        onError: function(client) {
 
             if (null !== onError) {
                 onError();
@@ -628,11 +628,11 @@ vscp.service.Container.prototype.read = function(options) {
     }
 
     // Read container from variable
-    this.connection.readVar({
+    this.client.readVar({
 
         name: this.name,
 
-        onSuccess: function(conn, variable) {
+        onSuccess: function(client, variable) {
 
             // Clear data container
             this.data = [];
@@ -652,7 +652,7 @@ vscp.service.Container.prototype.read = function(options) {
             options.onSuccess();
         }.bind(this),
 
-        onError: function(conn) {
+        onError: function(client) {
 
             if (null !== onError) {
                 onError();

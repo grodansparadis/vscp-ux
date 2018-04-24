@@ -110,12 +110,13 @@
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
-    <!-- VSCP hash calculation -->
-    <script type="text/javascript" src="../js/md5.js"></script>
+
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
-    <!-- VSCP websocket base library -->
-    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP common core library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <!-- VSCP websocket client library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscpws.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navbar.js"></script>
@@ -124,8 +125,8 @@
 
     <script type="text/javascript" >
 
-            // VSCP websocket connection
-            var vscpConn = null;
+            // VSCP websocket client
+            var vscpClient = null;
 
            // Wait until the whole website is loaded
             $( document ).ready( function() {
@@ -134,10 +135,10 @@
                 navBarMenu.show( "menu", navBarMenu.content );
 
                 // Create a VSCP websocket
-                vscpConn = new vscp.Connection();
+                vscpClient = new vscp.ws.Client();
 
                 // Connect to VSCP server
-                vscpConn.connect({
+                vscpClient.connect({
 
                     url: settings.url,
                     userName: settings.user,
@@ -145,13 +146,13 @@
                     vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain,
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
 
                         // Enable the user interface
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         alert("Couldn't establish a connection or connection lost.");
                     }
 
@@ -195,7 +196,7 @@
 
                 ui.disable();
 
-                vscpConn.createVar({
+                vscpClient.createVar({
 
                     name:           "demovariable",
                     type:           vscp.constants.varTypes.BOOLEAN,    // Optional, defaults to string
@@ -205,12 +206,12 @@
                     persistency:    false,                              // defaults to false (non-persistent)
 
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
                         $("#mystatus").text("'demovariable' successfully created.");
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         $("#mystatus").text("Failed to create 'demovariable'.");
                         ui.enable();
                     }
@@ -222,18 +223,18 @@
 
                 ui.disable();
 
-                vscpConn.writeVar({
+                vscpClient.writeVar({
 
                     name:   "demovariable",
                     value:  "true",
                     type:   vscp.constants.varTypes.BOOLEAN,
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
                         $("#mystatus").text("'demovariable' value successfully set to 'true'.");
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         $("#mystatus").text("Failed to set 'demovariable' value to 'true'.");
                         ui.enable();
                     }
@@ -245,18 +246,18 @@
 
                 ui.disable();
 
-                vscpConn.writeVar({
+                vscpClient.writeVar({
 
                     name:   "demovariable",
                     value:  "false",
                     type:   vscp.constants.varTypes.BOOLEAN,
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
                         $("#mystatus").text("'demovariable' value successfully set to 'false'.");
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         $("#mystatus").text("Failed to set 'demovariable' value to 'false'.");
                         ui.enable();
                     }
@@ -268,16 +269,16 @@
 
                 ui.disable();
 
-                vscpConn.resetVar({
+                vscpClient.resetVar({
 
                     name: "demovariable",
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
                         $("#mystatus").text("'demovariable' value successfully resetted (set to 'false').");
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         $("#mystatus").text("Failed to reset 'demovariable'.");
                         ui.enable();
                     }
@@ -289,16 +290,16 @@
 
                 ui.disable();
 
-                vscpConn.removeVar({
+                vscpClient.removeVar({
 
                     name: "demovariable",
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
                         $("#mystatus").text("'demovariable' was successfully removed.");
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         $("#mystatus").text("Failed to remove 'demovariable'.");
                         ui.enable();
                     }
@@ -310,16 +311,16 @@
 
                 ui.disable();
 
-                vscpConn.lengthVar({
+                vscpClient.lengthVar({
 
                     name: "demovariable",
 
-                    onSuccess: function( conn, options ) {
+                    onSuccess: function( client, options ) {
                         $("#mystatus").text("Length for 'demovariable' is :" + options.length );
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         $("#mystatus").text("Failed to get length for 'demovariable'.");
                         ui.enable();
                     }
@@ -331,16 +332,16 @@
 
                 ui.disable();
 
-                vscpConn.lastChangeVar({
+                vscpClient.lastChangeVar({
 
                     name: "demovariable",
 
-                    onSuccess: function( conn, options ) {
+                    onSuccess: function( client, options ) {
                         $("#mystatus").text( options.name + " was last changed " + options.lastChange + "." );
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         $("#mystatus").text("Failed to get last change time/date for 'demovariable'.");
                         ui.enable();
                     }
@@ -364,11 +365,11 @@
                                                         "</th><th>" + "Persistent" +
                                                         "</th></tr>" );
 
-                vscpConn.listVar({
+                vscpClient.listVar({
 
                     regex: $("#myRegExp").val(),
 
-                    onVariable: function( conn, variable ) {
+                    onVariable: function( client, variable ) {
                         //alert( variable.name + ", " +  variable.type + ", " + variable.persistency );
                         $( "#myVariables" ).append( "<tr><td><b>" + variable.name.toLowerCase() +
                                                         "</b></td><td>" + variable.type +
@@ -378,11 +379,11 @@
                                                         "</td><td>" + variable.persistency + "</td></tr>" );
                     },
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         ui.enable();
                     }
                 });
@@ -393,13 +394,13 @@
 
                 ui.disable();
 
-                vscpConn.saveVar({
+                vscpClient.saveVar({
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
                         ui.enable();
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         ui.enable();
                     }
                 });
@@ -413,9 +414,9 @@
                 if ( true === bMonitor ) {
                     intervalId = setInterval(
                         function () {
-                            vscpConn.readVar({
+                            vscpClient.readVar({
                                 name: "demovariable",
-                                onSuccess: function( conn, options ) {
+                                onSuccess: function( client, options ) {
                                     $("#mystatus").text( "value = " + options.value );
                                     if ( "true" === options.value ) {
                                         document.body.style.backgroundColor = "#00FF00";

@@ -112,7 +112,7 @@
     <div class="container-fluid">
         <h1>VSCP HTML5 progress bar</h1>
         <p>
-            This is just the standard HTML5 progress bar with some extra styling. It is connected to the <b>vscp.Connection</b>
+            This is just the standard HTML5 progress bar with some extra styling. It is connected to the <b>vscp.ws.Client</b>
             and configured to write the value to the progress bars from the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.CONTROL,
                 Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>
             event.
@@ -155,12 +155,13 @@
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
-    <!-- VSCP hash calculation -->
-    <script type="text/javascript" src="../js/md5.js"></script>
+
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
-    <!-- VSCP websocket base library -->
-    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP common core library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <!-- VSCP websocket client library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscpws.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navbar.js"></script>
@@ -174,8 +175,8 @@
             var zone = 1;
             var subZone = 20;
 
-            // VSCP websocket connection
-            var vscpConn = null;
+            // VSCP websocket client
+            var vscpClient = null;
 
             // Wait until the whole website is loaded
             $( document ).ready( function() {
@@ -184,10 +185,10 @@
                 navBarMenu.show( "menu", navBarMenu.content );
 
                 // Create a VSCP websocket
-                vscpConn = new vscp.Connection();
+                vscpClient = new vscp.ws.Client();
 
                 // Connect to VSCP server
-                vscpConn.connect({
+                vscpClient.connect({
 
                     url: settings.url,
                     userName: settings.user,
@@ -195,18 +196,18 @@
                     vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain,
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
 
                         // Start receiving VSCP events
-                        vscpConn.start({
+                        vscpClient.start({
 
-                            onSuccess: function( conn ) {
+                            onSuccess: function( client ) {
 
-                                vscpConn.addEventListener( eventListener );
+                                vscpClient.addEventListener( eventListener );
 
                             },
 
-                            onError: function( conn ) {
+                            onError: function( client ) {
                                 alert("Couldn't start receiving events.");
                             }
 
@@ -214,14 +215,14 @@
 
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         alert("Couldn't establish a connection.");
                     }
 
                 });
             });
 
-            function eventListener( conn, evt ) {
+            function eventListener( client, evt ) {
 
                 if ( "undefined" === typeof evt ) {
                     return;

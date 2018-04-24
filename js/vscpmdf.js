@@ -1,6 +1,6 @@
 // VSCP MDF javascript library
 //
-// Copyright (c) 2015, 2018 Andreas Merkle
+// Copyright (c) 2015-2018 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -836,13 +836,13 @@ vscp.mdf.loadLocal = function(options) {
 /**
  * Read a abstract value.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {object} options.mdf                  - MDF as xml jquery object
- * @param {number} options.id                   - Abstract value id
- * @param {function} options.onSuccess          - Function which is called on a successful operation
- * @param {function} [options.onError]          - Function which is called on a failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {object} options.mdf              - MDF as xml jquery object
+ * @param {number} options.id               - Abstract value id
+ * @param {function} options.onSuccess      - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.mdf.readAbstractValue = function(options) {
 
@@ -859,8 +859,8 @@ vscp.mdf.readAbstractValue = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -999,7 +999,7 @@ vscp.mdf.readAbstractValue = function(options) {
     // Read registers
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1028,14 +1028,14 @@ vscp.mdf.readAbstractValue = function(options) {
 /**
  * Write a abstract value.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {object} options.mdf                  - MDF as xml jquery object
- * @param {number} options.id                   - Abstract value id
- * @param {string} options.value                - Abstract value
- * @param {function} options.onSuccess          - Function which is called on a successful operation
- * @param {function} [options.onError]          - Function which is called on a failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {object} options.mdf              - MDF as xml jquery object
+ * @param {number} options.id               - Abstract value id
+ * @param {string} options.value            - Abstract value
+ * @param {function} options.onSuccess      - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.mdf.writeAbstractValue = function(options) {
 
@@ -1052,8 +1052,8 @@ vscp.mdf.writeAbstractValue = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1197,7 +1197,7 @@ vscp.mdf.writeAbstractValue = function(options) {
     // Write registers
     vscp.register.write({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1226,16 +1226,16 @@ vscp.mdf.writeAbstractValue = function(options) {
 /**
  * Change some bits in a abstract value.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {object} options.mdf                  - MDF as xml jquery object
- * @param {number} options.id                   - Abstract value id
- * @param {number} options.pos                  - Bit position
- * @param {number} options.width                - Bit width
- * @param {string} options.value                - Abstract value
- * @param {function} options.onSuccess          - Function which is called on a successful operation
- * @param {function} [options.onError]          - Function which is called on a failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {object} options.mdf              - MDF as xml jquery object
+ * @param {number} options.id               - Abstract value id
+ * @param {number} options.pos              - Bit position
+ * @param {number} options.width            - Bit width
+ * @param {string} options.value            - Abstract value
+ * @param {function} options.onSuccess      - Function which is called on a successful operation
+ * @param {function} [options.onError]      - Function which is called on a failed operation
  */
 vscp.mdf.writeAbstractBits = function(options) {
 
@@ -1249,8 +1249,8 @@ vscp.mdf.writeAbstractBits = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1295,7 +1295,7 @@ vscp.mdf.writeAbstractBits = function(options) {
     // Read value
     vscp.mdf.readAbstractValue({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 

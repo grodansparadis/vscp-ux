@@ -127,11 +127,11 @@
                     vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain,
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
                         $( "#output" ).append( "<br /><br />Connection establishment successful." );
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         $( "#output" ).append( "<br /><br />Connection establishment failed." );
                     }
 

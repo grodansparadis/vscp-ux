@@ -1,6 +1,6 @@
 // VSCP widget javascript library
 //
-// Copyright (c) 2015, 2018 Andreas Merkle
+// Copyright (c) 2015-2018 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -116,8 +116,8 @@ vscp.widget.Image = function(options) {
  * @param {number} options.onImageUrl           - URL to button which is in on state
  * @param {number} options.x                    - x position of the image in the canvas
  * @param {number} options.y                    - y position of the image in the canvas
- * @param {number} [options.scale]               - Scale factor applied to the button image (default: 1.0)
- * @param {vscp.Connection} options.connection  - VSCP connection, used for event communication
+ * @param {number} [options.scale]              - Scale factor applied to the button image (default: 1.0)
+ * @param {vscp.ws.Client} options.client       - VSCP websocket client, used for event communication
  * @param {boolean} [options.bindToRemoteState] - Bind the button state to the remote state or not (default: false)
  * @param {number} [options.receiveZone]        - Zone where state events will come from (default: 255)
  * @param {number} [options.receiveSubZone]     - Sub-zone where state events will come from (default: 255)
@@ -139,7 +139,7 @@ vscp.widget.Button = function(options) {
     this._idOff = vscp.widget.generateUUID(); // Id used to identify the layer
     this._idDisabled = vscp.widget.generateUUID(); // Id used to identify the layer
 
-    this.connection = null; // VSCP connection
+    this.client = null; // VSCP websocket client
     this.bindToRemoteState = false; // Button state changes only local
     this.index = 0; // Button index (instance number)
     this.receiveZone = 255; // Zone where state events will come from
@@ -192,12 +192,12 @@ vscp.widget.Button = function(options) {
         this.scale = options.scale;
     }
 
-    if ("object" !== typeof options.connection) {
-        console.error(vscp.utility.getTime() + " VSCP connection is missing.");
+    if ("object" !== typeof options.client) {
+        console.error(vscp.utility.getTime() + " VSCP websocket client is missing.");
         return null;
     }
 
-    this.connection = options.connection;
+    this.client = options.client;
 
     if ("boolean" === typeof options.bindToRemoteState) {
         this.bindToRemoteState = options.bindToRemoteState;
@@ -228,7 +228,7 @@ vscp.widget.Button = function(options) {
     }
 
     // Event listener for VSCP events
-    var eventListener = (function(conn, evt) {
+    var eventListener = (function(client, evt) {
 
             if ("undefined" === typeof evt) {
                 return;
@@ -270,7 +270,7 @@ vscp.widget.Button = function(options) {
 
     var onClick = (function(layer) {
 
-        if (null === this.connection) {
+        if (null === this.client) {
             return;
         }
 
@@ -280,7 +280,7 @@ vscp.widget.Button = function(options) {
 
         if (false === this._state) {
 
-            this.connection.sendEvent({
+            this.client.sendEvent({
 
                 event: new vscp.Event({
                     vscpClass: vscp.constants.classes.VSCP_CLASS1_CONTROL,
@@ -293,7 +293,7 @@ vscp.widget.Button = function(options) {
                     ]
                 }),
 
-                onSuccess: (function(conn) {
+                onSuccess: (function(client) {
                     if (false === this.bindToRemoteState) {
                         this._state = true;
                         this.draw();
@@ -303,7 +303,7 @@ vscp.widget.Button = function(options) {
 
         } else {
 
-            this.connection.sendEvent({
+            this.client.sendEvent({
 
                 event: new vscp.Event({
                     vscpClass: vscp.constants.classes.VSCP_CLASS1_CONTROL,
@@ -316,7 +316,7 @@ vscp.widget.Button = function(options) {
                     ]
                 }),
 
-                onSuccess: (function(conn) {
+                onSuccess: (function(client) {
                     if (false === this.bindToRemoteState) {
                         this._state = false;
                         this.draw();
@@ -328,9 +328,9 @@ vscp.widget.Button = function(options) {
     }).bind(this);
 
     // Register the VSCP event handler
-    if ((null !== this.connection) &&
+    if ((null !== this.client) &&
         (true === this.bindToRemoteState)) {
-        this.connection.addEventListener(eventListener);
+        this.client.addEventListener(eventListener);
     }
 
     /* Create
@@ -447,7 +447,7 @@ vscp.widget.Button.prototype.setEnabled = function(value) {
  * @param {number} options.data.yOffset         - Thermometer column height offset from the begin to the first number
  * @param {string} options.data.color           - HTML color, e.g. '#8A0000'
  * @param {number} [options.scale]              - Scale factor applied to the thermometer image (default: 1.0)
- * @param {vscp.Connection} options.connection  - VSCP connection, used for event communication
+ * @param {vscp.ws.Client} options.client       - VSCP websocket client, used for event communication
  * @param {number} [options.receiveZone]        - Zone where state events will come from (default: 255)
  * @param {number} [options.receiveSubZone]     - Sub-zone where state events will come from (default: 255)
  * @param {number} [options.sensorIndex]        - Sensor index (default: 0)
@@ -468,7 +468,7 @@ vscp.widget.Thermometer = function(options) {
     this._idData = vscp.widget.generateUUID(); // Id used to identify the layer
     this._temperature = 0; // Temperature
         
-    this.connection = null; // VSCP connection
+    this.client = null; // VSCP websocket client
     this.decoder = null; // VSCP measurement decoder
     this.sensorIndex = -1; // Sensor index (instance number)
     this.vscpClass = vscp.constants.classes.VSCP_CLASS1_MEASUREMENT; // Measurement class
@@ -587,12 +587,12 @@ vscp.widget.Thermometer = function(options) {
         this.scale = options.scale;
     }
 
-    if ("object" !== typeof options.connection) {
-        console.error(vscp.utility.getTime() + " VSCP connection is missing.");
+    if ("object" !== typeof options.client) {
+        console.error(vscp.utility.getTime() + " VSCP websocket client is missing.");
         return null;
     }
 
-    this.connection = options.connection;
+    this.client = options.client;
 
     if ("number" === typeof options.receiveZone) {
         this.receiveZone = options.receiveZone;
@@ -658,7 +658,7 @@ vscp.widget.Thermometer = function(options) {
 
     // Create a VSCP measurement event decoder
     this.decoder = new vscp.measurement.Decoder({
-        connection: this.connection,
+        connection: this.client,
         onValue: onValue,
         filter: {
             vscpClass: this.vscpClass,

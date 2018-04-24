@@ -1,6 +1,6 @@
 // VSCP register abstraction model javascript library
 //
-// Copyright (c) 2015, 2018 Andreas Merkle
+// Copyright (c) 2015-2018 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -99,14 +99,14 @@ vscp.register.constants = {
 /**
  * Read one or more register values.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {number} [options.page]               - Register page
- * @param {number} options.offset               - Register page offset
- * @param {number} options.count                - Number of registers to read
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {number} [options.page]           - Register page
+ * @param {number} options.offset           - Register page offset
+ * @param {number} options.count            - Number of registers to read
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.read = function(options) {
 
@@ -123,8 +123,8 @@ vscp.register.read = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -166,7 +166,7 @@ vscp.register.read = function(options) {
     }
 
     // Event listener to catch all CLASS1.PROTOCOL extended register read responses
-    eventListener = function(conn, evt) {
+    eventListener = function(client, evt) {
 
         var index = 0;
         var data = [];
@@ -227,7 +227,7 @@ vscp.register.read = function(options) {
                 }
 
                 // Finished
-                options.connection.removeEventListener(eventListener);
+                options.client.removeEventListener(eventListener);
                 options.onSuccess(data);
             }
         }
@@ -243,7 +243,7 @@ vscp.register.read = function(options) {
         count // Number of registers to read.
     ];
 
-    options.connection.sendEvent({
+    options.client.sendEvent({
 
         event: new vscp.Event({
             vscpClass: vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
@@ -252,14 +252,14 @@ vscp.register.read = function(options) {
             vscpData: eventData
         }),
 
-        onSuccess: function(conn) {
-            options.connection.addEventListener(eventListener);
+        onSuccess: function(client) {
+            options.client.addEventListener(eventListener);
 
             timerHandle = setTimeout(
                 function() {
                     console.info(vscp.utility.getTime() + " Read register timeout.");
 
-                    options.connection.removeEventListener(eventListener);
+                    options.client.removeEventListener(eventListener);
 
                     if (null !== onError) {
                         onError();
@@ -269,7 +269,7 @@ vscp.register.read = function(options) {
             );
         },
 
-        onError: function(conn) {
+        onError: function(client) {
             console.error(vscp.utility.getTime() + " Reading register failed.");
 
             if (null !== onError) {
@@ -282,14 +282,14 @@ vscp.register.read = function(options) {
 /**
  * Write one or more register values.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {number} options.page                 - Register page
- * @param {number} options.offset               - Register page offset
- * @param {number[]} options.data               - Data array
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {number} options.page             - Register page
+ * @param {number} options.offset           - Register page offset
+ * @param {number[]} options.data           - Data array
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.write = function(options) {
 
@@ -307,8 +307,8 @@ vscp.register.write = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -341,7 +341,7 @@ vscp.register.write = function(options) {
     }
 
     // Event listener to catch all CLASS1.PROTOCOL extended register write responses
-    eventListener = function(conn, evt) {
+    eventListener = function(client, evt) {
 
         if ("undefined" === typeof evt) {
             return;
@@ -367,7 +367,7 @@ vscp.register.write = function(options) {
 
         // Is register write finished?
         if (0 === count) {
-            options.connection.removeEventListener(eventListener);
+            options.client.removeEventListener(eventListener);
             options.onSuccess();
         } else {
             console.info(vscp.utility.getTime() + " Write register at page " + page + " and offset " + (options.offset + dataIndex) + " to node " + options.nodeId + ".");
@@ -389,7 +389,7 @@ vscp.register.write = function(options) {
                 }
             }
 
-            options.connection.sendEvent({
+            options.client.sendEvent({
 
                 event: new vscp.Event({
                     vscpClass: vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
@@ -398,13 +398,13 @@ vscp.register.write = function(options) {
                     vscpData: eventData
                 }),
 
-                onSuccess: function(conn) {
+                onSuccess: function(client) {
 
                     timerHandle = setTimeout(
                         function() {
                             console.info(vscp.utility.getTime() + " Write register timeout.");
 
-                            options.connection.removeEventListener(eventListener);
+                            options.client.removeEventListener(eventListener);
 
                             if (null !== onError) {
                                 onError();
@@ -414,10 +414,10 @@ vscp.register.write = function(options) {
                     );
                 },
 
-                onError: function(conn) {
+                onError: function(client) {
                     console.error(vscp.utility.getTime() + " Writing register failed.");
 
-                    options.connection.removeEventListener(eventListener);
+                    options.client.removeEventListener(eventListener);
 
                     if (null !== onError) {
                         onError();
@@ -448,7 +448,7 @@ vscp.register.write = function(options) {
         }
     }
 
-    options.connection.sendEvent({
+    options.client.sendEvent({
 
         event: new vscp.Event({
             vscpClass: vscp.constants.classes.VSCP_CLASS1_PROTOCOL,
@@ -457,14 +457,14 @@ vscp.register.write = function(options) {
             vscpData: eventData
         }),
 
-        onSuccess: function(conn) {
-            options.connection.addEventListener(eventListener);
+        onSuccess: function(client) {
+            options.client.addEventListener(eventListener);
 
             timerHandle = setTimeout(
                 function() {
                     console.info(vscp.utility.getTime() + " Write register timeout.");
 
-                    options.connection.removeEventListener(eventListener);
+                    options.client.removeEventListener(eventListener);
 
                     if (null !== onError) {
                         onError();
@@ -474,7 +474,7 @@ vscp.register.write = function(options) {
             );
         },
 
-        onError: function(conn) {
+        onError: function(client) {
             console.error(vscp.utility.getTime() + " Writing register failed.");
 
             if (null !== onError) {
@@ -487,16 +487,16 @@ vscp.register.write = function(options) {
 /**
  * Change some bits of a register.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {number} options.page                 - Register page
- * @param {number} options.offset               - Register page offset
- * @param {number} options.pos                  - Bit position
- * @param {number} options.width                - Bit width
- * @param {number[]} options.data               - Data array
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP connection
+ * @param {number} options.nodeId           - Node id
+ * @param {number} options.page             - Register page
+ * @param {number} options.offset           - Register page offset
+ * @param {number} options.pos              - Bit position
+ * @param {number} options.width            - Bit width
+ * @param {number[]} options.data           - Data array
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.writeBits = function(options) {
 
@@ -512,8 +512,8 @@ vscp.register.writeBits = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -557,7 +557,7 @@ vscp.register.writeBits = function(options) {
     // Read register value
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -591,7 +591,7 @@ vscp.register.writeBits = function(options) {
             // Write changed register value back
             vscp.register.write({
 
-                connection: options.connection,
+                client: options.client,
 
                 nodeId: options.nodeId,
 
@@ -631,11 +631,11 @@ vscp.register.writeBits = function(options) {
 /**
  * Read the alarm status from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readAlarmStatus = function(options) {
 
@@ -646,8 +646,8 @@ vscp.register.readAlarmStatus = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -670,7 +670,7 @@ vscp.register.readAlarmStatus = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -695,11 +695,11 @@ vscp.register.readAlarmStatus = function(options) {
 /**
  * Read the supported VSCP version from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readVscpVersion = function(options) {
 
@@ -710,8 +710,8 @@ vscp.register.readVscpVersion = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -734,7 +734,7 @@ vscp.register.readVscpVersion = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -762,11 +762,11 @@ vscp.register.readVscpVersion = function(options) {
 /**
  * Read the node control flags from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readNodeControlFlags = function(options) {
 
@@ -777,8 +777,8 @@ vscp.register.readNodeControlFlags = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -801,7 +801,7 @@ vscp.register.readNodeControlFlags = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -826,11 +826,11 @@ vscp.register.readNodeControlFlags = function(options) {
 /**
  * Read the user id from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readUserId = function(options) {
 
@@ -841,8 +841,8 @@ vscp.register.readUserId = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -865,7 +865,7 @@ vscp.register.readUserId = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -899,11 +899,11 @@ vscp.register.readUserId = function(options) {
 /**
  * Read the manufacturer device id from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readManufacturerDevId = function(options) {
 
@@ -914,8 +914,8 @@ vscp.register.readManufacturerDevId = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -938,7 +938,7 @@ vscp.register.readManufacturerDevId = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -972,11 +972,11 @@ vscp.register.readManufacturerDevId = function(options) {
 /**
  * Read the manufacturer sub device id from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readManufacturerSubDevId = function(options) {
 
@@ -987,8 +987,8 @@ vscp.register.readManufacturerSubDevId = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1011,7 +1011,7 @@ vscp.register.readManufacturerSubDevId = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1045,11 +1045,11 @@ vscp.register.readManufacturerSubDevId = function(options) {
 /**
  * Read the nickname id from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readNicknameId = function(options) {
 
@@ -1060,8 +1060,8 @@ vscp.register.readNicknameId = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1084,7 +1084,7 @@ vscp.register.readNicknameId = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1109,11 +1109,11 @@ vscp.register.readNicknameId = function(options) {
 /**
  * Read the current selected page from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readSelectedPage = function(options) {
 
@@ -1124,8 +1124,8 @@ vscp.register.readSelectedPage = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1148,7 +1148,7 @@ vscp.register.readSelectedPage = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1182,11 +1182,11 @@ vscp.register.readSelectedPage = function(options) {
 /**
  * Read the firmware version from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readFirmwareVersion = function(options) {
 
@@ -1197,8 +1197,8 @@ vscp.register.readFirmwareVersion = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1221,7 +1221,7 @@ vscp.register.readFirmwareVersion = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1250,11 +1250,11 @@ vscp.register.readFirmwareVersion = function(options) {
 /**
  * Read the bootloader algorithm from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readBootloaderAlgorithm = function(options) {
 
@@ -1265,8 +1265,8 @@ vscp.register.readBootloaderAlgorithm = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1289,7 +1289,7 @@ vscp.register.readBootloaderAlgorithm = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1314,11 +1314,11 @@ vscp.register.readBootloaderAlgorithm = function(options) {
 /**
  * Read the number of used pages from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readUsedPages = function(options) {
 
@@ -1329,8 +1329,8 @@ vscp.register.readUsedPages = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1353,7 +1353,7 @@ vscp.register.readUsedPages = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1378,11 +1378,11 @@ vscp.register.readUsedPages = function(options) {
 /**
  * Read the standard device family code from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readStdDevFamCode = function(options) {
 
@@ -1393,8 +1393,8 @@ vscp.register.readStdDevFamCode = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1417,7 +1417,7 @@ vscp.register.readStdDevFamCode = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1450,11 +1450,11 @@ vscp.register.readStdDevFamCode = function(options) {
 /**
  * Read the standard device type from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readStdDevType = function(options) {
 
@@ -1465,8 +1465,8 @@ vscp.register.readStdDevType = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1489,7 +1489,7 @@ vscp.register.readStdDevType = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1522,11 +1522,11 @@ vscp.register.readStdDevType = function(options) {
 /**
  * Read the GUID from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readGUID = function(options) {
 
@@ -1537,8 +1537,8 @@ vscp.register.readGUID = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1561,7 +1561,7 @@ vscp.register.readGUID = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 
@@ -1586,11 +1586,11 @@ vscp.register.readGUID = function(options) {
 /**
  * Read the MDF URL from a node.
  *
- * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number} options.nodeId               - Node id
- * @param {function} options.onSuccess          - Callback which is called on successful operation
- * @param {function} [options.onError]          - Callback which is called on failed operation
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
+ * @param {function} options.onSuccess      - Callback which is called on successful operation
+ * @param {function} [options.onError]      - Callback which is called on failed operation
  */
 vscp.register.readMdfUrl = function(options) {
 
@@ -1601,8 +1601,8 @@ vscp.register.readMdfUrl = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -1625,7 +1625,7 @@ vscp.register.readMdfUrl = function(options) {
     // Read register
     vscp.register.read({
 
-        connection: options.connection,
+        client: options.client,
 
         nodeId: options.nodeId,
 

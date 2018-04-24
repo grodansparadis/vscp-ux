@@ -1,6 +1,6 @@
 // VSCP wizard javascript library
 //
-// Copyright (c) 2015, 2018 Andreas Merkle
+// Copyright (c) 2015-2018 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -578,9 +578,9 @@ vscp.wizard.Recipe.prototype.parse = function($recipe) {
 /**
  * Write a recipe.
  *
- * @param {object] options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
- * @param {number] options.nodeId               - Node id
+ * @param {object} options                  - Options
+ * @param {vscp.ws.Client} options.client   - VSCP websocket client
+ * @param {number} options.nodeId           - Node id
  */
 vscp.wizard.Recipe.prototype.write = function(options) {
 
@@ -611,7 +611,7 @@ vscp.wizard.Recipe.prototype.write = function(options) {
 
             vscp.writeRegister.writeBits({
 
-                connection: options.connection,
+                client: options.client,
 
                 nodeId: options.nodeId,
 
@@ -636,7 +636,7 @@ vscp.wizard.Recipe.prototype.write = function(options) {
 
             vscp.mdf.writeAbstractBits({
 
-                connection: options.connection,
+                client: options.client,
 
                 nodeId: options.nodeId,
 
@@ -662,7 +662,7 @@ vscp.wizard.Recipe.prototype.write = function(options) {
 
             vscp.register.write({
 
-                connection: options.connection,
+                client: options.client,
 
                 nodeId: options.nodeId,
 
@@ -686,7 +686,7 @@ vscp.wizard.Recipe.prototype.write = function(options) {
 
             vscp.mdf.writeAbstractValue({
 
-                connection: options.connection,
+                client: options.client,
 
                 nodeId: options.nodeId,
 
@@ -716,8 +716,8 @@ vscp.wizard.Recipe.prototype.write = function(options) {
         return;
     }
 
-    if (false === (options.connection instanceof vscp.Connection)) {
-        console.error(vscp.utility.getTime() + " VSCP connection object is missing.");
+    if (false === (options.client instanceof vscp.ws.Client)) {
+        console.error(vscp.utility.getTime() + " VSCP client object is missing.");
         return;
     }
 
@@ -782,7 +782,7 @@ vscp.wizard.Recipe.prototype.write = function(options) {
 /**
  * Get recipes from a MDF in JSON format.
  *
- * @param {object] options      - Options
+ * @param {object} options      - Options
  * @param {object} options.mdf  - The mdf as jquery xml object
  *
  * @return {vscp.wizard.Recipe[]} Recipe array

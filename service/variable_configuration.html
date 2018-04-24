@@ -42,8 +42,8 @@
     <script type="text/javascript">
         /*jshint bitwise: false */
 
-        // VSCP websocket connection
-        var vscpConn = null;
+        // VSCP websocket client
+        var vscpClient = null;
 
         // VSCP variable
         var Variable = function( options ) {
@@ -91,7 +91,7 @@
             navBarMenu.show( "menu", navBarMenu.content );
 
             // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
+            vscpClient = new vscp.ws.Client();
 
             // Connect to VSCP daemon
             connect()
@@ -111,7 +111,7 @@
             var deferred = new $.Deferred();
 
             // Connect to VSCP server
-            vscpConn.connect({
+            vscpClient.connect({
 
                 url: settings.url,
                 userName: settings.user,
@@ -119,11 +119,11 @@
                 vscpkey: settings.vscpkey,
                 authdomain: settings.authdomain, 
 
-                onSuccess: function( conn ) {
+                onSuccess: function( client ) {
                     deferred.resolve();
                 },
 
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Connection lost. Please reload website." );
                     deferred.reject();
                 }
@@ -199,9 +199,9 @@
             ui.disable();
 
             // Request all variables from the VSCP server
-            vscpConn.listVar({
+            vscpClient.listVar({
 
-                onVariable: function( conn, variable ) {
+                onVariable: function( client, variable ) {
 
                     // Store the variable
                     variables.push(
@@ -217,7 +217,7 @@
                     update( 'configuration' );
                 },
 
-                onSuccess: function( conn ) {
+                onSuccess: function( client ) {
 
                     // Clear all variables
                     variables = [];
@@ -226,7 +226,7 @@
                     ui.enable();
                 },
 
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Failed to list all variables." );
 
                     // Enable the user interface
@@ -257,11 +257,11 @@
             ui.disable();
 
             // Write variable value
-            vscpConn.writeVar({
+            vscpClient.writeVar({
                 name: name,
                 value: value,
                 type: type,
-                onSuccess: function( conn, options ) {
+                onSuccess: function( client, options ) {
 
                     // Find variable and set the value
                     for( index = 0; index < variables.length; ++index ) {
@@ -286,7 +286,7 @@
                     // Enable user interface
                     ui.enable();
                 },
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Failed to write " + name + "." );
 
                     // Enable user interface
@@ -305,9 +305,9 @@
             ui.disable();
 
             // Read variable value
-            vscpConn.readVar({
+            vscpClient.readVar({
                 name: name,
-                onSuccess: function( conn, options ) {
+                onSuccess: function( client, options ) {
 
                     // Find variable and set the value
                     for( index = 0; index < variables.length; ++index ) {
@@ -325,7 +325,7 @@
                     // Enable user interface
                     ui.enable();
                 },
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Failed to read " + name + "." );
 
                     // Enable user interface
@@ -344,9 +344,9 @@
             ui.disable();
 
             // Reset variable value
-            vscpConn.resetVar({
+            vscpClient.resetVar({
                 name: name,
-                onSuccess: function( conn, options ) {
+                onSuccess: function( client, options ) {
 
                     // Find variable and set the value
                     for( index = 0; index < variables.length; ++index ) {
@@ -364,7 +364,7 @@
                     // Enable user interface
                     ui.enable();
                 },
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Failed to reset " + name + "." );
 
                     // Enable user interface
@@ -383,9 +383,9 @@
             ui.disable();
 
             // Reset variable value
-            vscpConn.removeVar({
+            vscpClient.removeVar({
                 name: name,
-                onSuccess: function( conn, options ) {
+                onSuccess: function( client, options ) {
 
                     // Find variable and remove it
                     for( index = 0; index < variables.length; ++index ) {
@@ -402,7 +402,7 @@
                     // Enable user interface
                     ui.enable();
                 },
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Failed to remove " + name + "." );
 
                     // Enable user interface
@@ -419,16 +419,16 @@
             ui.disable();
 
             // Get variable length
-            vscpConn.lengthVar({
+            vscpClient.lengthVar({
                 name: name,
-                onSuccess: function( conn, options ) {
+                onSuccess: function( client, options ) {
 
                     BootstrapDialog.alert( name + " length is " + options.length + "." );
 
                     // Enable user interface
                     ui.enable();
                 },
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Failed to get length of " + name + "." );
 
                     // Enable user interface
@@ -445,16 +445,16 @@
             ui.disable();
 
             // Get variable last changed
-            vscpConn.lastChangeVar({
+            vscpClient.lastChangeVar({
                 name: name,
-                onSuccess: function( conn, options ) {
+                onSuccess: function( client, options ) {
 
                     BootstrapDialog.alert( name + " was last changed " + options.lastChange + "." );
 
                     // Enable user interface
                     ui.enable();
                 },
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Failed to get last changed of " + name + "." );
 
                     // Enable user interface
@@ -471,15 +471,15 @@
             ui.disable();
 
             // Get variable last changed
-            vscpConn.saveVar({
-                onSuccess: function( conn, options ) {
+            vscpClient.saveVar({
+                onSuccess: function( client, options ) {
 
                     BootstrapDialog.alert( "All persistent variables saved successful." );
 
                     // Enable user interface
                     ui.enable();
                 },
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Failed to save all persistent variables." );
 
                     // Enable user interface

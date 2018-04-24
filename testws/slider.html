@@ -109,12 +109,13 @@
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
-    <!-- VSCP hash calculation -->
-    <script type="text/javascript" src="../js/md5.js"></script>
+
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
-    <!-- VSCP websocket base library -->
-    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP common core library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <!-- VSCP websocket client library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscpws.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navbar.js"></script>
@@ -123,8 +124,8 @@
 
     <script type="text/javascript">
 
-        // VSCP websocket connection
-        var vscpConn = null;
+        // VSCP websocket client
+        var vscpClient = null;
 
         // Wait until the whole website is loaded
         $( document ).ready( function() {
@@ -133,10 +134,10 @@
             navBarMenu.show( "menu", navBarMenu.content );
 
             // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
+            vscpClient = new vscp.ws.Client();
 
             // Connect to VSCP server
-            vscpConn.connect({
+            vscpClient.connect({
 
                 url: settings.url,
                 userName: settings.user,
@@ -144,10 +145,10 @@
                 vscpkey: settings.vscpkey,
                 authdomain: settings.authdomain,
 
-                onSuccess: function( conn ) {
+                onSuccess: function( client ) {
 
                     // Set filter for CLASS1.INFORMATION
-                    vscpConn.setFilter({
+                    vscpClient.setFilter({
                         filterClass: vscp.constants.classes.VSCP_CLASS1_INFORMATION,
                         maskClass: 0xffff,
                         filterType: vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED,
@@ -155,15 +156,15 @@
                     });
 
                     // Start receiving VSCP events
-                    vscpConn.start({
+                    vscpClient.start({
 
-                        onSuccess: function( conn ) {
+                        onSuccess: function( client ) {
 
-                            vscpConn.addEventListener( eventListener );
+                            vscpClient.addEventListener( eventListener );
 
                         },
 
-                        onError: function( conn ) {
+                        onError: function( client ) {
                             alert("Couldn't start receiving events.");
                         }
 
@@ -171,14 +172,14 @@
 
                 },
 
-                onError: function( conn ) {
+                onError: function( client ) {
                     alert("Couldn't establish a connection.");
                 }
 
             });
         });
 
-        var eventListener = function( conn, evt ) {
+        var eventListener = function( client, evt ) {
 
             var index   = 0;
             var bFound  = false;
@@ -210,7 +211,7 @@
         {
             $( "#sliderText1" ).html( newValue );
 
-            vscpConn.sendEvent({
+            vscpClient.sendEvent({
 
                 event: new vscp.Event({
                     vscpClass:      vscp.constants.classes.VSCP_CLASS1_CONTROL,

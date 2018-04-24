@@ -48,8 +48,8 @@
     <script type="text/javascript">
         /*jshint bitwise: false */
 
-        // VSCP websocket connection
-        var vscpConn = null;
+        // VSCP websocket client
+        var vscpClient = null;
 
         // User interface data
         var ui = {
@@ -82,7 +82,7 @@
             navBarMenu.show( "menu", navBarMenu.content );
 
             // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
+            vscpClient = new vscp.ws.Client();
 
             // Connect to VSCP daemon
             connect()
@@ -104,7 +104,7 @@
             var deferred = new $.Deferred();
 
             // Connect to VSCP server
-            vscpConn.connect({
+            vscpClient.connect({
 
                 url: settings.url,
                 userName: settings.user,
@@ -112,11 +112,11 @@
                 vscpkey: settings.vscpkey,
                 authdomain: settings.authdomain,  
 
-                onSuccess: function( conn ) {
+                onSuccess: function( client ) {
                     deferred.resolve();
                 },
 
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Connection lost. Please reload website." );
                     deferred.reject();
                 }
@@ -131,7 +131,7 @@
             var deferred = new $.Deferred();
 
             // Set filter for CLASS1.Protocol
-            vscpConn.setFilter({
+            vscpClient.setFilter({
 
                 filterClass: 0x0000,
                 maskClass: 0xffff,
@@ -156,13 +156,13 @@
             var deferred = new $.Deferred();
 
             // Start receiving VSCP events
-            vscpConn.start({
+            vscpClient.start({
 
-                onSuccess: function( conn ) {
+                onSuccess: function( client ) {
                     deferred.resolve();
                 },
 
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Server error!" );
                     deferred.reject();
                 }
@@ -179,7 +179,7 @@
             // Initialize node list
             nodeList.init({
 
-                connection: vscpConn,
+                client: vscpClient,
 
                 onSuccess: function() {
                     deferred.resolve();
@@ -222,7 +222,7 @@
 
             vscp.service.whoIsThere({
 
-                connection: vscpConn,
+                client: vscpClient,
 
                 onSuccess: function( nodes ) {
 
@@ -280,7 +280,7 @@
 
             vscp.service.scan({
 
-                connection: vscpConn,
+                client: vscpClient,
 
                 begin: ui.scanFrom(),
 

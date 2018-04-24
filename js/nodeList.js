@@ -1,6 +1,6 @@
 // Node list handling.
 //
-// Copyright (c) 2015, 2018 Andreas Merkle
+// Copyright (c) 2015-2018 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -42,8 +42,8 @@
  */
 var nodeList = (function() {
 
-    var connection = null;  // VSCP connection
-    var container  = null;  // Container for the node list
+    var client      = null;  // VSCP client
+    var container   = null;  // Container for the node list
     
     /**
      * Initializes the node list by
@@ -51,10 +51,10 @@ var nodeList = (function() {
      * - Reading the node list from the daemon
      * - If the node list variable not exists, it will create one
      *
-     * @param {object} options                      - Options
-     * @param {vscp.Connection} options.connection  - VSCP connection
-     * @param {function} options.onSuccess          - Callback which is called on successful operation
-     * @param {function} [options.onError]          - Callback which is called on failed operation
+     * @param {object} options                  - Options
+     * @param {vscp.ws.Client} options.client   - VSCP websocket client
+     * @param {function} options.onSuccess      - Callback which is called on successful operation
+     * @param {function} [options.onError]      - Callback which is called on failed operation
      */
     function init( options ) 
     {
@@ -63,12 +63,12 @@ var nodeList = (function() {
             return;
         }
         
-        if ( true === ( options.connection instanceof vscp.Connection ) ) {
-            connection = options.connection;
+        if ( true === ( options.client instanceof vscp.ws.Client ) ) {
+            client = options.client;
             
             // Create node list container
             container = new vscp.service.Container({
-                connection: connection,
+                client: client,
                 name: "nodeList"
             });
             

@@ -59,12 +59,13 @@
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
-    <!-- VSCP hash calculation -->
-    <script type="text/javascript" src="../js/md5.js"></script>
+
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
-    <!-- VSCP websocket base library -->
-    <script type="text/javascript" src="../js/vscp.js"></script>
+    <!-- VSCP common core library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <!-- VSCP websocket client library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscpws.js"></script>
     <!-- VSCP measurement functions, which are dependend on the VSCP websocket base library -->
     <script type="text/javascript" src="../js/vscpmeasurement.js"></script>
 
@@ -76,8 +77,8 @@
     <script type="text/javascript" >
 
         (function() {
-            // VSCP websocket connection
-            var vscpConn = null;
+            // VSCP websocket client
+            var vscpClient = null;
 
             // Measurement event decoder
             var decoder = null;
@@ -89,10 +90,10 @@
                 navBarMenu.show( "menu", navBarMenu.content );
 
                 // Create a VSCP websocket
-                vscpConn = new vscp.Connection();
+                vscpClient = new vscp.ws.Client();
 
                 // Connect to VSCP server
-                vscpConn.connect({
+                vscpClient.connect({
 
                     url: settings.url,
                     userName: settings.user,
@@ -100,11 +101,11 @@
                     vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain,
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
 
                         // Create a VSCP measurement event decoder
                         decoder = new vscp.measurement.Decoder({
-                            connection: conn,
+                            client: client,
                             onValue: onValue,
                             filter: {
                                 vscpClass: vscp.constants.classes.VSCP_CLASS1_MEASUREMENT,
@@ -114,13 +115,13 @@
                         });
 
                         // Start receiving VSCP events
-                        vscpConn.start({
+                        vscpClient.start({
 
-                            onSuccess: function( conn ) {
+                            onSuccess: function( client ) {
 
                             },
 
-                            onError: function( conn ) {
+                            onError: function( client ) {
                                 alert("Couldn't start receiving events.");
                             }
 
@@ -128,7 +129,7 @@
 
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         alert("Couldn't establish a connection.");
                     }
 

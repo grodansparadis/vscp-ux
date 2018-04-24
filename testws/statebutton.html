@@ -76,10 +76,11 @@
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../js/settings.js"></script>
-    <!-- VSCP hash calculation -->
-    <script type="text/javascript" src="../js/md5.js"></script>
-    <!-- VSCP websocket base library -->
-    <script type="text/javascript" src="../js/vscp.js"></script>
+
+    <!-- VSCP common core library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <!-- VSCP websocket client library -->
+    <script type="text/javascript" src="../js/vscp-js/1.0.0pre/vscpws.js"></script>
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../js/aes-js-3.1.0/index.js"></script>
     <!-- VSCP widget library, dependend on the VSCP websocket base library and jCanvas -->
@@ -96,8 +97,8 @@
 
         (function() {
 
-            // VSCP websocket connection
-            var vscpConn = null;
+            // VSCP websocket client
+            var vscpClient = null;
 
             // Button in the kitchen
             var buttonKitchen = null;
@@ -115,10 +116,10 @@
                 navBarMenu.show( "menu", navBarMenu.content );
 
                 // Create a VSCP websocket
-                vscpConn = new vscp.Connection();
+                vscpClient = new vscp.ws.Client();
 
                 // Connect to VSCP server
-                vscpConn.connect({
+                vscpClient.connect({
 
                     url: settings.url,
                     userName: settings.user,
@@ -126,7 +127,7 @@
                     vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain,
 
-                    onSuccess: function( conn ) {
+                    onSuccess: function( client ) {
 
                         // Initialize canvas
                         // Don't do this without a established connection, because
@@ -134,9 +135,9 @@
                         initCanvas();
 
                         // Start receiving VSCP events
-                        vscpConn.start({
+                        vscpClient.start({
 
-                            onSuccess: function( conn ) {
+                            onSuccess: function( client ) {
 
                                 // The user interface (buttons) make only sense
                                 // in case that the event communication is ready
@@ -145,7 +146,7 @@
                                 buttonLivingRoom.setEnabled( true );
                             },
 
-                            onError: function( conn ) {
+                            onError: function( client ) {
                                 alert("Couldn't start receiving events.");
                             }
 
@@ -153,7 +154,7 @@
 
                     },
 
-                    onError: function( conn ) {
+                    onError: function( client ) {
                         alert("Couldn't establish a connection.");
                     }
 
@@ -171,7 +172,7 @@
 
                 // Create button in the kitchen
                 buttonKitchen = new vscp.widget.Button({
-                    connection: vscpConn,       // VSCP connection object
+                    client: vscpClient,       // VSCP websocket client
                     canvasName: "#myCanvas",    // Canvas id
                     offImageUrl: "../lib/widgets/button/button-off.png",    // Button off image
                     onImageUrl: "../lib/widgets/button/button-on.png",      // Button on image
@@ -188,7 +189,7 @@
 
                 // Create button in study room
                 buttonStudyRoom = new vscp.widget.Button({
-                    connection: vscpConn,       // VSCP connection object
+                    client: vscpClient,       // VSCP websocket client
                     canvasName: "#myCanvas",    // Canvas id
                     offImageUrl: "../lib/widgets/light/lightbulb1_off.png", // Button off image
                     onImageUrl: "../lib/widgets/light/lightbulb1_on.png",   // Button on image
@@ -205,7 +206,7 @@
 
                 // Create button in living room
                 buttonLivingRoom = new vscp.widget.Button({
-                    connection: vscpConn,       // VSCP connection object
+                    client: vscpClient,       // VSCP websocket client
                     canvasName: "#myCanvas",    // Canvas id
                     offImageUrl: "../lib/widgets/button/pressoffo.png", // Button off image
                     onImageUrl: "../lib/widgets/button/pressono.png",   // Button on image

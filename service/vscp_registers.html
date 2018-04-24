@@ -48,8 +48,8 @@
     <script type="text/javascript">
         /*jshint bitwise: false */
 
-        // VSCP websocket connection
-        var vscpConn = null;
+        // VSCP websocket client
+        var vscpClient = null;
 
         // User interface data
         var ui = {
@@ -74,7 +74,7 @@
             navBarMenu.show( "menu", navBarMenu.content );
 
             // Create a VSCP websocket
-            vscpConn = new vscp.Connection();
+            vscpClient = new vscp.ws.Client();
 
             // Connect to VSCP the daemon
             connect()
@@ -96,7 +96,7 @@
             var deferred = new $.Deferred();
 
             // Connect to VSCP server
-            vscpConn.connect({
+            vscpClient.connect({
 
                 url: settings.url,
                 userName: settings.user,
@@ -104,11 +104,11 @@
                 vscpkey: settings.vscpkey,
                 authdomain: settings.authdomain,  
 
-                onSuccess: function( conn ) {
+                onSuccess: function( client ) {
                     deferred.resolve();
                 },
 
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Connection lost. Please reload website." );
                     deferred.reject();
                 }
@@ -123,7 +123,7 @@
             var deferred = new $.Deferred();
 
             // Set filter for CLASS1.Protocol
-            vscpConn.setFilter({
+            vscpClient.setFilter({
 
                 filterClass: 0x0000,
                 maskClass: 0xffff,
@@ -148,13 +148,13 @@
             var deferred = new $.Deferred();
 
             // Start receiving VSCP events
-            vscpConn.start({
+            vscpClient.start({
 
-                onSuccess: function( conn ) {
+                onSuccess: function( client ) {
                     deferred.resolve();
                 },
 
-                onError: function( conn ) {
+                onError: function( client ) {
                     BootstrapDialog.alert( "Server error!" );
                     deferred.reject();
                 }
@@ -171,7 +171,7 @@
             // Initialize node list
             nodeList.init({
 
-                connection: vscpConn,
+                client: vscpClient,
 
                 onSuccess: function() {
                     deferred.resolve();
@@ -258,7 +258,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readAlarmStatus({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -281,7 +281,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readVscpVersion({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -304,7 +304,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readNodeControlFlags({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -327,7 +327,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readUserId({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -350,7 +350,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readManufacturerDevId({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -373,7 +373,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readManufacturerDevId({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -396,7 +396,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readNicknameId({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -419,7 +419,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readSelectedPage({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -442,7 +442,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readFirmwareVersion({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -465,7 +465,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readBootloaderAlgorithm({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -488,7 +488,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readUsedPages({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -511,7 +511,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readStdDevFamCode({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -534,7 +534,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readStdDevType({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -557,7 +557,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readGUID({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 
@@ -580,7 +580,7 @@
             var deferred = new $.Deferred();
 
             vscp.register.readMdfUrl({
-                connection: vscpConn,
+                client: vscpClient,
 
                 nodeId: ui.getNodeId(),
 

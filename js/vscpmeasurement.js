@@ -1,6 +1,6 @@
 // VSCP measurement javascript library
 //
-// Copyright (c) 2015, 2018 Andreas Merkle
+// Copyright (c) 2015-2018 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -516,7 +516,7 @@ vscp.measurement.convertInchToMeter = function(value) {
  * @class
  *
  * @param {object} options                      - Options
- * @param {vscp.Connection} options.connection  - VSCP connection
+ * @param {vscp.ws.Client} options.client       - VSCP websocket client
  * @param {function} options.onValue            - Function which will be called for every received measurement value.
  * @param {object} options.filter               - Filter
  * @param {string} options.filter.vscpGuid      - Node GUID string
@@ -528,10 +528,10 @@ vscp.measurement.convertInchToMeter = function(value) {
  */
 vscp.measurement.Decoder = function(options) {
 
-    /** VSCP connection
-     * @member {Connection}
+    /** VSCP websocket client
+     * @member {vscp.ws.Client}
      */
-    this.connection = null;
+    this.client = null;
     /** Callback which will be called for every received value.
      * @member {function}
      */
@@ -550,8 +550,8 @@ vscp.measurement.Decoder = function(options) {
 
     if ("undefined" !== typeof options) {
 
-        if (true === (options.connection instanceof vscp.Connection)) {
-            this.connection = options.connection;
+        if (true === (options.client instanceof vscp.ws.Client)) {
+            this.client = options.client;
         }
 
         if ("function" === typeof options.onValue) {
@@ -563,8 +563,8 @@ vscp.measurement.Decoder = function(options) {
         }
     }
 
-    if (null !== this.connection) {
-        this.connection.addEventListener(this.eventListener.bind(this));
+    if (null !== this.client) {
+        this.client.addEventListener(this.eventListener.bind(this));
     }
 };
 
@@ -572,10 +572,10 @@ vscp.measurement.Decoder = function(options) {
  * VSCP event listener, which receives, filters and converts every received measurement event.
  * @private
  *
- * @param {vscp.Connection} conn    - VSCP connection
+ * @param {vscp.ws.Client} client   - VSCP connection
  * @param {vscp.Event} evt          - VSCP event
  */
-vscp.measurement.Decoder.prototype.eventListener = function(conn, evt) {
+vscp.measurement.Decoder.prototype.eventListener = function(client, evt) {
 
     var sensorIndex = -1;
     var value = 0;
