@@ -44,6 +44,6 @@ var vscp_ux = {
         minor: vscp.version.minor,
         sub: vscp.version.patch,
         full: ""+vscp.version.major+"."+vscp.version.minor+"."+vscp.version.patch,
-        copyright: "Copyright (c) 2012-2017 Grodans Paradis AB (Paradise of the Frog)"
+        copyright: "Copyright (c) 2012-2018 Grodans Paradis AB (Paradise of the Frog)"
     }
 };
