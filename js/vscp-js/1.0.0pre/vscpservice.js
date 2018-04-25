@@ -260,13 +260,13 @@ vscp.service.whoIsThere = function(options) {
         }),
 
         onSuccess: function(client) {
-            options.client.addEventListener(eventListener);
+            client.addEventListener(eventListener);
 
             timerHandle = setTimeout(
                 function() {
                     console.info(vscp.utility.getTime() + " Who is there timeout.");
 
-                    options.client.removeEventListener(eventListener);
+                    client.removeEventListener(eventListener);
 
                     if (null !== onError) {
                         onError();
@@ -276,7 +276,9 @@ vscp.service.whoIsThere = function(options) {
             );
         },
 
+        /* eslint-disable no-unused-vars */
         onError: function(client) {
+        /* eslint-enable no-unused-vars */
             console.error(vscp.utility.getTime() + " Who is there failed.");
 
             if (null !== onError) {
@@ -393,12 +395,12 @@ vscp.service.scan = function(options) {
 
             onSuccess: function(client) {
 
-                options.client.addEventListener(eventListener);
+                client.addEventListener(eventListener);
 
                 timerHandle = setTimeout(
                     function() {
 
-                        options.client.removeEventListener(eventListener);
+                        client.removeEventListener(eventListener);
 
                         if (options.end === currentNodeId) {
 
@@ -420,7 +422,9 @@ vscp.service.scan = function(options) {
 
             },
 
+            /* eslint-disable no-unused-vars */
             onError: function(client) {
+            /* eslint-enable no-unused-vars */
                 console.error(vscp.utility.getTime() + " Scan failed.");
 
                 if (null !== onError) {
@@ -527,12 +531,16 @@ vscp.service.Container.prototype.create = function(options) {
 
         persistency: true,
 
+        /* eslint-disable no-unused-vars */
         onSuccess: function(client, variable) {
+        /* eslint-enable no-unused-vars */
 
             options.onSuccess();
         },
 
+        /* eslint-disable no-unused-vars */
         onError: function(client) {
+        /* eslint-enable no-unused-vars */
 
             if (null !== onError) {
                 onError();
@@ -589,12 +597,16 @@ vscp.service.Container.prototype.write = function(options) {
 
         value: container,
 
+        /* eslint-disable no-unused-vars */
         onSuccess: function(client, variable) {
+        /* eslint-enable no-unused-vars */
 
             options.onSuccess();
         },
 
+        /* eslint-disable no-unused-vars */
         onError: function(client) {
+        /* eslint-enable no-unused-vars */
 
             if (null !== onError) {
                 onError();
@@ -652,7 +664,9 @@ vscp.service.Container.prototype.read = function(options) {
             options.onSuccess();
         }.bind(this),
 
+        /* eslint-disable no-unused-vars */
         onError: function(client) {
+        /* eslint-enable no-unused-vars */
 
             if (null !== onError) {
                 onError();

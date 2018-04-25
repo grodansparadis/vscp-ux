@@ -176,13 +176,17 @@ vscp.mdf.constants = {
 
             return value;
         },
+        /* eslint-disable no-unused-vars */
         "int64_t": function(data) {
+        /* eslint-enable no-unused-vars */
             // Javascript doesn't support signed 64 bit integer.
             // All numbers in javascript are 64 bit "double" precision IEE754 floating point.
             // The largest positive whole number that can therefore be accurately represented is 2^53
             return 0;
         },
+        /* eslint-disable no-unused-vars */
         "uint64_t": function(data) {
+        /* eslint-enable no-unused-vars */
             // Javascript doesn't support signed 64 bit integer.
             // All numbers in javascript are 64 bit "double" precision IEE754 floating point.
             // The largest positive whole number that can therefore be accurately represented is 2^53
@@ -199,6 +203,7 @@ vscp.mdf.constants = {
             var mask = 0;
             var powerOf2 = 1;
             var exponentSign = false;
+            var prevIndex = 0;
 
             //  1 bit sign
             //  8 bit exponent
@@ -253,7 +258,9 @@ vscp.mdf.constants = {
                 fractional = 1.0 / powerOf2;
             }
 
-            for (index = index; index < 23; ++index) {
+            prevIndex = index;
+
+            for (index = prevIndex; index < 23; ++index) {
                 powerOf2 *= 2; // powerOf2 <<= 1;
 
                 if (0 !== (mantissa & mask)) {
@@ -280,6 +287,7 @@ vscp.mdf.constants = {
             var maskLsb = 0;
             var powerOf2 = 1;
             var exponentSign = false;
+            var prevIndex = 0;
 
             //  1 bit sign
             // 11 bit exponent
@@ -351,7 +359,9 @@ vscp.mdf.constants = {
                 fractional = 1.0 / powerOf2;
             }
 
-            for (index = index; index < 52; ++index) {
+            prevIndex = index;
+
+            for (index = prevIndex; index < 52; ++index) {
                 powerOf2 *= 2; // powerOf2 <<= 1;
 
                 if (0 < maskMsb) {
@@ -377,7 +387,7 @@ vscp.mdf.constants = {
             // yy yy mm dd
             var day = data[3];
             var month = data[2];
-            var year = data[0] * 256 + data[1];
+            var year = (data[0] * 256) + data[1];
 
             return "" + day + "-" + month + "-" + year;
         },
@@ -393,19 +403,19 @@ vscp.mdf.constants = {
             return data;
         },
         "char": function(data) {
-            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL["int8_t"](data);
+            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL.int8_t(data);
         },
         "byte": function(data) {
-            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL["int8_t"](data);
+            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL.int8_t(data);
         },
         "short": function(data) {
-            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL["int16_t"](data);
+            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL.int16_t(data);
         },
         "integer": function(data) {
-            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL["int16_t"](data);
+            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL.int16_t(data);
         },
         "long": function(data) {
-            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL["int32_t"](data);
+            return vscp.mdf.constants.CONVERSION_FROM_DECIMAL.int32_t(data);
         }
     },
 
@@ -441,10 +451,10 @@ vscp.mdf.constants = {
             var dataArray = [];
 
             // Check for limits
-            if (vscp.mdf.constants.RANGE["int8_t"].MAX < data) {
-                data = vscp.mdf.constants.RANGE["int8_t"].MAX;
-            } else if (vscp.mdf.constants.RANGE["int8_t"].MIN > data) {
-                data = vscp.mdf.constants.RANGE["int8_t"].MIN;
+            if (vscp.mdf.constants.RANGE.int8_t.MAX < data) {
+                data = vscp.mdf.constants.RANGE.int8_t.MAX;
+            } else if (vscp.mdf.constants.RANGE.int8_t.MIN > data) {
+                data = vscp.mdf.constants.RANGE.int8_t.MIN;
             }
 
             if (0 > data) {
@@ -459,10 +469,10 @@ vscp.mdf.constants = {
             var dataArray = [];
 
             // Check for limits
-            if (vscp.mdf.constants.RANGE["uint8_t"].MAX < data) {
-                data = vscp.mdf.constants.RANGE["uint8_t"].MAX;
-            } else if (vscp.mdf.constants.RANGE["uint8_t"].MIN > data) {
-                data = vscp.mdf.constants.RANGE["uint8_t"].MIN;
+            if (vscp.mdf.constants.RANGE.uint8_t.MAX < data) {
+                data = vscp.mdf.constants.RANGE.uint8_t.MAX;
+            } else if (vscp.mdf.constants.RANGE.uint8_t.MIN > data) {
+                data = vscp.mdf.constants.RANGE.uint8_t.MIN;
             }
 
             dataArray.push(data);
@@ -473,10 +483,10 @@ vscp.mdf.constants = {
             var dataArray = [];
 
             // Check for limits
-            if (vscp.mdf.constants.RANGE["int16_t"].MAX < data) {
-                data = vscp.mdf.constants.RANGE["int16_t"].MAX;
-            } else if (vscp.mdf.constants.RANGE["int16_t"].MIN > data) {
-                data = vscp.mdf.constants.RANGE["int16_t"].MIN;
+            if (vscp.mdf.constants.RANGE.int16_t.MAX < data) {
+                data = vscp.mdf.constants.RANGE.int16_t.MAX;
+            } else if (vscp.mdf.constants.RANGE.int16_t.MIN > data) {
+                data = vscp.mdf.constants.RANGE.int16_t.MIN;
             }
 
             if (0 > data) {
@@ -492,10 +502,10 @@ vscp.mdf.constants = {
             var dataArray = [];
 
             // Check for limits
-            if (vscp.mdf.constants.RANGE["uint16_t"].MAX < data) {
-                data = vscp.mdf.constants.RANGE["uint16_t"].MAX;
-            } else if (vscp.mdf.constants.RANGE["uint16_t"].MIN > data) {
-                data = vscp.mdf.constants.RANGE["uint16_t"].MIN;
+            if (vscp.mdf.constants.RANGE.uint16_t.MAX < data) {
+                data = vscp.mdf.constants.RANGE.uint16_t.MAX;
+            } else if (vscp.mdf.constants.RANGE.uint16_t.MIN > data) {
+                data = vscp.mdf.constants.RANGE.uint16_t.MIN;
             }
 
             dataArray.push((data >> 8) & 0xFF);
@@ -507,10 +517,10 @@ vscp.mdf.constants = {
             var dataArray = [];
 
             // Check for limits
-            if (vscp.mdf.constants.RANGE["int32_t"].MAX < data) {
-                data = vscp.mdf.constants.RANGE["int32_t"].MAX;
-            } else if (vscp.mdf.constants.RANGE["int32_t"].MIN > data) {
-                data = vscp.mdf.constants.RANGE["int32_t"].MIN;
+            if (vscp.mdf.constants.RANGE.int32_t.MAX < data) {
+                data = vscp.mdf.constants.RANGE.int32_t.MAX;
+            } else if (vscp.mdf.constants.RANGE.int32_t.MIN > data) {
+                data = vscp.mdf.constants.RANGE.int32_t.MIN;
             }
 
             if (0 > data) {
@@ -528,10 +538,10 @@ vscp.mdf.constants = {
             var dataArray = [];
 
             // Check for limits
-            if (vscp.mdf.constants.RANGE["uint32_t"].MAX < data) {
-                data = vscp.mdf.constants.RANGE["uint32_t"].MAX;
-            } else if (vscp.mdf.constants.RANGE["uint32_t"].MIN > data) {
-                data = vscp.mdf.constants.RANGE["uint32_t"].MIN;
+            if (vscp.mdf.constants.RANGE.uint32_t.MAX < data) {
+                data = vscp.mdf.constants.RANGE.uint32_t.MAX;
+            } else if (vscp.mdf.constants.RANGE.uint32_t.MIN > data) {
+                data = vscp.mdf.constants.RANGE.uint32_t.MIN;
             }
 
             dataArray.push((data >> 24) & 0xFF);
@@ -541,35 +551,43 @@ vscp.mdf.constants = {
 
             return dataArray;
         },
+        /* eslint-disable no-unused-vars */
         "int64_t": function(data) {
+        /* eslint-enable no-unused-vars */
             // Javascript doesn't support signed 64 bit integer.
             // All numbers in javascript are 64 bit "double" precision IEE754 floating point.
             // The largest positive whole number that can therefore be accurately represented is 2^53
             return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         },
+        /* eslint-disable no-unused-vars */
         "uint64_t": function(data) {
+        /* eslint-enable no-unused-vars */
             // Javascript doesn't support signed 64 bit integer.
             // All numbers in javascript are 64 bit "double" precision IEE754 floating point.
             // The largest positive whole number that can therefore be accurately represented is 2^53
             return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         },
+        /* eslint-disable no-unused-vars */
         "float": function(data) {
+        /* eslint-enable no-unused-vars */
 
             //  1 bit sign
             //  8 bit exponent
             // 23 bit mantissa
 
-            // TODO
+            // To be implemented
 
             return [0, 0, 0, 0, 0, 0, 0, 0];
         },
+        /* eslint-disable no-unused-vars */
         "double": function(data) {
+        /* eslint-enable no-unused-vars */
 
             //  1 bit sign
             // 11 bit exponent
             // 52 bit mantissa
 
-            // TODO
+            // To be implemented
 
             return [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
         },
@@ -608,19 +626,19 @@ vscp.mdf.constants = {
             return data;
         },
         "char": function(data) {
-            return vscp.mdf.constants.CONVERSION_TO_DECIMAL["int8_t"](data);
+            return vscp.mdf.constants.CONVERSION_TO_DECIMAL.int8_t(data);
         },
         "byte": function(data) {
-            return vscp.mdf.constants.CONVERSION_TO_DECIMAL["int8_t"](data);
+            return vscp.mdf.constants.CONVERSION_TO_DECIMAL.int8_t(data);
         },
         "short": function(data) {
-            return vscp.mdf.constants.CONVERSION_TO_DECIMAL["int16_t"](data);
+            return vscp.mdf.constants.CONVERSION_TO_DECIMAL.int16_t(data);
         },
         "integer": function(data) {
-            return vscp.mdf.constants.CONVERSION_TO_DECIMAL["int16_t"](data);
+            return vscp.mdf.constants.CONVERSION_TO_DECIMAL.int16_t(data);
         },
         "long": function(data) {
-            return vscp.mdf.constants.CONVERSION_TO_DECIMAL["int32_t"](data);
+            return vscp.mdf.constants.CONVERSION_TO_DECIMAL.int32_t(data);
         }
     },
 
@@ -815,14 +833,14 @@ vscp.mdf.loadLocal = function(options) {
 
     reader.readAsText(options.fileRef);
 
-    reader.onload = function(e) {
+    reader.onload = function() {
         var xml = $.parseXML(reader.result);
         var xmlDoc = $(xml);
 
         options.onSuccess(xmlDoc);
     };
 
-    reader.onerror = function(e) {
+    reader.onerror = function() {
 
         if (null !== onError) {
             onError();

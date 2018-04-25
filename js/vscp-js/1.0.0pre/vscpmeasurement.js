@@ -275,58 +275,58 @@ vscp.measurement.decodeClass10 = function(data) {
         case 0: // Bits
         case 1: // Bytes
         case 3: // Integer
-            {
-                for (i = 1; i < data.length; i++) {
-                    newData[i - 1] = data[i];
-                }
-                rval = vscp.measurement.varInteger2Float(newData);
+            for (i = 1; i < data.length; i++) {
+                newData[i - 1] = data[i];
             }
+            rval = vscp.measurement.varInteger2Float(newData);
             break;
 
         case 2: // String
-            {
-                for (i = 1; i < data.length; i++) {
-                    str += String.fromCharCode(data[i]);
-                }
-                rval = parseFloat(str);
+            for (i = 1; i < data.length; i++) {
+                str += String.fromCharCode(data[i]);
             }
+            rval = parseFloat(str);
             break;
+
         case 4: // Normalized integer
-            {
-                exp = data[1];
+            exp = data[1];
 
-                for (i = 2; i < data.length; i++) {
-                    newData[i - 2] = data[i];
-                }
+            for (i = 2; i < data.length; i++) {
+                newData[i - 2] = data[i];
+            }
 
-                rval = vscp.measurement.varInteger2Float(newData);
+            rval = vscp.measurement.varInteger2Float(newData);
 
-                // Handle mantissa
-                if (0 !== (exp & 0x80)) {
-                    exp &= 0x7f;
-                    rval = rval / Math.pow(10, exp);
-                } else {
-                    exp &= 0x7f;
-                    rval = rval * Math.pow(10, exp);
-                }
-
+            // Handle mantissa
+            if (0 !== (exp & 0x80)) {
+                exp &= 0x7f;
+                rval = rval / Math.pow(10, exp);
+            } else {
+                exp &= 0x7f;
+                rval = rval * Math.pow(10, exp);
             }
             break;
+
         case 5: // Floating point
-            {
-                if (5 === data.length) {
-                    sign = data[1] & 0x80; // Negative if != 0
-                    exp = (data[1] & 0x7f) << 1 + (data[2] & 0x80) ? 1 : 0;
-                    mantissa = (data[2] & 0x7f) << 16 + data[3] << 8 + data[4];
-                    // sign * 2^exponent * mantissa
-                    rval = Math.pow(2, exp) * mantissa;
-                    if (sign) rval = -1 * rval;
+            if (5 === data.length) {
+                sign = data[1] & 0x80; // Negative if != 0
+                exp = (data[1] & 0x7f) << 1 + (data[2] & 0x80) ? 1 : 0;
+                mantissa = (data[2] & 0x7f) << 16 + data[3] << 8 + data[4];
+                // sign * 2^exponent * mantissa
+                rval = Math.pow(2, exp) * mantissa;
+                if (sign) {
+                    rval = -1 * rval;
                 }
             }
             break;
+
         case 6: // Reserved
             break;
+
         case 7: // Reserved
+            break;
+
+        default:
             break;
     }
 
@@ -403,7 +403,7 @@ vscp.measurement.decodeClass65Number = function(data) {
  */
 vscp.measurement.convertFahrenheitToKelvin = function(value) {
     var fTempVal = ("string" === typeof value) ? parseFloat(value) : value;
-    var cTempVal = (fTempVal - 32) * (5 / 9) + 273.15;
+    var cTempVal = ((fTempVal - 32) * (5 / 9)) + 273.15;
     return cTempVal;
 };
 

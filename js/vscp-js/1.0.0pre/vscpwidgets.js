@@ -56,7 +56,7 @@ vscp.widget.generateUUID = function() {
 
     var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
         var r = Math.random() * 16 | 0;
-        var v = (c === 'x') ? r : (r & 0x03 | 0x08);
+        var v = (c === 'x') ? r : ((r & 0x03) | 0x08);
         return v.toString(16);
     });
 
@@ -148,7 +148,7 @@ vscp.widget.Button = function(options) {
     this.transmitSubZone = 255; // Sub-zone where button event will be sent to
     this._state = false; // Current button state
 
-    if ("undefined" === typeof(options)) {
+    if ("undefined" === typeof options) {
         console.error(vscp.utility.getTime() + " Options are missing.");
         return null;
     }
@@ -268,7 +268,9 @@ vscp.widget.Button = function(options) {
         })
         .bind(this);
 
+    /* eslint-disable no-unused-vars */
     var onClick = (function(layer) {
+    /* eslint-enable no-unused-vars */
 
         if (null === this.client) {
             return;
@@ -293,7 +295,9 @@ vscp.widget.Button = function(options) {
                     ]
                 }),
 
+                /* eslint-disable no-unused-vars */
                 onSuccess: (function(client) {
+                /* eslint-enable no-unused-vars */
                     if (false === this.bindToRemoteState) {
                         this._state = true;
                         this.draw();
@@ -316,7 +320,9 @@ vscp.widget.Button = function(options) {
                     ]
                 }),
 
+                /* eslint-disable no-unused-vars */
                 onSuccess: (function(client) {
+                /* eslint-enable no-unused-vars */
                     if (false === this.bindToRemoteState) {
                         this._state = false;
                         this.draw();
@@ -362,7 +368,7 @@ vscp.widget.Button = function(options) {
         .addLayer({
             type: 'function',
             name: this._idDisabled,
-            fn: (function(ctx) {
+            fn: (function() {
 
                 var imageWidth = $(this.canvasName).getLayer(this._idOff).width * this.scale;
                 var imageHeight = $(this.canvasName).getLayer(this._idOff).height * this.scale;
@@ -371,18 +377,18 @@ vscp.widget.Button = function(options) {
                     .drawLine({
                         strokeStyle: '#f00',
                         strokeWidth: 2,
-                        x1: (this.x - imageWidth / 2),
-                        y1: (this.y - imageHeight / 2),
-                        x2: (this.x + imageWidth / 2),
-                        y2: (this.y + imageHeight / 2)
+                        x1: (this.x - (imageWidth / 2)),
+                        y1: (this.y - (imageHeight / 2)),
+                        x2: (this.x + (imageWidth / 2)),
+                        y2: (this.y + (imageHeight / 2))
                     })
                     .drawLine({
                         strokeStyle: '#f00',
                         strokeWidth: 2,
-                        x1: (this.x - imageWidth / 2),
-                        y1: (this.y + imageHeight / 2),
-                        x2: (this.x + imageWidth / 2),
-                        y2: (this.y - imageHeight / 2)
+                        x1: (this.x - (imageWidth / 2)),
+                        y1: (this.y + (imageHeight / 2)),
+                        x2: (this.x + (imageWidth / 2)),
+                        y2: (this.y - (imageHeight / 2))
                     });
             }).bind(this),
             visible: true
@@ -488,7 +494,7 @@ vscp.widget.Thermometer = function(options) {
         color: ""
     };
 
-    if ("undefined" === typeof(options)) {
+    if ("undefined" === typeof options) {
         console.error(vscp.utility.getTime() + " Options are missing.");
         return null;
     }
@@ -658,7 +664,7 @@ vscp.widget.Thermometer = function(options) {
 
     // Create a VSCP measurement event decoder
     this.decoder = new vscp.measurement.Decoder({
-        connection: this.client,
+        client: this.client,
         onValue: onValue,
         filter: {
             vscpClass: this.vscpClass,
@@ -684,7 +690,7 @@ vscp.widget.Thermometer = function(options) {
         .addLayer({
             type: 'function',
             name: this._idDisabled,
-            fn: (function(ctx) {
+            fn: (function() {
 
                 var imageWidth = $(this.canvasName).getLayer(this._idThermometer).width * this.scale;
                 var imageHeight = $(this.canvasName).getLayer(this._idThermometer).height * this.scale;
@@ -693,18 +699,18 @@ vscp.widget.Thermometer = function(options) {
                     .drawLine({
                         strokeStyle: '#f00',
                         strokeWidth: 2,
-                        x1: (this.x - imageWidth / 2),
-                        y1: (this.y - imageHeight / 2),
-                        x2: (this.x + imageWidth / 2),
-                        y2: (this.y + imageHeight / 2)
+                        x1: (this.x - (imageWidth / 2)),
+                        y1: (this.y - (imageHeight / 2)),
+                        x2: (this.x + (imageWidth / 2)),
+                        y2: (this.y + (imageHeight / 2))
                     })
                     .drawLine({
                         strokeStyle: '#f00',
                         strokeWidth: 2,
-                        x1: (this.x - imageWidth / 2),
-                        y1: (this.y + imageHeight / 2),
-                        x2: (this.x + imageWidth / 2),
-                        y2: (this.y - imageHeight / 2)
+                        x1: (this.x - (imageWidth / 2)),
+                        y1: (this.y + (imageHeight / 2)),
+                        x2: (this.x + (imageWidth / 2)),
+                        y2: (this.y - (imageHeight / 2))
                     });
             }).bind(this),
             visible: true
@@ -712,7 +718,7 @@ vscp.widget.Thermometer = function(options) {
         .addLayer({
             type: 'function',
             name: this._idData,
-            fn: (function(ctx) {
+            fn: (function() {
 
                 var imageWidth = $(this.canvasName).getLayer(this._idThermometer).width * this.scale;
                 var imageHeight = $(this.canvasName).getLayer(this._idThermometer).height * this.scale;
@@ -735,8 +741,8 @@ vscp.widget.Thermometer = function(options) {
                 $(this.canvasName)
                     .drawRect({
                         fillStyle: this._data.color,
-                        x: (this.x - imageWidth / 2) + realX,
-                        y: (this.y - imageHeight / 2) + realY,
+                        x: (this.x - (imageWidth / 2)) + realX,
+                        y: (this.y - (imageHeight / 2)) + realY,
                         width: realWidth,
                         height: -realYOffset - t,
                         fromCenter: false

@@ -253,7 +253,7 @@ vscp.register.read = function(options) {
         }),
 
         onSuccess: function(client) {
-            options.client.addEventListener(eventListener);
+            client.addEventListener(eventListener);
 
             timerHandle = setTimeout(
                 function() {
@@ -269,7 +269,9 @@ vscp.register.read = function(options) {
             );
         },
 
+        /* eslint-disable no-unused-vars */
         onError: function(client) {
+        /* eslint-enable no-unused-vars */
             console.error(vscp.utility.getTime() + " Reading register failed.");
 
             if (null !== onError) {
@@ -398,13 +400,13 @@ vscp.register.write = function(options) {
                     vscpData: eventData
                 }),
 
-                onSuccess: function(client) {
+                onSuccess: function(wsClient) {
 
                     timerHandle = setTimeout(
                         function() {
                             console.info(vscp.utility.getTime() + " Write register timeout.");
 
-                            options.client.removeEventListener(eventListener);
+                            wsClient.removeEventListener(eventListener);
 
                             if (null !== onError) {
                                 onError();
@@ -414,10 +416,11 @@ vscp.register.write = function(options) {
                     );
                 },
 
-                onError: function(client) {
+                onError: function(wsClient) {
+
                     console.error(vscp.utility.getTime() + " Writing register failed.");
 
-                    options.client.removeEventListener(eventListener);
+                    wsClient.removeEventListener(eventListener);
 
                     if (null !== onError) {
                         onError();
@@ -458,13 +461,13 @@ vscp.register.write = function(options) {
         }),
 
         onSuccess: function(client) {
-            options.client.addEventListener(eventListener);
+            client.addEventListener(eventListener);
 
             timerHandle = setTimeout(
                 function() {
                     console.info(vscp.utility.getTime() + " Write register timeout.");
 
-                    options.client.removeEventListener(eventListener);
+                    client.removeEventListener(eventListener);
 
                     if (null !== onError) {
                         onError();
@@ -474,7 +477,9 @@ vscp.register.write = function(options) {
             );
         },
 
+        /* eslint-disable no-unused-vars */
         onError: function(client) {
+        /* eslint-enable no-unused-vars */
             console.error(vscp.utility.getTime() + " Writing register failed.");
 
             if (null !== onError) {
