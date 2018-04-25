@@ -7,7 +7,7 @@ bootstrap           3.3.7       https://getbootstrap.com/
 bootstrap3-dialog   1.34.6      http://nakupanda.github.io/bootstrap3-dialog/
 d3                  3.5.17      https://d3js.org/
 epoch               0.8.4       
-jcanvas             20.1.4      https://projects.calebevans.me/jcanvas/
+jcanvas             21.0.0      https://projects.calebevans.me/jcanvas/
 jquery              3.2.1       https://jquery.com/
 jquery-migrate      3.0.1
 vscp-js             1.0.0pre    https://github.com/grodansparadis/vscp-js/

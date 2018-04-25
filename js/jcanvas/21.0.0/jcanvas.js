@@ -1,5 +1,5 @@
 /**
- * @license jCanvas v20.1.4
+ * @license jCanvas v21.0.0
  * Copyright 2017 Caleb Evans
  * Released under the MIT license
  */
@@ -35,7 +35,6 @@ var defaults,
 		return Object.prototype.toString.call(operand)
 			.slice(8, -1).toLowerCase();
 	},
-	isFunction = $.isFunction,
 	isPlainObject = $.isPlainObject,
 	// Math constants and functions
 	PI = Math.PI,
@@ -199,6 +198,11 @@ jCanvasObject.prototype = defaults;
 // Determines if the given operand is a string
 function isString(operand) {
 	return (typeOf(operand) === 'string');
+}
+
+// Determines if the given operand is a function
+function isFunction(operand) {
+	return (typeOf(operand) === 'function');
 }
 
 // Determines if the given operand is numeric
@@ -1476,6 +1480,13 @@ $.fn.drawLayers = function drawLayers(args) {
 				$canvas.clearCanvas();
 			}
 
+			// If a completion callback was provided, save it to the canvas data
+			// store so that the function can be passed to drawLayers() again
+			// after any image layers have loaded
+			if (params.complete) {
+				data.drawLayersComplete = params.complete;
+			}
+
 			// Cache the layers array
 			layers = data.layers;
 
@@ -1506,11 +1517,17 @@ $.fn.drawLayers = function drawLayers(args) {
 			// If layer is an image layer
 			if (isImageLayer) {
 				// Stop and wait for drawImage() to resume drawLayers()
-				break;
+				continue;
 			}
 
 			// Store the latest
 			lastIndex = l;
+
+			// Run completion callback (if provided) once all layers have drawn
+			if (params.complete) {
+				params.complete.call($canvases[e]);
+				delete data.drawLayersComplete;
+			}
 
 			// Get first layer that intersects with event coordinates
 			layer = _getIntersectingLayer(data);
@@ -3958,10 +3975,13 @@ $.fn.drawImage = function drawImage(args) {
 				layer._masks = data.transforms.masks.slice(0);
 				if (params._next) {
 					// Draw successive layers
+					var complete = data.drawLayersComplete;
+					delete data.drawLayersComplete;
 					$canvas.drawLayers({
 						clear: false,
 						resetFire: true,
-						index: params._next
+						index: params._next,
+						complete: complete
 					});
 				}
 			}
