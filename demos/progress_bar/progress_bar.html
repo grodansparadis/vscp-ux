@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VSCP progress bar demo</title>
+
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="../../js/bootstrap/3.3.7/css/bootstrap.min.css">
+    
+    <!-- Navigation bar CSS -->
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css">
+    
+    <!-- Favorite icon -->
+    <link rel="icon" href="../../images/favicon.ico">
+    
+    <style>
+        /* Progress 1 */
+        /* Firefox - value portion of progress progress1 */
+        progress#progress1::-moz-progress-bar {
+            background-color: red;
+            -moz-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* Chrome, Safari - value portion of progress bar */
+        progress#progress1::-webkit-progress-value {
+            background-color: red;
+            -webkit-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* All other attributes */
+        progress#progress1 {
+            background-color: #F0F0F0;
+            border: solid #808080 2px;
+            border-radius: 5px;
+            -moz-box-shadow: 3px 3px 3px #C0C0C0;
+            -webkit-box-shadow: 3px 3px 3px #C0C0C0;
+            box-shadow: 3px 3px 3px #C0C0C0;
+            padding: 3px;
+            width: 250px;
+            height: 20px;
+        }
+
+        /* Progress 2 */
+        /* Firefox - value portion of progress progress1 */
+        progress#progress2::-moz-progress-bar {
+            background-color: blue;
+            -moz-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* Chrome, Safari - value portion of progress bar */
+        progress#progress2::-webkit-progress-value {
+            background-color: blue;
+            -webkit-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* All other attributes */
+        progress#progress2 {
+            background-color: #F0F0F0;
+            border: solid #808080 2px;
+            border-radius: 5px;
+            -moz-box-shadow: 3px 3px 3px #C0C0C0;
+            -webkit-box-shadow: 3px 3px 3px #C0C0C0;
+            box-shadow: 3px 3px 3px #C0C0C0;
+            padding: 3px;
+            width: 250px;
+            height: 20px;
+        }
+
+        /* Progress 3 */
+        /* Firefox - value portion of progress progress1 */
+        progress#progress3::-moz-progress-bar {
+            background-color: green;
+            -moz-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* Chrome, Safari - value portion of progress bar */
+        progress#progress3::-webkit-progress-value {
+            background-color: green;
+            -webkit-box-shadow: 1px 1px 1px #333333;
+        }
+
+        /* All other attributes */
+        progress#progress3 {
+            background-color: #F0F0F0;
+            border: solid #808080 2px;
+            border-radius: 5px;
+            -moz-box-shadow: 3px 3px 3px #C0C0C0;
+            -webkit-box-shadow: 3px 3px 3px #C0C0C0;
+            box-shadow: 3px 3px 3px #C0C0C0;
+            padding: 3px;
+            width: 250px;
+            height: 20px;
+        }
+    </style>
+    
+</head>
+
+<body>
+   <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <h1>VSCP progress bar demo</h1>
+        <p>
+            This is just the standard HTML5 progress bar with some extra styling. It is connected to the <b>vscp.ws.Client</b>
+            and configured to write the value to the progress bars from the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.CONTROL,
+                Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>
+            event.
+        </p>
+        <p>
+            You can update the slider by sending
+        </p>
+        <pre>send 0,20,40,0,0,"-",90,1,20</pre>
+        <p>
+            Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
+            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b> there to
+            set the slider value to either 0,10,50 or 100.
+        </p>
+        <div>
+            <progress id="bar" max="100" >33%</progress>
+            <br /><br /><br />
+
+            <progress id="progress1" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
+            <br /><br /><br />
+        </div>
+
+        <div>
+            <progress id="progress2" style="width: 600px; height: 30px;" value="50" max="100"  >33%</progress>
+        </div>
+
+        <div>
+            <progress id="progress3" style="width: 600px; height: 30px;" value="90" max="100"  >33%</progress>
+        </div>
+    </div>
+    
+    <hr />
+    Copyright &copy; 2015-2018 <a href="mailto:vscp@blue-andi.de">Andreas Merkle</a><br />
+    Copyright &copy; 2000-2018 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+
+    <!-- JQuery -->
+    <script type="text/javascript" src="../../js/jquery/3.3.1/jquery-3.3.1.min.js"></script>
+
+    <!-- Bootstrap -->
+    <script type="text/javascript" src="../../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="../../js/settings.js"></script>
+
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../../js/aes-js/3.1.0/index.js"></script>
+    <!-- VSCP common core library -->
+    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <!-- VSCP websocket client library -->
+    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscpws.js"></script>
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script type="text/javascript" src="../../js/navbar.js"></script>
+    
+    <!-- Navigation bar menu structure -->
+    <script type="text/javascript" src="../../js/menu.js"></script>
+
+    <script type="text/javascript" >
+
+        (function() {
+
+            var zone = 1;
+            var subZone = 20;
+
+            // VSCP websocket client
+            var vscpClient = null;
+
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
+
+                // Create a VSCP websocket
+                vscpClient = new vscp.ws.Client();
+
+                // Connect to VSCP server
+                vscpClient.connect({
+
+                    url: settings.url,
+                    userName: settings.user,
+                    password: settings.password,
+                    vscpkey: settings.vscpkey,
+                    authdomain: settings.authdomain,
+
+                    onSuccess: function( client ) {
+
+                        // Start receiving VSCP events
+                        vscpClient.start({
+
+                            onSuccess: function( client ) {
+
+                                vscpClient.addEventListener( eventListener );
+
+                            },
+
+                            onError: function( client ) {
+                                alert("Couldn't start receiving events.");
+                            }
+
+                        });
+
+                    },
+
+                    onError: function( client ) {
+                        alert("Couldn't establish a connection.");
+                    }
+
+                });
+            });
+
+            function eventListener( client, evt ) {
+
+                if ( "undefined" === typeof evt ) {
+                    return;
+                }
+
+                if ( false === ( evt instanceof vscp.Event ) ) {
+                    return;
+                }
+
+                if ( ( vscp.constants.classes.VSCP_CLASS1_INFORMATION === evt.vscpClass ) &&
+                     ( vscp.constants.types.VSCP_TYPE_INFORMATION_LEVEL_CHANGED === evt.vscpType ) &&
+                     ( zone === evt.vscpData[ 1 ] ) &&
+                     ( subZone === evt.vscpData[ 2 ] ) ) {
+
+                    console.debug( evt.vscpData[ 0 ] );
+                    $( "#bar" ).val( evt.vscpData[ 0 ] );
+                    $( "#progress1" ).val( evt.vscpData[ 0 ] );
+                    $( "#progress2" ).val( evt.vscpData[ 0 ] );
+                    $( "#progress3" ).val( evt.vscpData[ 0 ] );
+
+                }
+            };
+
+        })();
+
+    </script>
+
+</body>
+</html>

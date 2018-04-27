@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>VSCP google table demo</title>
+
+    <!-- Don't cache the page -->
+    <meta http-equiv="Pragma" content="no-cache" />
+    <meta http-equiv="Expires" content="-1" />
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" type="text/css" href="../../js/bootstrap/3.3.7/css/bootstrap.min.css">
+    
+    <!-- Navigation bar CSS -->
+    <link rel="stylesheet" type="text/css" href="../../css/custom.css">
+    
+    <!-- Favorite icon -->
+    <link rel="icon" href="../../images/favicon.ico">
+    
+</head>
+<body>
+   <nav class="navbar navbar-default">
+        <div class="container-fluid">
+            <div class="navbar-header">
+                <a class="navbar-brand" href="../index.html"><img src="../../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+            </div>
+            <div id="menu">
+            </div>
+        </div>
+    </nav>
+    <div class="container-fluid">
+        <h1>VSCP google table demo</h1>
+        <p>
+            This demo uses the Table from Google charts to display dynamic temperature measurement values in degrees Celsius. It displays
+            all CLASS1.MEASUREMENT, Type=6/Temperature values that comes from any sensor of that device. That is not just sensoridx=2 aside
+            the other demo do.
+        </p>
+        <p>
+            The <a href="event.html">event.html</a> sample can be used to set temperature values if you don't have live hardware.
+        </p>
+        <h2>Demo</h2>
+        <div id="table_div" style="width: 600px; height: 420px;"></div>  <!-- dimensions is not needed -->
+    </div>
+
+    <hr />
+    Copyright &copy; 2015-2018 <a href="mailto:vscp@blue-andi.de">Andreas Merkle</a><br />
+    Copyright &copy; 2000-2018 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+    
+    <!-- JQuery -->
+    <script type="text/javascript" src="../../js/jquery/3.3.1/jquery-3.3.1.min.js"></script>
+
+    <!-- Bootstrap -->
+    <script type="text/javascript" src="../../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+
+    <!-- VSCP settings -->
+    <script type="text/javascript" src="../../js/settings.js"></script>
+
+    <!-- VSCP encryption/decryption -->
+    <script type="text/javascript" src="../../js/aes-js/3.1.0/index.js"></script>
+    <!-- VSCP common core library -->
+    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <!-- VSCP websocket client library -->
+    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscpws.js"></script>
+    <!-- VSCP measurement functions, which are dependend on the VSCP websocket base library -->
+    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscpmeasurement.js"></script>
+
+    <!-- Google Charts API -->
+    <script type="text/javascript" src="https://www.google.com/jsapi"></script>
+
+    <!-- Boostrap navigation bar helper functions -->
+    <script type="text/javascript" src="../../js/navbar.js"></script>
+    <!-- Navigation bar menu structure -->
+    <script type="text/javascript" src="../../js/menu.js"></script>
+
+    <script type="text/javascript">
+
+        (function() {
+            // VSCP websocket client
+            var vscpClient = null;
+
+            // Measurement event decoder
+            var decoder = null;
+
+            var data = null;
+            var table = null;
+
+            google.load( "visualization", "1", { packages: ["table"] } );
+            google.setOnLoadCallback( drawTable );
+
+            // Wait until the whole website is loaded
+            $( document ).ready( function() {
+
+                // Show navigation bar menu
+                navBarMenu.show( "menu", navBarMenu.content );
+
+                // Create a VSCP websocket
+                vscpClient = new vscp.ws.Client();
+
+                // Connect to VSCP server
+                vscpClient.connect({
+
+                    url: settings.url,
+                    userName: settings.user,
+                    password: settings.password,
+                    vscpkey: settings.vscpkey,
+                    authdomain: settings.authdomain,
+
+                    onSuccess: function( client ) {
+
+                        // Create a VSCP measurement event decoder
+                        decoder = new vscp.measurement.Decoder({
+                            client: client,
+                            onValue: onValue,
+                            filter: {
+                                vscpClass: vscp.constants.classes.VSCP_CLASS1_MEASUREMENT,
+                                vscpType: vscp.constants.types.VSCP_TYPE_MEASUREMENT_TEMPERATURE,
+                                sensorIndex: 2
+                            }
+                        });
+
+                        // Start receiving VSCP events
+                        vscpClient.start({
+
+                            onSuccess: function( client ) {
+
+                            },
+
+                            onError: function( client ) {
+                                alert("Couldn't start receiving events.");
+                            }
+
+                        });
+
+                    },
+
+                    onError: function( client ) {
+                        alert("Couldn't establish a connection.");
+                    }
+
+                });
+            });
+
+            var onValue = function( measurement ) {
+
+                var temperatureCelsius = 0;
+
+                if ( "undefined" === measurement ) {
+                    return;
+                }
+
+                console.log( "Class = " + measurement.event.vscpDateTime );
+                // Temperature in degree Celsius expected
+                switch( measurement.unitId ) {
+
+                    // Kelvin
+                    case 0:
+                        temperatureCelsius = vscp.measurement.convertKelvinToCelsius( measurement.value );
+                        break;
+
+                    // Celsius
+                    case 1:
+                        temperatureCelsius = measurement.value;
+                        break;
+
+                    // Fahrenheit
+                    case 2:
+                        temperatureCelsius = vscp.measurement.convertFahrenheitToCelsius( measurement.value );
+                        break;
+
+                    // Should never happen
+                    default:
+                        break;
+                }
+
+                temperatureCelsius = parseFloat( vscp.measurement.toFixed( temperatureCelsius, 1 ) );
+
+                var dateTime = measurement.event.vscpDateTime;
+
+                data.addRows([
+                    [ dateTime.toISOString(),
+                      measurement.sensorIndex,
+                      temperatureCelsius ]
+                ]);
+                table.draw( data, {showRowNumber: true});
+            };
+
+            function drawTable() {
+
+                data = new google.visualization.DataTable();
+                data.addColumn( 'string', 'Date' );
+                data.addColumn( 'number', 'Sensor idx' );
+                data.addColumn( 'number', 'Temperature' );
+
+                table = new google.visualization.Table( document.getElementById( 'table_div' ) );
+
+                table.draw( data, { showRowNumber: true } );
+            }
+
+        })();
+
+    </script>
+
+</body>
+</html>
