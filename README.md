@@ -1,4 +1,4 @@
-<h1>VSCP & Friends - HTML5 UX components</h1>
+<h1>VSCP & Friends - HTML5 UX demos</h1>
 
 <img src="http://vscp.org/images/logo.png" width="200px" alt="VSCP logo">
 
@@ -66,6 +66,5 @@ send head,class,type,obid,time-stamp,GUID,data1,data2,data3....
 
 <br><br>
 <hr>
-Copyright &copy; 2015-2018 Andreas Merkle <vscp@blue-andi.de>  
+Copyright &copy; 2015-2018 Andreas Merkle (vscp@blue-andi.de)<br />
 Copyright &copy; 2012-2018 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-</div>
