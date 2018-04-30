@@ -595,7 +595,9 @@ vscp.rest.Client = function(config) {
             .then(
                 // Success
                 function(data) {
+                    /* eslint-disable no-unused-vars */
                     return new Promise(function(resolve, reject) {
+                    /* eslint-enable no-unused-vars */
                         var index = 0;
                         var eventList = [];
                         var event = null;
@@ -1069,7 +1071,9 @@ vscp.rest.Client = function(config) {
             .then(
                 // Success
                 function(data) {
+                    /* eslint-disable no-unused-vars */
                     return new Promise(function(resolve, reject) {
+                    /* eslint-enable no-unused-vars */
 
                         if (null !== data.response) {
                             data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartypecode, data.response.varvalue);
@@ -1329,7 +1333,9 @@ vscp.rest.Client = function(config) {
             .then(
                 // Successful
                 function(data) {
+                    /* eslint-disable no-unused-vars */
                     return new Promise(function(resolve, reject) {
+                    /* eslint-enable no-unused-vars */
                         var index = 0;
 
                         if (null !== data.response) {
