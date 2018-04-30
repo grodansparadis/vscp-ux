@@ -42,7 +42,7 @@ var navBarMenu = navBarMenu || {};
 navBarMenu.content = [
     {
         title: "Home",
-        url: "../index.html"
+        url: "index.html"
     },
     {
         title: "General demos",
@@ -50,43 +50,43 @@ navBarMenu.content = [
         dropDown: [
             {
                 title: "Authentication",
-                url: "../../demos/authentication/authentication.html"
+                url: "authentication/authentication.html"
             },
             {
                 title: "Control events",
-                url: "../../demos/control_events/control_events.html"
+                url: "control_events/control_events.html"
             },
             {
                 title: "Button widget demo",
-                url: "../../demos/button_widget/button_widget.html"
+                url: "button_widget/button_widget.html"
             },
             {
                 title: "Variables",
-                url: "../../demos/variables/variables.html"
+                url: "variables/variables.html"
             },
             {
                 title: "Node discovery",
-                url: "../../demos/node_discovery/node_discovery.html"
+                url: "node_discovery/node_discovery.html"
             },
             {
                 title: "Slider",
-                url: "../../demos/slider/slider.html"
+                url: "slider/slider.html"
             },
             {
                 title: "Progress bar",
-                url: "../../demos/progress_bar/progress_bar.html"
+                url: "progress_bar/progress_bar.html"
             },
             {
                 title: "Simple text",
-                url: "../../demos/simple_text/simple_text.html"
+                url: "simple_text/simple_text.html"
             },
             {
                 title: "Thermometer widget demo",
-                url: "../../demos/thermometer_widget/thermometer_widget.html"
+                url: "thermometer_widget/thermometer_widget.html"
             },
             {
                 title: "lm-sensors demo",
-                url: "../../demos/lm_sensors/lm_sensors.html"
+                url: "lm_sensors/lm_sensors.html"
             }
         ]
     },
@@ -96,11 +96,11 @@ navBarMenu.content = [
         dropDown: [
             {
                 title: "Epoch simple",
-                url: "../../demos/epoch_simple/epoch_simple.html"
+                url: "epoch_simple/epoch_simple.html"
             },
             {
                 title: "Dynamic table",
-                url: "../../demos/dynamic_table/dynamic_table.html"
+                url: "dynamic_table/dynamic_table.html"
             }
         ]
     },
@@ -110,15 +110,15 @@ navBarMenu.content = [
         dropDown: [
             {
                 title: "Gauge demo",
-                url: "../../demos/google_gauge/google_gauge.html"
+                url: "google_gauge/google_gauge.html"
             },
             {
                 title: "Line chart demo",
-                url: "../../demos/google_line_chart/google_line_chart.html"
+                url: "google_line_chart/google_line_chart.html"
             },
             {
                 title: "Table demo",
-                url: "../../demos/google_table/google_table.html"
+                url: "google_table/google_table.html"
             }
         ]
     },
@@ -128,7 +128,7 @@ navBarMenu.content = [
         dropDown: [
             {
                 title: "REST demo",
-                url: "../../demos/rest/index.html"
+                url: "rest/rest.html"
             }
         ]
     }

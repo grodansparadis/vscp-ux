@@ -45,9 +45,11 @@ var navBarMenu = navBarMenu || {};
 /**
  * Show a menu in bootstrap style.
  *
+ * @param {string} id HTML tag id
  * @param {object} menu  Menu structure
+ * @param {string} basePath Base path
  */
-navBarMenu.show = function( id, menu ) {
+navBarMenu.show = function( id, menu, basePath ) {
 
     var index       = 0;
     var navigation  = "";
@@ -57,10 +59,17 @@ navBarMenu.show = function( id, menu ) {
     for(index = 0; index < menu.length; ++index ) {
     
         if ( "undefined" !== typeof menu[ index ].dropDown ) {
-            navigation += navBarMenu._dropDown( menu[ index ] );
+            navigation += navBarMenu._dropDown( menu[ index ], basePath );
         }
         else {
-            navigation += '<li><a href="' + menu[ index ].url + '">' + menu[ index ].title + '</a></li>';
+            navigation += '<li><a href="';
+
+            if ( ( "#" !== menu[ index ].url ) &&
+                 ( false === menu[ index ].url.startsWith("javascript:") ) ) {
+                navigation += basePath;
+            }
+
+            navigation += menu[ index ].url + '">' + menu[ index ].title + '</a></li>';
         }
     }
     
@@ -73,16 +82,22 @@ navBarMenu.show = function( id, menu ) {
  * @private
  *
  * @param {object} menu  Menu structure
+ * @param {string} basePath Base path
  *
  * @return {string} HTML drop-down menu part
  */
-navBarMenu._dropDown = function( menu ) {
+navBarMenu._dropDown = function( menu, basePath ) {
     
     var index       = 0;
     var navigation  = "";
     
     navigation += '<li class="dropdown">';
-    navigation += '<a class="dropdown-toggle" data-toggle="dropdown" href="' + menu.url + '">' + menu.title + '';
+    navigation += '<a class="dropdown-toggle" data-toggle="dropdown" href="';
+    if ( ( "#" !== menu.url ) &&
+         ( false === menu.url.startsWith("javascript:") ) ) {
+        navigation += basePath;
+    }
+    navigation += menu.url + '">' + menu.title + '';
     navigation += '<span class="caret"></span></a>';
     navigation += '<ul class="dropdown-menu">';
                         
@@ -92,7 +107,14 @@ navBarMenu._dropDown = function( menu ) {
             navigation += navBarMenu._dropDown( menu.dropDown[ index ] );
         }
         else {
-            navigation += '<li><a href="' + menu.dropDown[ index ].url + '">' + menu.dropDown[ index ].title + '</a></li>';
+            navigation += '<li><a href="';
+            
+            if ( ( "#" !== menu.dropDown[ index ].url ) &&
+                 ( false === menu.dropDown[ index ].url.startsWith("javascript:") ) ) {
+                navigation += basePath;
+            }
+
+            navigation += menu.dropDown[ index ].url + '">' + menu.dropDown[ index ].title + '</a></li>';
         }
     }
     

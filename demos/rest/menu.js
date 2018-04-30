@@ -41,7 +41,7 @@ var navBarMenu = navBarMenu || {};
 
 navBarMenu.content = [{
         title: "Home",
-        url: "../index.html"
+        url: "index.html"
     },
     {
         title: "General REST functionality",
