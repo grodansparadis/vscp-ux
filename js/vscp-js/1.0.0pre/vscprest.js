@@ -47,7 +47,7 @@ vscp._createNS("vscp.rest");
 
 /** The VSCP client class handles the basic REST api of the VSCP daemon.
  * The function interface uses jquery ajax call in the background and will
- * return object with the jquery promise interface.
+ * return a Promise.
  * 
  * @class
  * @param {string}      config                  - Configuration
@@ -117,133 +117,140 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess] - Callback, which is called for successful request.
      * @param {function}    [options.onError]   - Callback, which is called for failed request.
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this._makeRequest = function(options) {
-        var url = this._buildUrl(options.path);
-        var index = 0;
+        return new Promise(function(resolve, reject) {
+            var url = this._buildUrl(options.path);
+            var index = 0;
 
-        if ("undefined" === typeof options) {
-            console.error(vscp.utility.getTime() + " Options are missing.");
-            return $.Deferred().reject(null, 'error', 'Options are missing.');
-        }
-
-        if ("string" !== typeof options.path) {
-            console.error(vscp.utility.getTime() + " Path is missing.");
-            return $.Deferred().reject(null, 'error', 'Path is missing.');
-        }
-
-        if (false === (options.parameter instanceof Array)) {
-            console.error(vscp.utility.getTime() + " Parameter is missing.");
-            return $.Deferred().reject(null, 'error', 'Parameter is missing.');
-        }
-
-        if ("string" !== typeof options.type) {
-            console.error(vscp.utility.getTime() + " Type is missing.");
-            return $.Deferred().reject(null, 'error', 'Type is missing.');
-        }
-
-        // Add all parameter to URL
-        for (index = 0; index < options.parameter.length; ++index) {
-
-            if (0 == index) {
-                url += '?';
-            } else {
-                url += '&';
+            if ("undefined" === typeof options) {
+                console.error(vscp.utility.getTime() + " Options are missing.");
+                reject(Error("Options are missing."));
+                return;
             }
 
-            url += options.parameter[index].name;
-            url += '=';
-            url += options.parameter[index].value;
-        }
+            if ("string" !== typeof options.path) {
+                console.error(vscp.utility.getTime() + " Path is missing.");
+                reject(Error("Path is missing."));
+                return;
+            }
 
-        console.debug(vscp.utility.getTime() + " Make request: " + url);
+            if (false === (options.parameter instanceof Array)) {
+                console.error(vscp.utility.getTime() + " Parameter is missing.");
+                reject(Error("Parameter is missing."));
+                return;
+            }
 
-        return $.ajax({
-                url: url,
-                type: options.type,
-                jsonpCallback: 'handler',
-                cache: true,
-                dataType: 'jsonp'
-            })
-            .then(
-                // On success, manipulate callback and promise data to get harmonized response
-                function(response) {
-                    var defer = $.Deferred();
-                    var data = null;
+            if ("string" !== typeof options.type) {
+                console.error(vscp.utility.getTime() + " Type is missing.");
+                reject(Error("Type is missing."));
+                return;
+            }
 
-                    // Positive response received from VSCP daemon?
-                    if (true === response.success) {
+            // Add all parameter to URL
+            for (index = 0; index < options.parameter.length; ++index) {
+
+                if (0 == index) {
+                    url += '?';
+                } else {
+                    url += '&';
+                }
+
+                url += options.parameter[index].name;
+                url += '=';
+                url += options.parameter[index].value;
+            }
+
+            console.debug(vscp.utility.getTime() + " Make request: " + url);
+
+            return $.ajax({
+                    url: url,
+                    type: options.type,
+                    jsonpCallback: 'handler',
+                    cache: true,
+                    dataType: 'jsonp'
+                })
+                .then(
+                    // On success, manipulate callback and promise data to get harmonized response
+                    function(response) {
+                        var data = null;
+
+                        // Positive response received from VSCP daemon?
+                        if (true === response.success) {
+                            data = {
+                                success: true,
+                                clientError: null,
+                                serverError: null,
+                                response: response
+                            };
+
+                            if ("function" === typeof options.onSuccess) {
+                                options.onSuccess(data);
+                            }
+
+                            resolve(data);
+                            return;
+                        }
+
+                        // Negative response received from VSCP daemon
                         data = {
-                            success: true,
+                            success: false,
                             clientError: null,
                             serverError: null,
                             response: response
-                        };
-
-                        if ("function" === typeof options.onSuccess) {
-                            options.onSuccess(data);
                         }
 
-                        return defer.resolve(data);
-                    }
+                        if ("function" === typeof options.onError) {
+                            options.onError(data);
+                        }
 
-                    // Negative response received from VSCP daemon
-                    data = {
-                        success: false,
-                        clientError: null,
-                        serverError: null,
-                        response: response
-                    }
+                        reject(data);
+                        return;
+                    }.bind(this),
+                    // On error, manipulate callback and promise data to get harmonized response
+                    function(xhr, status, error) {
+                        var data = {
+                            success: false,
+                            clientError: null,
+                            serverError: {
+                                xhr: xhr,
+                                status: status,
+                                error: error
+                            },
+                            response: null
+                        };
 
-                    if ("function" === typeof options.onError) {
-                        options.onError(data);
-                    }
+                        switch (xhr.readyState) {
+                            case 0:
+                                console.error(vscp.utility.getTime() + " Ready state = UNSENT");
+                                break;
+                            case 1:
+                                console.error(vscp.utility.getTime() + " Ready state = OPENED");
+                                break;
+                            case 2:
+                                console.error(vscp.utility.getTime() + " Ready state = HEADERS_RECEIVED");
+                                break;
+                            case 3:
+                                console.error(vscp.utility.getTime() + " Ready state = LOADING");
+                                break;
+                            case 4:
+                                console.error(vscp.utility.getTime() + " Ready state = DONE");
+                                break;
+                            default:
+                                console.error(vscp.utility.getTime() + " Ready state = " + xhr.readyState);
+                                break;
+                        }
 
-                    return defer.reject(data);
-                }.bind(this),
-                // On error, manipulate callback and promise data to get harmonized response
-                function(xhr, status, error) {
-                    var defer = $.Deferred();
-                    var data = {
-                        success: false,
-                        clientError: null,
-                        serverError: {
-                            xhr: xhr,
-                            status: status,
-                            error: error
-                        },
-                        response: null
-                    };
+                        if ("function" === typeof options.onError) {
+                            options.onError(data);
+                        }
 
-                    switch (xhr.readyState) {
-                        case 0:
-                            console.error(vscp.utility.getTime() + " Ready state = UNSENT");
-                            break;
-                        case 1:
-                            console.error(vscp.utility.getTime() + " Ready state = OPENED");
-                            break;
-                        case 2:
-                            console.error(vscp.utility.getTime() + " Ready state = HEADERS_RECEIVED");
-                            break;
-                        case 3:
-                            console.error(vscp.utility.getTime() + " Ready state = LOADING");
-                            break;
-                        case 4:
-                            console.error(vscp.utility.getTime() + " Ready state = DONE");
-                            break;
-                        default:
-                            console.error(vscp.utility.getTime() + " Ready state = " + xhr.readyState);
-                            break;
-                    }
-
-                    if ("function" === typeof options.onError) {
-                        options.onError(data);
-                    }
-
-                    return defer.reject(data);
-                }.bind(this)
-            );
+                        reject(data);
+                        return;
+                    }.bind(this)
+                );
+        }.bind(this));
     };
 
     /** Prepare error object, call error callback and return rejected promise.
@@ -252,21 +259,24 @@ vscp.rest.Client = function(config) {
      * @param {string}      error       - Error description
      * @param {function}    [onError]   - Callback
      * 
-     * @return {object} Rejected jquery promise
+     * @return {object} Rejected Promise
      */
     this._abort = function(error, onError) {
-        var data = {
-            success: false,
-            clientError: error,
-            serverError: null,
-            response: null
-        };
+        return new Promise(function(relsove, reject) {
+            var data = {
+                success: false,
+                clientError: error,
+                serverError: null,
+                response: null
+            };
 
-        if ("function" === typeof onError) {
-            onError(data);
-        }
+            if ("function" === typeof onError) {
+                onError(data);
+            }
 
-        return $.Deferred().reject(data);
+            reject(data);
+            return;
+        });
     };
 
     /** Open a session.
@@ -277,7 +287,7 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess] - Callback, which is called for successful request.
      * @param {function}    [options.onError]   - Callback, which is called for failed request.
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.openSession = function(options) {
 
@@ -344,7 +354,7 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess] - Callback, which is called for successful request.
      * @param {function}    [options.onError]   - Callback, which is called for failed request.
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.closeSession = function(options) {
 
@@ -406,7 +416,7 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess] - Callback, which is called for successful request.
      * @param {function}    [options.onError]   - Callback, which is called for failed request.
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.getStatus = function(options) {
 
@@ -466,7 +476,7 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess] - Callback, which is called for successful request.
      * @param {function}    [options.onError]   - Callback, which is called for failed request.
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.sendEvent = function(options) {
 
@@ -531,7 +541,7 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess] - Callback, which is called for successful request.
      * @param {function}    [options.onError]   - Callback, which is called for failed request.
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.readEvent = function(options) {
 
@@ -585,73 +595,77 @@ vscp.rest.Client = function(config) {
             .then(
                 // Success
                 function(data) {
-                    var defer = $.Deferred();
-                    var index = 0;
-                    var eventList = [];
-                    var event = null;
+                    return new Promise(function(resolve, reject) {
+                        var index = 0;
+                        var eventList = [];
+                        var event = null;
 
-                    if (null !== data.response) {
+                        if (null !== data.response) {
 
-                        // Convert REST jsonp event format to vscp.Event format
-                        for (index = 0; index < data.response.count; ++index) {
-                            event = new vscp.Event({
-                                vscpHead: data.response.event[index].head,
-                                vscpClass: data.response.event[index].vscpClass,
-                                vscpType: data.response.event[index].vscpType,
-                                vscpObId: data.response.event[index].obid,
-                                vscpTimeStamp: data.response.event[index].timestamp,
-                                vscpDateTime: new Date(data.response.event[index].datetime),
-                                vscpGuid: data.response.event[index].guid,
-                                vscpData: data.response.event[index].data
-                            });
-                            eventList.push(event);
+                            // Convert REST jsonp event format to vscp.Event format
+                            for (index = 0; index < data.response.count; ++index) {
+                                event = new vscp.Event({
+                                    vscpHead: data.response.event[index].head,
+                                    vscpClass: data.response.event[index].vscpClass,
+                                    vscpType: data.response.event[index].vscpType,
+                                    vscpObId: data.response.event[index].obid,
+                                    vscpTimeStamp: data.response.event[index].timestamp,
+                                    vscpDateTime: new Date(data.response.event[index].datetime),
+                                    vscpGuid: data.response.event[index].guid,
+                                    vscpData: data.response.event[index].data
+                                });
+                                eventList.push(event);
+                            }
+
+                            data.response.event = eventList;
                         }
 
-                        data.response.event = eventList;
-                    }
-
-                    if ("undefined" !== typeof options) {
-                        if ("function" === typeof options.onSuccess) {
-                            options.onSuccess(data);
+                        if ("undefined" !== typeof options) {
+                            if ("function" === typeof options.onSuccess) {
+                                options.onSuccess(data);
+                            }
                         }
-                    }
 
-                    return defer.resolve(data);
+                        resolve(data);
+                        return;
+                    });
                 }.bind(this),
                 // Error
                 function(data) {
-                    var defer = $.Deferred();
-                    var index = 0;
-                    var eventList = [];
-                    var event = null;
+                    return new Promise(function(resolve, reject) {
+                        var index = 0;
+                        var eventList = [];
+                        var event = null;
 
-                    if (null !== data.response) {
+                        if (null !== data.response) {
 
-                        // Convert REST jsonp event format to vscp.Event format
-                        for (index = 0; index < data.response.count; ++index) {
-                            event = new vscp.Event({
-                                vscpHead: data.response.event[index].head,
-                                vscpClass: data.response.event[index].vscpClass,
-                                vscpType: data.response.event[index].vscpType,
-                                vscpObId: data.response.event[index].obid,
-                                vscpTimeStamp: data.response.event[index].timestamp,
-                                vscpDateTime: new Date(data.response.event[index].datetime),
-                                vscpGuid: data.response.event[index].guid,
-                                vscpData: data.response.event[index].data
-                            });
-                            eventList.push(event);
+                            // Convert REST jsonp event format to vscp.Event format
+                            for (index = 0; index < data.response.count; ++index) {
+                                event = new vscp.Event({
+                                    vscpHead: data.response.event[index].head,
+                                    vscpClass: data.response.event[index].vscpClass,
+                                    vscpType: data.response.event[index].vscpType,
+                                    vscpObId: data.response.event[index].obid,
+                                    vscpTimeStamp: data.response.event[index].timestamp,
+                                    vscpDateTime: new Date(data.response.event[index].datetime),
+                                    vscpGuid: data.response.event[index].guid,
+                                    vscpData: data.response.event[index].data
+                                });
+                                eventList.push(event);
+                            }
+
+                            data.response.event = eventList;
                         }
 
-                        data.response.event = eventList;
-                    }
-
-                    if ("undefined" !== typeof options) {
-                        if ("function" === typeof options.onError) {
-                            options.onError(data);
+                        if ("undefined" !== typeof options) {
+                            if ("function" === typeof options.onError) {
+                                options.onError(data);
+                            }
                         }
-                    }
 
-                    return defer.reject(data);
+                        reject(data);
+                        return;
+                    });
                 }.bind(this)
             );
     };
@@ -670,7 +684,7 @@ vscp.rest.Client = function(config) {
      * @param {function}        [options.onSuccess]         - Function which is called on a successful operation
      * @param {function}        [options.onError]           - Function which is called on a failed operation
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.setFilter = function(options) {
 
@@ -813,7 +827,7 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess] - Callback, which is called for successful request.
      * @param {function}    [options.onError]   - Callback, which is called for failed request.
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.clearQueue = function(options) {
 
@@ -879,7 +893,7 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess]     - Function which is called on a successful operation
      * @param {function}    [options.onError]       - Function which is called on a failed operation
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.createVar = function(options) {
 
@@ -1003,7 +1017,7 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess] - Function which is called on a successful operation
      * @param {function}    [options.onError]   - Function which is called on a failed operation
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.readVar = function(options) {
 
@@ -1055,33 +1069,37 @@ vscp.rest.Client = function(config) {
             .then(
                 // Success
                 function(data) {
-                    var defer = $.Deferred();
+                    return new Promise(function(resolve, reject) {
 
-                    if (null !== data.response) {
-                        data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartypecode, data.response.varvalue);
-                        data.response.varnote = vscp.b64DecodeUnicode(data.response.varnote);
-                    }
+                        if (null !== data.response) {
+                            data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartypecode, data.response.varvalue);
+                            data.response.varnote = vscp.b64DecodeUnicode(data.response.varnote);
+                        }
 
-                    if ("function" === typeof options.onSuccess) {
-                        options.onSuccess(data);
-                    }
+                        if ("function" === typeof options.onSuccess) {
+                            options.onSuccess(data);
+                        }
 
-                    return defer.resolve(data);
+                        resolve(data);
+                        return;
+                    });
                 }.bind(this),
                 // Error
                 function(data) {
-                    var defer = $.Deferred();
+                    return new Promise(function(resolve, reject) {
 
-                    if (null !== data.response) {
-                        data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartypecode, data.response.varvalue);
-                        data.response.varnote = vscp.b64DecodeUnicode(data.response.varnote);
-                    }
+                        if (null !== data.response) {
+                            data.response.varvalue = vscp.decodeValueIfBase64(data.response.vartypecode, data.response.varvalue);
+                            data.response.varnote = vscp.b64DecodeUnicode(data.response.varnote);
+                        }
 
-                    if ("function" === typeof options.onError) {
-                        options.onError(data);
-                    }
+                        if ("function" === typeof options.onError) {
+                            options.onError(data);
+                        }
 
-                    return defer.reject(data);
+                        reject(data);
+                        return;
+                    });
                 }.bind(this)
             );
     };
@@ -1096,7 +1114,7 @@ vscp.rest.Client = function(config) {
      * @param {function} [options.onSuccess]    - Function which is called on a successful operation
      * @param {function} [options.onError]      - Function which is called on a failed operation
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.writeVar = function(options) {
 
@@ -1183,7 +1201,7 @@ vscp.rest.Client = function(config) {
      * @param {function} [options.onSuccess]    - Function which is called on a successful operation
      * @param {function} [options.onError]      - Function which is called on a failed operation
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.removeVar = function(options) {
 
@@ -1250,7 +1268,7 @@ vscp.rest.Client = function(config) {
      * @param {function}    [options.onSuccess] - Function which is called on a successful operation
      * @param {function}    [options.onError]   - Function which is called on a failed operation
      * 
-     * @return {object} jquery promise (deferred object)
+     * @return {object} Promise
      */
     this.listVar = function(options) {
 
@@ -1311,49 +1329,53 @@ vscp.rest.Client = function(config) {
             .then(
                 // Successful
                 function(data) {
-                    var defer = $.Deferred();
-                    var index = 0;
+                    return new Promise(function(resolve, reject) {
+                        var index = 0;
 
-                    if (null !== data.response) {
-                        for (index = 0; index < data.response.count; ++index) {
-                            if ("string" === typeof data.response.variable[index].varvalue) {
-                                data.response.variable[index].varvalue = vscp.decodeValueIfBase64(data.response.variable[index].vartypecode, data.response.variable[index].varvalue);
-                            }
+                        if (null !== data.response) {
+                            for (index = 0; index < data.response.count; ++index) {
+                                if ("string" === typeof data.response.variable[index].varvalue) {
+                                    data.response.variable[index].varvalue = vscp.decodeValueIfBase64(data.response.variable[index].vartypecode, data.response.variable[index].varvalue);
+                                }
 
-                            if ("string" === typeof data.response.variable[index].varnote) {
-                                data.response.variable[index].varnote = vscp.b64DecodeUnicode(data.response.variable[index].varnote);
+                                if ("string" === typeof data.response.variable[index].varnote) {
+                                    data.response.variable[index].varnote = vscp.b64DecodeUnicode(data.response.variable[index].varnote);
+                                }
                             }
                         }
-                    }
 
-                    if ("function" === typeof options.onSuccess) {
-                        options.onSuccess(data);
-                    }
+                        if ("function" === typeof options.onSuccess) {
+                            options.onSuccess(data);
+                        }
 
-                    return defer.resolve(data);
+                        resolve(data);
+                        return;
+                    });
                 }.bind(this),
                 // Error
                 function(data) {
-                    var defer = $.Deferred();
-                    var index = 0;
+                    return new Promise(function(resolve, reject) {
+                        var index = 0;
 
-                    if (null !== data.response) {
-                        for (index = 0; index < data.response.count; ++index) {
-                            if ("string" === typeof data.response.variable[index].varvalue) {
-                                data.response.variable[index].varvalue = vscp.decodeValueIfBase64(data.response.variable[index].vartypecode, data.response.variable[index].varvalue);
-                            }
+                        if (null !== data.response) {
+                            for (index = 0; index < data.response.count; ++index) {
+                                if ("string" === typeof data.response.variable[index].varvalue) {
+                                    data.response.variable[index].varvalue = vscp.decodeValueIfBase64(data.response.variable[index].vartypecode, data.response.variable[index].varvalue);
+                                }
 
-                            if ("string" === typeof data.response.variable[index].varnote) {
-                                data.response.variable[index].varnote = vscp.b64DecodeUnicode(data.response.variable[index].varnote);
+                                if ("string" === typeof data.response.variable[index].varnote) {
+                                    data.response.variable[index].varnote = vscp.b64DecodeUnicode(data.response.variable[index].varnote);
+                                }
                             }
                         }
-                    }
 
-                    if ("function" === typeof options.onError) {
-                        options.onError(data);
-                    }
+                        if ("function" === typeof options.onError) {
+                            options.onError(data);
+                        }
 
-                    return defer.reject(data);
+                        reject(data);
+                        return;
+                    });
                 }.bind(this)
             );
     };

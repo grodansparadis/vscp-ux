@@ -97,7 +97,7 @@
             $(document).ready(function() {
 
                 // Show navigation bar menu
-                navBarMenu.show("menu", navBarMenu.content);
+                navBarMenu.show("menu", navBarMenu.content, "../../demos/");
 
                 // Show current server settings
                 $("#host").html("<b>Host</b>: " + vscpServer);
@@ -128,11 +128,11 @@
                 user: settings.user,
                 password: settings.password
             })
-            .done(function(data) {
+            .then(function(data) {
                 vscpSessionKey = data.response.vscpsession;
                 $("#sessionkey").html("<b>Sessionkey</b>: <font size='2' color='red'>" + data.response.vscpsession + "</font>");
             })
-            .fail(function(data) {
+            .catch(function(data) {
                 if (null !== data.clientError) {
                     $("#sessionkey").html("<font size='2' color='red'><b>Failed to open</b>: " + data.clientError + "</font>");
                 } else if (null !== data.serverError) {
@@ -154,7 +154,7 @@
             if (null !== vscpRestClient) {
 
                 vscpRestClient.closeSession()
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -168,7 +168,7 @@
                         $("#sessionkey").html("<b>Sessionkey</b>: ");
                         $("#nevents").html(" ");
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#sessionkey").html("<font size='2' color='red'><b>Failed to close</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -193,7 +193,7 @@
             if (null !== vscpRestClient) {
 
                 vscpRestClient.getStatus()
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -207,7 +207,7 @@
 
                         $("#nevents").html("<b>Number of events in queue</b>: " + data.response.nEvents);
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#nevents").html("<font size='2' color='red'><b>Failed to get status</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -256,7 +256,7 @@
             if (null !== vscpRestClient) {
 
                 vscpRestClient.readEvent()
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -275,7 +275,7 @@
                             $("#events").html(printEventData(data.response.event[0]));
                         }
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#events").html("<font size='2' color='red'><b>Failed to read event</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -302,7 +302,7 @@
                 vscpRestClient.readEvent({
                     count: 10000
                 })
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -328,7 +328,7 @@
                             $("#nevents").html("It looks like there is no event to read.");
                         };
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#events").html("<font size='2' color='red'><b>Failed to read event</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -360,7 +360,7 @@
                         vscpData:       [ 138, 0, 255 ]
                     })
                 })
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -373,7 +373,7 @@
 
                         $("#events").html("Event sent.");
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#events").html("<font size='2' color='red'><b>Failed to send</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -405,7 +405,7 @@
                     maskClass: 0xffff,
                     maskType: 0xffff
                 })
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -418,7 +418,7 @@
 
                         $("#events").html("Filter set.");
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#events").html("<font size='2' color='red'><b>Failed to set filter</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -450,7 +450,7 @@
                     maskClass: 0x0000,
                     maskType: 0x0000
                 })
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -463,7 +463,7 @@
 
                         $("#events").html("Filter cleared.");
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#events").html("<font size='2' color='red'><b>Failed to clear filter</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -488,7 +488,7 @@
             if (null !== vscpRestClient) {
 
                 vscpRestClient.clearQueue()
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -501,7 +501,7 @@
 
                         $("#events").html("Queue cleared.");
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#events").html("<font size='2' color='red'><b>Failed to clear queue</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -609,7 +609,7 @@
                     value: txtVariableValue,
                     note: txtVariableNote
                 })
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -622,7 +622,7 @@
 
                         $("#log").html("OK Variable written.");
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#log").html("<font size='2' color='red'><b>Failed to create variable</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -651,7 +651,7 @@
                 vscpRestClient.readVar({
                     name: txtVariableName
                 })
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -680,7 +680,7 @@
                                 "<br>Last-change = " + data.response.varlastchange +
                                 "<br>Note = " + data.response.varnote);
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#log").html("<font size='2' color='red'><b>Failed to read variable</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -714,7 +714,7 @@
                     type: vscp.getVarTypeNumerical(txtVariableType),
                     value: txtVariableValue
                 })
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -727,7 +727,7 @@
 
                         $("#log").html("OK Variable written.");
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#log").html("<font size='2' color='red'><b>Failed to write variable</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -756,7 +756,7 @@
                 vscpRestClient.removeVar({
                     name: txtVariableName
                 })
-                .done(function(data) {
+                .then(function(data) {
                         // response will be a JavaScript
                         // array of objects
                         console.log("-----------------------------------------------------------");
@@ -769,7 +769,7 @@
 
                         $("#log").html("OK Variable deleted.");
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#log").html("<font size='2' color='red'><b>Failed to delete variable</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -827,7 +827,7 @@
                     listLong: false,
                     regex: txtRegEx
                 })
-                .done(function(data) {
+                .then(function(data) {
                     var eventtxt = "";
                     var index = 0;
 
@@ -854,7 +854,7 @@
                         $("#nevents").html("It looks like there is no variables to read.");
                     };
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#log").html("<font size='2' color='red'><b>Failed to list variables</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
@@ -888,7 +888,7 @@
                     listLong: true,
                     regex: txtRegEx
                 })
-                .done(function(data) {
+                .then(function(data) {
                     var eventtxt = "";
                     var index = 0;
 
@@ -916,7 +916,7 @@
                         $("#nevents").html("It looks like there is no variables to read.");
                     };
                 })
-                .fail(function(data) {
+                .catch(function(data) {
                     if (null !== data.clientError) {
                         $("#log").html("<font size='2' color='red'><b>Failed to list variables</b>: " + data.clientError + "</font>");
                     } else if (null !== data.serverError) {
