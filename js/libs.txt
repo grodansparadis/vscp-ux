@@ -9,7 +9,6 @@ d3                  3.5.17      https://d3js.org/
 epoch               0.8.4       http://fastly.github.io/epoch/
 jcanvas             21.0.0      https://projects.calebevans.me/jcanvas/
 jquery              3.3.1       https://jquery.com/
-jquery-migrate      3.0.1       https://jquery.com/
 vscp-js             1.0.0pre    https://github.com/grodansparadis/vscp-js/
 
 icons
