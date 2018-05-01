@@ -80,7 +80,7 @@
         $( document ).ready( function() {
 
             // Show navigation bar menu
-            navBarMenu.show( "menu", navBarMenu.content, "../../demos/" );
+            navBarMenu.show( "menu", navBarMenu.content, "../service/" );
 
             // Create a VSCP websocket
             vscpClient = new vscp.ws.Client();
@@ -90,7 +90,7 @@
             .then( setFilter )
             .then( startReceivingEvents )
             .then( initNodeList )
-            .done( function() {
+            .then( function() {
                 // Show the nodes in the list
                 showNodeList();
 
@@ -102,10 +102,8 @@
         // Connect to the VSCP daemon
         function connect()
         {
-            var deferred = new $.Deferred();
-
             // Connect to VSCP server
-            vscpClient.connect({
+            return vscpClient.connect({
 
                 url: settings.url,
                 userName: settings.user,
@@ -113,86 +111,61 @@
                 vscpkey: settings.vscpkey,
                 authdomain: settings.authdomain,  
 
-                onSuccess: function( client ) {
-                    deferred.resolve();
-                },
-
                 onError: function( client ) {
                     BootstrapDialog.alert( "Connection lost. Please reload website." );
-                    deferred.reject();
                 }
             });
-
-            return deferred.promise();
         }
 
         // Set a filter for CLASS1.Protocol
         function setFilter()
         {
-            var deferred = new $.Deferred();
-
             // Set filter for CLASS1.Protocol
-            vscpClient.setFilter({
+            return vscpClient.setFilter({
 
                 filterClass: 0x0000,
                 maskClass: 0xffff,
                 filterType: 0x0000,
                 maskType: 0x0000,
 
-                onSuccess: function() {
-                    deferred.resolve();
-                },
-
-                onError: function() {
-                    deferred.reject();
+                onError: function( client ) {
+                    BootstrapDialog.alert( "Server error!" );
                 }
             });
-
-            return deferred.promise();
         }
 
         // Start receiving VSCP events
         function startReceivingEvents()
         {
-            var deferred = new $.Deferred();
-
             // Start receiving VSCP events
-            vscpClient.start({
-
-                onSuccess: function( client ) {
-                    deferred.resolve();
-                },
+            return vscpClient.start({
 
                 onError: function( client ) {
                     BootstrapDialog.alert( "Server error!" );
-                    deferred.reject();
                 }
             });
-
-            return deferred.promise();
         }
 
         // Initialize global node list
         function initNodeList()
         {
-            var deferred = new $.Deferred();
+            return new Promise(function(resolve, reject) {
 
-            // Initialize node list
-            nodeList.init({
+                // Initialize node list
+                nodeList.init({
 
-                client: vscpClient,
+                    client: vscpClient,
 
-                onSuccess: function() {
-                    deferred.resolve();
-                },
+                    onSuccess: function() {
+                        resolve();
+                    },
 
-                onError: function() {
-                    BootstrapDialog.alert( "Server error!" );
-                    deferred.reject();
-                }
+                    onError: function() {
+                        BootstrapDialog.alert( "Server error!" );
+                        reject();
+                    }
+                });
             });
-
-            return deferred.promise();
         }
 
         // Show the node list

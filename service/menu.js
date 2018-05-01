@@ -80,6 +80,6 @@ navBarMenu.content = [
     },
     {
         title: "Demos",
-        url: "../testws/index.html"
+        url: "../demos/index.html"
     }
 ];
