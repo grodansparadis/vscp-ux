@@ -26,7 +26,8 @@ You should probably compress this javascript file for a production system. There
 
 <h4>Demos</h4>
 
-VSCP websocket demo code is in the subfolder *testws* and VSCP REST demo code is in the subfolder *rest*. The *index.html* file in it will take you to it and give some further instructions. The folder contains a few demos on how to use the VSCP widgets and demonstrates the VSCP daemon websocket and REST interface.
+You will find the demo code in the demo subfolder. The *index.html* file in it will take you to it and give some further instructions.
+The folder contains a few demos on how to use VSCP widgets and demonstrates the VSCP daemon websocket and REST interface.
 
 In the configuration file this is set as
 
