@@ -53,10 +53,6 @@ navBarMenu.content = [
                 url: "dm_std_configuration.html"
             },
             {
-                title: "Configure decision matrix NG",
-                url: "dm_ng_configuration.html"
-            },
-            {
                 title: "Event logger",
                 url: "event_logger.html"
             },
