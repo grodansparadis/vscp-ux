@@ -179,7 +179,7 @@
                 var temperatureCelsius = measurement.value;
                 var temperatureFahrenheit = vscp.measurement.convertCelsiusToFahrenheit( temperatureCelsius );
                 var temperatureKelvin = vscp.measurement.convertCelsiusToKelvin( temperatureCelsius );
-
+ 
                 // Display in Celsius
                 $( "#id1" ).text(
                     vscp.measurement.toFixed( temperatureCelsius, 3 ) + " degrees " + measurement.unit
