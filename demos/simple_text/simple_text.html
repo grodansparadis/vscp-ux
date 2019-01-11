@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -12,20 +13,21 @@
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" type="text/css" href="../../js/bootstrap/3.3.7/css/bootstrap.min.css">
-    
+
     <!-- Navigation bar CSS -->
     <link rel="stylesheet" type="text/css" href="../../css/custom.css">
-    
+
     <!-- Favorite icon -->
     <link rel="icon" href="../../images/favicon.ico">
-    
+
 </head>
 
 <body>
-   <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
-                <a class="navbar-brand" href="../index.html"><img src="../../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
+                <a class="navbar-brand" href="../index.html"><img src="../../images/logo/vscp_new.png" class="img-thumbnail"
+                        width="100" alt="vscp logo" /></a>
             </div>
             <div id="menu">
             </div>
@@ -49,12 +51,16 @@
                 use default settings).
             </li>
             <li>
-                Issue <b>"user admin"</b> and press return and then <b>"pass secret"</b> and press return. You should now
-                be logged into the host (<b>"+OK - Success."</b> should be displayed after the pass command). If you have changed
-                the admin password to something else (and you should!) you should of course use that password instead of 'secret'.
+                Issue <b>"user admin"</b> and press return and then <b>"pass secret"</b> and press return. You should
+                now
+                be logged into the host (<b>"+OK - Success."</b> should be displayed after the pass command). If you
+                have changed
+                the admin password to something else (and you should!) you should of course use that password instead
+                of 'secret'.
             </li>
             <li>
-                Now send an event with <b>send send 0,10,6,0,,0,-,138,0,6</b> This is a simulated temperature measurement in Celsius
+                Now send an event with <b>send send 0,10,6,0,,0,-,138,0,6</b> This is a simulated temperature
+                measurement in Celsius
                 sent from sensor 2 on a remote device and it says 6 degrees Celsius.
             </li>
         </ol>
@@ -69,7 +75,7 @@
             also as <span id="id2" style="color: blue;"></span>. The inline values can be set anywhere
             also in headers and tables as demonstrated below.
         </p>
-        
+
         <div>
             <h1 id="id3"></h1>
         </div>
@@ -81,9 +87,9 @@
     </div>
 
     <hr />
-    Copyright &copy; 2015-2018 <a href="mailto:vscp@blue-andi.de">Andreas Merkle</a><br />
-    Copyright &copy; 2000-2018 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
-    
+    Copyright &copy; 2015-2019 <a href="mailto:vscp@blue-andi.de">Andreas Merkle</a><br />
+    Copyright &copy; 2000-2019 <a href="http://www.grodansparadis.com">Grodans Paradis AB (Paradise of the Frog)</a>
+
     <!-- JQuery -->
     <script type="text/javascript" src="../../js/jquery/3.3.1/jquery-3.3.1.min.js"></script>
 
@@ -108,13 +114,13 @@
 
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../../js/navbar.js"></script>
-    
+
     <!-- Navigation bar menu structure -->
     <script type="text/javascript" src="../../js/menu.js"></script>
 
     <script type="text/javascript">
 
-        (function() {
+        (function () {
             // VSCP websocket client
             var vscpClient = null;
 
@@ -122,10 +128,10 @@
             var decoder = null;
 
             // Wait until the whole website is loaded
-            $( document ).ready( function() {
+            $(document).ready(function () {
 
                 // Show navigation bar menu
-                navBarMenu.show( "menu", navBarMenu.content, "../../demos/" );
+                navBarMenu.show("menu", navBarMenu.content, "../../demos/");
 
                 // Create a VSCP websocket
                 vscpClient = new vscp.ws.Client();
@@ -139,7 +145,7 @@
                     vscpkey: settings.vscpkey,
                     authdomain: settings.authdomain,
 
-                    onSuccess: function( client ) {
+                    onSuccess: function (client) {
 
                         // Create a VSCP measurement event decoder
                         decoder = new vscp.measurement.Decoder({
@@ -155,11 +161,11 @@
                         // Start receiving VSCP events
                         vscpClient.start({
 
-                            onSuccess: function( client ) {
+                            onSuccess: function (client) {
 
                             },
 
-                            onError: function( client ) {
+                            onError: function (client) {
                                 alert("Couldn't start receiving events.");
                             }
 
@@ -167,39 +173,39 @@
 
                     },
 
-                    onError: function( client ) {
+                    onError: function (client) {
                         alert("Couldn't establish a connection.");
                     }
 
                 });
             });
 
-            var onValue = function( measurement ) {
+            var onValue = function (measurement) {
 
                 var temperatureCelsius = measurement.value;
-                var temperatureFahrenheit = vscp.measurement.convertCelsiusToFahrenheit( temperatureCelsius );
-                var temperatureKelvin = vscp.measurement.convertCelsiusToKelvin( temperatureCelsius );
- 
+                var temperatureFahrenheit = vscp.measurement.convertCelsiusToFahrenheit(temperatureCelsius);
+                var temperatureKelvin = vscp.measurement.convertCelsiusToKelvin(temperatureCelsius);
+
                 // Display in Celsius
-                $( "#id1" ).text(
-                    vscp.measurement.toFixed( temperatureCelsius, 3 ) + " degrees " + measurement.unit
+                $("#id1").text(
+                    vscp.measurement.toFixed(temperatureCelsius, 3) + " degrees " + measurement.unit
                 );
 
                 // Display in Fahrenheit
-                $( "#id2" ).text(
-                    vscp.measurement.toFixed( temperatureFahrenheit, 3 ) + " degrees Fahrenheit"
+                $("#id2").text(
+                    vscp.measurement.toFixed(temperatureFahrenheit, 3) + " degrees Fahrenheit"
                 );
 
                 // Display in Kelvin
-                $( "#id3" ).text(
-                    vscp.measurement.toFixed( temperatureKelvin, 3 ) + " degrees Kelvin"
+                $("#id3").text(
+                    vscp.measurement.toFixed(temperatureKelvin, 3) + " degrees Kelvin"
                 );
 
-                $( "#myTable" ).append(
+                $("#myTable").append(
                     "<tr><td>" +
                     "<b>Value</b>=" + measurement.value +
                     ", <b>Unit</b>=" + measurement.unit +
-                    ", <b>Event</b>=" + JSON.stringify( measurement.event ) +
+                    ", <b>Event</b>=" + JSON.stringify(measurement.event) +
                     "</td></tr>"
                 );
             };
@@ -209,4 +215,5 @@
     </script>
 
 </body>
+
 </html>
