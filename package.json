@@ -1,0 +1,25 @@
+{
+  "name": "vscp-ux",
+  "version": "1.0.0",
+  "description": "<h1>VSCP & Friends - HTML5 UX demos</h1>",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/grodansparadis/vscp-ux.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/grodansparadis/vscp-ux/issues"
+  },
+  "homepage": "https://github.com/grodansparadis/vscp-ux#readme",
+  "devDependencies": {
+    "eslint": "^6.6.0"
+  }
+}
