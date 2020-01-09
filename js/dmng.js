@@ -1,6 +1,6 @@
 // VSCP decision matrix Next Generation
 //
-// Copyright (c) 2015-2019 Andreas Merkle
+// Copyright (c) 2015-2020 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -9,7 +9,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2019 Paradise of the Frog/Grodans Paradis AB
+// Copyright (c) 2012-2020 Paradise of the Frog/Grodans Paradis AB
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
