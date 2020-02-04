@@ -32,7 +32,7 @@
 // THE SOFTWARE.
 //
 // Alternative licenses for VSCP & Friends may be arranged by contacting
-// Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
+// Grodans Paradis AB at info@grodansparadis.com, https://www.grodansparadis.com
 //
 
 /*
