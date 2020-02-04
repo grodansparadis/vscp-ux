@@ -1,5 +1,5 @@
 // Menu definition
-// Copyright (c) 2015-2020 Andreas Merkle
+// Copyright © 2015-2020 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -8,7 +8,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2020 Grodans Paradis AB (Paradise of the Frog)
+// Copyright © 2012-2020 Ake Hedman, Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
