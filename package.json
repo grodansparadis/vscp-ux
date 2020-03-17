@@ -21,5 +21,8 @@
   "homepage": "https://github.com/grodansparadis/vscp-ux#readme",
   "devDependencies": {
     "eslint": "^6.6.0"
+  },
+  "dependencies": {
+    "minimist": "^1.2.5"
   }
 }
