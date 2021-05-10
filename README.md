@@ -60,5 +60,5 @@ send head,class,type,obid,time-stamp,GUID,data1,data2,data3....
 
 <br><br>
 <hr>
-Copyright &copy; 2015-2020 Andreas Merkle (vscp@blue-andi.de)<br />
+Copyright &copy; 2015-2021 Andreas Merkle (vscp@blue-andi.de)<br />
 Copyright &copy; 2012-2020 <a href="https://www.grodansparadis.com">Ake Hedman, Grodans Paradis AB</a>
