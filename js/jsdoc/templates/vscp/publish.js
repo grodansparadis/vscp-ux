@@ -10,7 +10,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2015 Paradise of the Frog/Grodans Paradis AB
+// Copyright (c) 2012-2015 Paradise of the Frog/the VSCP Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -31,7 +31,7 @@
 // THE SOFTWARE.
 //
 // Alternative licenses for VSCP & Friends may be arranged by contacting
-// Grodans Paradis AB at info@grodansparadis.com, https://www.grodansparadis.com
+// the VSCP Project at info@grodansparadis.com, https://www.grodansparadis.com
 //
 'use strict';
 

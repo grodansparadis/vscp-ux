@@ -1,5 +1,5 @@
 // VSCP REST API javascript library
-// Copyright (c) 2017-2020 Andreas Merkle
+// Copyright (c) 2017 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -8,7 +8,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright © 2012-2021 Ake Hedman, Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2020 Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -29,7 +29,7 @@
 // THE SOFTWARE.
 //
 // Alternative licenses for VSCP & Friends may be arranged by contacting
-// Grodans Paradis AB at info@grodansparadis.com, https://www.grodansparadis.com
+// Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
 //
 
 /* eslint-env jquery */
@@ -606,11 +606,10 @@ vscp.rest.Client = function(config) {
 
                             // Convert REST jsonp event format to vscp.Event format
                             for (index = 0; index < data.response.count; ++index) {
-                                
                                 event = new vscp.Event({
                                     vscpHead: data.response.event[index].head,
-                                    vscpClass: data.response.event[index].vscpclass,
-                                    vscpType: data.response.event[index].vscptype,
+                                    vscpClass: data.response.event[index].vscpClass,
+                                    vscpType: data.response.event[index].vscpType,
                                     vscpObId: data.response.event[index].obid,
                                     vscpTimeStamp: data.response.event[index].timestamp,
                                     vscpDateTime: new Date(data.response.event[index].datetime),
@@ -646,8 +645,8 @@ vscp.rest.Client = function(config) {
                             for (index = 0; index < data.response.count; ++index) {
                                 event = new vscp.Event({
                                     vscpHead: data.response.event[index].head,
-                                    vscpClass: data.response.event[index].vscpclass,
-                                    vscpType: data.response.event[index].vscptype,
+                                    vscpClass: data.response.event[index].vscpClass,
+                                    vscpType: data.response.event[index].vscpType,
                                     vscpObId: data.response.event[index].obid,
                                     vscpTimeStamp: data.response.event[index].timestamp,
                                     vscpDateTime: new Date(data.response.event[index].datetime),

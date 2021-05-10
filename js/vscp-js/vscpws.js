@@ -2,7 +2,7 @@
 //
 // Copyright (C) 2012-2020 Ake Hedman, Grodans Paradis AB
 // <akhe@grodansparadis.com>
-// Copyright © 2015-2021 Andreas Merkle
+// Copyright (c) 2015-2020 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -11,7 +11,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright © 2012-2021 Ake Hedman, Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2020 Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 // THE SOFTWARE.
 //
 // Alternative licenses for VSCP & Friends may be arranged by contacting
-// Grodans Paradis AB at info@grodansparadis.com, https://www.grodansparadis.com
+// Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
 //
 
 /* global aesjs:true */
@@ -664,8 +664,10 @@ vscp.ws.Client = function() {
                 console.error(vscp.utility.getTime() + " AUTH0 negative reply received, but no challenge is pending!?");
             }
 
-            if (null !== cmd.reject) {
-                cmd.reject(Error("Authentication failed."));
+            if (null !== cmd) {
+                if (null !== cmd.reject) {
+                    cmd.reject(Error("Authentication failed."));
+                }
             }
     
             return;
@@ -734,8 +736,10 @@ vscp.ws.Client = function() {
                 console.error(vscp.utility.getTime() + " AUTH1 negative reply received, but no challenge is pending!?");
             }
 
-            if (null !== cmd.reject) {
-                cmd.reject(Error("Authentication failed."));
+            if (null !== cmd) {
+                if (null !== cmd.reject) {
+                    cmd.reject(Error("Authentication failed."));
+                }
             }
 
             return;
@@ -1081,7 +1085,8 @@ vscp.ws.Client.prototype.onWebSocketMessage = function(msg) {
 
             // Find response parser
             index = 0;
-            while(this._webSocketMessages[index].event !== msgItems[1]) {
+            while((this._webSocketMessages.length > index) &&
+                  (this._webSocketMessages[index].event !== msgItems[1])) {
                 ++index;
             }
         
@@ -1660,7 +1665,7 @@ vscp.ws.Client.prototype.setFilter = function(options) {
  * @param {object} options                      - Options
  * @param {string} options.name                 - Variable name
  * @param {number} [options.type]               - Variable type (default: string)
- * @param {number} [options.accessrights]       - Variable value (default: 744)
+ * @param {number} [options.accessrights]       - Variable value (default: 0x744)
  * @param {boolean} options.persistency         - Variable is persistent (true) or not (false)
  * @param {string} options.value                - Variable Value
  * @param {string} [options.note]               - Variable note (optional)
@@ -1675,7 +1680,7 @@ vscp.ws.Client.prototype.createVar = function(options) {
         var onSuccess = null;
         var onError = null;
         var type = vscp.constants.varTypes.STRING;  // Default type is string
-        var accessrights = 744;                     // Default access rights
+        var accessrights = 0x744;                     // Default access rights
         var persistency = false;                    // Not persistent
         var note = "";                              // No note
         var value = "";

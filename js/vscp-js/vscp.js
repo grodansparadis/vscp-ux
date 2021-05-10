@@ -2,7 +2,7 @@
 //
 // Copyright (C) 2012-2020 Ake Hedman, Grodans Paradis AB
 // <akhe@grodansparadis.com>
-// Copyright © 2015-2021 Andreas Merkle
+// Copyright (c) 2015-2020 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -11,7 +11,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright © 2012-2021 Ake Hedman, Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2020 Grodans Paradis AB (Paradise of the Frog)
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 // THE SOFTWARE.
 //
 // Alternative licenses for VSCP & Friends may be arranged by contacting
-// Grodans Paradis AB at info@grodansparadis.com, https://www.grodansparadis.com
+// Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
 //
 
 /** Namespace for all functionality of the VSCP provided libraries.
@@ -423,27 +423,11 @@ vscp.b64DecodeUnicode = function(str) {
  * @param {number} type - Variable type numerical code
  * @return {bool} Stored base64 encoded (true) or not (false).
  */
+/* eslint-disable no-unused-vars */
 vscp.isBase64Type = function(type) {
-    switch (Number(type)) {
-        case vscp.constants.varTypes.STRING:
-        case vscp.constants.varTypes.BLOB:
-        case vscp.constants.varTypes.MIME:
-        case vscp.constants.varTypes.HTML:
-        case vscp.constants.varTypes.JAVASCIPT:
-        case vscp.constants.varTypes.JSON:
-        case vscp.constants.varTypes.XML:
-        case vscp.constants.varTypes.SQL:
-        case vscp.constants.varTypes.LUA:
-        case vscp.constants.varTypes.LUARES:
-        case vscp.constants.varTypes.UXTYPE1:
-        case vscp.constants.varTypes.DMROW:
-        case vscp.constants.varTypes.DRIVER:
-        case vscp.constants.varTypes.USER:
-        case vscp.constants.varTypes.FILTER:
-            return true;
-    }
+/* eslint-enable no-unused-vars */
 
-    return false;
+    return true;
 };
 
 /** Decode the value if its base64 encoded.

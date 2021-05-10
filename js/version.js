@@ -1,7 +1,7 @@
 //
 // Version information
-// Copyright (C) 2012-2020 Ake Hedman, Grodans Paradis AB
-// <akhe@grodansparadis.com>
+// Copyright (C) 2012-2021 Ake Hedman, the VSCP Project
+// <akje@vscp.org>
 // Copyright © 2015-2021 Andreas Merkle
 // <vscp@blue-andi.de>
 //
@@ -11,7 +11,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright © 2012-2021 Ake Hedman, Grodans Paradis AB (Paradise of the Frog)
+// Copyright © 2012-2021 Ake Hedman, the VSCP Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -32,7 +32,7 @@
 // THE SOFTWARE.
 //
 // Alternative licenses for VSCP & Friends may be arranged by contacting
-// Grodans Paradis AB at info@grodansparadis.com, https://www.grodansparadis.com
+// the VSCP Project at info@grodansparadis.com, https://www.grodansparadis.com
 //
 
 /** Get VSCP UX version.
@@ -44,6 +44,6 @@ var vscp_ux = {
         minor: vscp.version.minor,
         sub: vscp.version.patch,
         full: ""+vscp.version.major+"."+vscp.version.minor+"."+vscp.version.patch,
-        copyright: "Copyright © 2012-2021 Ake Hedman, Grodans Paradis AB (Paradise of the Frog)"
+        copyright: "Copyright © 2012-2021 Ake Hedman, the VSCP Project)"
     }
 };
