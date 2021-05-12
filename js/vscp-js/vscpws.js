@@ -133,16 +133,6 @@ vscp.ws.Client = function() {
      */
     this.vscpkey = "";
 
-    /** authdomain used for connection establishment
-     * @member {string}
-     */
-    this.authdomain = "";
-
-    /** Password hash used for connection establishment
-     * @member {string}
-     */
-    this.passwordHash = "";
-
     /** Callback called on any connection error
      * @member {function}
      */
@@ -1210,14 +1200,6 @@ vscp.ws.Client.prototype.connect = function(options) {
 
         this.password = options.password;
 
-        if ("string" !== typeof options.authdomain) {
-            console.error(vscp.utility.getTime() + " authdomain is missing.");
-            reject(Error("authdomain is missing."));
-            return;
-        }
-
-        this.authdomain = options.authdomain;
-
         if ("string" !== typeof options.vscpkey) {
             console.error(vscp.utility.getTime() + " vscpkey is missing.");
             reject(Error("vscpkey is missing."));
@@ -1244,7 +1226,7 @@ vscp.ws.Client.prototype.connect = function(options) {
 
         console.info(vscp.utility.getTime() +
             " Websocket connect to " + options.url +
-            " (user name: " + this.userName + ", password: " + this.passwordHash + ")");
+            " (user name: " + this.userName + ", password: " + this.vscpkey + ")");
 
         this.socket = new WebSocket(options.url);
 
