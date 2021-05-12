@@ -11,7 +11,8 @@
     <meta http-equiv="Expires" content="-1" />
 
     <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-wEmeIV1mKuiNpC+IOBjI7aAzPcEZeedi5yW5f2yOq55WWLwNGmvvx4Um1vskeMj0" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    
     
     <!-- Navigation bar CSS -->
     <link rel="stylesheet" type="text/css" href="../css/custom.css">
@@ -21,21 +22,20 @@
     
 </head>
 <body>
-   <nav class="navbar navbar-default">
+    <nav class="navbar navbar-default">
         <div class="container-fluid">
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div id="menu">
-            </div>
+            <div id="menu" />
         </div>
     </nav>
     <div class="container-fluid">
         <h1>VSCP websocket demos</h1>
         <p>
-            For help on how to use the samples check the <a href="http://www.vscp.org/wiki">wiki</a>
-            and the <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=start"> specification document</a> and
-            the <a href="http://www.vscp.org/docs/vscpd/doku.php">VSCP daemon documentation</a>.
+            This page contains a few simple samples to test VSCP ux functionality using the 
+            <a href"https://grodansparadis.github.io/vscp-doc-spec/#/./vscp_websocket">VSCP websocket 1 protocol (ws1)</a>. 
+            There is similar samples available for the VSCP websocket 2 protocol (ws2) as well.
         </p>
         <ul>
             <li>Test the authentication sequence - <a href="authentication/authentication.html">authentication.html</a></li>
@@ -80,11 +80,10 @@
         <h2>If you want to learn more or need help</h2>
         <p>
             You find links to the different parts of the documentation for the VSCP & Friends project
-            <a href="http://www.vscp.org#documentation">here</a>. It's a lot of words because it's a big and advanced system with
-            many features. You may also find our <a href="http://www.vscp.org/wiki/doku.php">wiki</a> to be a valuable resource.
-            If you have questions or need pointers on where to start subscribe to our
-            <a href="https://groups.google.com/forum/#!forum/vscp">mailinglist</a>. You will find that we have a very nice
-            discussion climate and any question is taken care of.
+            <a href="https://docs.vscp.org/">here</a>. It's a lot of words because it's a big and advanced system with
+            many features. 
+            If you have questions or need pointers on where to start you can get help at
+            <a href="https://github.com/grodansparadis/vscp/discussions">discussion list at github</a>.
         </p>
 
         <hr />
@@ -92,10 +91,10 @@
         <h2>VSCP hardware</h2>
 
         <p>
-            <a href="https://www.grodansparadis.com">Ake Hedman, the VSCP Project/Paradise of the Frog</a> is the company behind VSCP &amp; Friends
+            <a href="https://www.grodansparadis.com">Grodans Paradis AB</a> is the company behind VSCP &amp; Friends
             and we sell some VSCP plug and play hardware. Visit our <a href="https://www.grodansparadis.com">site</a> and
-            <a href="http://www.frogshop.se">store</a> to get info about the latest and greatest. Actually, the best way to support this project
-            is to buy products from our <a href="http://www.frogshop.se">store</a>.
+            <a href="https://www.frogshop.se">store</a> to get info about the latest and greatest. Actually, the best way to support this project
+            is to buy something from our <a href="https://www.frogshop.se">store</a>.
         </p>
     </div>
     
@@ -104,10 +103,11 @@
     Copyright &copy; 2015-2021 <a href="https://www.grodansparadis.com">Ake Hedman, the VSCP Project</a>
 
     <!-- JQuery -->
-    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.0/dist/jquery.min.js" integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <!-- Bootstrap -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-p34f1UUtsS3wqzfto5wAAmdvj+osOnFyQFpp4Ua3gs/ZVWx6oOypYoCJhGGScy+8" crossorigin="anonymous"></script>
+    
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../js/navbar.js"></script>

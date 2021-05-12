@@ -61,10 +61,6 @@ navBarMenu.content = [
                 url: "button_widget/button_widget.html"
             },
             {
-                title: "Variables",
-                url: "variables/variables.html"
-            },
-            {
                 title: "Node discovery",
                 url: "node_discovery/node_discovery.html"
             },
@@ -87,20 +83,6 @@ navBarMenu.content = [
             {
                 title: "lm-sensors demo",
                 url: "lm_sensors/lm_sensors.html"
-            }
-        ]
-    },
-    {
-        title: "Epoch chart demos",
-        url: "#",
-        dropDown: [
-            {
-                title: "Epoch simple",
-                url: "epoch_simple/epoch_simple.html"
-            },
-            {
-                title: "Dynamic table",
-                url: "dynamic_table/dynamic_table.html"
             }
         ]
     },

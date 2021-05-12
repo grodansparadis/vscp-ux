@@ -40,10 +40,16 @@
  */
 var vscp_ux = {
 	version: {
+        major: 15,
+        minor: 0,
+        build: 0,
+        full: "15.0.0",
+        copyright: "Copyright © 2012-2021 Ake Hedman, the VSCP Project)"
+    },
+    jslibversion: {
         major: vscp.version.major,
         minor: vscp.version.minor,
-        sub: vscp.version.patch,
+        build: vscp.version.patch,
         full: ""+vscp.version.major+"."+vscp.version.minor+"."+vscp.version.patch,
-        copyright: "Copyright © 2012-2021 Ake Hedman, the VSCP Project)"
     }
 };

@@ -73,6 +73,7 @@ navBarMenu.show = function( id, menu, basePath ) {
         }
     }
     
+    console.log(navigation);
     $( "#" + id ).html( navigation );
 
 };

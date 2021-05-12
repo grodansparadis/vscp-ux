@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="-1" />
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="../../js/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     
     <!-- Navigation bar CSS -->
     <link rel="stylesheet" type="text/css" href="../../css/custom.css">
@@ -27,8 +27,7 @@
             <div class="navbar-header">
                 <a class="navbar-brand" href="../index.html"><img src="../../images/logo/vscp_new.png" class="img-thumbnail" width="100" alt="vscp logo" /></a>
             </div>
-            <div id="menu">
-            </div>
+            <div id="menu" />
         </div>
     </nav>
     <div class="container-fluid">
@@ -40,8 +39,8 @@
         <div id="ui">
 
             <h2>Demo 1 - Turn on and/or turn off</h2>
-            <p>The first button sends <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_5_0x05_turnon">CLASS1.CONTROL, Type=5/TurnOn</a>
-            and the second button sends <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a>
+            <p>The first button sends <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type5" target="new">CLASS1.CONTROL, Type=5/TurnOn</a>
+            and the second button sends <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type6" target="new">CLASS1.CONTROL, Type=6/TurnOff</a>
             </p>
             <p>Open a telnet session to the VSCP daemon to see the events.</p>
             <p>
@@ -53,28 +52,28 @@
 
             <h2>Demo 2 - Visual feedback</h2>
             <p>
-                The button widget demo wait for a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_3_0x03_on">CLASS1.INFORMATION, Type=3/ON</a> to validate a sent
-                <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_5_0x05_turnon">CLASS1.CONTROL, Type=5/TurnOn</a> event
+                The button widget demo wait for a <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.information?id=type3" target="new">CLASS1.INFORMATION, Type=3/ON</a> to validate a sent
+                <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type5" target="new">CLASS1.CONTROL, Type=5/TurnOn</a> event
                 and will confirm an on state when it is received. The same is true for
-                <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off">CLASS1.INFORMATION, Type=3/OFF</a> which is a
-                validation for <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a> event. That is<br />
+                <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.information?id=type4" target="new">CLASS1.INFORMATION, Type=3/OFF</a> which is a
+                validation for <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type6" target="new">CLASS1.CONTROL, Type=6/TurnOff</a> event. That is<br />
             </p>
             <ul>
                 <li>
-                    A button is pressed and send <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_5_0x05_turnon">CLASS1.CONTROL, Type=5/TurnOn</a> event.
+                    A button is pressed and send <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type5" target="new">CLASS1.CONTROL, Type=5/TurnOn</a> event.
                 </li>
                 <li>
                     To visually indicate that the TurnOn event has been handled by a remote node
-                    the button waits for a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_3_0x03_on">CLASS1.INFORMATION, Type=3/ON</a> and when received it changes the
+                    the button waits for a <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.information?id=type3" target="new">CLASS1.INFORMATION, Type=3/ON</a> and when received it changes the
                     state of the button.
                 </li>
                 <li>
                     The same is true when the button is on and is pressed which sends
-                    <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_6_0x06_turnoff">CLASS1.CONTROL, Type=6/TurnOff</a> event and waits for
-                    <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_4_0x04_off"> CLASS1.INFORMATION, Type=3/OFF</a>
+                    <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type6" target="new">CLASS1.CONTROL, Type=6/TurnOff</a> event and waits for
+                    <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.information?id=type4" target="new"> CLASS1.INFORMATION, Type=3/OFF</a>
                 </li>
             </ul>
-            <p>The righmost button (yellow) in the <a href="statebutton.html">button widget demo</a> will change state when the below buttons are pressed.</p>
+            <p>The rightmost button (yellow) in the <a href="../button_widget/button_widget.html">button widget demo</a> will change state when the below buttons are pressed.</p>
             <p>
                 <input type="submit" class="btn btn-warning" value="Send ON Event (Zone=1, SubZone=12)" onclick="vscpOnEvent()" disabled />
                 <input type="submit" class="btn btn-warning" value="Send OFF Event (Zone=1, SubZone=12)" onclick="vscpOffEvent()" disabled />
@@ -128,7 +127,7 @@
                 <input id="sliderText" type="text" value="0" size="2" disabled />
             </p>
             <p>
-                <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL, Type=20, Dim
+                <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type20" target="new">CLASS1.CONTROL, Type=20, Dim
                 Lamps</a> is sent by the slider control in this particular example.
             </p>
 
@@ -138,8 +137,8 @@
             <p>
                 This demo show how to listen for events. All events received on the system are displayed here. Normally
                 one sets a filter to limit the received events to the ones of interest. Event definitions can be found
-                <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=level_i_events">here to help you decode the events
-                received.</a>
+                <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./level_i_events?id=level-i-events" target="new">here</a> to help you decode the events
+                received.
             </p>
             <div>
                 <h3>Received events</h3>
@@ -158,10 +157,10 @@
     Copyright &copy; 2000-2021 <a href="https://www.grodansparadis.com">Ake Hedman, the VSCP Project</a>
 
     <!-- JQuery -->
-    <script type="text/javascript" src="../../js/jquery/3.3.1/jquery-3.3.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <!-- Bootstrap -->
-    <script type="text/javascript" src="../../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../../js/settings.js"></script>
@@ -169,13 +168,13 @@
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../../js/aes-js/3.1.0/index.js"></script>
     <!-- VSCP common core library -->
-    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <script type="text/javascript" src="../../js/vscp-js/vscp.js"></script>
     <!-- VSCP class definitions -->
-    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscp_class.js"></script>
+    <script type="text/javascript" src="../../js/vscp-js/vscp_class.js"></script>
     <!-- VSCP type definitions -->
-    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscp_type.js"></script>
+    <script type="text/javascript" src="../../js/vscp-js/vscp_type.js"></script>
     <!-- VSCP websocket client library -->
-    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscpws.js"></script>
+    <script type="text/javascript" src="../../js/vscp-js/vscpws.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../../js/navbar.js"></script>

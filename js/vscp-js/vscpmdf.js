@@ -1,6 +1,6 @@
 // VSCP MDF javascript library
 //
-// Copyright (c) 2015-2020 Andreas Merkle
+// Copyright (c) 2015-2021 Andreas Merkle
 // <vscp@blue-andi.de>
 //
 // Licence:
@@ -9,7 +9,7 @@
 //
 // The MIT License (MIT)
 //
-// Copyright (c) 2012-2020 Grodans Paradis AB (Paradise of the Frog)
+// Copyright (c) 2012-2021 The VSCP Project
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -30,7 +30,7 @@
 // THE SOFTWARE.
 //
 // Alternative licenses for VSCP & Friends may be arranged by contacting
-// Grodans Paradis AB at info@grodansparadis.com, http://www.grodansparadis.com
+// The VSCP Project at info@grodansparadis.com, http://www.grodansparadis.com
 //
 
 /*jshint bitwise: false */

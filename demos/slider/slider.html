@@ -11,7 +11,7 @@
     <meta http-equiv="Expires" content="-1" />
 
     <!-- Bootstrap CSS -->
-    <link rel="stylesheet" type="text/css" href="../../js/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
     
     <!-- Navigation bar CSS -->
     <link rel="stylesheet" type="text/css" href="../../css/custom.css">
@@ -34,20 +34,21 @@
         <h1>VSCP slider demo</h1>
         <p>
             This demo demonstrates how to use the HTML slider control with VSCP. When you drag the slider it
-            sends <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL,
+            sends <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type20" target="new">CLASS1.CONTROL,
             Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> with zone=1, subzone=20. This event
             have a value between 0-100 in byte zero and zone/subzone in byte 1/2.
         </p>
         <p>
-            The usual response from a <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.control#type_20_0x14_dim_lamp_s">CLASS1.CONTROL,
+            The usual response from a <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type20" target="new">CLASS1.CONTROL,
             Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a> event is
-            <a href="http://www.vscp.org/docs/vscpspec/doku.php?id=class1.information#type_40_0x28_level_changed">CLASS1.INFORMATION,
+            <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.information?id=type40">CLASS1.INFORMATION,
             Type=40/VSCP_TYPE_INFORMATION_LEVEL_CHANGED</a>. So a mask is set to only receive
             this event and if it is received it will set the value of the slider after checking that the zone/subzone
             is the expected ones.
         </p>
         <p>
-            If one have several sliders one may be tempted to react on <b>CLASS1.CONTROL, Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</b>
+            If one have several sliders one may be tempted to react on <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type20" target="new">CLASS1.CONTROL,
+                Type=20/VSCP_TYPE_CONTROL_DIM_LAMPS</a>
             also but it is better to just use the CLASS1-INFORMATION event to avoid message loops.
         </p>
         <p>
@@ -56,7 +57,7 @@
         <pre>send 0,20,40,0,0,-,90,1,20</pre>
         <p>
             Over the TCP/IP connection. The <b>"90"</b> is the value of the slider. For your convenience you can
-            also open <a href="event.html">event.html</a> in a new browser window and use <b>demo 3</b> there to
+            also open <a href="../control_events/control_events.html">event.html</a> in a new browser window and use <b>demo 3</b> there to
             set the slider value to either 0,10,50 or 100.
         </p>
         <p>
@@ -64,7 +65,8 @@
             of the slider that is commented out.
         </p>
         <p>
-            The VSCP_TYPE_CONTROL_BIG_CHANGE_LEVEL, VSCP_TYPE_INFORMATION_BIG_ LEVEL_CHANGED events can be used if you need ranges
+            The <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.control?id=type33">CLASS1.CONTROL, Type=xx/VSCP_TYPE_CONTROL_BIG_CHANGE_LEVEL</a> and 
+            <a href="https://grodansparadis.github.io/vscp-doc-spec/#/./class1.information?id=type51">CLASS1.INFORMATION, Type=51/VSCP_TYPE_INFORMATION_BIG_LEVEL_CHANGED</a> events can be used if you need ranges
             other than 0-100
         </p>
         <div>
@@ -104,10 +106,10 @@
     Copyright &copy; 2015-2021 <a href="https://www.grodansparadis.com">Ake Hedman, the VSCP Project</a>
 
     <!-- JQuery -->
-    <script type="text/javascript" src="../../js/jquery/3.3.1/jquery-3.3.1.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
     <!-- Bootstrap -->
-    <script type="text/javascript" src="../../js/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 
     <!-- VSCP settings -->
     <script type="text/javascript" src="../../js/settings.js"></script>
@@ -115,13 +117,13 @@
     <!-- VSCP encryption/decryption -->
     <script type="text/javascript" src="../../js/aes-js/3.1.0/index.js"></script>
     <!-- VSCP common core library -->
-    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscp.js"></script>
+    <script type="text/javascript" src="../../js/vscp-js/vscp.js"></script>
     <!-- VSCP class definitions -->
-    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscp_class.js"></script>
+    <script type="text/javascript" src="../../js/vscp-js/vscp_class.js"></script>
     <!-- VSCP type definitions -->
-    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscp_type.js"></script>
+    <script type="text/javascript" src="../../js/vscp-js/vscp_type.js"></script>
     <!-- VSCP websocket client library -->
-    <script type="text/javascript" src="../../js/vscp-js/1.0.0pre/vscpws.js"></script>
+    <script type="text/javascript" src="../../js/vscp-js/vscpws.js"></script>
 
     <!-- Boostrap navigation bar helper functions -->
     <script type="text/javascript" src="../../js/navbar.js"></script>
