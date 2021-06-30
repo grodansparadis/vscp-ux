@@ -11,7 +11,7 @@
 var settings = {
     user: "admin",
     password: "secret",
-    vscpkey: "2DBB079A38985AF00EBEEFE22F9FFA0E7F72DF06EBE44563EDF4A1073CABC7D4"
+    vscpkey: "2DBB079A38985AF00EBEEFE22F9FFA0E7F72DF06EBE44563EDF4A1073CABC7D4",
     url: "ws://localhost:8884/ws1" // Local server
     //url: "ws://192.168.1.9:8884/ws1" // Non SSL (to be able to use from remote machine)
     //url: "wss://192.168.1.9:8843/ws1" // SSL (to be able to use from remote machine)

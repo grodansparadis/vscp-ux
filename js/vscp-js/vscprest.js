@@ -62,6 +62,10 @@ vscp.rest.Client = function(config) {
      */
     this.baseUrl = 'http://localhost:8884';
 
+    /** baseUrl
+     * @member {string}
+     */
+
     /** Path prefix
      * @member {string}
      */
@@ -81,6 +85,7 @@ vscp.rest.Client = function(config) {
 
         if ("string" === typeof config.baseUrl) {
             this.baseUrl = config.baseUrl;
+            console.log(this.baseUrl);
         }
 
         if ("string" === typeof config.pathPrefix) {
